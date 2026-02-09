@@ -1,0 +1,521 @@
+/* Global Styles */ 
+/* Chỉ áp dụng cho trang login/register, không ảnh hưởng đến home page */
+body.login-page,
+body.register-page { 
+    min-height: 100vh; 
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3b82f6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-brand { 
+    font-weight: 700; 
+    letter-spacing: .3px; 
+}
+
+/* Login & Register Card Styles */ 
+.login-card, .register-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Form Control Styles */ 
+.form-control {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+}
+
+.form-control.is-valid {
+    border-color: #198754;
+}
+
+/* Button Styles */ 
+.btn-login, .btn-register {
+    background: linear-gradient(135deg, #1e3c72 0%, #3b82f6 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-login:hover, .btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+}
+
+/* Alert Styles */ 
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+/* Input Group Styles */ 
+.input-group-text {
+    background: transparent;
+    border: 2px solid #e9ecef;
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+}
+
+.input-group .form-control {
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+}
+
+.input-group:focus-within .input-group-text {
+    border-color: #3b82f6;
+}
+
+/* Password Strength Indicator */ 
+.password-strength {
+    height: 4px;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.strength-weak { 
+    background-color: #dc3545; 
+}
+
+.strength-medium { 
+    background-color: #ffc107; 
+}
+
+.strength-strong { 
+    background-color: #198754; 
+}
+
+/* Register specific styles */ 
+.register-page {
+    padding: 20px 0;
+}
+
+/* Additional Blue Theme Enhancements */ 
+.login-card:hover, .register-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(30, 60, 114, 0.15);
+    transition: all 0.3s ease;
+}
+
+/* Icon colors for blue theme */ 
+.text-primary {
+    color: #3b82f6 !important;
+}
+
+/* Link hover effects */ 
+a.text-decoration-none:hover {
+    color: #1e3c72 !important;
+    transition: color 0.3s ease;
+}
+
+/* Card header enhancement */ 
+.card-body h3 {
+    background: linear-gradient(135deg, #1e3c72, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ========== AI Chat Floating Icon ========== */
+#ai-chat-button {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 60px;
+  height: 60px;
+  background: #0066ff;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+}
+#ai-chat-button img {
+  width: 36px;
+  height: 36px;
+}
+
+
+/* ========== AI Chat Box ========== */
+#ai-chat-box {
+  position: fixed;
+  bottom: 100px;
+  right: 25px;
+  width: 350px;
+  height: 420px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1001;
+}
+.hidden { display: none; }
+
+.chat-header {
+  background: #0066ff;
+  color: #fff;
+  padding: 10px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.chat-body {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  font-size: 14px;
+}
+.chat-input {
+  display: flex;
+  border-top: 1px solid #ddd;
+}
+.chat-input input {
+  flex: 1;
+  border: none;
+  padding: 10px;
+}
+.chat-input button {
+  background: #0066ff;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+/* ========= CHAT ICON (GÓC PHẢI DƯỚI) ========= */
+#chat-launcher {
+  position: fixed;
+  bottom: 25px;
+  right: 25px; /* 👈 nằm góc phải */
+  width: 60px;
+  height: 60px;
+  background: #0d6efd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  cursor: pointer;
+  z-index: 99999;
+  transition: all 0.3s ease;
+}
+#chat-launcher:hover {
+  transform: scale(1.1);
+}
+#chat-launcher img {
+  width: 36px;
+  height: 36px;
+}
+
+/* ========= KHUNG CHAT ========= */
+#chat-window {
+  position: fixed;
+  bottom: 100px;
+  right: 25px; /* 👈 cùng phía với icon */
+  width: 360px;
+  height: 480px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 100000;
+  animation: fadeIn 0.25s ease;
+}
+.hidden {
+  display: none;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.chat-header {
+  background: #0d6efd;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  font-weight: 600;
+}
+.chat-header .chat-logo {
+  width: 28px;
+  height: 28px;
+  margin-right: 8px;
+}
+.chat-header button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Body */
+.chat-body {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+  background: #f9f9f9;
+}
+.chat-placeholder {
+  text-align: center;
+  margin-top: 30%;
+  color: #555;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* Footer */
+.chat-footer {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #ddd;
+  padding: 8px;
+  background: #fff;
+}
+.chat-footer input {
+  flex: 1;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #f0f0f0;
+  outline: none;
+}
+.chat-footer button {
+  background: #0d6efd;
+  border: none;
+  color: white;
+  margin-left: 8px;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+/* --- FIX CHATBOT POSITION --- */
+#chat-launcher {
+  position: fixed !important;
+  bottom: 25px !important;
+  right: 25px !important;
+  width: 60px !important;
+  height: 60px !important;
+  background: #0d6efd !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  cursor: pointer !important;
+  z-index: 99999 !important; /* cực cao để nằm trên footer */
+}
+#chat-launcher img {
+  width: 36px !important;
+  height: 36px !important;
+}
+
+#chat-window {
+  position: fixed !important;
+  bottom: 100px !important;
+  right: 25px !important;
+  width: 360px !important;
+  height: 480px !important;
+  background: #fff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  z-index: 100000 !important;
+}
+.hidden {
+  display: none !important;
+}
+
+/* Hiệu ứng rung & hover cho icon chat */
+#chat-launcher {
+  animation: floatPulse 3s ease-in-out infinite;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#chat-launcher:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes floatPulse {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+#chat-window {
+  display: none !important;
+}
+
+#chat-window.show {
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.hidden {
+  display: none !important;
+}
+
+#chat-window.show {
+  display: flex !important;
+  flex-direction: column;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ====== Bubble chat UI ====== */
+.chat-message {
+  margin: 8px 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.chat-message.user {
+  justify-content: flex-end;
+}
+
+.chat-message.user .bubble {
+  background: #0d6efd;
+  color: white;
+  border-radius: 16px 16px 0 16px;
+  padding: 10px 14px;
+  max-width: 75%;
+  word-wrap: break-word;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.chat-message.ai {
+  justify-content: flex-start;
+}
+
+.chat-message.ai .bubble {
+  background: #f1f1f1;
+  color: #333;
+  border-radius: 16px 16px 16px 0;
+  padding: 10px 14px;
+  max-width: 75%;
+  word-wrap: break-word;
+}
+
+.chat-typing {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin: 0 2px;
+  background: #999;
+  border-radius: 50%;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+
+
+
+
+
+
+.disease-left-img {
+    border-radius: 20px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Tabs */
+.nav-tabs .nav-link {
+    border: none;
+    color: #555;
+}
+
+.nav-tabs .nav-link.active {
+    color: #2a60e8;
+    font-weight: 600;
+    border-bottom: 3px solid #2a60e8;
+    background-color: transparent;
+}
+
+/* Cards */
+.product-card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.product-img {
+    height: 180px;
+    object-fit: contain;
+    background-color: #fff;
+    padding: 10px;
+}
+
+.btn-buy {
+    background-color: #2a60e8;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 10px;
+    border: none;
+}
+
+.btn-buy:hover {
+    background-color: #1746c9;
+}

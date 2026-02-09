@@ -1,0 +1,90 @@
+body {
+    background-color: #f4f7fc;
+}
+
+.success-container {
+    max-width: 720px;
+    margin: 80px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    text-align: center;
+    padding: 50px 30px;
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(15px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+.success-icon {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: #28a745;
+    color: #fff;
+    font-size: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px auto;
+}
+
+.success-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #2a60e8;
+}
+
+.success-message {
+    color: #555;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.order-info {
+    text-align: left;
+    margin-top: 30px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    line-height: 1.8;
+}
+
+.order-info strong {
+    color: #2a60e8;
+}
+
+.btn-wrap {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn-primary {
+    background: #2a60e8;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 30px;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    background: #184cd6;
+}
+
+.btn-outline {
+    border: 2px solid #2a60e8;
+    color: #2a60e8;
+    padding: 12px 30px;
+    border-radius: 30px;
+    background: none;
+    transition: 0.3s;
+}
+
+.btn-outline:hover {
+    background: #2a60e8;
+    color: #fff;
+}
