@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import models.Cart;
+import models.Order;
 
 @WebServlet(name = "CheckoutController", urlPatterns = { "/checkout" })
 public class CheckoutController extends HttpServlet {
@@ -39,7 +40,7 @@ public class CheckoutController extends HttpServlet {
         String fullName = request.getParameter("fullName");
         String phone = request.getParameter("phone");
         String address = request.getParameter("address");
-        String note = request.getParameter("note");
+        // String note = request.getParameter("note"); // Not used in Order model yet
 
         // Here you would typically validate input and save the order to database
         // For now, we will just simulate a successful order
@@ -47,9 +48,34 @@ public class CheckoutController extends HttpServlet {
         HttpSession session = request.getSession();
         Cart cart = (Cart) session.getAttribute("cart");
 
-        if (cart != null) {
-            // Process order with cart items...
-            // checkoutService.processOrder(cart, fullName, phone, address, note);
+        if (cart != null && !cart.getItems().isEmpty()) {
+            // Create new Order
+            Order order = new Order();
+            order.setOrderId((int) (System.currentTimeMillis() / 1000)); // Simple ID generation
+            order.setCustomerId(1); // Default user ID since no login
+            order.setOrderDate(new java.util.Date());
+            order.setShippingName(fullName);
+            order.setShippingPhone(phone);
+            order.setShippingAddress(address);
+            // Note is not in Order model yet, ignoring for now
+
+            order.setStatus("Pending");
+            order.setTotalAmount(cart.getTotalMoney());
+
+            // Convert Cart Items to Order Items
+            java.util.List<models.OrderItem> orderItems = new java.util.ArrayList<>();
+            for (Cart.Item cartItem : cart.getItems()) {
+                models.OrderItem orderItem = new models.OrderItem(
+                        order.getOrderId(),
+                        cartItem.getMedicine(),
+                        cartItem.getQuantity(),
+                        cartItem.getPrice());
+                orderItems.add(orderItem);
+            }
+            order.setItems(orderItems);
+
+            // Save order to mock database
+            OrderController.addOrder(order);
 
             // Clear cart after successful order
             session.removeAttribute("cart");
@@ -58,6 +84,6 @@ public class CheckoutController extends HttpServlet {
         // Redirect to a success page or home with a success message
         // For simplicity, redirecting to home with a flag
         request.setAttribute("orderSuccess", true);
-        request.getRequestDispatcher("view/client/checkout_success.jsp").forward(request, response);
+        request.getRequestDispatcher("view/client/checkout-success.jsp").forward(request, response);
     }
 }
