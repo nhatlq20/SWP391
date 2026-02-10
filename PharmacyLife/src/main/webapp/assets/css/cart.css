@@ -1,0 +1,129 @@
+:root {
+    --primary-color: #4F81E1;
+    --header-height: 115px;
+}
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Inter', sans-serif;
+}
+
+.cart-header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 15px;
+    border-radius: 8px 8px 0 0;
+}
+
+.cart-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.table thead th {
+    border-top: none;
+    color: #555;
+    font-weight: 600;
+}
+
+.cart-item-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.btn-primary-custom {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary-custom:hover {
+    background-color: #3b6ac5;
+    border-color: #3b6ac5;
+    color: white;
+}
+
+.btn-outline-primary-custom {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary-custom:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.quantity-group {
+    width: 80px;
+}
+
+.quantity-group .form-control {
+    text-align: center;
+    border-color: #ced4da;
+    padding: 0;
+    font-weight: 500;
+}
+
+.quantity-group .btn {
+    padding: 0.25rem 0.5rem;
+    font-weight: bold;
+}
+
+.total-section {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.price-text {
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.empty-cart {
+    padding: 50px;
+    text-align: center;
+}
+
+.empty-cart>i {
+    font-size: 60px;
+    color: #ccc;
+    margin-bottom: 20px;
+}
+
+/* Sidebar Styles moved to view/css/sidebar.css */
+
+.cart-page-layout {
+    display: flex;
+    padding-top: var(--header-height);
+    min-height: 100vh;
+}
+
+.cart-sidebar-container {
+    width: 280px;
+    flex-shrink: 0;
+    border-right: 1px solid #dee2e6;
+    background-color: #fff;
+}
+
+.cart-content-container {
+    flex: 1;
+    width: calc(100% - 280px);
+    padding: 0;
+}
+
+
+
+/* Override container width if needed for full view */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1320px;
+    }
+}
