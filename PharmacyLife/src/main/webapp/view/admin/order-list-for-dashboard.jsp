@@ -6,7 +6,7 @@
 
             <head>
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-                <title>Admin Dashboard - Order Management</title>
+                <title>Quản lý đơn hàng - Quản trị nhà thuốc</title>
                 <!-- Bootstrap CSS -->
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
                 <!-- Font Awesome -->
@@ -46,6 +46,28 @@
                         font-size: 90%;
                         padding: 5px 10px;
                     }
+
+                    :root {
+                        --primary-theme: #4F81E1;
+                    }
+
+                    .text-theme {
+                        color: var(--primary-theme) !important;
+                    }
+
+                    .bg-theme {
+                        background-color: var(--primary-theme) !important;
+                    }
+
+                    .btn-outline-theme {
+                        color: var(--primary-theme);
+                        border-color: var(--primary-theme);
+                    }
+
+                    .btn-outline-theme:hover {
+                        background-color: var(--primary-theme);
+                        color: white;
+                    }
                 </style>
             </head>
 
@@ -60,11 +82,11 @@
                 <!-- Main Content -->
                 <div class="main-content">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2>Order Management</h2>
+                        <h2>Quản lý đơn hàng</h2>
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Orders</li>
+                                <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Đơn hàng</li>
                             </ol>
                         </nav>
                     </div>
@@ -73,11 +95,11 @@
                         <div class="card-header bg-white py-3">
                             <div class="row align-items-center">
                                 <div class="col">
-                                    <h5 class="mb-0">All Orders</h5>
+                                    <h5 class="mb-0">Tất cả đơn hàng</h5>
                                 </div>
                                 <div class="col-auto">
                                     <div class="input-group input-group-sm">
-                                        <input type="text" class="form-control" placeholder="Search orders...">
+                                        <input type="text" class="form-control" placeholder="Tìm kiếm đơn hàng...">
                                         <button class="btn btn-outline-secondary" type="button"><i
                                                 class="fas fa-search"></i></button>
                                     </div>
@@ -89,12 +111,12 @@
                                 <table class="table table-hover align-middle mb-0">
                                     <thead class="bg-light">
                                         <tr>
-                                            <th class="ps-4">Order ID</th>
-                                            <th>Customer</th>
-                                            <th>Date</th>
-                                            <th>Total</th>
-                                            <th>Status</th>
-                                            <th class="text-end pe-4">Actions</th>
+                                            <th class="ps-4">Mã đơn</th>
+                                            <th>Khách hàng</th>
+                                            <th>Ngày đặt</th>
+                                            <th>Tổng tiền</th>
+                                            <th>Trạng thái</th>
+                                            <th class="text-end pe-4">Thao tác</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -124,13 +146,23 @@
                                                         <c:otherwise>bg-secondary</c:otherwise>
                                                         </c:choose>
                                                         ">
-                                                        ${o.status}
+                                                        <c:choose>
+                                                            <c:when test="${o.status == 'Pending'}">Chờ xử lý</c:when>
+                                                            <c:when test="${o.status == 'Confirmed'}">Đã xác nhận
+                                                            </c:when>
+                                                            <c:when test="${o.status == 'Shipping'}">Đang giao hàng
+                                                            </c:when>
+                                                            <c:when test="${o.status == 'Delivered'}">Đã giao hàng
+                                                            </c:when>
+                                                            <c:when test="${o.status == 'Cancelled'}">Đã hủy</c:when>
+                                                            <c:otherwise>${o.status}</c:otherwise>
+                                                        </c:choose>
                                                     </span>
                                                 </td>
                                                 <td class="text-end pe-4">
-                                                    <a href="order-detail-dashboard?id=${o.orderId}"
-                                                        class="btn btn-sm btn-outline-primary">
-                                                        Manage
+                                                    <a href="order-detail-dashboard?id=${o.orderId}" class="text-theme"
+                                                        title="Xem chi tiết">
+                                                        <i class="fas fa-eye"></i>
                                                     </a>
                                                 </td>
                                             </tr>
