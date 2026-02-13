@@ -6,7 +6,7 @@
 
             <head>
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-                <title>Order Detail #${order.orderId} - Admin Dashboard</title>
+                <title>Chi tiết đơn hàng #${order.orderId} - Quản trị nhà thuốc</title>
                 <!-- Bootstrap CSS -->
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
                 <!-- Font Awesome -->
@@ -57,6 +57,38 @@
                         object-fit: cover;
                         border-radius: 4px;
                     }
+
+                    :root {
+                        --primary-theme: #4F81E1;
+                    }
+
+                    .text-theme {
+                        color: var(--primary-theme) !important;
+                    }
+
+                    .bg-theme {
+                        background-color: var(--primary-theme) !important;
+                    }
+
+                    .btn-primary {
+                        background-color: var(--primary-theme);
+                        border-color: var(--primary-theme);
+                    }
+
+                    .btn-primary:hover {
+                        background-color: #3a6cc5;
+                        border-color: #3a6cc5;
+                    }
+
+                    .btn-outline-theme {
+                        color: var(--primary-theme);
+                        border-color: var(--primary-theme);
+                    }
+
+                    .btn-outline-theme:hover {
+                        background-color: var(--primary-theme);
+                        color: white;
+                    }
                 </style>
             </head>
 
@@ -69,11 +101,21 @@
                 <jsp:include page="/view/common/sidebar.jsp" />
 
                 <div class="main-content container">
+                    <!-- Alert Message -->
+                    <c:if test="${not empty sessionScope.message}">
+                        <div class="alert alert-${sessionScope.messageType} alert-dismissible fade show" role="alert">
+                            ${sessionScope.message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <c:remove var="message" scope="session" />
+                        <c:remove var="messageType" scope="session" />
+                    </c:if>
+
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="mb-0">Order Detail</h2>
+                        <h2 class="mb-0">Chi tiết đơn hàng</h2>
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb mb-0">
-                                <li class="breadcrumb-item"><a href="orders-dashboard">Orders</a></li>
+                                <li class="breadcrumb-item"><a href="orders-dashboard">Đơn hàng</a></li>
                                 <li class="breadcrumb-item active" aria-current="page">#${order.orderId}</li>
                             </ol>
                         </nav>
@@ -84,17 +126,17 @@
                         <div class="col-lg-8">
                             <div class="card mb-4">
                                 <div class="card-header bg-white py-3">
-                                    <h5 class="mb-0">Order Items</h5>
+                                    <h5 class="mb-0">Sản phẩm trong đơn</h5>
                                 </div>
                                 <div class="card-body p-0">
                                     <div class="table-responsive">
                                         <table class="table align-middle mb-0">
                                             <thead class="bg-light">
                                                 <tr>
-                                                    <th class="ps-4">Product</th>
-                                                    <th class="text-center">Price</th>
-                                                    <th class="text-center">Quantity</th>
-                                                    <th class="text-end pe-4">Total</th>
+                                                    <th class="ps-4">Sản phẩm</th>
+                                                    <th class="text-center">Đơn giá</th>
+                                                    <th class="text-center">Số lượng</th>
+                                                    <th class="text-end pe-4">Thành tiền</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -108,7 +150,7 @@
                                                                 <div>
                                                                     <h6 class="mb-0 text-dark">
                                                                         ${item.medicine.medicineName}</h6>
-                                                                    <small class="text-muted">Code:
+                                                                    <small class="text-muted">Mã:
                                                                         ${item.medicine.medicineCode}</small>
                                                                 </div>
                                                             </div>
@@ -127,7 +169,7 @@
                                             </tbody>
                                             <tfoot class="bg-light">
                                                 <tr>
-                                                    <td colspan="3" class="text-end fw-bold pt-3">Total Amount:</td>
+                                                    <td colspan="3" class="text-end fw-bold pt-3">Tổng cộng:</td>
                                                     <td class="text-end fs-5 fw-bold text-danger pt-3 pe-4">
                                                         <fmt:formatNumber value="${order.totalAmount}" type="currency"
                                                             currencySymbol="₫" maxFractionDigits="0" />
@@ -145,7 +187,7 @@
                             <!-- Status Card -->
                             <div class="card mb-4">
                                 <div class="card-header bg-white py-3">
-                                    <h5 class="mb-0">Order Status</h5>
+                                    <h5 class="mb-0">Trạng thái đơn hàng</h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3 text-center">
@@ -159,7 +201,14 @@
                                             <c:otherwise>bg-secondary</c:otherwise>
                                             </c:choose>
                                             ">
-                                            ${order.status}
+                                            <c:choose>
+                                                <c:when test="${order.status == 'Pending'}">Chờ xử lý</c:when>
+                                                <c:when test="${order.status == 'Confirmed'}">Đã xác nhận</c:when>
+                                                <c:when test="${order.status == 'Shipping'}">Đang giao hàng</c:when>
+                                                <c:when test="${order.status == 'Delivered'}">Đã giao hàng</c:when>
+                                                <c:when test="${order.status == 'Cancelled'}">Đã hủy</c:when>
+                                                <c:otherwise>${order.status}</c:otherwise>
+                                            </c:choose>
                                         </span>
                                     </div>
 
@@ -168,22 +217,23 @@
                                     <form action="order-update-dashboard" method="POST">
                                         <input type="hidden" name="id" value="${order.orderId}">
                                         <div class="mb-3">
-                                            <label for="statusSelect" class="form-label fw-bold">Update Status</label>
+                                            <label for="statusSelect" class="form-label fw-bold">Cập nhật trạng
+                                                thái</label>
                                             <select class="form-select" id="statusSelect" name="status">
                                                 <option value="Pending" ${order.status=='Pending' ? 'selected' : '' }>
-                                                    Pending</option>
+                                                    Chờ xử lý</option>
                                                 <option value="Confirmed" ${order.status=='Confirmed' ? 'selected' : ''
-                                                    }>Confirmed</option>
+                                                    }>Đã xác nhận</option>
                                                 <option value="Shipping" ${order.status=='Shipping' ? 'selected' : '' }>
-                                                    Shipping</option>
+                                                    Đang giao hàng</option>
                                                 <option value="Delivered" ${order.status=='Delivered' ? 'selected' : ''
-                                                    }>Delivered</option>
+                                                    }>Đã giao hàng</option>
                                                 <option value="Cancelled" ${order.status=='Cancelled' ? 'selected' : ''
-                                                    }>Cancelled</option>
+                                                    }>Đã hủy</option>
                                             </select>
                                         </div>
                                         <div class="d-grid">
-                                            <button type="submit" class="btn btn-primary">Update Status</button>
+                                            <button type="submit" class="btn btn-primary">Cập nhật</button>
                                         </div>
                                     </form>
                                 </div>
@@ -192,25 +242,25 @@
                             <!-- Customer Info Card -->
                             <div class="card mb-4">
                                 <div class="card-header bg-white py-3">
-                                    <h5 class="mb-0">Customer Details</h5>
+                                    <h5 class="mb-0">Thông tin khách hàng</h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
-                                        <label class="small text-muted text-uppercase fw-bold">Customer</label>
+                                        <label class="small text-muted text-uppercase fw-bold">Khách hàng</label>
                                         <div>${order.shippingName}</div>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="small text-muted text-uppercase fw-bold">Contact Info</label>
+                                        <label class="small text-muted text-uppercase fw-bold">Liên hệ</label>
                                         <div><i class="fas fa-phone me-2 text-muted"></i>${order.shippingPhone}</div>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="small text-muted text-uppercase fw-bold">Shipping Address</label>
+                                        <label class="small text-muted text-uppercase fw-bold">Địa chỉ giao hàng</label>
                                         <div><i
                                                 class="fas fa-map-marker-alt me-2 text-muted"></i>${order.shippingAddress}
                                         </div>
                                     </div>
                                     <div class="mb-0">
-                                        <label class="small text-muted text-uppercase fw-bold">Order Date</label>
+                                        <label class="small text-muted text-uppercase fw-bold">Ngày đặt hàng</label>
                                         <div><i class="far fa-clock me-2 text-muted"></i>
                                             <fmt:formatDate value="${order.orderDate}" pattern="dd/MM/yyyy HH:mm" />
                                         </div>
