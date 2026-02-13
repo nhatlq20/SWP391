@@ -6,22 +6,52 @@
                 <div class="sidebar-menu">
                     <c:set var="uri" value="${pageContext.request.requestURI}" />
 
-                    <a href="profile" class="sidebar-item ${fn:contains(uri, 'profile') ? 'active' : ''}">
+                    <a href="${pageContext.request.contextPath}/profile"
+                        class="sidebar-item ${fn:contains(uri, 'profile') ? 'active' : ''}">
                         <i class="fas fa-user"></i> Thông tin của tôi
                     </a>
 
-                    <a href="order-list"
+                    <a href="${pageContext.request.contextPath}/order-list"
                         class="sidebar-item ${fn:contains(uri, 'order-list') || fn:contains(uri, 'order-detail') ? 'active' : ''}">
                         <i class="fas fa-box"></i> Đơn hàng của tôi
                     </a>
 
-                    <a href="cart"
+                    <a href="${pageContext.request.contextPath}/cart"
                         class="sidebar-item ${fn:contains(uri, 'cart') || fn:contains(uri, 'checkout') ? 'active' : ''}">
                         <i class="fas fa-shopping-cart"></i> Giỏ hàng của tôi
                     </a>
 
-                    <a href="reviews" class="sidebar-item ${fn:contains(uri, 'reviews') ? 'active' : ''}">
+                    <a href="${pageContext.request.contextPath}/reviews"
+                        class="sidebar-item ${fn:contains(uri, 'reviews') ? 'active' : ''}">
                         <i class="fas fa-comment-dots"></i> Đánh giá của tôi
+                    </a>
+
+                    <hr>
+                    <div class="sidebar-heading text-muted small text-uppercase fw-bold mb-2 px-3">Quản Trị Viên</div>
+
+                    <a href="${pageContext.request.contextPath}/admin/dashboard"
+                        class="sidebar-item ${fn:contains(uri, 'dashboard') && !fn:contains(uri, 'order') && !fn:contains(uri, 'customer') && !fn:contains(uri, 'product') && !fn:contains(uri, 'staff') ? 'active' : ''}">
+                        <i class="fas fa-tachometer-alt"></i> Tổng quan
+                    </a>
+
+                    <a href="${pageContext.request.contextPath}/admin/orders-dashboard"
+                        class="sidebar-item ${fn:contains(uri, 'orders-dashboard') || fn:contains(uri, 'order-detail-dashboard') ? 'active' : ''}">
+                        <i class="fas fa-shopping-bag"></i> Quản lý đơn hàng
+                    </a>
+
+                    <a href="${pageContext.request.contextPath}/admin/products-dashboard"
+                        class="sidebar-item ${fn:contains(uri, 'products-dashboard') ? 'active' : ''}">
+                        <i class="fas fa-pills"></i> Quản lý sản phẩm
+                    </a>
+
+                    <a href="${pageContext.request.contextPath}/admin/customers-dashboard"
+                        class="sidebar-item ${fn:contains(uri, 'customer') ? 'active' : ''}">
+                        <i class="fas fa-users"></i> Quản lý khách hàng
+                    </a>
+
+                    <a href="${pageContext.request.contextPath}/admin/staff-dashboard"
+                        class="sidebar-item ${fn:contains(uri, 'staff-dashboard') ? 'active' : ''}">
+                        <i class="fas fa-user-shield"></i> Quản lý nhân viên
                     </a>
                 </div>
                 <div class="sidebar-footer">
