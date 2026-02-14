@@ -15,66 +15,7 @@
                     <link href="<c:url value='/assets/css/header.css'/>" rel="stylesheet">
                     <link href="<c:url value='/assets/css/style.css'/>" rel="stylesheet">
                     <link href="<c:url value='/assets/css/home-page.css'/>" rel="stylesheet">
-                    <style>
-                        .search-header {
-                            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-                            padding: 30px 0;
-                            margin-bottom: 25px;
-                            border-radius: 0 0 15px 15px;
-                        }
-
-                        .search-header h2 {
-                            color: #2c3e50;
-                            font-weight: 700;
-                            font-size: 22px;
-                            margin-bottom: 5px;
-                        }
-
-                        .search-header .keyword-highlight {
-                            color: #007bff;
-                            font-weight: 700;
-                        }
-
-                        .search-header .result-count {
-                            color: #6c757d;
-                            font-size: 14px;
-                        }
-
-                        .empty-state {
-                            text-align: center;
-                            padding: 60px 20px;
-                        }
-
-                        .empty-state i {
-                            font-size: 64px;
-                            color: #dee2e6;
-                            margin-bottom: 20px;
-                        }
-
-                        .empty-state h4 {
-                            color: #6c757d;
-                            margin-bottom: 10px;
-                        }
-
-                        .empty-state p {
-                            color: #adb5bd;
-                            font-size: 14px;
-                        }
-
-                        .back-link {
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 6px;
-                            color: #007bff;
-                            text-decoration: none;
-                            font-size: 14px;
-                            margin-bottom: 15px;
-                        }
-
-                        .back-link:hover {
-                            text-decoration: underline;
-                        }
-                    </style>
+                    <link href="<c:url value='/assets/css/search-result.css'/>" rel="stylesheet">
                 </head>
 
                 <body>
