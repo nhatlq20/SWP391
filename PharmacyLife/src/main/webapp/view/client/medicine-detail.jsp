@@ -148,10 +148,6 @@
                                         <!-- Action Buttons -->
                                         <div class="action-buttons">
                                             <button class="btn-buy btn btn-primary">Mua</button>
-                                            <a href="${pageContext.request.contextPath}/home"
-                                                class="btn-back btn btn-outline-secondary">
-
-                                            </a>
                                         </div>
                                     </div>
                                 </div>

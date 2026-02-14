@@ -22,11 +22,12 @@
                         </button>
 
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                            <form class="d-flex ms-auto me-auto" role="search">
+                            <form class="d-flex ms-auto me-auto" role="search"
+                                action="${pageContext.request.contextPath}/search" method="GET">
                                 <div class="search-placeholder w-100 d-flex align-items-center">
                                     <i class="fas fa-search" style="color: #ccc;"></i>
-                                    <input class="form-control border-0 ms-2" type="search"
-                                        placeholder="Tìm kiếm sản phẩm..." aria-label="Search" disabled>
+                                    <input class="form-control border-0 ms-2" type="search" name="keyword"
+                                        placeholder="Tìm kiếm sản phẩm..." aria-label="Search" value="${keyword}">
                                 </div>
                             </form>
 
@@ -46,4 +47,3 @@
                         </div>
                     </div>
                 </nav>
-                            

@@ -12,6 +12,10 @@
         <servlet-name>MedicineDetailController</servlet-name>
         <servlet-class>controllers.MedicineDetailController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>SearchController</servlet-name>
+        <servlet-class>controllers.SearchController</servlet-class>
+    </servlet>
     
     <servlet-mapping>
         <servlet-name>HomeController</servlet-name>
@@ -24,6 +28,10 @@
     <servlet-mapping>
         <servlet-name>MedicineDetailController</servlet-name>
         <url-pattern>/medicine/detail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SearchController</servlet-name>
+        <url-pattern>/search</url-pattern>
     </servlet-mapping>
     
     <session-config>
