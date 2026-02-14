@@ -16,6 +16,20 @@ public class StaffController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Security check - Only Admin can access staff management
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("loggedInUser") == null) {
+            response.sendRedirect(request.getContextPath() + "/Login");
+            return;
+        }
+        
+        String roleName = (String) session.getAttribute("roleName");
+        if (!"Admin".equalsIgnoreCase(roleName)) {
+            // User is not Admin, redirect to home or error page
+            response.sendRedirect(request.getContextPath() + "/cart");
+            return;
+        }
+
         String action = request.getParameter("action");
         if (action == null) {
             action = "list";
@@ -31,9 +45,8 @@ public class StaffController extends HttpServlet {
                     staffList = new ArrayList<>();
                 }
                 // Exclude currently logged-in staff (if the session user is a Staff)
-                HttpSession session = request.getSession(false);
                 if (session != null) {
-                    Object currentUser = session.getAttribute("user");
+                    Object currentUser = session.getAttribute("loggedInUser");
                     if (currentUser instanceof Staff) {
                         int currId = ((Staff) currentUser).getStaffId();
                         staffList.removeIf(s -> s.getStaffId() == currId);

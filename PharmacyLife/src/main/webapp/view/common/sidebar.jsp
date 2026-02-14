@@ -5,7 +5,8 @@
             <div class="sidebar-wrapper">
                 <div class="sidebar-menu">
                     <c:set var="uri" value="${pageContext.request.requestURI}" />
-
+                    
+                    <!-- Common menu for all users -->
                     <a href="profile" class="sidebar-item ${fn:contains(uri, 'profile') ? 'active' : ''}">
                         <i class="fas fa-user"></i> Thông tin của tôi
                     </a>
@@ -23,6 +24,16 @@
                     <a href="reviews" class="sidebar-item ${fn:contains(uri, 'reviews') ? 'active' : ''}">
                         <i class="fas fa-comment-dots"></i> Đánh giá của tôi
                     </a>
+                    
+                    <%-- Only Admin can manage staff --%>
+                    <% 
+                    String roleName = (String) session.getAttribute("roleName");
+                    if ("Admin".equalsIgnoreCase(roleName)) {
+                    %>
+                        <a href="Staffmanage" class="sidebar-item ${fn:contains(uri, 'Staffmanage') || fn:contains(uri, 'staff') ? 'active' : ''}">
+                            <i class="fas fa-users-cog"></i> Quản lý nhân viên
+                        </a>
+                    <% } %>
                 </div>
                 <div class="sidebar-footer">
                     <a href="logout" class="sidebar-item sidebar-logout">

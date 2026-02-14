@@ -54,6 +54,29 @@
     box-shadow: none;
 }
 
+.sidebar-divider {
+    height: 1px;
+    background-color: #dee2e6;
+    margin: 15px 0;
+}
+
+.sidebar-section-title {
+    padding: 12px 25px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #6c757d;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.sidebar-section-title i {
+    margin-right: 8px;
+    font-size: 0.9rem;
+}
+
 .sidebar-footer {
     padding-top: 20px;
     border-top: 1px solid #dee2e6;
