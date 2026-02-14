@@ -68,4 +68,33 @@ public class Medicine {
     public void setShortDescription(String shortDescription) {
         this.shortDescription = shortDescription;
     }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    @Override
+    public String toString() {
+        return "Medicine{" +
+                "medicineID='" + medicineID + '\'' +
+                ", medicineName='" + medicineName + '\'' +
+                ", sellingPrice=" + sellingPrice +
+                ", unit='" + unit + '\'' +
+                ", remainingQuantity=" + remainingQuantity +
+                ", categoryID='" + categoryID + '\'' +
+                ", prescriptionRequired=" + prescriptionRequired +
+                '}';
+    }
 }
