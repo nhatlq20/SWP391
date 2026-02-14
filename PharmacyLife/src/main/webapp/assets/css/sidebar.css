@@ -1,0 +1,70 @@
+:root {
+    --primary-color: #4F81E1;
+    --header-height: 115px;
+}
+
+/* Sidebar Styles */
+.sidebar-wrapper {
+    background-color: white;
+    padding: 20px;
+    width: 280px;
+    /* Fixed width */
+    height: calc(100vh - var(--header-height));
+    position: fixed;
+    /* Fixed position */
+    top: var(--header-height);
+    left: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.sidebar-menu {
+    flex-grow: 1;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    color: #6c757d;
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 4px;
+    transition: all 0.2s ease-in-out;
+}
+
+.sidebar-item i {
+    width: 25px;
+    margin-right: 12px;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.sidebar-item:hover {
+    background-color: #f8f9fa;
+    color: var(--primary-color);
+}
+
+.sidebar-item.active {
+    background-color: #eef2ff;
+    color: var(--primary-color);
+    border-right: 3px solid var(--primary-color);
+    box-shadow: none;
+}
+
+.sidebar-footer {
+    padding-top: 20px;
+    border-top: 1px solid #dee2e6;
+    margin-top: auto;
+}
+
+.sidebar-logout {
+    color: #dc3545;
+}
+
+.sidebar-logout:hover {
+    background-color: #fee2e2;
+    color: #dc3545;
+}

@@ -1,0 +1,130 @@
+/* Styles for staff-list.jsp extracted from inline styles */
+.staff-page {
+    max-width: 1180px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Push content right so sidebar doesn't cover it (adjust to match sidebar width) */
+.staff-main {
+    margin-left: 240px;
+}
+.staff-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:18px;
+}
+.staff-title {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-size:26px;
+    font-weight:700;
+}
+.staff-title img {
+    width:34px;
+    height:34px;
+}
+.staff-actions {
+    display:flex;
+    gap:12px;
+    align-items:center;
+}
+.staff-search {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#fff;
+    padding:10px 16px;
+    border-radius:28px;
+    box-shadow:none;
+}
+.staff-search input {
+    border:none;
+    outline:none;
+    width:260px;
+    font-size:14px;
+}
+.add-btn {
+    background:#4B9BFF;
+    color:#fff;
+    padding:8px 14px;
+    border-radius:18px;
+    text-decoration:none;
+}
+.staff-card {
+    background:#eef6ff;
+    padding:26px 22px;
+    border-radius:18px;
+}
+table.staff-table {
+    width:100%;
+    border-collapse:collapse;
+    background:#fff;
+    border-radius:12px;
+    overflow:hidden;
+}
+table.staff-table th, table.staff-table td {
+    padding:22px 24px;
+    text-align:left;
+    border-bottom:1px solid #eef6fb;
+    vertical-align:middle;
+}
+table.staff-table th {
+    background:rgba(255,255,255,0.6);
+    font-weight:700;
+}
+.action-icons img {
+    width:20px;
+    height:20px;
+    margin-left:8px;
+    cursor:pointer;
+}
+.action-icons a {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+}
+.action-icons a img { display:block; }
+.action-icons a.edit { background: #e8fbff; }
+.action-icons a.edit img { filter: none; }
+.action-icons a.delete { background: #ffecec; }
+.action-icons a.delete img { filter: none; }
+
+/* small responsive tweaks */
+@media (max-width: 900px) {
+    .staff-page {
+        padding: 0 12px;
+    }
+    .staff-main {
+        margin-left: 0;
+    }
+    .staff-search input {
+        width:140px;
+    }
+    table.staff-table th, table.staff-table td {
+        padding:10px;
+    }
+}
+
+/* Detail card styles */
+.detail-card {
+    background: #fff;
+    padding: 28px;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    max-width: 880px;
+    margin: 8px auto 40px;
+}
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 28px; margin-top: 8px; }
+.form-field label { display:block; font-weight:600; margin-bottom:8px; color:#333; }
+.field-box { background:#f3f6fa; padding:10px 12px; border-radius:8px; color:#333; }
+.form-field.wide { grid-column: 1 / -1; }
+
+@media (max-width: 700px) {
+  .detail-grid { grid-template-columns: 1fr; }
+}
