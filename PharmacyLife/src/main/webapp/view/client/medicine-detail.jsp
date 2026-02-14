@@ -134,7 +134,10 @@
                                         <!-- Category -->
                                         <div class="category-section">
                                             <span class="category-label">Danh mục:</span>
-                                            <span class="category-value">Thuốc dị ứng</span>
+                                            <span class="category-value">
+                                                <c:out value='${medicine.category.categoryName}'
+                                                    default='Chưa phân loại' />
+                                            </span>
                                         </div>
 
                                         <!-- Description -->

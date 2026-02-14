@@ -15,7 +15,8 @@
                     <link href="<c:url value='/assets/css/header.css'/>" rel="stylesheet">
                     <link href="<c:url value='/assets/css/style.css'/>" rel="stylesheet">
                     <link href="<c:url value='/assets/css/home-page.css'/>" rel="stylesheet">
-                    <link href="<c:url value='/assets/css/search-result.css'/>" rel="stylesheet">
+                    \ href="
+                    <c:url value='/assets/css/search-result.css' />" rel="stylesheet">
                 </head>
 
                 <body>
