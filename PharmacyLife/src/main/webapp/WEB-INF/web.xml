@@ -37,9 +37,17 @@
         <servlet-name>CartController</servlet-name>
         <servlet-class>controllers.CartController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>StaffController</servlet-name>
+        <servlet-class>controllers.StaffController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>CartController</servlet-name>
         <url-pattern>/cart</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StaffController</servlet-name>
+        <url-pattern>/Staffmanage</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
