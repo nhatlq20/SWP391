@@ -30,6 +30,15 @@
 
                 <p class="login-title">Đăng nhập vào tài khoản của bạn</p>
 
+                <!-- Success Message -->
+                <% if (request.getAttribute("successMessage") != null) { %>
+                <div style="background-color: #e6f7e6; border-left: 4px solid #44cc44; padding: 12px; margin-bottom: 20px; border-radius: 4px;">
+                    <p style="color: #00aa00; margin: 0; font-size: 14px;">
+                        <%= request.getAttribute("successMessage") %>
+                    </p>
+                </div>
+                <% } %>
+
                 <!-- Error Message -->
                 <% if (request.getAttribute("errorMessage") != null) { %>
                 <div style="background-color: #ffe6e6; border-left: 4px solid #ff4444; padding: 12px; margin-bottom: 20px; border-radius: 4px;">
