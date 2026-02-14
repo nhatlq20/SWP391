@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class Category {
 
-    private String categoryID;
+    private int categoryId;
     private String categoryName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -16,7 +16,7 @@ public class Category {
         return medicineCount;
     }
 
-// Setter
+    // Setter
     public void setMedicineCount(int medicineCount) {
         this.medicineCount = medicineCount;
     }
@@ -25,25 +25,25 @@ public class Category {
     public Category() {
     }
 
-    public Category(String categoryID, String categoryName) {
-        this.categoryID = categoryID;
+    public Category(int categoryId, String categoryName) {
+        this.categoryId = categoryId;
         this.categoryName = categoryName;
     }
 
-    public Category(String categoryID, String categoryName, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.categoryID = categoryID;
+    public Category(int categoryId, String categoryName, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
     // Getters and Setters
-    public String getCategoryID() {
-        return categoryID;
+    public int getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategoryID(String categoryID) {
-        this.categoryID = categoryID;
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getCategoryName() {
@@ -73,7 +73,7 @@ public class Category {
     @Override
     public String toString() {
         return "Category{"
-                + "categoryID='" + categoryID + '\''
+                + "categoryId=" + categoryId
                 + ", categoryName='" + categoryName + '\''
                 + ", createdAt=" + createdAt
                 + ", updatedAt=" + updatedAt
