@@ -2,6 +2,7 @@ package dao;
 
 import models.Import;
 import models.ImportDetail;
+import models.Medicine;
 import utils.DBContext;
 import java.sql.Connection;
 import java.sql.Date;
@@ -483,5 +484,26 @@ public class ImportDAO {
             // e.printStackTrace(); // Silent fail or log
         }
         return 0;
+    }
+
+    // Lấy danh sách tất cả thuốc (cho Dropdown)
+    public List<Medicine> getAllMedicines() {
+        List<Medicine> list = new ArrayList<>();
+        String sql = "SELECT MedicineId, MedicineCode, MedicineName, Price FROM Medicine";
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Medicine m = new Medicine();
+                m.setMedicineId(rs.getInt("MedicineId"));
+                m.setMedicineCode(rs.getString("MedicineCode"));
+                m.setMedicineName(rs.getString("MedicineName"));
+                m.setPrice(rs.getDouble("Price"));
+                list.add(m);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

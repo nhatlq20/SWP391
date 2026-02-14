@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import models.Import;
 import models.ImportDetail;
+import models.Medicine;
 
 public class ImportController extends HttpServlet {
 
@@ -153,6 +154,10 @@ public class ImportController extends HttpServlet {
             throws ServletException, IOException {
         String newCode = importDAO.generateImportCode();
         request.setAttribute("newCode", newCode);
+
+        List<Medicine> medicines = importDAO.getAllMedicines();
+        request.setAttribute("medicines", medicines);
+
         request.getRequestDispatcher("/view/imports/create.jsp").forward(request, response);
     }
 
@@ -221,6 +226,12 @@ public class ImportController extends HttpServlet {
             }
             imp.setStaffId(staffId);
             imp.setTotalAmount(0);
+
+            String status = request.getParameter("status");
+            if (status == null || status.isEmpty()) {
+                status = "Đang chờ";
+            }
+            imp.setStatus(status);
 
             if (importDAO.createImport(imp)) {
                 int newImportId = imp.getImportId();
@@ -408,8 +419,8 @@ public class ImportController extends HttpServlet {
                 }
             } else {
                 if (importId > 0) {
-                    response.sendRedirect(request.getContextPath() + "/ImportController?action=edit&id=" + importId); 
-                }else {
+                    response.sendRedirect(request.getContextPath() + "/ImportController?action=edit&id=" + importId);
+                } else {
                     response.sendRedirect(request.getContextPath() + "/ImportController?action=list");
                 }
             }
@@ -433,7 +444,7 @@ public class ImportController extends HttpServlet {
     // ================= HELPER METHODS ===============
     // Lấy Import ID từ request (param 'id' hoặc 'code' hoặc 'importCode')
     private int getImportIdFromRequest(HttpServletRequest request) {
-        String[] params = {"id", "code", "importCode", "importId"};
+        String[] params = { "id", "code", "importCode", "importId" };
         for (String param : params) {
             String val = request.getParameter(param);
             if (val != null && !val.isEmpty()) {

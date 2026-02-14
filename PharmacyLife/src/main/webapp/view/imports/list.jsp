@@ -56,6 +56,7 @@
                                                 <th>Nhà cung cấp</th>
                                                 <th>Ngày nhập</th>
                                                 <th>Tổng tiền</th>
+                                                <th>Trạng thái</th>
                                                 <th>Thao tác</th>
                                             </tr>
                                         </thead>
@@ -75,6 +76,18 @@
                                                                 <fmt:formatNumber value="${imp.totalAmount}"
                                                                     type="number" groupingUsed="true"
                                                                     maxFractionDigits="0" />₫
+                                                            </td>
+                                                            <td>
+                                                                <c:set var="statusClass" value="status-pending" />
+                                                                <c:if test="${imp.status == 'Đã duyệt'}">
+                                                                    <c:set var="statusClass" value="status-approved" />
+                                                                </c:if>
+                                                                <c:if
+                                                                    test="${imp.status == 'Chưa duyệt' || imp.status == 'Đã hủy'}">
+                                                                    <c:set var="statusClass" value="status-cancelled" />
+                                                                </c:if>
+                                                                <span class="${statusClass}">${imp.status != null ?
+                                                                    imp.status : 'Đang chờ'}</span>
                                                             </td>
 
                                                             <td>

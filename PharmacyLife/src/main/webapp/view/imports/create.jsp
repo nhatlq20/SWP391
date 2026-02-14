@@ -64,11 +64,11 @@
                                                 <!-- Visual-only Status -->
                                                 <div class="custom-input-group">
                                                     <label class="custom-input-label">Trạng thái</label>
-                                                    <div class="custom-input"
-                                                        style="background-color: #eee; color: #555; display: flex; align-items: center; justify-content: space-between;">
-                                                        <span>Đang chờ</span>
-                                                        <span>⌄</span>
-                                                    </div>
+                                                    <select name="status" class="custom-input">
+                                                        <option value="Đang chờ">Đang chờ</option>
+                                                        <option value="Đã duyệt">Đã duyệt</option>
+                                                        <option value="Chưa duyệt">Chưa duyệt</option>
+                                                    </select>
                                                 </div>
 
                                                 <div class="total-amount-display">
@@ -147,8 +147,13 @@
 
                             <div class="form-group">
                                 <label>Mã thuốc</label>
-                                <input type="text" id="modalMedicineCode" class="custom-input"
-                                    placeholder="Nhập mã thuốc">
+                                <select id="modalMedicineCode" class="custom-input">
+                                    <option value="">-- Chọn thuốc --</option>
+                                    <c:forEach var="med" items="${medicines}">
+                                        <option value="${med.medicineCode}">${med.medicineCode} - ${med.medicineName}
+                                        </option>
+                                    </c:forEach>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label>Số lượng</label>
@@ -192,7 +197,8 @@
                         }
 
                         // --- NEW: AJAX to fetch price ---
-                        document.getElementById('modalMedicineCode').addEventListener('blur', function () {
+                        // --- NEW: AJAX to fetch price ---
+                        document.getElementById('modalMedicineCode').addEventListener('change', function () {
                             const code = this.value;
                             if (code && code.trim() !== '') {
                                 fetch('${pageContext.request.contextPath}/MedicineAjaxController?action=getPrice&code=' + code)
@@ -204,6 +210,10 @@
                                         }
                                     })
                                     .catch(err => console.error('Error fetching price:', err));
+                            } else {
+                                // Reset price if no medicine selected
+                                document.getElementById('modalPrice').value = '';
+                                calculateModalTotal();
                             }
                         });
 
