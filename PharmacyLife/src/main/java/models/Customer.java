@@ -21,6 +21,7 @@ public class Customer {
     private Date createdAt;
     private boolean status;
     private Date Dob;
+    private String gender;
 
     public Customer() {
     }
@@ -118,7 +119,12 @@ public class Customer {
     public void setDob(Date Dob) {
         this.Dob = Dob;
     }
-    
-    
-    
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
 }

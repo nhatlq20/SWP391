@@ -43,6 +43,7 @@ public class CustomerDAO {
                 customer.setCreatedAt(rs.getDate("CreatedAt"));
                 customer.setStatus(rs.getBoolean("IsActive"));
                 customer.setDob(rs.getDate("Dob"));
+                customer.setGender(rs.getString("Gender"));
 
                 return customer;
             }
