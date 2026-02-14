@@ -1,6 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="5.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd">
     <servlet>
+        <servlet-name>HomeController</servlet-name>
+        <servlet-class>controllers.HomeController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MedicineController</servlet-name>
+        <servlet-class>controllers.MedicineController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MedicineDetailController</servlet-name>
+        <servlet-class>controllers.MedicineDetailController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SearchController</servlet-name>
+        <servlet-class>controllers.SearchController</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>HomeController</servlet-name>
+        <url-pattern>/home</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MedicineController</servlet-name>
+        <url-pattern>/medicine</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MedicineDetailController</servlet-name>
+        <url-pattern>/medicine/detail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SearchController</servlet-name>
+        <url-pattern>/search</url-pattern>
+    </servlet-mapping>
+    
         <servlet-name>CartController</servlet-name>
         <servlet-class>controllers.CartController</servlet-class>
     </servlet>
@@ -22,6 +55,6 @@
         </session-timeout>
     </session-config>
     <welcome-file-list>
-        <welcome-file>cart</welcome-file>
+        <welcome-file>home</welcome-file>
     </welcome-file-list>
 </web-app>

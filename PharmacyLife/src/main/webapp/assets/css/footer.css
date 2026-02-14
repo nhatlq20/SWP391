@@ -1,0 +1,73 @@
+.footer {
+    background-color: #f1f1f1;
+    color: #222;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    padding-top: 30px;
+    border-top: 1px solid #ddd;
+}
+
+.footer-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px 20px 40px;
+}
+
+.footer-column h4 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #2a60e8; /* chủ đạo xanh của dự án */
+}
+
+.footer-column p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-column li {
+    margin-bottom: 6px;
+}
+
+.footer-column a {
+    text-decoration: none;
+    color: #2a60e8; /* màu mặc định cho liên kết */
+    transition: color 0.3s ease;
+    font-size: 14px;
+}
+
+.footer-column a:hover {
+    color: #1e3c72; /* đậm hơn khi hover */
+}
+
+/* hotline nổi bật */
+.hotline {
+    font-weight: bold;
+    color: #007a33;
+    font-size: 15px;
+}
+
+.hotline span {
+    font-weight: normal;
+    color: #444;
+    margin-left: 4px;
+}
+
+/* phần bản quyền dưới cùng */
+.footer-bottom {
+    border-top: 1px solid #ccc;
+    text-align: center;
+    font-size: 13px;
+    padding: 12px 0;
+    background-color: #eaeaea;
+    color: #333;
+}
