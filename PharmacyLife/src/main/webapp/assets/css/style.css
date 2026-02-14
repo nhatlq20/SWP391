@@ -486,7 +486,7 @@ a.text-decoration-none:hover {
 }
 
 /* Cards */
-.product-card {
+.medicine-card {
     border: none;
     border-radius: 12px;
     overflow: hidden;
@@ -495,12 +495,12 @@ a.text-decoration-none:hover {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.product-card:hover {
+.medicine-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
-.product-img {
+.medicine-img {
     height: 180px;
     object-fit: contain;
     background-color: #fff;

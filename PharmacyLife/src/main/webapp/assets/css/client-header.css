@@ -1,0 +1,207 @@
+.header {
+    background: linear-gradient(135deg, #5B7FD4 0%, #4A6DB8 100%);
+    padding: 12px 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-shrink: 0;
+}
+
+.logo-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: white;
+}
+
+.logo-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    line-height: 1.2;
+}
+
+.logo-subtitle {
+    font-size: 11px;
+    opacity: 0.9;
+    display: block;
+}
+
+.site-logo {
+    width: 45px;
+    height: auto;
+}
+
+.search-placeholder {
+    flex: 1;
+    max-width: 400px;
+    background: white;
+    border-radius: 25px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-placeholder input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: #999;
+}
+
+/* navbar layout handled by Bootstrap; keep only minimal search/input overrides */
+
+.cart-icon {
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.cart-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .header {
+        padding: 10px 15px;
+        gap: 15px;
+    }
+
+    .logo-section {
+        gap: 12px;
+    }
+
+    .logo-text {
+        font-size: 16px;
+    }
+
+    .logo-subtitle {
+        font-size: 10px;
+    }
+
+    .site-logo {
+        width: 40px;
+    }
+
+    .search-placeholder {
+        max-width: 300px;
+    }
+
+    .search-placeholder input {
+        font-size: 13px;
+    }
+
+
+
+    .cart-icon {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 8px 12px;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .logo-section {
+        gap: 10px;
+        order: 1;
+    }
+
+    .logo-text {
+        font-size: 14px;
+    }
+
+    .logo-subtitle {
+        font-size: 9px;
+    }
+
+    .site-logo {
+        width: 35px;
+    }
+
+    .search-placeholder {
+        order: 3;
+        width: 100%;
+        max-width: 100%;
+        margin-top: 8px;
+    }
+
+    .search-placeholder input {
+        font-size: 12px;
+    }
+
+    .nav-section {
+        order: 2;
+        gap: 12px;
+    }
+
+    .admin-btn {
+        display: none;
+    }
+
+    .cart-icon {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 576px) {
+    .header {
+        padding: 6px 10px;
+        gap: 8px;
+    }
+
+    .logo-section {
+        gap: 8px;
+    }
+
+    .logo-text {
+        font-size: 12px;
+        line-height: 1.1;
+    }
+
+    .logo-subtitle {
+        font-size: 8px;
+    }
+
+    .site-logo {
+        width: 30px;
+    }
+
+    .search-placeholder {
+        padding: 6px 12px;
+        gap: 8px;
+    }
+
+    .search-placeholder input {
+        font-size: 11px;
+        padding: 0;
+    }
+
+    .search-placeholder i {
+        font-size: 12px;
+    }
+
+    .nav-section {
+        gap: 10px;
+    }
+
+    .cart-icon {
+        font-size: 16px;
+    }
+}
