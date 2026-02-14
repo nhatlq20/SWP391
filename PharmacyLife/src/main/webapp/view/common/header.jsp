@@ -32,33 +32,42 @@
 
                     <!-- Navigation Section -->
                     <div class="nav-section">
-                        <% if (session.getAttribute("user") !=null) { %>
+                        <% if (session.getAttribute("loggedInUser") != null) { %>
                             <div class="user-menu">
                                 <a class="user-trigger" href="${pageContext.request.contextPath}/profile">
                                     <span class="avatar"><i class="fas fa-user"></i></span>
-                                    <span class="name">${sessionScope.user.fullName}</span>
+                                    <span class="name">${sessionScope.userName}</span>
                                 </a>
                                 <div class="user-dropdown">
                                     <a class="user-item" href="${pageContext.request.contextPath}/profile">Thông tin cá
                                         nhân</a>
                                     <a class="user-item" href="${pageContext.request.contextPath}/my-orders">Xem đơn
                                         hàng</a>
-                                    <% if ("admin".equalsIgnoreCase((String)session.getAttribute("roleName"))) { %>
+                                    <% 
+                                    String roleName = (String)session.getAttribute("roleName");
+                                    if ("Admin".equalsIgnoreCase(roleName)) { 
+                                    %>
                                         <div style="border-top:1px solid #eef2f7; margin:6px 6px 8px;"></div>
                                         <a class="user-item" href="${pageContext.request.contextPath}/order">Quản lí đơn
                                             hàng</a>
                                         <a class="user-item" href="${pageContext.request.contextPath}/product">Quản lí
                                             sản phẩm</a>
-                                        <a class="user-item" href="${pageContext.request.contextPath}/staff">Quản lí
-                                            khách hàng</a>
+                                        <a class="user-item" href="${pageContext.request.contextPath}/Staffmanage">Quản lí
+                                            nhân viên</a>
+                                        <% } else if ("Staff".equalsIgnoreCase(roleName)) { %>
+                                        <div style="border-top:1px solid #eef2f7; margin:6px 6px 8px;"></div>
+                                        <a class="user-item" href="${pageContext.request.contextPath}/order">Quản lí đơn
+                                            hàng</a>
+                                        <a class="user-item" href="${pageContext.request.contextPath}/product">Quản lí
+                                            sản phẩm</a>
                                         <% } %>
                                             <a class="user-item"
-                                                href="${pageContext.request.contextPath}/auth?action=logout">Đăng
+                                                href="${pageContext.request.contextPath}/logout">Đăng
                                                 xuất</a>
                                 </div>
                             </div>
                             <% } else { %>
-                                <a href="${pageContext.request.contextPath}/auth" class="login-btn">
+                                <a href="${pageContext.request.contextPath}/Login" class="login-btn">
                                     <i class="fas fa-user-circle"></i>
                                     <span>Tài khoản</span>
                                 </a>

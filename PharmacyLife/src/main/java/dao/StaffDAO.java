@@ -175,5 +175,41 @@ public class StaffDAO {
         }
     }
 
+    // 5. Login - Authenticate user by email and password
+    public Staff login(String email, String password) {
+        String sql = "SELECT s.StaffId, s.StaffCode, s.StaffName, s.StaffEmail, s.StaffPassword, s.StaffPhone, s.StaffGender, s.RoleId, r.RoleName, s.StaffIsActive " +
+                     "FROM Staff s JOIN Role r ON s.RoleId = r.RoleId " +
+                     "WHERE s.StaffEmail = ? AND s.StaffPassword = ? AND s.StaffIsActive = 1";
+
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+            ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Staff staff = new Staff();
+                staff.setStaffId(rs.getInt("StaffId"));
+                staff.setStaffCode(rs.getString("StaffCode"));
+                staff.setStaffName(rs.getString("StaffName"));
+                staff.setStaffEmail(rs.getString("StaffEmail"));
+                staff.setStaffPassword(rs.getString("StaffPassword"));
+                staff.setStaffPhone(rs.getString("StaffPhone"));
+                staff.setStaffGender(rs.getString("StaffGender"));
+                staff.setRoleId(rs.getInt("RoleId"));
+                staff.setRoleName(rs.getString("RoleName"));
+                staff.setActive(rs.getBoolean("StaffIsActive"));
+
+                return staff;
+            }
+
+        } catch (Exception e) {
+            System.out.println("Login error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
     
 }
