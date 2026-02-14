@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- <web-app version="5.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"> -->
+    
+    <servlet>
+        <servlet-name>ImportController</servlet-name>
+        <servlet-class>controllers.ImportController</servlet-class>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>ImportController</servlet-name>
+        <url-pattern>/ImportController</url-pattern>
+    </servlet-mapping>
+
+
+
 <web-app version="5.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd">
     <servlet>
         <servlet-name>HomeController</servlet-name>
@@ -51,9 +67,7 @@
         <url-pattern>/Staffmanage</url-pattern>
     </servlet-mapping>
     <session-config>
-        <session-timeout>
-            30
-        </session-timeout>
+        <session-timeout>30</session-timeout>
     </session-config>
     <welcome-file-list>
         <welcome-file>home</welcome-file>
