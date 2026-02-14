@@ -87,103 +87,137 @@ public class MedicineController extends HttpServlet {
 
     // Helper to create medicine from form
     private void createMedicineFromRequest(jakarta.servlet.http.HttpServletRequest request,
-                                       jakarta.servlet.http.HttpServletResponse response)
-        throws java.io.IOException, jakarta.servlet.ServletException {
-    try {
-        String medicineID = request.getParameter("medicineID");
-        String medicineName = request.getParameter("medicineName");
-        String sellingPriceStr = request.getParameter("sellingPrice");
-        String unit = request.getParameter("unit");
-        String categoryID = request.getParameter("categoryID");
-        String remainingQuantityStr = request.getParameter("remainingQuantity");
-        String imageUrl = request.getParameter("imageUrl");
-        String shortDescription = request.getParameter("shortDescription");
-        String packDescription = request.getParameter("packDescription");
+            jakarta.servlet.http.HttpServletResponse response)
+            throws java.io.IOException, jakarta.servlet.ServletException {
+        try {
+            String medicineID = request.getParameter("medicineID"); // Code
+            String medicineName = request.getParameter("medicineName");
+            String sellingPriceStr = request.getParameter("sellingPrice");
+            String unit = request.getParameter("unit");
+            String categoryID = request.getParameter("categoryID");
+            String remainingQuantityStr = request.getParameter("remainingQuantity");
+            String imageUrl = request.getParameter("imageUrl");
+            String shortDescription = request.getParameter("shortDescription");
+            String packDescription = request.getParameter("packDescription");
 
-        models.Medicine m = new models.Medicine();
-        m.setMedicineID(medicineID);
-        m.setMedicineName(medicineName);
-        if (sellingPriceStr != null && !sellingPriceStr.isEmpty()) {
-            m.setSellingPrice(new java.math.BigDecimal(sellingPriceStr));
-        }
-        m.setUnit(unit);
-        m.setCategoryID(categoryID);
-        int qty = 0;
-        try { qty = Integer.parseInt(remainingQuantityStr); } catch (Exception ignored) {}
-        m.setRemainingQuantity(qty);
-        m.setImageUrl(imageUrl);
-        m.setShortDescription(shortDescription);
-        m.setPackDescription(packDescription);
+            models.Medicine m = new models.Medicine();
+            m.setMedicineCode(medicineID); // Set Code
+            m.setMedicineName(medicineName);
+            if (sellingPriceStr != null && !sellingPriceStr.isEmpty()) {
+                m.setSellingPrice(Double.parseDouble(sellingPriceStr));
+            }
+            m.setUnit(unit);
 
-        boolean ok = medicineDAO.createMedicine(m);
-        if (ok) {
-            response.sendRedirect(request.getContextPath() + "/medicine");
-        } else {
-            request.setAttribute("errorMessage", "Không thể thêm thuốc. Vui lòng thử lại.");
+            if (categoryID != null && !categoryID.isEmpty()) {
+                try {
+                    m.setCategoryId(Integer.parseInt(categoryID));
+                } catch (NumberFormatException e) {
+                    // Log or ignore
+                }
+            }
+
+            int qty = 0;
+            try {
+                qty = Integer.parseInt(remainingQuantityStr);
+            } catch (Exception ignored) {
+            }
+            m.setRemainingQuantity(qty);
+            m.setImageUrl(imageUrl);
+            m.setShortDescription(shortDescription);
+            m.setPackDescription(packDescription);
+
+            boolean ok = medicineDAO.createMedicine(m);
+            if (ok) {
+                response.sendRedirect(request.getContextPath() + "/medicine");
+            } else {
+                request.setAttribute("errorMessage", "Không thể thêm thuốc. Vui lòng thử lại.");
+                request.setAttribute("categories", categoryDAO.getAllCategories());
+                request.setAttribute("pageTitle", "Thêm Thuốc");
+                request.setAttribute("content", "/view/admin/medicine-add.jsp");
+                request.getRequestDispatcher("/view/common/sidebar.jsp").forward(request, response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
             request.setAttribute("categories", categoryDAO.getAllCategories());
             request.setAttribute("pageTitle", "Thêm Thuốc");
             request.setAttribute("content", "/view/admin/medicine-add.jsp");
             request.getRequestDispatcher("/view/common/sidebar.jsp").forward(request, response);
         }
-    } catch (Exception e) {
-        e.printStackTrace();
-        request.setAttribute("errorMessage", "Có lỗi xảy ra.");
-        request.setAttribute("categories", categoryDAO.getAllCategories());
-        request.setAttribute("pageTitle", "Thêm Thuốc");
-        request.setAttribute("content", "/view/admin/medicine-add.jsp");
-        request.getRequestDispatcher("/view/common/sidebar.jsp").forward(request, response);
     }
-}
 
-// Helper to update medicine from form
-private void updateMedicineFromRequest(jakarta.servlet.http.HttpServletRequest request,
-                                       jakarta.servlet.http.HttpServletResponse response)
-        throws java.io.IOException, jakarta.servlet.ServletException {
-    try {
-        String medicineID = request.getParameter("medicineID");
-        String medicineName = request.getParameter("medicineName");
-        String sellingPriceStr = request.getParameter("sellingPrice");
-        String unit = request.getParameter("unit");
-        String categoryID = request.getParameter("categoryID");
-        String remainingQuantityStr = request.getParameter("remainingQuantity");
-        String imageUrl = request.getParameter("imageUrl");
-        String shortDescription = request.getParameter("shortDescription");
-        String packDescription = request.getParameter("packDescription");
+    // Helper to update medicine from form
+    private void updateMedicineFromRequest(jakarta.servlet.http.HttpServletRequest request,
+            jakarta.servlet.http.HttpServletResponse response)
+            throws java.io.IOException, jakarta.servlet.ServletException {
+        try {
+            String medicineID = request.getParameter("medicineID"); // This is the Code
+            String medicineName = request.getParameter("medicineName");
+            String sellingPriceStr = request.getParameter("sellingPrice");
+            String unit = request.getParameter("unit");
+            String categoryID = request.getParameter("categoryID");
+            String remainingQuantityStr = request.getParameter("remainingQuantity");
+            String imageUrl = request.getParameter("imageUrl");
+            String shortDescription = request.getParameter("shortDescription");
+            String packDescription = request.getParameter("packDescription");
 
-        Medicine m = new Medicine();
-        m.setMedicineID(medicineID);
-        m.setMedicineName(medicineName);
-        if (sellingPriceStr != null && !sellingPriceStr.isEmpty()) {
-            m.setSellingPrice(new java.math.BigDecimal(sellingPriceStr));
-        }
-        m.setUnit(unit);
-        m.setCategoryID(categoryID);
-        int qty = 0; try { qty = Integer.parseInt(remainingQuantityStr); } catch (Exception ignored) {}
-        m.setRemainingQuantity(qty);
-        m.setImageUrl(imageUrl);
-        m.setShortDescription(shortDescription);
-        m.setPackDescription(packDescription);
+            // Look up existing medicine to get the PK
+            Medicine existing = medicineDAO.getMedicineById(medicineID);
+            // Note: getMedicineById handles String by calling getMedicineByCode if not int
 
-        boolean ok = medicineDAO.updateMedicine(m);
-        if (ok) {
-            response.sendRedirect(request.getContextPath() + "/medicine");
-        } else {
-            request.setAttribute("errorMessage", "Không thể cập nhật thuốc.");
-            request.setAttribute("medicine", m);
+            if (existing == null) {
+                request.setAttribute("errorMessage", "Không thể tìm thấy thuốc để cập nhật.");
+                response.sendRedirect(request.getContextPath() + "/medicine");
+                return;
+            }
+
+            Medicine m = new Medicine();
+            m.setMedicineId(existing.getMedicineId()); // Set PK
+            m.setMedicineCode(medicineID);
+            m.setMedicineName(medicineName);
+            if (sellingPriceStr != null && !sellingPriceStr.isEmpty()) {
+                m.setSellingPrice(Double.parseDouble(sellingPriceStr));
+            }
+            m.setUnit(unit);
+
+            if (categoryID != null && !categoryID.isEmpty()) {
+                try {
+                    m.setCategoryId(Integer.parseInt(categoryID));
+                } catch (NumberFormatException e) {
+                    // Log or ignore
+                }
+            }
+
+            int qty = 0;
+            try {
+                qty = Integer.parseInt(remainingQuantityStr);
+            } catch (Exception ignored) {
+            }
+            m.setRemainingQuantity(qty);
+            m.setImageUrl(imageUrl);
+            m.setShortDescription(shortDescription);
+            m.setPackDescription(packDescription);
+
+            boolean ok = medicineDAO.updateMedicine(m);
+            if (ok) {
+                response.sendRedirect(request.getContextPath() + "/medicine");
+            } else {
+                request.setAttribute("errorMessage", "Không thể cập nhật thuốc.");
+                request.setAttribute("medicine", m);
+                request.setAttribute("categories", categoryDAO.getAllCategories());
+                request.setAttribute("pageTitle", "Cập nhật thuốc");
+                request.setAttribute("content", "/view/admin/medicine-edit.jsp");
+                request.getRequestDispatcher("/view/common/sidebar.jsp").forward(request, response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Có lỗi xảy ra: " + e.getMessage());
+            String id = request.getParameter("medicineID");
+            request.setAttribute("medicine", medicineDAO.getMedicineById(id));
             request.setAttribute("categories", categoryDAO.getAllCategories());
             request.setAttribute("pageTitle", "Cập nhật thuốc");
             request.setAttribute("content", "/view/admin/medicine-edit.jsp");
             request.getRequestDispatcher("/view/common/sidebar.jsp").forward(request, response);
         }
-    } catch (Exception e) {
-        e.printStackTrace();
-        request.setAttribute("errorMessage", "Có lỗi xảy ra.");
-        String id = request.getParameter("medicineID");
-        request.setAttribute("medicine", medicineDAO.getMedicineById(id));
-        request.setAttribute("categories", categoryDAO.getAllCategories());
-        request.setAttribute("pageTitle", "Cập nhật thuốc");
-        request.setAttribute("content", "/view/admin/medicine-edit.jsp");
-        request.getRequestDispatcher("/view/common/sidebar.jsp").forward(request, response);
     }
-}
 }

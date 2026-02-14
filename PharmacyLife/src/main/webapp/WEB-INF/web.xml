@@ -34,6 +34,7 @@
         <url-pattern>/search</url-pattern>
     </servlet-mapping>
     
+    <servlet>
         <servlet-name>CartController</servlet-name>
         <servlet-class>controllers.CartController</servlet-class>
     </servlet>
