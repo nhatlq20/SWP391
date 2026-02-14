@@ -28,6 +28,10 @@
         <servlet-name>ChangePasswordController</servlet-name>
         <servlet-class>controllers.ChangePasswordController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>LogoutPageController</servlet-name>
+        <servlet-class>controllers.LogoutPageController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>CartController</servlet-name>
         <url-pattern>/cart</url-pattern>
@@ -55,6 +59,10 @@
     <servlet-mapping>
         <servlet-name>ChangePasswordController</servlet-name>
         <url-pattern>/change-password</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LogoutPageController</servlet-name>
+        <url-pattern>/logout-page</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

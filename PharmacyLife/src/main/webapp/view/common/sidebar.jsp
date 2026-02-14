@@ -36,7 +36,7 @@
                     <% } %>
                 </div>
                 <div class="sidebar-footer">
-                    <a href="logout" class="sidebar-item sidebar-logout">
+                    <a href="logout-page" class="sidebar-item sidebar-logout">
                         <i class="fas fa-sign-out-alt"></i> Đăng xuất
                     </a>
                 </div>
