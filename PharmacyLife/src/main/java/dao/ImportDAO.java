@@ -13,23 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * DAO cho chức năng nhập thuốc, mapping đúng với schema database hiện tại.
- *
- * Bảng [Import]:
- * - ImportId INT IDENTITY(1,1) PRIMARY KEY
- * - SupplierId INT NOT NULL
- * - StaffId INT NOT NULL
- * - ImportCreateAt DATETIME2
- * - TotalPrice DECIMAL(12,2) NOT NULL
- *
- * Bảng [ImportDetail]:
- * - ImportDetailId INT IDENTITY(1,1) PRIMARY KEY
- * - ImportId INT NOT NULL
- * - MedicineId INT NOT NULL
- * - ImportQuantity INT
- * - UnitPrice DECIMAL(12,2)
- */
+
 public class ImportDAO {
 
     private final DBContext dbContext;
@@ -38,9 +22,6 @@ public class ImportDAO {
         this.dbContext = new DBContext();
     }
 
-    // ============================ IMPORT ============================
-
-    // Lấy danh sách tất cả phiếu nhập
     public List<Import> getAllImports() {
         List<Import> imports = new ArrayList<>();
 
@@ -455,29 +436,15 @@ public class ImportDAO {
         }
     }
 
-    // Lấy giá thuốc (UnitPrice) từ MedicineId hoặc Code (giả sử lấy từ bảng
-    // Medicine nếu có cột giá nhập, hoặc 0)
-    // Sửa lại: Trong bảng Medicine có thể không có giá nhập, nhưng ImportDetail có.
-    // Nếu đề bài yêu cầu "lấy bên database", có thể là lấy giá bán hoặc giá nhập
-    // gần nhất?
-    // Giả sử bảng Medicine có cột Price hoặc ImportPrice. Nếu không, trả về 0.
-    // Dựa vào context Import, ta có thể lấy giá nhập gần nhất của thuốc đó.
     public double getMedicinePriceByCode(String code) {
-        // Option 1: Try to look up in Medicine table (if strictly required 'Price')
-        // Option 2: Look up latest import price for suggestion (more advanced)
 
-        // Let's assume Medicine table has a 'Price' or 'ImportPrice' column.
-        // Checking previous files... Medicine.java wasn't viewed but likely exists.
-        // Let's query: SELECT ImportPrice FROM Medicine WHERE MedicineCode = ?
-        // If not exists, return 0.
-
-        String sql = "SELECT Price FROM Medicine WHERE MedicineCode = ?"; // Assuming Price exists
+        String sql = "SELECT OriginalPrice FROM Medicine WHERE MedicineCode = ?"; // Assuming Price exists
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, code);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getDouble("Price");
+                    return rs.getDouble("OriginalPrice");
                 }
             }
         } catch (SQLException e) {
@@ -486,10 +453,9 @@ public class ImportDAO {
         return 0;
     }
 
-    // Lấy danh sách tất cả thuốc (cho Dropdown)
     public List<Medicine> getAllMedicines() {
         List<Medicine> list = new ArrayList<>();
-        String sql = "SELECT MedicineId, MedicineCode, MedicineName, Price FROM Medicine";
+        String sql = "SELECT MedicineId, MedicineCode, MedicineName, OriginalPrice FROM Medicine";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
@@ -498,7 +464,7 @@ public class ImportDAO {
                 m.setMedicineId(rs.getInt("MedicineId"));
                 m.setMedicineCode(rs.getString("MedicineCode"));
                 m.setMedicineName(rs.getString("MedicineName"));
-                m.setPrice(rs.getDouble("Price"));
+                m.setOriginalPrice(rs.getDouble("OriginalPrice"));
                 list.add(m);
             }
         } catch (SQLException e) {
