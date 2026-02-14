@@ -34,6 +34,13 @@
         <url-pattern>/search</url-pattern>
     </servlet-mapping>
     
+        <servlet-name>CartController</servlet-name>
+        <servlet-class>controllers.CartController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CartController</servlet-name>
+        <url-pattern>/cart</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
             30

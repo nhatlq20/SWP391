@@ -5,7 +5,7 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* CSS variables (needed for buttons/dropdowns colors) */
+
 :root {
     --bg-surface: #ffffff;
     --text-primary: #1f2937;
@@ -33,18 +33,26 @@
     transform: translate(-50%, -50%);
     animation: ripplePop .6s ease-out forwards;
     z-index: 1000000;
-    box-shadow: 0 0 0 6px rgba(42,96,232,0.15), 0 0 0 12px rgba(42,96,232,0.06);
+
+    box-shadow: 0 0 0 6px rgba(42, 96, 232, 0.15), 0 0 0 12px rgba(42, 96, 232, 0.06);
 }
+
 @keyframes ripplePop {
-    from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    to   { opacity: 0; transform: translate(-50%, -50%) scale(6); }
+    from {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(6);
+    }
 }
 
 .header {
-    background-image: url('../img/header4.png');
-    background-size: 100% auto;
-    background-position: center top;
-    background-repeat: no-repeat;
+    background-color: #4F81E1;
+    background-image: none;
+
     height: 115px;
     display: flex;
     align-items: center;
@@ -56,13 +64,8 @@
     left: 0;
     width: 100%;
     z-index: 9999;
-    overflow: visible !important; /* ✅ Cho phép dropdown hiển thị ra ngoài header */
-}
 
-/* Đảm bảo header không tạo stacking context mới che dropdown */
-.header::after {
-    content: none;
-    display: none;
+    overflow: visible !important;
 }
 
 .logo-section {
@@ -70,180 +73,129 @@
     align-items: center;
 }
 
-.logo-text {
-    color: white;
+
+.logo-link {
+    display: flex;
+    flex-direction: column;
+    /* Stack text vertically */
+    align-items: flex-start;
     text-decoration: none;
-    font-size: 32px;
-    font-weight: bold;
-    line-height: 1.2;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-    z-index: 10;
-    position: relative;
+    color: #fff;
 }
 
+.logo-wrapper {
+    display: flex;
+    flex-direction: column;
+}
 
+.logo-top {
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+    color: rgba(255, 255, 255, 0.9);
+}
 
+.logo-main {
+    font-size: 28px;
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1.1;
+    color: #fff;
+    text-shadow: none;
+
+}
+
+.site-logo,
+.logo-text,
 .logo-subtitle {
-    font-size: 18px;
-    font-weight: normal;
-    display: block;
+    display: none;
 }
 
 .search-section {
     flex: 1;
     max-width: 600px;
-    margin: 0 40px 0 0;
+    margin: 0 40px;
 }
 
 .search-bar {
     width: 100%;
-    padding: 12px 20px;
+
+    padding: 10px 25px;
     border: none;
-    border-radius: 30px;
-    font-size: 16px;
+    border-radius: 50px;
+    /* Pill shape */
+    font-size: 15px;
     outline: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    background-color: rgba(255, 255, 255, 0.95);
-    z-index: 10;
-    position: relative;
+    box-shadow: none;
+    background-color: #fff;
+    color: #555;
+    height: 46px;
 }
 
-.search-bar:focus {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+.search-bar::placeholder {
+    color: #9ca3af;
 }
 
 .nav-section {
     display: flex;
     align-items: center;
-    gap: 43px; /* Increased gap between nav items */
-    min-width: 380px; /* Ensure minimum width for nav section */
-    justify-content: flex-end; /* Align items to the right */
+
+    gap: 20px;
+    justify-content: flex-end;
     position: relative;
     z-index: 10001;
     overflow: visible;
 }
 
-/* Theme toggle button */
-.theme-toggle {
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: #fff;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: inline-flex;
+
+.cart-btn {
+    display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    transition: all .2s ease;
-}
-.theme-toggle:hover {
-    background: rgba(255,255,255,0.25);
-    transform: translateY(-1px);
-}
-
-.nav-link i {
-
-    color: white !important;
-    text-decoration: none;
-    font-size: 22px;
-    font-weight: 600;
-    padding: 12px 24px;
-    border-radius: 25px;
-    transition: all 0.3s ease;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-    z-index: 10;
-    position: relative;
-    display: flex;
-    align-items: center;
-
-    gap: 25px;
-    /* Increased gap between icon and text */
-    margin-left: -20px;
-    /* Move the entire nav-link left */
-
-    line-height: 1;
-}
-
-.nav-link i {
-    color: white;
-
-    font-size: 44px !important;
-    /* Increased icon size further */
-    height: 55px;
-    /* Match search bar total height */
-    display: flex;
-    align-items: center;
-    /* Center icon vertically */
-}
-
-/* Specific styling for cart icon */
-.cart-link i {
-    font-size: 42px;
-    /* Match user icon size */
-
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-    vertical-align: middle;
-}
-
-.nav-link:hover {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.2);
-    color: white !important;
-    text-decoration: none;
+    color: #fff;
+    padding: 0;
+    transition: background 0.2s;
 }
 
-.nav-link:hover i {
-    color: white;
+.cart-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: none;
 }
 
-.cart-link {
+.cart-btn i {
+    font-size: 20px;
     position: relative;
 }
 
-.cart-icon {
-    font-size: 18px;
-    margin-right: 5px;
-
-}
-
-/* ===== Logo Layout ===== */
-.logo-section {
+.user-trigger {
     display: flex;
     align-items: center;
-}
-
-.logo-link {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
+    gap: 10px;
     color: #fff;
-    /* hoặc màu chữ bạn đang dùng */
+    text-decoration: none;
+    font-weight: 500;
 }
 
-.site-logo {
-
-    height: 80px;
-    /* chỉnh kích thước logo */
-    width: auto;
-    margin-right: 13px;
-    /* khoảng cách giữa logo và chữ */
-
+.user-trigger .avatar {
+    width: 32px;
+    height: 32px;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.logo-text {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #0bd549;
-    line-height: 1.2;
+.user-trigger .avatar i {
+    font-size: 24px;
 }
 
-.logo-subtitle {
-    font-size: 0.9rem;
-    color: #0bd549;
-    /* màu nhẹ hơn cho tagline */
-}
 
-/* Header actions modern styles */
 .header .login-btn {
     display: flex;
     align-items: center;
@@ -274,64 +226,17 @@
 
 
 
-/*.header .cart-btn {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #fff;
-  font-size: 1.06rem;
-  text-decoration: none;
-  font-weight: 500;
-  background: #2a60e8;
-  border-radius: 36px;
-  padding: 14px 32px;
-  border: none;
-  outline: none;
-  box-shadow: 0 1.5px 8px rgba(53,86,233,0.09);
-  transition: background 0.22s, color 0.22s;
-}
-.header .cart-btn i {
-  font-size: 1.22em;
-  color: #fff;
-}
-.header .cart-btn:hover { background: #1751c9; color: #e0eaff; }*/
 
 
-
-
-/* --- Mini Cart Dropdown (FINAL POLISHED VERSION) --- */
 .cart-wrapper {
     position: relative;
     display: inline-block;
-    z-index: 10002 !important; /* đảm bảo nằm trên cùng */
+    z-index: 10002 !important;
     overflow: visible !important;
 }
 
-/* Nút giỏ hàng giữ nguyên */
-.cart-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: #fff;
-    text-decoration: none;
-    font-weight: 500;
-    position: relative;
-    background: #2a60e8 !important;
-    padding: 14px 32px;
-    border-radius: 36px;
-    transition: background 0.25s ease, transform 0.15s ease;
-}
 
-.cart-btn:hover {
-    background: #1751c9;
-    transform: translateY(-1px);
-}
 
-.cart-btn i {
-    position: relative;
-}
-
-/* Số lượng trên icon */
 .cart-badge {
     position: absolute;
     top: -6px;
@@ -343,26 +248,37 @@
     border-radius: 50%;
     padding: 3px 6px;
     line-height: 1;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-/* --- Dropdown --- */
 .cart-dropdown {
     position: absolute;
-    top: calc(100% + 8px); /* nằm ngay dưới nút giỏ hàng với khoảng cách */
+    top: calc(100% + 8px);
     right: 0;
     width: 320px;
     background: #fff;
     border-radius: 14px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px);
     transition: all 0.25s ease;
-    z-index: 10003 !important; /* đảm bảo nằm trên header */
-    overflow: hidden; /* Để giữ rounded corners */
+    z-index: 10003 !important;
+    overflow: visible !important;
+    /* Changed from hidden to visible */
     max-height: 500px;
     margin-top: 0;
+}
+
+/* Invisible bridge to prevent dropdown closing */
+.cart-dropdown::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    background: transparent;
 }
 
 .cart-items {
@@ -382,15 +298,13 @@
     white-space: normal;
 }
 
-/* Hover để hiện dropdown */
 .cart-wrapper:hover .cart-dropdown {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
 }
 
-/* --- Nội dung trong dropdown --- */
-.cart-header {
+.dropdown-cart-header {
     font-weight: 600;
     font-size: 15px;
     color: #374151;
@@ -402,7 +316,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    border-radius: 14px 14px 0 0; /* Rounded top corners */
+    border-radius: 14px 14px 0 0;
 }
 
 .cart-item {
@@ -444,6 +358,7 @@
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     word-break: break-word;
 }
@@ -471,11 +386,11 @@
     margin-left: 6px;
     transition: color 0.2s ease;
 }
+
 .cart-item a.text-danger:hover {
     color: #dc2626 !important;
 }
 
-/* Footer */
 .cart-footer {
     background-color: #f9fafb;
     border-top: 1px solid #eee;
@@ -484,7 +399,7 @@
     position: relative;
     z-index: 1;
     overflow: hidden;
-    border-radius: 0 0 14px 14px; /* Rounded bottom corners */
+    border-radius: 0 0 14px 14px;
 }
 
 .cart-footer .btn {
@@ -497,47 +412,64 @@
     transition: background 0.25s ease, transform 0.08s ease;
     position: relative;
     z-index: 2;
-    overflow: hidden; /* for ripple */
+    overflow: hidden;
+    /* for ripple */
     white-space: nowrap;
     display: inline-block;
     opacity: 1 !important;
-    box-shadow: 0 4px 12px rgba(42,96,232,0.25);
+    box-shadow: 0 4px 12px rgba(42, 96, 232, 0.25);
 }
-.cart-footer .btn:active { transform: scale(0.98); }
+
+.cart-footer .btn:active {
+    transform: scale(0.98);
+}
 
 /* ripple element inside button */
 .btn-ripple {
     position: absolute;
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(255,255,255,0.6);
+    background: rgba(255, 255, 255, 0.6);
     pointer-events: none;
     animation: btnRipple 600ms ease-out forwards;
 }
+
 @keyframes btnRipple {
-    from { width: 0; height: 0; opacity: .5; }
-    to { width: 240px; height: 240px; opacity: 0; }
+    from {
+        width: 0;
+        height: 0;
+        opacity: .5;
+    }
+
+    to {
+        width: 240px;
+        height: 240px;
+        opacity: 0;
+    }
 }
+
 .cart-footer .btn:hover {
     background: #1751c9;
 }
 
 /* --- Ensure dropdown displays above all sections --- */
-.main-content, .container, section {
+.main-content,
+.container,
+section {
     position: relative;
     z-index: 1;
     overflow: visible !important;
 }
 
-/* ✅ Ngăn tràn ngang toàn trang */
-html, body {
-  overflow-x: hidden;
+html,
+body {
+    overflow-x: hidden;
 }
 
-/* ✅ Giới hạn header và nav không vượt quá chiều rộng trang */
-.header, .nav-section, .nav-categories, .main-content {
-  max-width: 100vw;
-  overflow-x: clip;
+.nav-categories,
+.main-content {
+    max-width: 100vw;
+    overflow-x: clip;
 }
 
 
@@ -612,6 +544,7 @@ html, body {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
 }
+
 /* Force solid dropdown background, avoid transparency over header */
 .header .user-dropdown {
     background-color: #ffffff !important;
@@ -657,7 +590,7 @@ html, body {
     width: 64px;
     flex: 0 0 64px;
     position: relative;
-    transition: width .28s cubic-bezier(.4,0,.2,1);
+    transition: width .28s cubic-bezier(.4, 0, .2, 1);
     will-change: width;
 }
 
@@ -858,14 +791,29 @@ html, body {
     flex-basis: 250px;
 }
 
-.left-sidebar::before { content: ""; position: absolute; left: -16px; top: 0; width: 16px; height: 100%; }
+.left-sidebar::before {
+    content: "";
+    position: absolute;
+    left: -16px;
+    top: 0;
+    width: 16px;
+    height: 100%;
+}
+
 .left-sidebar:hover .label,
 .left-sidebar:hover .sidebar-name,
 .left-sidebar:hover .sidebar-greeting,
-.left-sidebar:hover .sidebar-pos { opacity: 1; visibility: visible; transform: translateX(0); }
+.left-sidebar:hover .sidebar-pos {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
 .left-sidebar:hover .label,
 .left-sidebar:hover .sidebar-name,
-.left-sidebar:hover .sidebar-greeting { transform: translateX(0); }
+.left-sidebar:hover .sidebar-greeting {
+    transform: translateX(0);
+}
 
 .left-sidebar:hover .sidebar-item {
     justify-content: flex-start;
@@ -892,14 +840,29 @@ html, body {
     flex-basis: 250px;
 }
 
-.sidebar-aside::before { content: ""; position: absolute; left: -16px; top: 0; width: 16px; height: 100%; }
+.sidebar-aside::before {
+    content: "";
+    position: absolute;
+    left: -16px;
+    top: 0;
+    width: 16px;
+    height: 100%;
+}
+
 .sidebar-aside:hover .label,
 .sidebar-aside:hover .sidebar-name,
 .sidebar-aside:hover .sidebar-greeting,
-.sidebar-aside:hover .sidebar-pos { opacity: 1; visibility: visible; transform: translateX(0); }
+.sidebar-aside:hover .sidebar-pos {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
 .sidebar-aside:hover .label,
 .sidebar-aside:hover .sidebar-name,
-.sidebar-aside:hover .sidebar-greeting { transform: translateX(0); }
+.sidebar-aside:hover .sidebar-greeting {
+    transform: translateX(0);
+}
 
 .sidebar-aside:hover .sidebar-item {
     justify-content: flex-start;
