@@ -41,6 +41,7 @@
                                 <div class="user-dropdown">
                                     <a class="user-item" href="${pageContext.request.contextPath}/profile">Thông tin cá
                                         nhân</a>
+                                    <a class="user-item" href="${pageContext.request.contextPath}/my-reviews">Đánh giá của tôi</a>
                                     <a class="user-item" href="${pageContext.request.contextPath}/my-orders">Xem đơn
                                         hàng</a>
                                     <% 
@@ -70,6 +71,10 @@
                                 <a href="${pageContext.request.contextPath}/Login" class="login-btn">
                                     <i class="fas fa-user-circle"></i>
                                     <span>Tài khoản</span>
+                                </a>
+                                <a href="${pageContext.request.contextPath}/my-reviews?customerId=2" class="login-btn">
+                                    <i class="fas fa-star"></i>
+                                    <span>Đánh giá của tôi</span>
                                 </a>
                                 <% } %>
 
@@ -167,3 +172,4 @@
                     </div>
                 </header>
                 <script src="${pageContext.request.contextPath}/assets/js/header.js"></script>
+

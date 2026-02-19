@@ -5,6 +5,7 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+
 :root {
     --bg-surface: #ffffff;
     --text-primary: #1f2937;
@@ -32,6 +33,7 @@
     transform: translate(-50%, -50%);
     animation: ripplePop .6s ease-out forwards;
     z-index: 1000000;
+
     box-shadow: 0 0 0 6px rgba(42, 96, 232, 0.15), 0 0 0 12px rgba(42, 96, 232, 0.06);
 }
 
@@ -50,6 +52,7 @@
 .header {
     background-color: #4F81E1;
     background-image: none;
+
     height: 115px;
     display: flex;
     align-items: center;
@@ -61,14 +64,15 @@
     left: 0;
     width: 100%;
     z-index: 9999;
+
     overflow: visible !important;
 }
 
-/* Logo Layout */
 .logo-section {
     display: flex;
     align-items: center;
 }
+
 
 .logo-link {
     display: flex;
@@ -117,6 +121,7 @@
 
 .search-bar {
     width: 100%;
+
     padding: 10px 25px;
     border: none;
     border-radius: 50px;
@@ -136,12 +141,14 @@
 .nav-section {
     display: flex;
     align-items: center;
+
     gap: 20px;
     justify-content: flex-end;
     position: relative;
     z-index: 10001;
     overflow: visible;
 }
+
 
 .cart-btn {
     display: flex;
