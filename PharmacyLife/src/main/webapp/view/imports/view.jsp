@@ -1,202 +1,177 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-            <!DOCTYPE html>
-            <html>
+            <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+                <!DOCTYPE html>
+                <html>
 
-            <head>
-                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-                <title>Xem chi tiết phiếu nhập</title>
-                <link rel="stylesheet" href="${pageContext.request.contextPath}/view/css/import.css">
-                <style>
-                    /* Specific overrides for the View Details Card to match screenshot */
-                    .view-card {
-                        background-color: white;
-                        border-radius: 12px;
-                        padding: 40px;
-                        max-width: 900px;
-                        margin: 0 auto;
-                        /* Center horizontally in the main content */
-                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-                    }
+                <head>
+                    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+                    <title>Chi tiết phiếu nhập - Admin</title>
+                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+                        rel="stylesheet">
+                    <link rel="stylesheet"
+                        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+                    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
 
-                    .view-title-center {
-                        text-align: center;
-                        color: #4a86e8;
-                        font-size: 28px;
-                        font-weight: bold;
-                        margin-bottom: 40px;
-                    }
+                    <style>
+                        body {
+                            background-color: #f4f6f9;
+                        }
 
-                    .view-grid {
-                        display: grid;
-                        grid-template-columns: 1fr 1fr;
-                        gap: 30px;
-                        /* Horizontal and Vertical gap */
-                        margin-bottom: 30px;
-                    }
+                        .sidebar-wrapper {
+                            top: 115px !important;
+                            height: calc(100vh - 115px) !important;
+                            z-index: 100;
+                        }
 
-                    .view-label {
-                        display: block;
-                        margin-bottom: 10px;
-                        font-weight: 600;
-                        color: #333;
-                        font-size: 15px;
-                    }
+                        .main-content-dashboard {
+                            margin-left: 250px;
+                            padding: 30px;
+                            margin-top: 115px;
+                            max-width: 100%;
+                            width: calc(100% - 250px);
+                        }
 
-                    .view-input-readonly {
-                        width: 100%;
-                        padding: 12px 15px;
-                        background-color: #f1f3f5;
-                        /* Light gray from screenshot */
-                        border: none;
-                        border-radius: 8px;
-                        font-size: 14px;
-                        color: #555;
-                        font-weight: 500;
-                    }
+                        .page-title-dashboard {
+                            font-size: 28px;
+                            font-weight: 700;
+                            color: #2c3e50;
+                            margin-bottom: 30px;
+                            display: flex;
+                            align-items: center;
+                            gap: 15px;
+                        }
 
-                    .view-close-btn {
-                        background-color: #999;
-                        color: white;
-                        border: none;
-                        padding: 10px 30px;
-                        border-radius: 20px;
-                        font-size: 16px;
-                        cursor: pointer;
-                        font-weight: bold;
-                        transition: background 0.2s;
-                        text-decoration: none;
-                        display: inline-block;
-                    }
+                        .card-custom {
+                            background: white;
+                            border-radius: 12px;
+                            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+                            border: 1px solid #eef2f7;
+                            padding: 25px;
+                        }
+                    </style>
+                </head>
 
-                    .view-close-btn:hover {
-                        background-color: #888;
-                    }
+                <body>
+                    <jsp:include page="/view/common/header.jsp" />
+                    <jsp:include page="/view/common/sidebar.jsp" />
 
-                    .view-footer {
-                        display: flex;
-                        justify-content: flex-end;
-                        margin-top: 40px;
-                    }
-                </style>
-            </head>
+                    <div class="main-content-dashboard">
+                        <div class="page-title-dashboard">
+                            <i class="fas fa-file-invoice" style="color: #4F81E1;"></i>
+                            <span>Chi tiết phiếu nhập thuốc</span>
+                        </div>
 
-            <body>
-                <%@include file="header.jsp" %>
+                        <div class="card-custom">
+                            <c:if test="${empty import}">
+                                <div class="alert alert-danger" role="alert">
+                                    <i class="fas fa-exclamation-circle me-2"></i>Không tìm thấy phiếu nhập
+                                </div>
+                                <a href="${pageContext.request.contextPath}/import" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Trở lại
+                                </a>
+                            </c:if>
 
-                    <div class="container">
-                        <%@include file="sidebar.jsp" %>
-
-                            <div class="main-content">
-                                <div class="page-title">
-                                    <i>📥</i>
-                                    <span>Quản lý nhập thuốc</span>
+                            <c:if test="${not empty import}">
+                                <div class="row mb-4">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Mã phiếu nhập</label>
+                                        <input type="text" class="form-control bg-light" value="${import.importCode}"
+                                            readonly>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Nhà cung cấp</label>
+                                        <input type="text" class="form-control bg-light"
+                                            value="${import.supplierName != null ? import.supplierName : import.supplierId}"
+                                            readonly>
+                                    </div>
                                 </div>
 
-                                <c:if test="${empty import}">
-                                    <div
-                                        style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-                                        Không tìm thấy phiếu nhập
+                                <div class="row mb-4">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Người nhập</label>
+                                        <input type="text" class="form-control bg-light"
+                                            value="${import.staffName != null ? import.staffName : import.staffId}"
+                                            readonly>
                                     </div>
-                                    <a href="${pageContext.request.contextPath}/ImportController"
-                                        class="btn-secondary">Trở lại</a>
-                                </c:if>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Ngày nhập</label>
+                                        <input type="text" class="form-control bg-light"
+                                            value="<fmt:formatDate value='${import.importDate}' pattern='dd/MM/yyyy'/>"
+                                            readonly>
+                                    </div>
+                                </div>
 
-                                <c:if test="${not empty import}">
-                                    <div class="view-card">
-                                        <div class="view-title-center">Xem chi tiết phiếu nhập</div>
-
-                                        <div class="view-grid">
-                                            <!-- Row 1 -->
-                                            <div>
-                                                <label class="view-label">Mã</label>
-                                                <input type="text" class="view-input-readonly"
-                                                    value="${import.importCode}" readonly>
-                                            </div>
-                                            <div>
-                                                <label class="view-label">Nhà cung cấp</label>
-                                                <input type="text" class="view-input-readonly"
-                                                    value="${import.supplierName != null ? import.supplierName : import.supplierId}"
-                                                    readonly>
-                                            </div>
-
-                                            <div>
-                                                <label class="view-label">Người nhập</label>
-                                                <input type="text" class="view-input-readonly"
-                                                    value="${import.staffName != null ? import.staffName : import.staffId}"
-                                                    readonly>
-                                            </div>
-                                            <div>
-                                                <label class="view-label">Ngày nhập</label>
-                                                <input type="text" class="view-input-readonly"
-                                                    value="<fmt:formatDate value='${import.importDate}' pattern='dd/MM/yyyy'/>"
-                                                    readonly>
-                                            </div>
-
-                                            <!-- Row 3 -->
-                                            <div>
-                                                <label class="view-label">Tổng tiền</label>
-                                                <input type="text" class="view-input-readonly"
-                                                    value="<fmt:formatNumber value='${import.totalAmount}' type='number' maxFractionDigits='0'/>₫"
-                                                    readonly>
-                                            </div>
-                                            <div>
-                                                <label class="view-label">Trạng thái</label>
-                                                <input type="text" class="view-input-readonly"
-                                                    value="${import.status != null ? import.status : 'Đã duyệt'}"
-                                                    readonly>
-                                                <!-- Note: Status might not make sense if not in DB, defaulting to 'Đã duyệt' as in screenshot/requirement context -->
-                                            </div>
+                                <div class="row mb-4">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Tổng tiền</label>
+                                        <div class="form-control bg-light text-success fw-bold">
+                                            <fmt:formatNumber value="${import.totalAmount}" type="number"
+                                                groupingUsed="true" maxFractionDigits="0" />₫
                                         </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Trạng thái</label>
+                                        <input type="text" class="form-control bg-light"
+                                            value="${import.status != null ? import.status : 'Đã duyệt'}" readonly>
+                                    </div>
+                                </div>
 
-                                        <!-- Medicine List (Optional but recommended for 'Details') -->
-                                        <c:if test="${not empty details}">
-                                            <div
-                                                style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px;">
-                                                <label class="view-label"
-                                                    style="font-size: 18px; margin-bottom: 20px;">Danh sách
-                                                    thuốc</label>
-                                                <table class="clean-table">
-                                                    <thead>
+                                <!-- Medicine List -->
+                                <c:if test="${not empty details}">
+                                    <div class="mt-5">
+                                        <h5 class="fw-bold mb-3"><i class="fas fa-list me-2"></i>Danh sách thuốc nhập
+                                        </h5>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover border">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Mã thuốc</th>
+                                                        <th>Tên thuốc</th>
+                                                        <th>Số lượng</th>
+                                                        <th>Giá</th>
+                                                        <th>Thành tiền</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <c:forEach var="detail" items="${details}">
                                                         <tr>
-                                                            <th>Mã thuốc</th>
-                                                            <th>Tên thuốc</th>
-                                                            <th>Số lượng</th>
-                                                            <th>Giá</th>
-                                                            <th>Thành tiền</th>
+                                                            <td><strong>${detail.medicineCode}</strong></td>
+                                                            <td>${detail.medicineName != null ? detail.medicineName :
+                                                                '-'}</td>
+                                                            <td>${detail.quantity}</td>
+                                                            <td class="text-success">
+                                                                <fmt:formatNumber value="${detail.price}" type="number"
+                                                                    maxFractionDigits="0" />₫
+                                                            </td>
+                                                            <td class="text-success fw-bold">
+                                                                <fmt:formatNumber value="${detail.totalAmount}"
+                                                                    type="number" maxFractionDigits="0" />₫
+                                                            </td>
                                                         </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <c:forEach var="detail" items="${details}">
-                                                            <tr>
-                                                                <td>${detail.medicineCode}</td>
-                                                                <td>${detail.medicineName != null ? detail.medicineName
-                                                                    : '-'}</td>
-                                                                <td>${detail.quantity}</td>
-                                                                <td class="amount-green">
-                                                                    <fmt:formatNumber value="${detail.price}"
-                                                                        type="number" maxFractionDigits="0" />₫
-                                                                </td>
-                                                                <td class="amount-green">
-                                                                    <fmt:formatNumber value="${detail.totalAmount}"
-                                                                        type="number" maxFractionDigits="0" />₫
-                                                                </td>
-                                                            </tr>
-                                                        </c:forEach>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </c:if>
-
-                                        <div class="view-footer">
-                                            <a href="${pageContext.request.contextPath}/ImportController"
-                                                class="view-close-btn">Đóng</a>
+                                                    </c:forEach>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </c:if>
-                            </div>
-                    </div>
-            </body>
 
-            </html>
+                                <div class="mt-5 d-flex justify-content-between">
+                                    <a href="${pageContext.request.contextPath}/import"
+                                        class="btn btn-secondary px-4">
+                                        <i class="fas fa-arrow-left me-2"></i>Trở lại
+                                    </a>
+                                    <a href="${pageContext.request.contextPath}/import?action=edit&code=${import.importCode}"
+                                        class="btn btn-warning px-4">
+                                        <i class="fas fa-edit me-2"></i>Chỉnh sửa
+                                    </a>
+                                </div>
+                            </c:if>
+                        </div>
+                    </div>
+
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+                </body>
+
+                </html>

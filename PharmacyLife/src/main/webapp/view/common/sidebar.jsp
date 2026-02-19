@@ -1,4 +1,3 @@
-
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -45,6 +44,7 @@
                         <i class="fas fa-pills"></i> Quản lý sản phẩm
                     </a>
 
+
                     <a href="${pageContext.request.contextPath}/admin/customers-dashboard"
                         class="sidebar-item ${fn:contains(uri, 'customer') && fn:contains(uri, 'dashboard') ? 'active' : ''}">
                         <i class="fas fa-users"></i> Quản lý khách hàng
@@ -53,6 +53,11 @@
                     <a href="${pageContext.request.contextPath}/admin/staff-dashboard"
                         class="sidebar-item ${fn:contains(uri, 'staff') && fn:contains(uri, 'dashboard') ? 'active' : ''}">
                         <i class="fas fa-user-shield"></i> Quản lý nhân viên
+                    </a>
+
+                    <a href="${pageContext.request.contextPath}/import"
+                        class="sidebar-item ${fn:contains(uri, '/import') ? 'active' : ''}">
+                        <i class="fas fa-file-import"></i> Quản lý nhập thuốc
                     </a>
                 </div>
                 <div class="sidebar-footer">

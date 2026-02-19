@@ -51,6 +51,9 @@
                                             sản phẩm</a>
                                         <a class="user-item" href="${pageContext.request.contextPath}/staff">Quản lí
                                             khách hàng</a>
+                                        <a class="user-item"
+                                            href="${pageContext.request.contextPath}/import">Quản lí nhập
+                                            thuốc</a>
                                         <% } %>
                                             <a class="user-item"
                                                 href="${pageContext.request.contextPath}/auth?action=logout">Đăng
@@ -158,4 +161,3 @@
                     </div>
                 </header>
                 <script src="${pageContext.request.contextPath}/assets/js/header.js"></script>
-
