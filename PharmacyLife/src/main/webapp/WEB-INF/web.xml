@@ -60,6 +60,10 @@
         <servlet-name>StaffController</servlet-name>
         <servlet-class>controllers.StaffController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ViewReviewsController</servlet-name>
+        <servlet-class>controllers.ViewReviewsController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>CartController</servlet-name>
         <url-pattern>/cart</url-pattern>
@@ -67,6 +71,26 @@
     <servlet-mapping>
         <servlet-name>StaffController</servlet-name>
         <url-pattern>/Staffmanage</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewReviewsController</servlet-name>
+        <url-pattern>/viewReviews</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>CreatedReview</servlet-name>
+        <servlet-class>controllers.CreatedReview</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MyReviewsController</servlet-name>
+        <servlet-class>controllers.MyReviewsController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreatedReview</servlet-name>
+        <url-pattern>/createdReview</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MyReviewsController</servlet-name>
+        <url-pattern>/my-reviews</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

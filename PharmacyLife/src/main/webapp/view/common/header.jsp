@@ -41,6 +41,7 @@
                                 <div class="user-dropdown">
                                     <a class="user-item" href="${pageContext.request.contextPath}/profile">Thông tin cá
                                         nhân</a>
+                                    <a class="user-item" href="${pageContext.request.contextPath}/my-reviews">Đánh giá của tôi</a>
                                     <a class="user-item" href="${pageContext.request.contextPath}/my-orders">Xem đơn
                                         hàng</a>
                                     <% if ("admin".equalsIgnoreCase((String)session.getAttribute("roleName"))) { %>
@@ -61,6 +62,10 @@
                                 <a href="${pageContext.request.contextPath}/auth" class="login-btn">
                                     <i class="fas fa-user-circle"></i>
                                     <span>Tài khoản</span>
+                                </a>
+                                <a href="${pageContext.request.contextPath}/my-reviews?customerId=2" class="login-btn">
+                                    <i class="fas fa-star"></i>
+                                    <span>Đánh giá của tôi</span>
                                 </a>
                                 <% } %>
 

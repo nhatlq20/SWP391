@@ -7,14 +7,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import dao.CustomerDAO;
 import models.Customer;
 
 @WebServlet(name = "CustomerControllerForDashboard", urlPatterns = { "/admin/customers-dashboard",
         "/admin/customer-detail-dashboard" })
 public class CustomerControllerForDashboard extends HttpServlet {
-
-    private CustomerDAO customerDAO = new CustomerDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
