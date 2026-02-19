@@ -1,0 +1,257 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    display: flex;
+    width: 90%;
+    max-width: 1200px;
+    height: 650px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Left Side - Image */
+.login-left {
+    flex: 1;
+    background: linear-gradient(135deg, #e8f0ff 0%, #f5f8ff 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.login-left img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Right Side - Form */
+.login-right {
+    flex: 1;
+    padding: 60px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.login-logo img.icon-logo {
+    width: 50px;
+    height: 50px;
+}
+
+.login-logo img.text-logo {
+    height: 45px;
+    width: auto;
+}
+
+.login-title {
+    color: #5b8def;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 35px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    right: 15px;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 45px 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #5b8def;
+    box-shadow: 0 0 0 3px rgba(91, 141, 239, 0.1);
+}
+
+.form-group input::placeholder {
+    color: #aaa;
+}
+
+.forgot-password {
+    text-align: right;
+    margin-bottom: 25px;
+}
+
+.forgot-password a {
+    color: #5b8def;
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.forgot-password a:hover {
+    color: #4a75d9;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #5b8def 0%, #4a75d9 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(91, 141, 239, 0.3);
+}
+
+.divider {
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.register-link {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.register-link a {
+    color: #5b8def;
+    font-size: 14px;
+    text-decoration: none;
+    font-weight: 500;
+    border: 1px solid #5b8def;
+    padding: 12px 30px;
+    border-radius: 8px;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.register-link a:hover {
+    background: #5b8def;
+    color: white;
+}
+
+.btn-google {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-google:hover {
+    border-color: #5b8def;
+    box-shadow: 0 2px 10px rgba(91, 141, 239, 0.1);
+}
+
+.google-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+    .login-container {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    .login-left {
+        padding: 30px;
+        min-height: 300px;
+    }
+    
+    .login-right {
+        padding: 40px 30px;
+    }
+}
+
+@media (max-width: 576px) {
+    .login-container {
+        width: 95%;
+        border-radius: 15px;
+    }
+    
+    .login-right {
+        padding: 30px 20px;
+    }
+}
+
+/* Google Icon Colors */
+.google-blue {
+    fill: #4285F4;
+}
+
+.google-green {
+    fill: #34A853;
+}
+
+.google-yellow {
+    fill: #FBBC05;
+}
+
+.google-red {
+    fill: #EA4335;
+}
