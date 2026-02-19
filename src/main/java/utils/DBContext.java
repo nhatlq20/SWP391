@@ -1,38 +1,28 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package Utils;
+package utils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
-/**
- *
- * @author PC
- */
 public class DBContext {
-
-    public Connection connection;
+    // JDBC URL used to create new connections on demand
+    private final String url = "jdbc:sqlserver://localhost:1433;" +
+            "databaseName=SWP391_Test;" +
+            "user=sa;" +
+            "password=hao0915;" +
+            "encrypt=true;" +
+            "trustServerCertificate=true;";
 
     public DBContext() {
-
         try {
-
-            String url = "jdbc:sqlserver://localhost:1433;"
-                    + "databaseName=SWP391_Test7;"
-                    + "user=sa;"
-                    + "password=123;"
-                    + "encrypt=true;"
-                    + "trustServerCertificate=true;";
-
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            connection = DriverManager.getConnection(url);
-
-        } catch (Exception e) {
-            System.out.println("Database connection failed: " + e);
+        } catch (ClassNotFoundException ex) {
+            System.out.println("JDBC Driver not found: " + ex);
         }
-
     }
 
+    // Return a new connection each time to avoid sharing/closing the same Connection instance
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(url);
+    }
 }

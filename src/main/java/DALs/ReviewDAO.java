@@ -6,7 +6,7 @@ package DALs;
 
 import Model.Review;
 import Model.ReviewDTO;
-import Utils.DBContext;
+import utils.DBContext;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
@@ -35,7 +35,7 @@ public class ReviewDAO extends DBContext {
         String sql = "SELECT * FROM Reviews Where CustomerId=?";
 
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+            PreparedStatement ps = getConnection().prepareStatement(sql);
             ps.setInt(1, customerId);
             ResultSet rs = ps.executeQuery();
 
@@ -62,7 +62,7 @@ public class ReviewDAO extends DBContext {
                 + "VALUES(?,?,?,?,GETDATE())";
 
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+            PreparedStatement ps = getConnection().prepareStatement(sql);
             ps.setInt(1, r.getCustomerId());
             ps.setInt(2, r.getMedicineId());
             ps.setInt(3, r.getRating());
@@ -84,7 +84,7 @@ public class ReviewDAO extends DBContext {
                 + "ORDER BY r.ReviewCreatedAt DESC";
         try {
 
-            PreparedStatement ps = connection.prepareStatement(sql);
+            PreparedStatement ps = getConnection().prepareStatement(sql);
             ps.setInt(1, medicineId);
             ResultSet rs = ps.executeQuery();
 
@@ -113,13 +113,12 @@ public class ReviewDAO extends DBContext {
                 + "WHERE CustomerId=? AND ReviewId=? AND MedicineId=?;";
 
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+            PreparedStatement ps = getConnection().prepareStatement(sql);
             ps.setInt(1, customerId);
             ps.setInt(2, reviewId);
             ps.setInt(3, medicineId);
 
             int rows = ps.executeUpdate();
-     
 
         } catch (Exception e) {
             e.printStackTrace();
