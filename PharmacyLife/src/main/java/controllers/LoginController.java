@@ -77,12 +77,10 @@ public class LoginController extends HttpServlet {
 
             // Redirect based on role
             String roleName = staff.getRoleName();
-            if ("Admin".equalsIgnoreCase(roleName)) {
-                response.sendRedirect(request.getContextPath() + "/Staffmanage");
-            } else if ("Staff".equalsIgnoreCase(roleName)) {
-                response.sendRedirect(request.getContextPath() + "/cart");
+            if ("Admin".equalsIgnoreCase(roleName) || "Staff".equalsIgnoreCase(roleName)) {
+                response.sendRedirect(request.getContextPath() + "/medicine");
             } else {
-                response.sendRedirect(request.getContextPath() + "/cart");
+                response.sendRedirect(request.getContextPath() + "/home");
             }
             return;
         }
@@ -101,8 +99,8 @@ public class LoginController extends HttpServlet {
             session.setAttribute("userEmail", customer.getEmail());
             session.setAttribute("roleName", "Customer");
 
-            // Redirect to shopping page
-            response.sendRedirect(request.getContextPath() + "/cart");
+            // Redirect to welcome file (home)
+            response.sendRedirect(request.getContextPath() + "/home");
             return;
         }
 
