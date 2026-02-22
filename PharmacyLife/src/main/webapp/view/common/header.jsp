@@ -72,10 +72,6 @@
                                     <i class="fas fa-user-circle"></i>
                                     <span>Tài khoản</span>
                                 </a>
-                                <a href="${pageContext.request.contextPath}/my-reviews?customerId=2" class="login-btn">
-                                    <i class="fas fa-star"></i>
-                                    <span>Đánh giá của tôi</span>
-                                </a>
                                 <% } %>
 
                                     <!-- Cart Dropdown -->
