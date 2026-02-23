@@ -60,8 +60,8 @@ public class CustomerControllerForDashboard extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/admin/customers-dashboard");
     }
 
-//    private List<Customer> getMockCustomers() {
-//        List<Customer> list = new java.util.ArrayList<>();
+    private List<Customer> getMockCustomers() {
+        List<Customer> list = new java.util.ArrayList<>();
 //        list.add(new Customer(1, "CUS001", "Nguyễn Văn A", "nguyenvana@example.com", "0901234567",
 //                "123 Lê Lợi, Quận 1, TP.HCM",
 //                "Active", new java.util.Date()));
@@ -76,6 +76,6 @@ public class CustomerControllerForDashboard extends HttpServlet {
 //                "Active", new java.util.Date()));
 //        list.add(new Customer(5, "CUS005", "Hoàng Văn E", "hoangvane@example.com", "0977889900",
 //                "654 Điện Biên Phủ, Bình Thạnh, TP.HCM", "Active", new java.util.Date()));
-//        return list;
-//    }
+        return list;
+    }
 }
