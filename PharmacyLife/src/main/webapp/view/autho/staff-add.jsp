@@ -59,7 +59,7 @@
                     <div class="form-group">
                         <label for="staffPassword">
                             <span style="display:inline-flex; align-items:center; gap:4px;">
-                                <img src="${pageContext.request.contextPath}/assets/img/pass.png" alt="Password" style="width:20px; height:20px;" /> Mật khẩu
+                                <img src="${pageContext.request.contextPath}/assets/img/Lock.png" alt="Password" style="width:20px; height:20px;" /> Mật khẩu
                             </span>
                         </label>
                         <input type="password" id="staffPassword" name="staffPassword" placeholder="Mật khẩu" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:14px; box-sizing:border-box;">

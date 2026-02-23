@@ -36,7 +36,7 @@
                     </div>
                     <a href="${pageContext.request.contextPath}/Staffmanage?action=add" class="add-btn">
                         <span style="display:inline-flex; align-items:center; gap:6px;">
-                            <span style="font-size:18px;">⊕</span>
+                            <img class="add-btn-icon" src="${pageContext.request.contextPath}/assets/img/plus.png" alt="plus" />
                             <span>Thêm nhân viên mới</span>
                         </span>
                     </a>

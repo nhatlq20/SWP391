@@ -4,6 +4,8 @@
  */
 package models;
 
+import java.util.Date;
+
 /**
  *
  * @author anltc
@@ -13,6 +15,8 @@ public class Staff {
     private String staffCode;
     private String staffName;
     private String staffPhone;
+    private String staffAddress;
+    private Date staffDob;
     private String roleName;
     private int roleId;
     private String staffEmail;
@@ -53,6 +57,22 @@ public class Staff {
 
     public void setStaffPhone(String staffPhone) {
         this.staffPhone = staffPhone;
+    }
+
+    public String getStaffAddress() {
+        return staffAddress;
+    }
+
+    public void setStaffAddress(String staffAddress) {
+        this.staffAddress = staffAddress;
+    }
+
+    public Date getStaffDob() {
+        return staffDob;
+    }
+
+    public void setStaffDob(Date staffDob) {
+        this.staffDob = staffDob;
     }
 
     public String getRoleName() {
