@@ -34,6 +34,18 @@ public class Customer {
         this.status = status;
         this.Dob = Dob;
     }
+
+    public Customer(int customerId, String customerCode, String fullName, String email, String phone, String address,
+            String status, Date createdAt) {
+        this.customerId = customerId;
+        this.customerCode = customerCode;
+        this.fullName = fullName;
+        this.email = email;
+        this.phone = phone;
+        this.address = address;
+        this.createdAt = createdAt;
+        this.status = "active".equalsIgnoreCase(status);
+    }
     
 
     public int getCustomerId() {

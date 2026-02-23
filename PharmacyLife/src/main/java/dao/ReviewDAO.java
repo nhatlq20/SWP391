@@ -39,6 +39,7 @@ public class ReviewDAO {
     }
 
     public List<ReviewCustomer> getReviewsWithCustomerByMedicine(int medicineId) {
+        //lấy danh sách review của 1 loại thuốc
         List<ReviewCustomer> list = new ArrayList<>();
         String sql = "SELECT c.FullName, r.Rating, r.Comment, r.ReviewCreatedAt " +
                      "FROM Reviews r " +
@@ -67,6 +68,46 @@ public class ReviewDAO {
         return list;
     }
 
+      public double getAverageRating(int medicineId) {
+        //tính trung bình sao
+        String sql = "SELECT AVG(CAST(Rating AS FLOAT)) as avgRating FROM Reviews WHERE MedicineId = ?";
+            
+        try (Connection conn = dbContext.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, medicineId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("avgRating");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0.0;
+    }
+
+        public int getTotalReviews(int medicineId) {
+            //đếm xem có bao nhiêu sản phẩm
+        String sql = "SELECT COUNT(*) as count FROM Reviews WHERE MedicineId = ?";
+
+        try (Connection conn = dbContext.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, medicineId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("count");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
     public boolean addReview(Review review) {
         String sql = "INSERT INTO Reviews (MedicineId, CustomerId, Rating, Comment, ReviewCreatedAt) VALUES (?, ?, ?, ?, GETDATE())";
 
@@ -86,43 +127,9 @@ public class ReviewDAO {
         return false;
     }
 
-    public double getAverageRating(int medicineId) {
-        String sql = "SELECT AVG(CAST(Rating AS FLOAT)) as avgRating FROM Reviews WHERE MedicineId = ?";
+  
 
-        try (Connection conn = dbContext.getConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, medicineId);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getDouble("avgRating");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0.0;
-    }
-
-    public int getTotalReviews(int medicineId) {
-        String sql = "SELECT COUNT(*) as count FROM Reviews WHERE MedicineId = ?";
-
-        try (Connection conn = dbContext.getConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, medicineId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("count");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
-    }
 
     public boolean insertReview(Review review) {
         return addReview(review);

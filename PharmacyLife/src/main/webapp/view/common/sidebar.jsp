@@ -1,3 +1,13 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %> <%@ taglib prefix="c"
+uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fn"
+uri="http://java.sun.com/jsp/jstl/functions" %>
+<link
+  rel="stylesheet"
+  href="${pageContext.request.contextPath}/assets/css/sidebar.css"
+/>
+<div class="sidebar-wrapper">
+  <div class="sidebar-menu">
+    <c:set var="uri" value="${pageContext.request.requestURI}" />
 
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>

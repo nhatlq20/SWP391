@@ -9,20 +9,9 @@ body {
     font-family: Arial, sans-serif;
 }
 
-.header {
-    background: #4f7ee3;
-    color: white;
-    padding: 25px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: bold;
-    font-size: 18px;
-}
-
 .container {
     max-width: 600px;
-    margin: 60px auto;
+    margin: 130px auto 60px;
     background: white;
     border-radius: 14px;
     padding: 30px;
@@ -163,7 +152,7 @@ textarea.form-input {
 /* Responsive */
 @media (max-width: 600px) {
     .container {
-        margin: 20px;
+        margin: 110px 20px 20px;
         padding: 20px;
     }
 
