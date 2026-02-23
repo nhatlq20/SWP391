@@ -6,6 +6,7 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html>
@@ -44,11 +45,23 @@
 
                 <div class="form-field">
                     <label>Giới tính</label>
-                    <div class="field-box">${staff.staffGender}</div>
+                    <div class="field-box">
+                        <c:choose>
+                            <c:when test="${not empty staff.staffGender}">${staff.staffGender}</c:when>
+                            <c:otherwise>Chưa cập nhật</c:otherwise>
+                        </c:choose>
+                    </div>
                 </div>
                 <div class="form-field">
                     <label>Ngày sinh</label>
-                    <div class="field-box">none</div>
+                    <div class="field-box">
+                        <c:choose>
+                            <c:when test="${not empty staff.staffDob}">
+                                <fmt:formatDate value="${staff.staffDob}" pattern="dd/MM/yyyy"/>
+                            </c:when>
+                            <c:otherwise>Chưa cập nhật</c:otherwise>
+                        </c:choose>
+                    </div>
                 </div>
 
                 <div class="form-field wide">
@@ -58,13 +71,18 @@
 
                 <div class="form-field wide">
                     <label>Địa chỉ</label>
-                    <div class="field-box">none</div>
+                    <div class="field-box">
+                        <c:choose>
+                            <c:when test="${not empty staff.staffAddress}">${staff.staffAddress}</c:when>
+                            <c:otherwise>Chưa cập nhật</c:otherwise>
+                        </c:choose>
+                    </div>
                 </div>
 
             </div>
 
             <div style="text-align:right; margin-top:18px;">
-                <a class="add-btn" href="${pageContext.request.contextPath}/Staffmanage">Đóng</a>
+                <a class="add-btn detail-close-btn" href="${pageContext.request.contextPath}/Staffmanage">Đóng</a>
             </div>
         </div>
 

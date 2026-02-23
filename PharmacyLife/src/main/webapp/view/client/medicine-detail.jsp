@@ -217,11 +217,21 @@
                         </div>
 
                         <!-- Action Buttons -->
+                         <!-- kien -->
                         <div class="action-buttons">
                             <button class="btn-buy btn btn-primary">Mua</button>
-                            <a class="btn-rate btn btn-outline-warning" href="${pageContext.request.contextPath}/createdReview?medicineId=${medicine.medicineId}">
-                                <i class="fas fa-star"></i> Đánh giá sản phẩm
-                            </a>
+                            <c:choose>
+                                <c:when test="${sessionScope.userType eq 'customer'}">
+                                    <a class="btn-rate btn btn-outline-warning" href="${pageContext.request.contextPath}/createdReview?medicineId=${medicine.medicineId}">
+                                        <i class="fas fa-star"></i> Đánh giá sản phẩm
+                                    </a>
+                                </c:when>
+                                <c:otherwise>
+                                    <a class="btn-rate btn btn-outline-warning" href="${pageContext.request.contextPath}/Login">
+                                        <i class="fas fa-star"></i> Đăng nhập để đánh giá
+                                    </a>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </div>
                 </div>

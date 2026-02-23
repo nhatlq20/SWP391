@@ -57,9 +57,13 @@ public class ProfileController extends HttpServlet {
             user.setFullName(staff.getStaffName());
             user.setEmail(staff.getStaffEmail());
             user.setPhone(staff.getStaffPhone());
-            user.setAddress(""); // Staff doesn't have address
-            user.setDob(null); // Staff doesn't have DOB
-            user.setGender(staff.getStaffGender());
+            user.setAddress(staff.getStaffAddress());
+            user.setDob(staff.getStaffDob());
+            String staffGender = staff.getStaffGender();
+            if (staffGender == null || staffGender.trim().isEmpty()) {
+                staffGender = "Khác";
+            }
+            user.setGender(staffGender);
         }
         
         request.setAttribute("user", user);
@@ -122,7 +126,13 @@ public class ProfileController extends HttpServlet {
                 
             } else if ("staff".equals(userType) && loggedInUser instanceof Staff) {
                 // Update Staff
-                success = profileDAO.updateStaffProfile(userId, fullName, phone, gender);
+                Date staffDob = null;
+                if (dobStr != null && !dobStr.isEmpty()) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    staffDob = sdf.parse(dobStr);
+                }
+
+                success = profileDAO.updateStaffProfile(userId, fullName, phone, address, staffDob, gender);
                 
                 if (success) {
                     // Reload staff data

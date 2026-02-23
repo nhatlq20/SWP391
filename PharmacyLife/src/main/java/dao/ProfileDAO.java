@@ -53,7 +53,7 @@ public class ProfileDAO {
     
     // Get staff by ID
     public Staff getStaffById(int staffId) {
-        String sql = "SELECT s.StaffId, s.StaffCode, s.StaffName, s.StaffPhone, r.RoleName, s.StaffIsActive, s.StaffEmail, s.StaffGender, s.RoleId, s.StaffPassword " +
+        String sql = "SELECT s.StaffId, s.StaffCode, s.StaffName, s.StaffPhone, s.StaffAddress, s.StaffDob, r.RoleName, s.StaffIsActive, s.StaffEmail, s.StaffGender, s.RoleId, s.StaffPassword " +
                      "FROM Staff s JOIN Role r ON s.RoleId = r.RoleId " +
                      "WHERE s.StaffId = ?";
 
@@ -69,6 +69,8 @@ public class ProfileDAO {
                 staff.setStaffCode(rs.getString("StaffCode"));
                 staff.setStaffName(rs.getString("StaffName"));
                 staff.setStaffPhone(rs.getString("StaffPhone"));
+                staff.setStaffAddress(rs.getString("StaffAddress"));
+                staff.setStaffDob(rs.getDate("StaffDob"));
                 staff.setRoleName(rs.getString("RoleName"));
                 staff.setActive(rs.getBoolean("StaffIsActive"));
                 staff.setStaffEmail(rs.getString("StaffEmail"));
@@ -118,16 +120,22 @@ public class ProfileDAO {
     }
     
     // Update staff profile
-    public boolean updateStaffProfile(int staffId, String staffName, String staffPhone, String staffGender) {
-        String sql = "UPDATE Staff SET StaffName = ?, StaffPhone = ?, StaffGender = ? WHERE StaffId = ?";
+    public boolean updateStaffProfile(int staffId, String staffName, String staffPhone, String staffAddress, java.util.Date staffDob, String staffGender) {
+        String sql = "UPDATE Staff SET StaffName = ?, StaffPhone = ?, StaffAddress = ?, StaffDob = ?, StaffGender = ? WHERE StaffId = ?";
 
         try (Connection conn = new DBContext().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, staffName);
             ps.setString(2, staffPhone);
-            ps.setString(3, staffGender);
-            ps.setInt(4, staffId);
+            ps.setString(3, staffAddress);
+            if (staffDob != null) {
+                ps.setDate(4, new java.sql.Date(staffDob.getTime()));
+            } else {
+                ps.setNull(4, java.sql.Types.DATE);
+            }
+            ps.setString(5, staffGender);
+            ps.setInt(6, staffId);
             
             int result = ps.executeUpdate();
             return result > 0;
