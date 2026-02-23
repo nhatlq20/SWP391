@@ -1,9 +1,5 @@
 package dao;
 
-import models.Import;
-import models.ImportDetail;
-import models.Medicine;
-import utils.DBContext;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -13,23 +9,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * DAO cho chức năng nhập thuốc, mapping đúng với schema database hiện tại.
- *
- * Bảng [Import]:
- * - ImportId INT IDENTITY(1,1) PRIMARY KEY
- * - SupplierId INT NOT NULL
- * - StaffId INT NOT NULL
- * - ImportCreateAt DATETIME2
- * - TotalPrice DECIMAL(12,2) NOT NULL
- *
- * Bảng [ImportDetail]:
- * - ImportDetailId INT IDENTITY(1,1) PRIMARY KEY
- * - ImportId INT NOT NULL
- * - MedicineId INT NOT NULL
- * - ImportQuantity INT
- * - UnitPrice DECIMAL(12,2)
- */
+import models.Import;
+import models.ImportDetail;
+import models.Medicine;
+import utils.DBContext;
+
 public class ImportDAO {
 
     private final DBContext dbContext;
@@ -241,7 +225,7 @@ public class ImportDAO {
         List<ImportDetail> details = new ArrayList<>();
 
         String sql = "SELECT d.ImportDetailId, d.ImportId, d.MedicineId, " +
-                "       m.MedicineName, d.ImportQuantity, d.UnitPrice " +
+                "       m.MedicineCode, m.MedicineName, d.ImportQuantity, d.UnitPrice " +
                 "FROM   ImportDetail d " +
                 "LEFT JOIN Medicine m ON d.MedicineId = m.MedicineId " +
                 "WHERE  d.ImportId = ?";
@@ -257,6 +241,7 @@ public class ImportDAO {
                     detail.setDetailId(rs.getInt("ImportDetailId"));
                     detail.setImportId(rs.getInt("ImportId"));
                     detail.setMedicineId(rs.getInt("MedicineId"));
+                    detail.setMedicineCode(rs.getString("MedicineCode"));
                     detail.setMedicineName(rs.getString("MedicineName"));
                     detail.setQuantity(rs.getInt("ImportQuantity"));
                     detail.setUnitPrice(rs.getDouble("UnitPrice"));
@@ -500,6 +485,37 @@ public class ImportDAO {
                 m.setMedicineName(rs.getString("MedicineName"));
                 m.setPrice(rs.getDouble("Price"));
                 list.add(m);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public double getMedicinePriceById(int medicineId) {
+        String sql = "SELECT OriginalPrice FROM Medicine WHERE MedicineId = ?";
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, medicineId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("OriginalPrice");
+                }
+            }
+        } catch (SQLException e) {
+            // e.printStackTrace(); // Silent fail or log
+        }
+        return 0;
+    }
+
+    public List<Object[]> getAllSuppliers() {
+        List<Object[]> list = new ArrayList<>();
+        String sql = "SELECT SupplierId, SupplierName FROM Supplier ORDER BY SupplierName";
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(new Object[] { rs.getInt("SupplierId"), rs.getString("SupplierName") });
             }
         } catch (SQLException e) {
             e.printStackTrace();

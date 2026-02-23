@@ -4,24 +4,25 @@ package models;
  * Model đại diện cho bảng [ImportDetail] trong database.
  *
  * Schema:
- *  - ImportDetailId INT IDENTITY(1,1) PRIMARY KEY
- *  - ImportId       INT NOT NULL
- *  - MedicineId     INT NOT NULL
- *  - ImportQuantity INT
- *  - UnitPrice      DECIMAL(12,2)
+ * - ImportDetailId INT IDENTITY(1,1) PRIMARY KEY
+ * - ImportId INT NOT NULL
+ * - MedicineId INT NOT NULL
+ * - ImportQuantity INT
+ * - UnitPrice DECIMAL(12,2)
  *
  * Thuộc tính medicineName và totalAmount chỉ dùng để hiển thị,
  * totalAmount được tính từ quantity * unitPrice, không bắt buộc lưu DB.
  */
 public class ImportDetail {
 
-    private int detailId;     // ImportDetailId
-    private int importId;     // ImportId
-    private int medicineId;   // MedicineId
+    private int detailId; // ImportDetailId
+    private int importId; // ImportId
+    private int medicineId; // MedicineId
 
     private String medicineName; // Tên thuốc (join từ bảng Medicine)
+    private String medicineCode; // Mã thuốc (join từ bảng Medicine)
 
-    private int quantity;     // ImportQuantity
+    private int quantity; // ImportQuantity
     private double unitPrice; // UnitPrice
 
     private double totalAmount; // quantity * unitPrice (tính toán)
@@ -38,7 +39,7 @@ public class ImportDetail {
     }
 
     public ImportDetail(int detailId, int importId, int medicineId,
-                        String medicineName, int quantity, double unitPrice, double totalAmount) {
+            String medicineName, int quantity, double unitPrice, double totalAmount) {
         this.detailId = detailId;
         this.importId = importId;
         this.medicineId = medicineId;
@@ -78,6 +79,14 @@ public class ImportDetail {
 
     public void setMedicineName(String medicineName) {
         this.medicineName = medicineName;
+    }
+
+    public String getMedicineCode() {
+        return medicineCode;
+    }
+
+    public void setMedicineCode(String medicineCode) {
+        this.medicineCode = medicineCode;
     }
 
     public int getQuantity() {

@@ -64,7 +64,7 @@
                         </div>
 
                         <div class="card-custom">
-                            <c:if test="${empty import}">
+                            <c:if test="${empty importRecord}">
                                 <div class="alert alert-danger" role="alert">
                                     <i class="fas fa-exclamation-circle me-2"></i>Không tìm thấy phiếu nhập
                                 </div>
@@ -73,17 +73,17 @@
                                 </a>
                             </c:if>
 
-                            <c:if test="${not empty import}">
+                            <c:if test="${not empty importRecord}">
                                 <div class="row mb-4">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-bold">Mã phiếu nhập</label>
-                                        <input type="text" class="form-control bg-light" value="${import.importCode}"
-                                            readonly>
+                                        <input type="text" class="form-control bg-light"
+                                            value="${importRecord.importCode}" readonly>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-bold">Nhà cung cấp</label>
                                         <input type="text" class="form-control bg-light"
-                                            value="${import.supplierName != null ? import.supplierName : import.supplierId}"
+                                            value="${importRecord.supplierName != null ? importRecord.supplierName : importRecord.supplierId}"
                                             readonly>
                                     </div>
                                 </div>
@@ -92,13 +92,13 @@
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-bold">Người nhập</label>
                                         <input type="text" class="form-control bg-light"
-                                            value="${import.staffName != null ? import.staffName : import.staffId}"
+                                            value="${importRecord.staffName != null ? importRecord.staffName : importRecord.staffId}"
                                             readonly>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-bold">Ngày nhập</label>
                                         <input type="text" class="form-control bg-light"
-                                            value="<fmt:formatDate value='${import.importDate}' pattern='dd/MM/yyyy'/>"
+                                            value="<fmt:formatDate value='${importRecord.importDate}' pattern='dd/MM/yyyy'/>"
                                             readonly>
                                     </div>
                                 </div>
@@ -107,14 +107,15 @@
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-bold">Tổng tiền</label>
                                         <div class="form-control bg-light text-success fw-bold">
-                                            <fmt:formatNumber value="${import.totalAmount}" type="number"
+                                            <fmt:formatNumber value="${importRecord.totalAmount}" type="number"
                                                 groupingUsed="true" maxFractionDigits="0" />₫
                                         </div>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-bold">Trạng thái</label>
                                         <input type="text" class="form-control bg-light"
-                                            value="${import.status != null ? import.status : 'Đã duyệt'}" readonly>
+                                            value="${importRecord.status != null ? importRecord.status : 'Đã duyệt'}"
+                                            readonly>
                                     </div>
                                 </div>
 
@@ -142,8 +143,8 @@
                                                                 '-'}</td>
                                                             <td>${detail.quantity}</td>
                                                             <td class="text-success">
-                                                                <fmt:formatNumber value="${detail.price}" type="number"
-                                                                    maxFractionDigits="0" />₫
+                                                                <fmt:formatNumber value="${detail.unitPrice}"
+                                                                    type="number" maxFractionDigits="0" />₫
                                                             </td>
                                                             <td class="text-success fw-bold">
                                                                 <fmt:formatNumber value="${detail.totalAmount}"
@@ -158,11 +159,10 @@
                                 </c:if>
 
                                 <div class="mt-5 d-flex justify-content-between">
-                                    <a href="${pageContext.request.contextPath}/import"
-                                        class="btn btn-secondary px-4">
+                                    <a href="${pageContext.request.contextPath}/import" class="btn btn-secondary px-4">
                                         <i class="fas fa-arrow-left me-2"></i>Trở lại
                                     </a>
-                                    <a href="${pageContext.request.contextPath}/import?action=edit&code=${import.importCode}"
+                                    <a href="${pageContext.request.contextPath}/import?action=edit&code=${importRecord.importCode}"
                                         class="btn btn-warning px-4">
                                         <i class="fas fa-edit me-2"></i>Chỉnh sửa
                                     </a>

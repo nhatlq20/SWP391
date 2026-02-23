@@ -1,3 +1,4 @@
+
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -74,10 +75,9 @@
                                 </div>
                             </c:if>
 
-                            <form method="POST" action="${pageContext.request.contextPath}/import"
-                                id="importForm">
+                            <form method="POST" action="${pageContext.request.contextPath}/import" id="importForm">
                                 <input type="hidden" name="action" value="create">
-                                <input type="hidden" name="importCode" value="${newCode != null ? newCode : 'IP001'}"
+                                <input type="hidden" name="importCode" value="${newCode != null ? newCode : 'IP001'}">
 
                                 <div class="import-card-layout">
                                     <div class="import-flex-content">
@@ -85,8 +85,12 @@
                                         <div class="left-panel">
                                             <div class="custom-input-group">
                                                 <label class="custom-input-label">Nhà cung cấp</label>
-                                                <input type="text" name="supplierId" required class="custom-input"
-                                                    placeholder="Nhập nhà cung cấp sản phẩm">
+                                                <select name="supplierId" required class="custom-input">
+                                                    <option value="">-- Chọn nhà cung cấp --</option>
+                                                    <c:forEach var="supplier" items="${suppliers}">
+                                                        <option value="${supplier[0]}">${supplier[1]}</option>
+                                                    </c:forEach>
+                                                </select>
                                             </div>
 
                                             <div class="custom-input-group">
@@ -97,8 +101,9 @@
 
                                             <div class="custom-input-group">
                                                 <label class="custom-input-label">Người nhập</label>
-                                                <input type="text" name="importerId" required class="custom-input"
-                                                    placeholder="Tên người nhập">
+                                                <input type="text" class="custom-input" value="${sessionScope.userName}"
+                                                    readonly style="background-color: #f0f0f0; cursor: not-allowed;">
+                                                <input type="hidden" name="importerId" value="${sessionScope.userId}">
                                             </div>
 
                                             <div class="custom-input-group">
@@ -179,10 +184,10 @@
                             </div>
                             <div class="form-group mb-3">
                                 <label class="form-label">Mã thuốc</label>
-                                <select id="modalMedicineCode" class="form-select">
+                                <select id="modalMedicineId" class="form-select">
                                     <option value="">-- Chọn thuốc --</option>
                                     <c:forEach var="med" items="${medicines}">
-                                        <option value="${med.medicineCode}">${med.medicineCode} - ${med.medicineName}
+                                        <option value="${med.medicineId}">${med.medicineCode} - ${med.medicineName}
                                         </option>
                                     </c:forEach>
                                 </select>
@@ -217,7 +222,7 @@
 
                         function openAddMedicineModal() {
                             document.getElementById('addMedicineModal').style.display = 'block';
-                            document.getElementById('modalMedicineCode').value = '';
+                            document.getElementById('modalMedicineId').value = '';
                             document.getElementById('modalQuantity').value = '';
                             document.getElementById('modalPrice').value = '';
                             document.getElementById('modalTotalDisplay').textContent = '0₫';
@@ -227,10 +232,10 @@
                             document.getElementById('addMedicineModal').style.display = 'none';
                         }
 
-                        document.getElementById('modalMedicineCode').addEventListener('change', function () {
-                            const code = this.value;
-                            if (code && code.trim() !== '') {
-                                fetch('${pageContext.request.contextPath}/MedicineAjaxController?action=getPrice&code=' + code)
+                        document.getElementById('modalMedicineId').addEventListener('change', function () {
+                            const medicineId = this.value;
+                            if (medicineId && medicineId.trim() !== '') {
+                                fetch('${pageContext.request.contextPath}/MedicineAjaxController?action=getPrice&id=' + medicineId)
                                     .then(response => response.json())
                                     .then(data => {
                                         if (data && data.price !== undefined) {
@@ -253,15 +258,28 @@
                         }
 
                         function addMedicineFromModal() {
-                            const code = document.getElementById('modalMedicineCode').value;
+                            const medicineId = document.getElementById('modalMedicineId').value;
                             const quantity = parseInt(document.getElementById('modalQuantity').value);
                             const price = parseFloat(document.getElementById('modalPrice').value);
-                            if (!code || !quantity || !price) {
+
+                            if (!medicineId || !quantity || !price) {
                                 alert("Vui lòng nhập đầy đủ thông tin thuốc.");
                                 return;
                             }
+
+                            // Lấy tên thuốc từ option
+                            const selectElement = document.getElementById('modalMedicineId');
+                            const selectedOption = selectElement.options[selectElement.selectedIndex];
+                            const medicineCode = selectedOption.text.split(' - ')[0];
+
                             const total = quantity * price;
-                            medicineList.push({ medicineCode: code, quantity: quantity, price: price, total: total });
+                            medicineList.push({
+                                medicineId: medicineId,
+                                medicineCode: medicineCode,
+                                quantity: quantity,
+                                price: price,
+                                total: total
+                            });
                             updateTable();
                             closeAddMedicineModal();
                         }
@@ -283,7 +301,7 @@
                                 medicineList.forEach((item, index) => {
                                     totalAmount += item.total;
                                     tbody.innerHTML += `<tr><td>\${item.medicineCode}</td><td>\${item.quantity}</td><td class="price-text">\${formatCurrency(item.price)}</td><td class="price-text">\${formatCurrency(item.total)}</td><td style="text-align: center;"><button type="button" class="btn btn-sm btn-link text-danger" onclick="removeMedicine(\${index})"><i class="fas fa-trash"></i></button></td></tr>`;
-                                    hiddenContainer.innerHTML += `<input type="hidden" name="medicines[\${index}].medicineCode" value="\${item.medicineCode}"><input type="hidden" name="medicines[\${index}].quantity" value="\${item.quantity}"><input type="hidden" name="medicines[\${index}].price" value="\${item.price}">`;
+                                    hiddenContainer.innerHTML += `<input type="hidden" name="medicines[\${index}].medicineId" value="\${item.medicineId}"><input type="hidden" name="medicines[\${index}].quantity" value="\${item.quantity}"><input type="hidden" name="medicines[\${index}].price" value="\${item.price}">`;
                                 });
                             }
                             document.getElementById('totalDisplay').textContent = formatCurrency(totalAmount);

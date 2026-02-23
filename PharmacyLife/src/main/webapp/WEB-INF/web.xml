@@ -2,17 +2,43 @@
 <<<<<<< Updated upstream
 <!-- <web-app version="5.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" 
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<<<<<<< Updated upstream
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"> -->
     
     <servlet>
+=======
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"> -->
+
+
+<web-app version="5.0" xmlns="https://jakarta.ee/xml/ns/jakartaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd">
+    <servlet>
+        <servlet-name>HomeController</servlet-name>
+        <servlet-class>controllers.HomeController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MedicineController</servlet-name>
+        <servlet-class>controllers.MedicineController</servlet-class>
+    </servlet>
+
+    <servlet>
+>>>>>>> Stashed changes
         <servlet-name>ImportController</servlet-name>
         <servlet-class>controllers.ImportController</servlet-class>
     </servlet>
-    
+
+    <servlet>
+        <servlet-name>MedicineAjaxController</servlet-name>
+        <servlet-class>controllers.MedicineAjaxController</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>ImportController</servlet-name>
         <url-pattern>/ImportController</url-pattern>
     </servlet-mapping>
+<<<<<<< Updated upstream
 
 
 
@@ -34,6 +60,16 @@
 =======
     
 >>>>>>> Stashed changes
+=======
+    <servlet-mapping>
+        <servlet-name>ImportController</servlet-name>
+        <url-pattern>/import</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MedicineAjaxController</servlet-name>
+        <url-pattern>/MedicineAjaxController</url-pattern>
+    </servlet-mapping>
+>>>>>>> Stashed changes
     <servlet>
         <servlet-name>MedicineDetailController</servlet-name>
         <servlet-class>controllers.MedicineDetailController</servlet-class>
@@ -43,6 +79,7 @@
         <servlet-name>SearchController</servlet-name>
         <servlet-class>controllers.SearchController</servlet-class>
     </servlet>
+<<<<<<< Updated upstream
     
     <servlet>
         <servlet-name>CartController</servlet-name>
@@ -60,6 +97,9 @@
     </servlet>
     
     <!-- Servlet Mappings -->
+=======
+
+>>>>>>> Stashed changes
     <servlet-mapping>
         <servlet-name>HomeController</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -79,7 +119,51 @@
         <servlet-name>SearchController</servlet-name>
         <url-pattern>/search</url-pattern>
     </servlet-mapping>
+<<<<<<< Updated upstream
     
+=======
+
+    <servlet>
+        <servlet-name>CartController</servlet-name>
+        <servlet-class>controllers.CartController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>StaffController</servlet-name>
+        <servlet-class>controllers.StaffController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>LoginController</servlet-name>
+        <servlet-class>controllers.LoginController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>LogoutController</servlet-name>
+        <servlet-class>controllers.LogoutController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RegisterController</servlet-name>
+        <servlet-class>controllers.RegisterController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ProfileController</servlet-name>
+        <servlet-class>controllers.ProfileController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ChangePasswordController</servlet-name>
+        <servlet-class>controllers.ChangePasswordController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>LogoutPageController</servlet-name>
+        <servlet-class>controllers.LogoutPageController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ForgotPasswordController</servlet-name>
+        <servlet-class>controllers.ForgotPasswordController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ViewReviewsController</servlet-name>
+        <servlet-class>controllers.ViewReviewsController</servlet-class>
+    </servlet>
+>>>>>>> Stashed changes
     <servlet-mapping>
         <servlet-name>CartController</servlet-name>
         <url-pattern>/cart</url-pattern>
@@ -91,8 +175,57 @@
     </servlet-mapping>
     
     <servlet-mapping>
+<<<<<<< Updated upstream
         <servlet-name>ImportController</servlet-name>
         <url-pattern>/import</url-pattern>
+=======
+        <servlet-name>LoginController</servlet-name>
+        <url-pattern>/Login</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LogoutController</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RegisterController</servlet-name>
+        <url-pattern>/register</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProfileController</servlet-name>
+        <url-pattern>/profile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ChangePasswordController</servlet-name>
+        <url-pattern>/change-password</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LogoutPageController</servlet-name>
+        <url-pattern>/logout-page</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ForgotPasswordController</servlet-name>
+        <url-pattern>/forgot-password</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ViewReviewsController</servlet-name>
+        <url-pattern>/viewReviews</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>CreatedReview</servlet-name>
+        <servlet-class>controllers.CreatedReview</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MyReviewsController</servlet-name>
+        <servlet-class>controllers.MyReviewsController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreatedReview</servlet-name>
+        <url-pattern>/createdReview</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MyReviewsController</servlet-name>
+        <url-pattern>/my-reviews</url-pattern>
+>>>>>>> Stashed changes
     </servlet-mapping>
     
     <session-config>
