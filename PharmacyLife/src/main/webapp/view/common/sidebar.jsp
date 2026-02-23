@@ -50,10 +50,12 @@
                         <i class="fas fa-users"></i> Quản lý khách hàng
                     </a>
 
-                    <a href="${pageContext.request.contextPath}/admin/staff-dashboard"
-                        class="sidebar-item ${fn:contains(uri, 'staff') && fn:contains(uri, 'dashboard') ? 'active' : ''}">
-                        <i class="fas fa-user-shield"></i> Quản lý nhân viên
-                    </a>
+                    <c:if test="${sessionScope.roleName eq 'Admin'}">
+                        <a href="${pageContext.request.contextPath}/Staffmanage"
+                            class="sidebar-item ${fn:contains(uri, 'Staffmanage') ? 'active' : ''}">
+                            <i class="fas fa-user-shield"></i> Quản lý nhân viên
+                        </a>
+                    </c:if>
                 </div>
                 <div class="sidebar-footer">
                     <a href="logout-page" class="sidebar-item sidebar-logout">
