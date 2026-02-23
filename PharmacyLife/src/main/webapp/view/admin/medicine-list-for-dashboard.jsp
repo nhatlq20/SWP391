@@ -27,8 +27,8 @@
                             <div class="d-flex align-items-center gap-2">
                                 <div class="search-box">
                                     <i class="fas fa-search"></i>
-                                    <input type="text" id="searchInput" placeholder="Tìm tên thuốc, mã thuốc,..."
-                                        oninput="filterTable()"
+                                    <input type="text" id="medicineSearchInput"
+                                        placeholder="Tìm tên thuốc, mã thuốc,..." oninput="filterTable()"
                                         onkeydown="if(event.key==='Enter'){event.preventDefault(); filterTable();}">
                                 </div>
                                 <button class="btn-action btn-view" title="Lọc" style="width:40px;height:40px;">
@@ -255,7 +255,7 @@
                         }
 
                         function filterTable() {
-                            var input = document.getElementById('searchInput').value.toLowerCase();
+                            var input = document.getElementById('medicineSearchInput').value.toLowerCase();
                             var rows = document.querySelectorAll('#medicineTable tbody tr');
                             rows.forEach(function (row) {
                                 var text = row.textContent.toLowerCase();
