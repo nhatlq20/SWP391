@@ -8,11 +8,8 @@
             <head>
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
                 <title>Chỉnh sửa phiếu nhập</title>
-<<<<<<< HEAD
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-=======
->>>>>>> main
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
                 <style>
                     /* Shared overrides for the Edit Card to match design */
@@ -138,20 +135,8 @@
                             </div>
                         </c:if>
 
-<<<<<<< HEAD
                                 <c:if test="${not empty importRecord}">
                                     <form action="${pageContext.request.contextPath}/ImportController" method="POST">
-=======
-                                <c:if test="${not empty error}">
-                                    <div
-                                        style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-                                        ${error}
-                                    </div>
-                                </c:if>
-
-                                <c:if test="${not empty import}">
-                                    <form action="${pageContext.request.contextPath}/import" method="POST">
->>>>>>> main
                                         <input type="hidden" name="action" value="update">
                                         <input type="hidden" name="importId" value="${importRecord.importId}">
                                         <!-- Pass original ID if implicit -->
@@ -229,17 +214,9 @@
                                                         style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
                                                         <label class="edit-label"
                                                             style="font-size: 18px; margin:0;">Danh sách thuốc</label>
-<<<<<<< HEAD
                                                         <button type="button" class="btn-save" onclick="openAddMedicineModal()"
                                                             style="padding: 5px 15px; font-size:13px; border: none; cursor: pointer;">+
                                                             Thêm thuốc</button>
-=======
-                                                        <a href="${pageContext.request.contextPath}/import?action=create"
-                                                            class="btn-save"
-                                                            style="padding: 5px 15px; font-size:13px; text-decoration:none;">+
-                                                            Thêm thuốc (Tạo mới)</a>
-                                                        <!-- Adding items to existing import might need a different flow or modal. Keeping it simple for now -->
->>>>>>> main
                                                     </div>
 
                                                     <table class="clean-table">
@@ -269,11 +246,7 @@
                                                                             type="number" maxFractionDigits="0" />₫
                                                                     </td>
                                                                     <td>
-<<<<<<< HEAD
                                                                         <a href="${pageContext.request.contextPath}/ImportController?action=deleteDetail&detailId=${detail.detailId}&importId=${importRecord.importId}"
-=======
-                                                                        <a href="${pageContext.request.contextPath}/import?action=deleteDetail&detailId=${detail.detailId}&importId=${import.importId}"
->>>>>>> main
                                                                             class="icon-trash"
                                                                             style="margin: 0 auto; text-decoration:none;"
                                                                             onclick="return confirm('Xóa thuốc này khỏi phiếu?')">🗑</a>
@@ -285,7 +258,6 @@
                                                 </div>
                                             </c:if>
 
-<<<<<<< HEAD
                                             <!-- New Medicines Section -->
                                             <div id="newMedicinesSection" style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px; display: none;">
                                                 <h6 style="font-weight: bold; margin-bottom: 15px;">Thuốc mới thêm</h6>
@@ -305,14 +277,6 @@
                                                     </tbody>
                                                 </table>
                                                 <div id="newHiddenInputsContainer"></div>
-=======
-                                            <div class="edit-footer">
-                                                <a href="${pageContext.request.contextPath}/import"
-                                                    class="btn-cancel">Đóng</a>
-                                                <button type="submit" class="btn-save">
-                                                    <span>💾</span> Lưu
-                                                </button>
->>>>>>> main
                                             </div>
 
                                             <div class="edit-footer">

@@ -5,7 +5,6 @@
                 <!DOCTYPE html>
                 <html>
 
-<<<<<<< HEAD
                 <head>
                     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
                     <title>Chi tiết phiếu nhập - Admin</title>
@@ -14,23 +13,6 @@
                     <link rel="stylesheet"
                         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
                     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
-=======
-            <head>
-                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-                <title>Xem chi tiết phiếu nhập</title>
-                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
-                <style>
-                    /* Specific overrides for the View Details Card to match screenshot */
-                    .view-card {
-                        background-color: white;
-                        border-radius: 12px;
-                        padding: 40px;
-                        max-width: 900px;
-                        margin: 0 auto;
-                        /* Center horizontally in the main content */
-                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-                    }
->>>>>>> main
 
                     <style>
                         body {
