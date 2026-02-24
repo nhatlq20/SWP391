@@ -22,7 +22,7 @@
                         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
                     }
 
-                    <style>
+                 
                         body {
                             background-color: #f4f6f9;
                         }
@@ -494,7 +494,7 @@
                                         </button>
                                     </div>
                                 </form>
-                            </c:if>
+                         
                         </div>
                     </div>
 
