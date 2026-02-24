@@ -17,6 +17,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 ///kiên
 public class MyReviewsController extends HttpServlet {
 
@@ -69,7 +70,7 @@ public class MyReviewsController extends HttpServlet {
             throws ServletException, IOException {
         Integer customerId = resolveCustomerId(request);
         if (customerId == null) {
-            response.sendRedirect(request.getContextPath() + "/Login");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
         String message = request.getParameter("message");
@@ -100,10 +101,11 @@ public class MyReviewsController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Lấy customer hiện tại từ session/request để đảm bảo chỉ thao tác trên review của chính user.
+        // Lấy customer hiện tại từ session/request để đảm bảo chỉ thao tác trên review
+        // của chính user.
         Integer customerId = resolveCustomerId(request);
         if (customerId == null) {
-            response.sendRedirect(request.getContextPath() + "/Login");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
         // action dùng để phân biệt các thao tác POST (hiện tại có delete).
@@ -123,11 +125,13 @@ public class MyReviewsController extends HttpServlet {
                 boolean deleted = reviewDAO.deleteReviewByCustomer(reviewId, customerId, medicineId);
                 String message = deleted ? "Xóa đánh giá thành công" : "Không thể xóa đánh giá";
                 // Redirect để tránh submit lại form khi refresh (Post/Redirect/Get).
-                response.sendRedirect(request.getContextPath() + "/my-reviews?message=" + java.net.URLEncoder.encode(message, "UTF-8"));
+                response.sendRedirect(request.getContextPath() + "/my-reviews?message="
+                        + java.net.URLEncoder.encode(message, "UTF-8"));
                 return;
             } catch (NumberFormatException e) {
                 // Trường hợp dữ liệu ID không hợp lệ từ request.
-                response.sendRedirect(request.getContextPath() + "/my-reviews?message=" + java.net.URLEncoder.encode("Dữ liệu xóa không hợp lệ", "UTF-8"));
+                response.sendRedirect(request.getContextPath() + "/my-reviews?message="
+                        + java.net.URLEncoder.encode("Dữ liệu xóa không hợp lệ", "UTF-8"));
                 return;
             }
         }

@@ -99,8 +99,8 @@
                                         style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
                                         Không tìm thấy phiếu nhập
                                     </div>
-                                    <a href="${pageContext.request.contextPath}/ImportController"
-                                        class="btn-secondary">Trở lại</a>
+                                    <a href="${pageContext.request.contextPath}/import" class="btn-secondary">Trở
+                                        lại</a>
                                 </c:if>
 
                                 <c:if test="${not empty import}">
@@ -190,7 +190,7 @@
                                         </c:if>
 
                                         <div class="view-footer">
-                                            <a href="${pageContext.request.contextPath}/ImportController"
+                                            <a href="${pageContext.request.contextPath}/import"
                                                 class="view-close-btn">Đóng</a>
                                         </div>
                                     </div>

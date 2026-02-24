@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpSession;
  * @author PC
  */
 public class CreatedReview extends HttpServlet {
-//  check 
+    // check
     private Integer getLoggedInCustomerId(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session == null) {
@@ -42,7 +42,7 @@ public class CreatedReview extends HttpServlet {
     private boolean requireCustomerLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Integer customerId = getLoggedInCustomerId(request);
         if (customerId == null) {
-            response.sendRedirect(request.getContextPath() + "/Login");
+            response.sendRedirect(request.getContextPath() + "/login");
             return false;
         }
         request.setAttribute("customerId", customerId);
@@ -56,7 +56,7 @@ public class CreatedReview extends HttpServlet {
             return;
         }
         Integer customerId = (Integer) request.getAttribute("customerId");
-        
+
         String medicineIdStr = request.getParameter("medicineId");
         String ratingStr = request.getParameter("rating");
         String comment = request.getParameter("comment");

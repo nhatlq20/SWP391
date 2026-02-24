@@ -30,8 +30,7 @@
                                 </c:if>
 
                                 <!-- Main Form -->
-                                <form method="POST" action="${pageContext.request.contextPath}/ImportController"
-                                    id="importForm">
+                                <form method="POST" action="${pageContext.request.contextPath}/import" id="importForm">
                                     <input type="hidden" name="action" value="create">
                                     <input type="hidden" name="importCode"
                                         value="${newCode != null ? newCode : 'IP001'}">
@@ -115,7 +114,7 @@
                                         <!-- FOOTER ACTIONS -->
                                         <div class="footer-row">
                                             <div style="display: flex; gap: 10px;">
-                                                <a href="${pageContext.request.contextPath}/ImportController"
+                                                <a href="${pageContext.request.contextPath}/import"
                                                     class="btn-pill btn-pill-gray">
                                                     <span>‹</span> Trở lại
                                                 </a>

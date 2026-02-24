@@ -158,7 +158,7 @@
                                 </c:if>
 
                                 <c:if test="${not empty import}">
-                                    <form action="${pageContext.request.contextPath}/ImportController" method="POST">
+                                    <form action="${pageContext.request.contextPath}/import" method="POST">
                                         <input type="hidden" name="action" value="update">
                                         <input type="hidden" name="importId" value="${import.importId}">
                                         <!-- Pass original ID if implicit -->
@@ -228,7 +228,7 @@
                                                         style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
                                                         <label class="edit-label"
                                                             style="font-size: 18px; margin:0;">Danh sách thuốc</label>
-                                                        <a href="${pageContext.request.contextPath}/ImportController?action=create"
+                                                        <a href="${pageContext.request.contextPath}/import?action=create"
                                                             class="btn-save"
                                                             style="padding: 5px 15px; font-size:13px; text-decoration:none;">+
                                                             Thêm thuốc (Tạo mới)</a>
@@ -262,7 +262,7 @@
                                                                             type="number" maxFractionDigits="0" />₫
                                                                     </td>
                                                                     <td>
-                                                                        <a href="${pageContext.request.contextPath}/ImportController?action=deleteDetail&detailId=${detail.detailId}&importId=${import.importId}"
+                                                                        <a href="${pageContext.request.contextPath}/import?action=deleteDetail&detailId=${detail.detailId}&importId=${import.importId}"
                                                                             class="icon-trash"
                                                                             style="margin: 0 auto; text-decoration:none;"
                                                                             onclick="return confirm('Xóa thuốc này khỏi phiếu?')">🗑</a>
@@ -275,7 +275,7 @@
                                             </c:if>
 
                                             <div class="edit-footer">
-                                                <a href="${pageContext.request.contextPath}/ImportController"
+                                                <a href="${pageContext.request.contextPath}/import"
                                                     class="btn-cancel">Đóng</a>
                                                 <button type="submit" class="btn-save">
                                                     <span>💾</span> Lưu

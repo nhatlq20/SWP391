@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 // kkk
 public class CategoryController extends HttpServlet {
 
@@ -32,7 +33,7 @@ public class CategoryController extends HttpServlet {
 
 		switch (action) {
 			case "search":
-				searchCategory(request,response);
+				searchCategory(request, response);
 				break;
 			case "detail":
 				viewDetail(request, response);
@@ -41,7 +42,7 @@ public class CategoryController extends HttpServlet {
 				deleteCategory(request, response);
 				break;
 			case "show":
-				showInsertForm(request,response);
+				showInsertForm(request, response);
 				break;
 			case "list":
 			default:
@@ -49,22 +50,24 @@ public class CategoryController extends HttpServlet {
 				break;
 		}
 	}
+
 	@Override
-protected void doPost(HttpServletRequest request, HttpServletResponse response)
-		throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-	String action = request.getParameter("action");
-	if (action == null) action = "list";
+		String action = request.getParameter("action");
+		if (action == null)
+			action = "list";
 
-	switch (action) {
-		case "insert":
-			insertCategory(request, response);
-			break;
-		default:
-			doGet(request, response); // fallback cho các action khác
-			break;
+		switch (action) {
+			case "insert":
+				insertCategory(request, response);
+				break;
+			default:
+				doGet(request, response); // fallback cho các action khác
+				break;
+		}
 	}
-}
 
 	// =============================
 	// 17.1 - List Category
@@ -76,7 +79,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
 		request.setAttribute("categoryList", list);
 
 		request.getRequestDispatcher("/view/admin/category-list.jsp")
-			   .forward(request, response);
+				.forward(request, response);
 	}
 
 	// =============================
@@ -91,7 +94,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
 		List<Medicine> medicine = dao.getMedicineByCategory(id);
 
 		if (medicine == null) {
-			response.sendRedirect("CategoryServlet?action=list");
+			response.sendRedirect("category?action=list");
 			return;
 		}
 
@@ -99,7 +102,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
 		request.setAttribute("category", category);
 
 		request.getRequestDispatcher("/view/admin/category-detail.jsp")
-			   .forward(request, response);
+				.forward(request, response);
 	}
 
 	// =============================
@@ -108,54 +111,54 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
 	private void deleteCategory(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		if (!isAdmin(request)) {
-			response.sendRedirect("CategoryServlet?action=list");
+			response.sendRedirect("category?action=list");
 			return;
 		}
 
 		int id = Integer.parseInt(request.getParameter("id"));
 		dao.deleteCategory(id);
 
-		response.sendRedirect("CategoryServlet?action=list");
+		response.sendRedirect("category?action=list");
 	}
 
-	private void showInsertForm(HttpServletRequest request, HttpServletResponse response) throws ServletException,IOException{
-	  if (!isAdmin(request)) {
-		  response.sendRedirect("CategoryServlet?action=list");
-		  return;
-	  }
-	  request.getRequestDispatcher("/view/admin/category-create.jsp").forward(request, response);
-	}
-	private void insertCategory(HttpServletRequest request,HttpServletResponse response) throws ServletException,IOException{
+	private void showInsertForm(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		if (!isAdmin(request)) {
-			response.sendRedirect("CategoryServlet?action=list");
+			response.sendRedirect("category?action=list");
 			return;
 		}
-		String code=request.getParameter("categoryCode");
-		String name= request.getParameter("categoryName");
+		request.getRequestDispatcher("/view/admin/category-create.jsp").forward(request, response);
+	}
 
+	private void insertCategory(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		if (!isAdmin(request)) {
+			response.sendRedirect("category?action=list");
+			return;
+		}
+		String code = request.getParameter("categoryCode");
+		String name = request.getParameter("categoryName");
 
-
-
-		Category c= new Category();
+		Category c = new Category();
 		c.setCategoryCode(code);
 		c.setCategoryName(name);
 
 		dao.insertCaterogy(c);
 
-		response.sendRedirect("CategoryServlet?action=list");
-
+		response.sendRedirect("category?action=list");
 
 	}
 
-	private void searchCategory(HttpServletRequest request, HttpServletResponse response) throws  ServletException,IOException{
+	private void searchCategory(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
-	String keyword = request.getParameter("keyword");
-	List<Category> list = dao.searchCategoryByName(keyword);
-	request.setAttribute("categoryList", list);
-	request.getRequestDispatcher("/view/admin/category-list.jsp")
-		   .forward(request, response);
+		String keyword = request.getParameter("keyword");
+		List<Category> list = dao.searchCategoryByName(keyword);
+		request.setAttribute("categoryList", list);
+		request.getRequestDispatcher("/view/admin/category-list.jsp")
+				.forward(request, response);
 
- }
+	}
 
 	private boolean isAdmin(HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
