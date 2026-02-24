@@ -34,6 +34,10 @@
         <servlet-name>SearchController</servlet-name>
         <servlet-class>controllers.SearchController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>CategoryController</servlet-name>
+        <servlet-class>controllers.CategoryController</servlet-class>
+    </servlet>
     
     <servlet-mapping>
         <servlet-name>HomeController</servlet-name>
@@ -50,6 +54,10 @@
     <servlet-mapping>
         <servlet-name>SearchController</servlet-name>
         <url-pattern>/search</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CategoryController</servlet-name>
+        <url-pattern>/CategoryServlet</url-pattern>
     </servlet-mapping>
     
     <servlet>

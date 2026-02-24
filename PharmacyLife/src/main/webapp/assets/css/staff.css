@@ -35,16 +35,28 @@
     display:flex;
     align-items:center;
     gap:8px;
-    background:#fff;
+    background:#ffffff;
     padding:10px 16px;
     border-radius:28px;
-    box-shadow:none;
+    border:1px solid #bcd6ff;
+    box-shadow: 0 0 0 2px rgba(75, 155, 255, 0.12);
 }
 .staff-search input {
     border:none;
     outline:none;
     width:260px;
     font-size:14px;
+    background:transparent;
+    color:#1f2937;
+}
+
+.staff-search input::placeholder {
+    color:#6b7280;
+    opacity:1;
+}
+
+.staff-search img {
+    opacity:0.9;
 }
 .add-btn {
     background:#4B9BFF;
@@ -53,26 +65,33 @@
     border-radius:18px;
     text-decoration:none;
 }
+
+.add-btn-icon {
+    width:18px;
+    height:18px;
+    object-fit:contain;
+    display:block;
+}
 .staff-card {
-    background:#eef6ff;
-    padding:26px 22px;
+    background:#dfe8f6;
+    padding:18px;
     border-radius:18px;
 }
 table.staff-table {
     width:100%;
     border-collapse:collapse;
     background:#fff;
-    border-radius:12px;
+    border-radius:14px;
     overflow:hidden;
 }
 table.staff-table th, table.staff-table td {
     padding:22px 24px;
     text-align:left;
-    border-bottom:1px solid #eef6fb;
+    border-bottom:1px solid #d9e3f3;
     vertical-align:middle;
 }
 table.staff-table th {
-    background:rgba(255,255,255,0.6);
+    background:#ffffff;
     font-weight:700;
 }
 .action-icons img {
@@ -113,17 +132,36 @@ table.staff-table th {
 
 /* Detail card styles */
 .detail-card {
-    background: #fff;
+    background: #eef4ff;
     padding: 28px;
     border-radius: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid #d8e4fb;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     max-width: 880px;
     margin: 8px auto 40px;
 }
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 28px; margin-top: 8px; }
-.form-field label { display:block; font-weight:600; margin-bottom:8px; color:#333; }
-.field-box { background:#f3f6fa; padding:10px 12px; border-radius:8px; color:#333; }
+.form-field label { display:block; font-weight:700; margin-bottom:8px; color:#1f2937; }
+.field-box {
+    background:#ffffff;
+    border: 1px solid #d4deef;
+    padding:11px 14px;
+    border-radius:8px;
+    color:#111827;
+    font-weight:500;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+}
 .form-field.wide { grid-column: 1 / -1; }
+
+.detail-close-btn {
+    background: #b1b7c3;
+}
+
+.detail-close-btn:hover {
+    background: #9ca3af;
+}
 
 @media (max-width: 700px) {
   .detail-grid { grid-template-columns: 1fr; }

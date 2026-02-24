@@ -1,0 +1,460 @@
+/* ============================================================
+   medicine-dashboard.css  –  Shared styles for Admin Medicine pages
+   ============================================================ */
+
+/* ---------- Layout ---------- */
+.sidebar-wrapper {
+    top: 115px !important;
+    height: calc(100vh - 115px) !important;
+    z-index: 100;
+}
+
+.main-content {
+    margin-left: 250px;
+    padding: 25px 30px;
+    margin-top: 115px;
+}
+
+/* ---------- Statistics Cards ---------- */
+.stats-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    flex: 1;
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-top: 6px;
+}
+
+.stat-total .stat-number  { color: #3b82f6; }
+.stat-instock .stat-number { color: #22c55e; }
+.stat-low .stat-number     { color: #f59e0b; }
+.stat-out .stat-number     { color: #ef4444; }
+
+/* ---------- Card Containers ---------- */
+.medicine-card,
+.form-card,
+.detail-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.medicine-card-header,
+.form-card-header,
+.detail-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.medicine-card-header h3,
+.form-card-header h3,
+.detail-card-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.form-card-body,
+.detail-card-body {
+    padding: 28px;
+}
+
+/* ---------- Search Box ---------- */
+.search-box {
+    position: relative;
+    max-width: 280px;
+}
+
+.search-box input {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 8px 14px 8px 38px;
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+}
+
+/* ---------- Buttons ---------- */
+.btn-add-medicine {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 22px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-add-medicine:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-back {
+    background: #f59e0b;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 24px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btn-back:hover {
+    background: #d97706;
+    color: #fff;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 24px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btn-submit:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-edit-detail {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 24px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btn-edit-detail:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+}
+
+/* ---------- Action Buttons (table) ---------- */
+.btn-action {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    font-size: 14px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn-view   { background: #dbeafe; color: #2563eb; }
+.btn-view:hover  { background: #bfdbfe; }
+.btn-edit   { background: #fef3c7; color: #d97706; }
+.btn-edit:hover  { background: #fde68a; }
+.btn-delete { background: #fee2e2; color: #dc2626; }
+.btn-delete:hover { background: #fecaca; }
+
+/* ---------- Table ---------- */
+.medicine-table thead th {
+    background: linear-gradient(90deg, #eef3ff, #e8efff);
+    color: #1e3a8a;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 14px 12px;
+    border-bottom: none;
+    white-space: nowrap;
+}
+
+.medicine-table tbody td {
+    padding: 12px;
+    vertical-align: middle;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.medicine-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* ---------- Product cell helpers ---------- */
+.medicine-img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #f0f0f0;
+}
+
+.medicine-img-placeholder {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background: #eef2ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 18px;
+}
+
+.medicine-name-cell .name {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.medicine-name-cell .desc {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-width: 280px;
+}
+
+.price {
+    font-weight: 700;
+    color: #16a34a;
+}
+
+.category-badge {
+    background: #eef2ff;
+    color: #3b82f6;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* ---------- Status Badges ---------- */
+.badge-stock { background-color: #22c55e; color: #fff; }
+.badge-low   { background-color: #f59e0b; color: #1e293b; }
+.badge-out   { background-color: #ef4444; color: #fff; }
+
+/* ---------- Delete Confirmation Modal ---------- */
+.modal-confirm .modal-content {
+    border-radius: 16px;
+    border: none;
+}
+
+.modal-confirm .modal-body {
+    text-align: center;
+    padding: 30px;
+}
+
+.modal-confirm .icon-box {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid #fee2e2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.modal-confirm .icon-box i {
+    font-size: 36px;
+    color: #ef4444;
+}
+
+.modal-confirm h4 {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.modal-confirm p {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.btn-cancel-modal {
+    background: #e5e7eb;
+    color: #374151;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 28px;
+    font-weight: 600;
+}
+
+.btn-cancel-modal:hover {
+    background: #d1d5db;
+}
+
+.btn-delete-modal {
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 28px;
+    font-weight: 600;
+}
+
+.btn-delete-modal:hover {
+    background: #dc2626;
+}
+
+/* ---------- Empty State ---------- */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+/* ---------- Detail Page ---------- */
+.detail-img-container {
+    text-align: center;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.detail-img {
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+.detail-img-placeholder {
+    width: 150px;
+    height: 150px;
+    border-radius: 12px;
+    background: #eef2ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    color: #94a3b8;
+    font-size: 48px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.info-item {
+    padding: 14px 18px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #f1f5f9;
+}
+
+.info-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.info-value {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.price-value {
+    color: #16a34a;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* ---------- Forms ---------- */
+.form-card .form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+}
+
+.form-card .form-control,
+.form-card .form-select {
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+}
+
+.form-card .form-control:focus,
+.form-card .form-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-card .form-control[readonly] {
+    background-color: #f9fafb;
+    color: #6b7280;
+}
