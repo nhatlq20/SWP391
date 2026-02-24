@@ -26,7 +26,7 @@
                     }
 
                     .main-content {
-                        margin-left: 250px;
+                        margin-left: 310px;
                         padding: 30px;
                         margin-top: 115px;
                     }
@@ -69,12 +69,12 @@
                 <!-- Sidebar -->
                 <jsp:include page="/view/common/sidebar.jsp" />
 
-                <div class="main-content container">
+                <div class="main-content">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="mb-0">Customer Profile</h2>
+                        <h2 class="mb-0">Hồ sơ khách hàng</h2>
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb mb-0">
-                                <li class="breadcrumb-item"><a href="customers-dashboard">Customers</a></li>
+                                <li class="breadcrumb-item"><a href="customers-dashboard">Khách hàng</a></li>
                                 <li class="breadcrumb-item active" aria-current="page">${customer.fullName}</li>
                             </ol>
                         </nav>
@@ -91,32 +91,19 @@
                                         </div>
                                     </div>
                                     <h4 class="card-title fw-bold">${customer.fullName}</h4>
-                                    <p class="text-muted">Customer #CUS
+                                    <p class="text-muted">Khách hàng #CUS
                                         <fmt:formatNumber value="${customer.customerId}" pattern="000" />
                                     </p>
-                                    <span class="badge rounded-pill px-3 py-2
-                            <c:choose>
-                                <c:when test=" ${customer.status=='Active' }">bg-success</c:when>
-                                        <c:when test="${customer.status == 'Inactive'}">bg-secondary</c:when>
-                                        <c:when test="${customer.status == 'Banned'}">bg-danger</c:when>
-                                        <c:otherwise>bg-info text-dark</c:otherwise>
-                                        </c:choose>
-                                        ">
-                                        ${customer.status}
+                                    <span
+                                        class="badge rounded-pill px-3 py-2 ${customer.status ? 'bg-success' : 'bg-secondary'}">
+                                        ${customer.status ? 'Hoạt động' : 'Không hoạt động'}
                                     </span>
-
-                                    <div class="mt-4 d-grid gap-2">
-                                        <button class="btn btn-primary"><i class="fas fa-edit me-2"></i>Edit
-                                            Profile</button>
-                                        <button class="btn btn-outline-danger"><i class="fas fa-ban me-2"></i>Block
-                                            User</button>
-                                    </div>
                                 </div>
                             </div>
 
                             <div class="card">
                                 <div class="card-header bg-white py-3">
-                                    <h5 class="mb-0">Contact Information</h5>
+                                    <h5 class="mb-0">Thông tin liên hệ</h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
@@ -125,17 +112,17 @@
                                                 class="text-decoration-none">${customer.email}</a></div>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="small text-muted text-uppercase fw-bold">Phone</label>
+                                        <label class="small text-muted text-uppercase fw-bold">Số điện thoại</label>
                                         <div>${customer.phone}</div>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="small text-muted text-uppercase fw-bold">Address</label>
+                                        <label class="small text-muted text-uppercase fw-bold">Địa chỉ</label>
                                         <div>${customer.address}</div>
                                     </div>
                                     <div class="mb-0">
-                                        <label class="small text-muted text-uppercase fw-bold">Join Date</label>
+                                        <label class="small text-muted text-uppercase fw-bold">Ngày tham gia</label>
                                         <div><i class="far fa-calendar-alt me-2 text-muted"></i>
-                                            <fmt:formatDate value="${customer.joinDate}" pattern="dd/MM/yyyy" />
+                                            <fmt:formatDate value="${customer.createdAt}" pattern="dd/MM/yyyy" />
                                         </div>
                                     </div>
                                 </div>
@@ -147,30 +134,30 @@
                             <div class="card mb-4">
                                 <div
                                     class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                                    <h5 class="mb-0">Recent Activity</h5>
+                                    <h5 class="mb-0">Hoạt động gần đây</h5>
                                 </div>
                                 <div class="card-body">
                                     <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link active" id="orders-tab" data-bs-toggle="tab"
-                                                data-bs-target="#orders" type="button" role="tab">Orders</button>
+                                                data-bs-target="#orders" type="button" role="tab">Đơn hàng</button>
                                         </li>
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link" id="reviews-tab" data-bs-toggle="tab"
-                                                data-bs-target="#reviews" type="button" role="tab">Reviews</button>
+                                                data-bs-target="#reviews" type="button" role="tab">Đánh giá</button>
                                         </li>
                                     </ul>
                                     <div class="tab-content" id="myTabContent">
                                         <div class="tab-pane fade show active" id="orders" role="tabpanel">
                                             <div class="text-center py-5 text-muted">
                                                 <i class="fas fa-shopping-basket fa-3x mb-3 opacity-50"></i>
-                                                <p>No recent orders found for this customer.</p>
+                                                <p>Không tìm thấy đơn hàng nào gần đây của khách hàng này.</p>
                                             </div>
                                         </div>
                                         <div class="tab-pane fade" id="reviews" role="tabpanel">
                                             <div class="text-center py-5 text-muted">
                                                 <i class="far fa-comment-dots fa-3x mb-3 opacity-50"></i>
-                                                <p>No reviews yet.</p>
+                                                <p>Chưa có đánh giá nào.</p>
                                             </div>
                                         </div>
                                     </div>

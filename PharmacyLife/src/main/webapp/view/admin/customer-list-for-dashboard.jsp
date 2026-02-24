@@ -138,21 +138,9 @@
                                                 </td>
                                                 <td>${c.address}</td>
                                                 <td>
-                                                    <span class="badge rounded-pill badge-status 
-                                            <c:choose>
-                                                <c:when test=" ${c.status=='Active' }">bg-success</c:when>
-                                                        <c:when test="${c.status == 'Inactive'}">bg-secondary</c:when>
-                                                        <c:when test="${c.status == 'Banned'}">bg-danger</c:when>
-                                                        <c:otherwise>bg-info text-dark</c:otherwise>
-                                                        </c:choose>
-                                                        ">
-                                                        <c:choose>
-                                                            <c:when test="${c.status == 'Active'}">Hoạt động</c:when>
-                                                            <c:when test="${c.status == 'Inactive'}">Không hoạt động
-                                                            </c:when>
-                                                            <c:when test="${c.status == 'Banned'}">Đã khóa</c:when>
-                                                            <c:otherwise>${c.status}</c:otherwise>
-                                                        </c:choose>
+                                                    <span
+                                                        class="badge rounded-pill badge-status ${c.status ? 'bg-success' : 'bg-secondary'}">
+                                                        ${c.status ? 'Hoạt động' : 'Không hoạt động'}
                                                     </span>
                                                 </td>
                                                 <td class="text-end pe-4">
