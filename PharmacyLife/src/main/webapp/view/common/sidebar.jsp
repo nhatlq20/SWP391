@@ -65,7 +65,7 @@
                 </div>
                 <div class="sidebar-footer">
                     <c:if test="${not empty sessionScope.loggedInUser}">
-                        <a href="${pageContext.request.contextPath}/logout" class="sidebar-item sidebar-logout">
+                        <a href="${pageContext.request.contextPath}/logout-page" class="sidebar-item sidebar-logout">
                             <i class="fas fa-sign-out-alt"></i> Đăng xuất
                         </a>
                     </c:if>
