@@ -62,20 +62,25 @@ public class CustomerControllerForDashboard extends HttpServlet {
 
     private List<Customer> getMockCustomers() {
         List<Customer> list = new java.util.ArrayList<>();
-//        list.add(new Customer(1, "CUS001", "Nguyễn Văn A", "nguyenvana@example.com", "0901234567",
-//                "123 Lê Lợi, Quận 1, TP.HCM",
-//                "Active", new java.util.Date()));
-//        list.add(new Customer(2, "CUS002", "Trần Thị B", "tranthib@example.com", "0987654321",
-//                "456 Nguyễn Huệ, Quận 1, TP.HCM",
-//                "Inactive", new java.util.Date()));
-//        list.add(new Customer(3, "CUS003", "Lê Văn C", "levanc@example.com", "0912345678",
-//                "789 Võ Văn Kiệt, Quận 5, TP.HCM",
-//                "Banned", new java.util.Date()));
-//        list.add(new Customer(4, "CUS004", "Phạm Thị D", "phamthid@example.com", "0933445566",
-//                "321 Hai Bà Trưng, Quận 3, TP.HCM",
-//                "Active", new java.util.Date()));
-//        list.add(new Customer(5, "CUS005", "Hoàng Văn E", "hoangvane@example.com", "0977889900",
-//                "654 Điện Biên Phủ, Bình Thạnh, TP.HCM", "Active", new java.util.Date()));
+        // list.add(new Customer(1, "CUS001", "Nguyễn Văn A", "nguyenvana@example.com",
+        // "0901234567",
+        // "123 Lê Lợi, Quận 1, TP.HCM",
+        // "Active", new java.util.Date()));
+        // list.add(new Customer(2, "CUS002", "Trần Thị B", "tranthib@example.com",
+        // "0987654321",
+        // "456 Nguyễn Huệ, Quận 1, TP.HCM",
+        // "Inactive", new java.util.Date()));
+        // list.add(new Customer(3, "CUS003", "Lê Văn C", "levanc@example.com",
+        // "0912345678",
+        // "789 Võ Văn Kiệt, Quận 5, TP.HCM",
+        // "Banned", new java.util.Date()));
+        // list.add(new Customer(4, "CUS004", "Phạm Thị D", "phamthid@example.com",
+        // "0933445566",
+        // "321 Hai Bà Trưng, Quận 3, TP.HCM",
+        // "Active", new java.util.Date()));
+        // list.add(new Customer(5, "CUS005", "Hoàng Văn E", "hoangvane@example.com",
+        // "0977889900",
+        // "654 Điện Biên Phủ, Bình Thạnh, TP.HCM", "Active", new java.util.Date()));
         return list;
     }
 }
