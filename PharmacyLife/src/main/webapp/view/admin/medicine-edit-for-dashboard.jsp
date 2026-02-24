@@ -100,7 +100,7 @@
                                 </div>
 
                                 <div class="d-flex justify-content-between mt-4">
-                                    <a href="${pageContext.request.contextPath}/admin/products-dashboard"
+                                    <a href="${pageContext.request.contextPath}/admin/medicines-dashboard"
                                         class="btn-back">
                                         <i class="fas fa-chevron-left"></i> Trở lại
                                     </a>

@@ -5,13 +5,24 @@
                 <!DOCTYPE html>
                 <html>
 
-                <head>
-                    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-                    <title>Chỉnh sửa phiếu nhập</title>
-                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-                    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
-                    <style>
+            <head>
+                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+                <title>Chỉnh sửa phiếu nhập</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
+                <style>
+                    /* Shared overrides for the Edit Card to match design */
+                    .edit-card {
+                        background-color: white;
+                        border-radius: 12px;
+                        padding: 40px;
+                        max-width: 900px;
+                        margin: 0 auto;
+                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+                    }
+
+                 
                         body {
                             background-color: #f4f6f9;
                         }
@@ -756,7 +767,7 @@
                                         </button>
                                     </div>
                                 </form>
-                            </c:if>
+                         
                         </div>
                     </div>
 
