@@ -1,14 +1,3 @@
-<%@ page contentType="text/html" pageEncoding="UTF-8" %> <%@ taglib prefix="c"
-uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fn"
-uri="http://java.sun.com/jsp/jstl/functions" %>
-<link
-  rel="stylesheet"
-  href="${pageContext.request.contextPath}/assets/css/sidebar.css"
-/>
-<div class="sidebar-wrapper">
-  <div class="sidebar-menu">
-    <c:set var="uri" value="${pageContext.request.requestURI}" />
-
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -61,8 +50,8 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
                     </a>
 
                     <c:if test="${sessionScope.roleName eq 'Admin'}">
-                        <a href="${pageContext.request.contextPath}/Staffmanage"
-                            class="sidebar-item ${fn:contains(uri, 'Staffmanage') ? 'active' : ''}">
+                        <a href="${pageContext.request.contextPath}/manage-staff"
+                            class="sidebar-item ${fn:contains(uri, 'manage-staff') ? 'active' : ''}">
                             <i class="fas fa-user-shield"></i> Quản lý nhân viên
                         </a>
                     </c:if>

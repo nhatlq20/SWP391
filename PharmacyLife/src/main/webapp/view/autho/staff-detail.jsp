@@ -1,94 +1,95 @@
-<%-- 
-    Document   : staff-detail
-    Created on : Feb 13, 2026, 1:21:06 PM
-    Author     : anltc
---%>
+<%-- Document : staff-detail Created on : Feb 13, 2026, 1:21:06 PM Author : anltc --%>
 
-<%@ page contentType="text/html;charset=UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+    <%@ page contentType="text/html;charset=UTF-8" %>
+        <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+            <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Chi tiết nhân viên</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/staff.css">
-</head>
-<body>
+                <!DOCTYPE html>
+                <html>
 
-<jsp:include page="/view/common/header.jsp" />
-<jsp:include page="/view/common/sidebar.jsp" />
+                <head>
+                    <title>Chi tiết nhân viên</title>
+                    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
+                    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/staff.css">
+                </head>
 
-<div class="main-content staff-main" style="padding:20px; margin-top:110px;">
-    <div class="staff-page">
-        <div class="staff-header">
-            <div class="staff-title">
-                <img src="${pageContext.request.contextPath}/assets/img/Manage.png" alt="manage" />
-                <div>Quản lí nhân viên</div>
-            </div>
-           
-        </div>
+                <body>
 
-        <div class="detail-card">
-            <h2 style="text-align:center; color:#2b7cff;">Xem chi tiết nhân viên</h2>
+                    <jsp:include page="/view/common/header.jsp" />
+                    <jsp:include page="/view/common/sidebar.jsp" />
 
-            <div class="detail-grid">
-                <div class="form-field">
-                    <label>Họ và tên</label>
-                    <div class="field-box">${staff.staffName}</div>
-                </div>
-                <div class="form-field">
-                    <label>Số điện thoại</label>
-                    <div class="field-box">${staff.staffPhone}</div>
-                </div>
+                    <div class="main-content staff-main" style="padding:20px; margin-top:110px;">
+                        <div class="staff-page">
+                            <div class="staff-header">
+                                <div class="staff-title">
+                                    <img src="${pageContext.request.contextPath}/assets/img/Manage.png" alt="manage" />
+                                    <div>Quản lí nhân viên</div>
+                                </div>
 
-                <div class="form-field">
-                    <label>Giới tính</label>
-                    <div class="field-box">
-                        <c:choose>
-                            <c:when test="${not empty staff.staffGender}">${staff.staffGender}</c:when>
-                            <c:otherwise>Chưa cập nhật</c:otherwise>
-                        </c:choose>
+                            </div>
+
+                            <div class="detail-card">
+                                <h2 style="text-align:center; color:#2b7cff;">Xem chi tiết nhân viên</h2>
+
+                                <div class="detail-grid">
+                                    <div class="form-field">
+                                        <label>Họ và tên</label>
+                                        <div class="field-box">${staff.staffName}</div>
+                                    </div>
+                                    <div class="form-field">
+                                        <label>Số điện thoại</label>
+                                        <div class="field-box">${staff.staffPhone}</div>
+                                    </div>
+
+                                    <div class="form-field">
+                                        <label>Giới tính</label>
+                                        <div class="field-box">
+                                            <c:choose>
+                                                <c:when test="${not empty staff.staffGender}">${staff.staffGender}
+                                                </c:when>
+                                                <c:otherwise>Chưa cập nhật</c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                    <div class="form-field">
+                                        <label>Ngày sinh</label>
+                                        <div class="field-box">
+                                            <c:choose>
+                                                <c:when test="${not empty staff.staffDob}">
+                                                    <fmt:formatDate value="${staff.staffDob}" pattern="dd/MM/yyyy" />
+                                                </c:when>
+                                                <c:otherwise>Chưa cập nhật</c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-field wide">
+                                        <label>Email</label>
+                                        <div class="field-box">${staff.staffEmail}</div>
+                                    </div>
+
+                                    <div class="form-field wide">
+                                        <label>Địa chỉ</label>
+                                        <div class="field-box">
+                                            <c:choose>
+                                                <c:when test="${not empty staff.staffAddress}">${staff.staffAddress}
+                                                </c:when>
+                                                <c:otherwise>Chưa cập nhật</c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div style="text-align:right; margin-top:18px;">
+                                    <a class="add-btn detail-close-btn"
+                                        href="${pageContext.request.contextPath}/Staffmanage">Đóng</a>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
-                </div>
-                <div class="form-field">
-                    <label>Ngày sinh</label>
-                    <div class="field-box">
-                        <c:choose>
-                            <c:when test="${not empty staff.staffDob}">
-                                <fmt:formatDate value="${staff.staffDob}" pattern="dd/MM/yyyy"/>
-                            </c:when>
-                            <c:otherwise>Chưa cập nhật</c:otherwise>
-                        </c:choose>
-                    </div>
-                </div>
 
-                <div class="form-field wide">
-                    <label>Email</label>
-                    <div class="field-box">${staff.staffEmail}</div>
-                </div>
+                </body>
 
-                <div class="form-field wide">
-                    <label>Địa chỉ</label>
-                    <div class="field-box">
-                        <c:choose>
-                            <c:when test="${not empty staff.staffAddress}">${staff.staffAddress}</c:when>
-                            <c:otherwise>Chưa cập nhật</c:otherwise>
-                        </c:choose>
-                    </div>
-                </div>
-
-            </div>
-
-            <div style="text-align:right; margin-top:18px;">
-                <a class="add-btn detail-close-btn" href="${pageContext.request.contextPath}/Staffmanage">Đóng</a>
-            </div>
-        </div>
-
-    </div>
-</div>
-
-</body>
-</html>
-
+                </html>

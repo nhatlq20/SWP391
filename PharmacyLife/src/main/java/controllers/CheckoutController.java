@@ -51,13 +51,11 @@ public class CheckoutController extends HttpServlet {
         if (cart != null && !cart.getItems().isEmpty()) {
             // Create new Order
             Order order = new Order();
-            order.setOrderId((int) (System.currentTimeMillis() / 1000)); // Simple ID generation
             order.setCustomerId(1); // Default user ID since no login
             order.setOrderDate(new java.util.Date());
             order.setShippingName(fullName);
             order.setShippingPhone(phone);
             order.setShippingAddress(address);
-            // Note is not in Order model yet, ignoring for now
 
             order.setStatus("Pending");
             order.setTotalAmount(cart.getTotalMoney());
@@ -65,17 +63,17 @@ public class CheckoutController extends HttpServlet {
             // Convert Cart Items to Order Items
             java.util.List<models.OrderItem> orderItems = new java.util.ArrayList<>();
             for (Cart.Item cartItem : cart.getItems()) {
-                models.OrderItem orderItem = new models.OrderItem(
-                        order.getOrderId(),
-                        cartItem.getMedicine(),
-                        cartItem.getQuantity(),
-                        cartItem.getPrice());
+                models.OrderItem orderItem = new models.OrderItem();
+                orderItem.setMedicineId(cartItem.getMedicine().getMedicineId());
+                orderItem.setQuantity(cartItem.getQuantity());
+                orderItem.setUnitPrice(cartItem.getPrice());
                 orderItems.add(orderItem);
             }
             order.setItems(orderItems);
 
-            // Save order to mock database
-            OrderController.addOrder(order);
+            // Save order to database
+            dao.OrderDAO orderDAO = new dao.OrderDAO();
+            orderDAO.saveOrder(order);
 
             // Clear cart after successful order
             session.removeAttribute("cart");

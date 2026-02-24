@@ -272,7 +272,7 @@ public class ImportController extends HttpServlet {
                     importDAO.updateImport(imp);
                 }
 
-                response.sendRedirect(request.getContextPath() + "/ImportController?action=edit&id=" + newImportId);
+                response.sendRedirect(request.getContextPath() + "/import?action=edit&id=" + newImportId);
             } else {
                 request.setAttribute("error", "Không thể tạo phiếu nhập");
                 showCreateForm(request, response);
@@ -327,7 +327,7 @@ public class ImportController extends HttpServlet {
 
             if (importDAO.updateImport(imp)) {
                 // Redirect to edit page to see changes or list page
-                response.sendRedirect(request.getContextPath() + "/ImportController?action=list");
+                response.sendRedirect(request.getContextPath() + "/import?action=list");
             } else {
                 request.setAttribute("error", "Không thể cập nhật phiếu nhập");
                 request.setAttribute("import", imp);
@@ -347,7 +347,7 @@ public class ImportController extends HttpServlet {
             throws ServletException, IOException {
         int importId = getImportIdFromRequest(request);
         if (importId > 0 && importDAO.deleteImport(importId)) {
-            response.sendRedirect(request.getContextPath() + "/ImportController?action=list");
+            response.sendRedirect(request.getContextPath() + "/import?action=list");
         } else {
             request.setAttribute("error", "Không thể xóa phiếu nhập");
             listImports(request, response);
@@ -360,7 +360,7 @@ public class ImportController extends HttpServlet {
         try {
             int importId = getImportIdFromRequest(request);
             if (importId == 0) {
-                response.sendRedirect(request.getContextPath() + "/ImportController?action=list");
+                response.sendRedirect(request.getContextPath() + "/import?action=list");
                 return;
             }
 
@@ -369,7 +369,7 @@ public class ImportController extends HttpServlet {
 
             if (medicineId == 0) {
                 request.setAttribute("error", "Mã thuốc không hợp lệ: " + medInput);
-                response.sendRedirect(request.getContextPath() + "/ImportController?action=edit&id=" + importId);
+                response.sendRedirect(request.getContextPath() + "/import?action=edit&id=" + importId);
                 return;
             }
 
@@ -385,7 +385,7 @@ public class ImportController extends HttpServlet {
                 imp.setTotalAmount(total);
                 importDAO.updateImport(imp);
             }
-            response.sendRedirect(request.getContextPath() + "/ImportController?action=edit&id=" + importId);
+            response.sendRedirect(request.getContextPath() + "/import?action=edit&id=" + importId);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -393,9 +393,9 @@ public class ImportController extends HttpServlet {
             // Try to find context from params
             int importId = getImportIdFromRequest(request);
             if (importId > 0) {
-                response.sendRedirect(request.getContextPath() + "/ImportController?action=edit&id=" + importId);
+                response.sendRedirect(request.getContextPath() + "/import?action=edit&id=" + importId);
             } else {
-                response.sendRedirect(request.getContextPath() + "/ImportController?action=list");
+                response.sendRedirect(request.getContextPath() + "/import?action=list");
             }
         }
     }
@@ -413,20 +413,20 @@ public class ImportController extends HttpServlet {
                     double total = importDAO.calculateTotalAmount(importId);
                     imp.setTotalAmount(total);
                     importDAO.updateImport(imp);
-                    response.sendRedirect(request.getContextPath() + "/ImportController?action=edit&id=" + importId);
+                    response.sendRedirect(request.getContextPath() + "/import?action=edit&id=" + importId);
                 } else {
-                    response.sendRedirect(request.getContextPath() + "/ImportController?action=list");
+                    response.sendRedirect(request.getContextPath() + "/import?action=list");
                 }
             } else {
                 if (importId > 0) {
-                    response.sendRedirect(request.getContextPath() + "/ImportController?action=edit&id=" + importId);
+                    response.sendRedirect(request.getContextPath() + "/import?action=edit&id=" + importId);
                 } else {
-                    response.sendRedirect(request.getContextPath() + "/ImportController?action=list");
+                    response.sendRedirect(request.getContextPath() + "/import?action=list");
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/ImportController?action=list");
+            response.sendRedirect(request.getContextPath() + "/import?action=list");
         }
     }
 

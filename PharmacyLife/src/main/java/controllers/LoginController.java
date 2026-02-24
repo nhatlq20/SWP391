@@ -24,10 +24,10 @@ public class LoginController extends HttpServlet {
     /**
      * Handles the HTTP <code>GET</code> method - Display login page
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -39,10 +39,10 @@ public class LoginController extends HttpServlet {
     /**
      * Handles the HTTP <code>POST</code> method - Process login
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -59,7 +59,7 @@ public class LoginController extends HttpServlet {
         }
 
         email = email.trim();
-        
+
         // Try to authenticate as Staff first
         StaffDAO staffDAO = new StaffDAO();
         Staff staff = staffDAO.login(email, password);
@@ -78,7 +78,7 @@ public class LoginController extends HttpServlet {
             // Redirect based on role
             String roleName = staff.getRoleName();
             if ("Admin".equalsIgnoreCase(roleName)) {
-                response.sendRedirect(request.getContextPath() + "/Staffmanage");
+                response.sendRedirect(request.getContextPath() + "/manage-staff");
             } else if ("Staff".equalsIgnoreCase(roleName)) {
                 response.sendRedirect(request.getContextPath() + "/cart");
             } else {

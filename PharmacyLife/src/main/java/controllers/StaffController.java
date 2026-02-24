@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import models.Staff;
 import models.Role;
 
-
 public class StaffController extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -19,10 +18,10 @@ public class StaffController extends HttpServlet {
         // Security check - Only Admin can access staff management
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("loggedInUser") == null) {
-            response.sendRedirect(request.getContextPath() + "/Login");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        
+
         String roleName = (String) session.getAttribute("roleName");
         if (!"Admin".equalsIgnoreCase(roleName)) {
             // User is not Admin, redirect to home or error page
@@ -66,7 +65,7 @@ public class StaffController extends HttpServlet {
                     request.getRequestDispatcher("/view/autho/staff-detail.jsp").forward(request, response);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    response.sendRedirect(request.getContextPath() + "/Staffmanage");
+                    response.sendRedirect(request.getContextPath() + "/manage-staff");
                 }
                 break;
 
@@ -77,7 +76,7 @@ public class StaffController extends HttpServlet {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                response.sendRedirect(request.getContextPath() + "/Staffmanage");
+                response.sendRedirect(request.getContextPath() + "/manage-staff");
                 break;
 
             case "add":
@@ -110,28 +109,28 @@ public class StaffController extends HttpServlet {
                     // Validate input
                     if (staffName == null || staffName.trim().isEmpty()) {
                         System.out.println("ERROR: Staff name is required");
-                        response.sendRedirect(request.getContextPath() + "/Staffmanage");
+                        response.sendRedirect(request.getContextPath() + "/manage-staff");
                         return;
                     }
                     if (staffEmail == null || staffEmail.trim().isEmpty()) {
                         System.out.println("ERROR: Staff email is required");
-                        response.sendRedirect(request.getContextPath() + "/Staffmanage");
+                        response.sendRedirect(request.getContextPath() + "/manage-staff");
                         return;
                     }
 
                     if (staffPassword == null || staffPassword.trim().isEmpty()) {
                         System.out.println("ERROR: Staff password is required");
-                        response.sendRedirect(request.getContextPath() + "/Staffmanage");
+                        response.sendRedirect(request.getContextPath() + "/manage-staff");
                         return;
                     }
 
                     // Get roleId for "nhân viên"
                     RoleDAO roleDao = new RoleDAO();
                     Integer roleId = roleDao.getRoleIdByName("Staff");
-                    
+
                     if (roleId == null) {
                         System.out.println("ERROR: Role 'nhân viên' not found in database");
-                        response.sendRedirect(request.getContextPath() + "/Staffmanage");
+                        response.sendRedirect(request.getContextPath() + "/manage-staff");
                         return;
                     }
                     System.out.println("Role ID: " + roleId);
@@ -148,24 +147,24 @@ public class StaffController extends HttpServlet {
 
                     // Insert into database
                     boolean success = dao.insertStaff(newStaff);
-                    
+
                     if (success) {
                         System.out.println("Staff added successfully!");
                     } else {
                         System.out.println("ERROR: Failed to insert staff");
                     }
                     System.out.println("===  END ===\n");
-                    
-                    response.sendRedirect(request.getContextPath() + "/Staffmanage");
+
+                    response.sendRedirect(request.getContextPath() + "/manage-staff");
                 } catch (Exception e) {
                     System.out.println("ERROR: " + e.getMessage());
                     e.printStackTrace();
-                    response.sendRedirect(request.getContextPath() + "/Staffmanage");
+                    response.sendRedirect(request.getContextPath() + "/manage-staff");
                 }
                 break;
 
             default:
-                response.sendRedirect(request.getContextPath() + "/Staffmanage");
+                response.sendRedirect(request.getContextPath() + "/manage-staff");
         }
     }
 
@@ -181,4 +180,3 @@ public class StaffController extends HttpServlet {
         processRequest(request, response);
     }
 }
-

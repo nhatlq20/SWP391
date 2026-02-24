@@ -24,7 +24,7 @@
 
                                 <div class="action-bar">
                                     <div class="search-filter">
-                                        <form method="POST" action="${pageContext.request.contextPath}/ImportController"
+                                        <form method="POST" action="${pageContext.request.contextPath}/import"
                                             style="display: flex; gap: 10px; flex: 1; max-width: 500px;">
                                             <input type="hidden" name="action" value="search">
                                             <input type="text" name="keyword" class="search-input"
@@ -34,7 +34,7 @@
                                                 style="cursor: pointer;">🔽</button>
                                         </form>
                                     </div>
-                                    <a href="${pageContext.request.contextPath}/ImportController?action=create"
+                                    <a href="${pageContext.request.contextPath}/import?action=create"
                                         class="btn-primary">
                                         <span style="font-size: 18px; font-weight: bold;">+</span>
                                         <span>Tạo phiếu nhập thuốc</span>
@@ -92,13 +92,13 @@
 
                                                             <td>
                                                                 <div class="action-buttons">
-                                                                    <a href="${pageContext.request.contextPath}/ImportController?action=view&code=${imp.importCode}"
+                                                                    <a href="${pageContext.request.contextPath}/import?action=view&code=${imp.importCode}"
                                                                         class="action-btn view-btn"
                                                                         title="Xem chi tiết">👁</a>
-                                                                    <a href="${pageContext.request.contextPath}/ImportController?action=edit&code=${imp.importCode}"
+                                                                    <a href="${pageContext.request.contextPath}/import?action=edit&code=${imp.importCode}"
                                                                         class="action-btn edit-btn"
                                                                         title="Chỉnh sửa">✏</a>
-                                                                    <a href="${pageContext.request.contextPath}/ImportController?action=delete&code=${imp.importCode}"
+                                                                    <a href="${pageContext.request.contextPath}/import?action=delete&code=${imp.importCode}"
                                                                         class="action-btn delete-btn"
                                                                         onclick="return confirm('Bạn có chắc chắn muốn xóa phiếu nhập này?')"
                                                                         title="Xóa">🗑</a>

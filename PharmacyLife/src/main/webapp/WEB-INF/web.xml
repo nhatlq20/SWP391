@@ -24,7 +24,7 @@
     
     <servlet-mapping>
         <servlet-name>ImportController</servlet-name>
-        <url-pattern>/ImportController</url-pattern>
+        <url-pattern>/import</url-pattern>
     </servlet-mapping>
     <servlet>
         <servlet-name>MedicineDetailController</servlet-name>
@@ -57,7 +57,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CategoryController</servlet-name>
-        <url-pattern>/CategoryServlet</url-pattern>
+        <url-pattern>/category</url-pattern>
     </servlet-mapping>
     
     <servlet>
@@ -95,6 +95,8 @@
     <servlet>
         <servlet-name>ForgotPasswordController</servlet-name>
         <servlet-class>controllers.ForgotPasswordController</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>ViewReviewsController</servlet-name>
         <servlet-class>controllers.ViewReviewsController</servlet-class>
     </servlet>
@@ -104,11 +106,11 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>StaffController</servlet-name>
-        <url-pattern>/Staffmanage</url-pattern>
+        <url-pattern>/manage-staff</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
-        <url-pattern>/Login</url-pattern>
+        <url-pattern>/login</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>LogoutController</servlet-name>
@@ -133,11 +135,13 @@
     <servlet-mapping>
         <servlet-name>ForgotPasswordController</servlet-name>
         <url-pattern>/forgot-password</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>ViewReviewsController</servlet-name>
-        <url-pattern>/viewReviews</url-pattern>
+        <url-pattern>/view-reviews</url-pattern>
     </servlet-mapping>
     <servlet>
-        <servlet-name>CreatedReview</servlet-name>
+        <servlet-name>CreateReview</servlet-name>
         <servlet-class>controllers.CreatedReview</servlet-class>
     </servlet>
     <servlet>
@@ -145,12 +149,12 @@
         <servlet-class>controllers.MyReviewsController</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>CreatedReview</servlet-name>
-        <url-pattern>/createdReview</url-pattern>
+        <servlet-name>CreateReview</servlet-name>
+        <url-pattern>/create-review</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>MyReviewsController</servlet-name>
-        <url-pattern>/my-reviews</url-pattern>
+        <url-pattern>/reviews</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
