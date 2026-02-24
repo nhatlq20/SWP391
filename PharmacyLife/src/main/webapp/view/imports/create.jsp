@@ -1,4 +1,3 @@
-
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -6,7 +5,6 @@
                 <!DOCTYPE html>
                 <html>
 
-<<<<<<< HEAD
                 <head>
                     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
                     <title>Tạo phiếu nhập - Admin</title>
@@ -15,13 +13,6 @@
                     <link rel="stylesheet"
                         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
                     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
-=======
-            <head>
-                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-                <title>Tạo phiếu nhập thuốc</title>
-                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
-            </head>
->>>>>>> main
 
                     <style>
                         body {
@@ -87,7 +78,6 @@
                                 <input type="hidden" name="action" value="create">
                                 <input type="hidden" name="importCode" value="${newCode != null ? newCode : 'IP001'}">
 
-<<<<<<< HEAD
                                 <div class="import-card-layout">
                                     <div class="import-flex-content">
                                         <!-- LEFT PANEL -->
@@ -100,53 +90,6 @@
                                                         <option value="${supplier[0]}">${supplier[1]}</option>
                                                     </c:forEach>
                                                 </select>
-=======
-                                <!-- Main Form -->
-                                <form method="POST" action="${pageContext.request.contextPath}/import" id="importForm">
-                                    <input type="hidden" name="action" value="create">
-                                    <input type="hidden" name="importCode"
-                                        value="${newCode != null ? newCode : 'IP001'}">
-
-                                    <div class="import-card-layout">
-
-                                        <!-- Flex Content: Left Input Panel + Right Table Panel -->
-                                        <div class="import-flex-content">
-
-                                            <!-- LEFT PANEL -->
-                                            <div class="left-panel">
-                                                <div class="custom-input-group">
-                                                    <label class="custom-input-label">Nhà cung cấp</label>
-                                                    <input type="text" name="supplierId" required class="custom-input"
-                                                        placeholder="Công ty dược phẩm X">
-                                                </div>
-
-                                                <div class="custom-input-group">
-                                                    <label class="custom-input-label">Ngày nhập</label>
-                                                    <input type="date" name="importDate" required class="custom-input"
-                                                        value="<fmt:formatDate value='<%=new java.util.Date()%>' pattern='yyyy-MM-dd'/>">
-                                                </div>
-
-                                                <div class="custom-input-group">
-                                                    <label class="custom-input-label">Người nhập</label>
-                                                    <input type="text" name="importerId" required class="custom-input"
-                                                        placeholder="Nguyễn Văn A">
-                                                </div>
-
-                                                <!-- Visual-only Status -->
-                                                <div class="custom-input-group">
-                                                    <label class="custom-input-label">Trạng thái</label>
-                                                    <select name="status" class="custom-input">
-                                                        <option value="Đang chờ">Đang chờ</option>
-                                                        <option value="Đã duyệt">Đã duyệt</option>
-                                                        <option value="Chưa duyệt">Chưa duyệt</option>
-                                                    </select>
-                                                </div>
-
-                                                <div class="total-amount-display">
-                                                    Tổng tiền: <span class="amount-highlight"
-                                                        id="totalDisplay">0₫</span>
-                                                </div>
->>>>>>> main
                                             </div>
 
                                             <div class="custom-input-group">
@@ -155,27 +98,11 @@
                                                     value="<fmt:formatDate value='<%=new java.util.Date()%>' pattern='yyyy-MM-dd'/>">
                                             </div>
 
-<<<<<<< HEAD
                                             <div class="custom-input-group">
                                                 <label class="custom-input-label">Người nhập</label>
                                                 <input type="text" class="custom-input" value="${sessionScope.userName}"
                                                     readonly style="background-color: #f0f0f0; cursor: not-allowed;">
                                                 <input type="hidden" name="importerId" value="${sessionScope.userId}">
-=======
-                                        </div>
-
-                                        <!-- FOOTER ACTIONS -->
-                                        <div class="footer-row">
-                                            <div style="display: flex; gap: 10px;">
-                                                <a href="${pageContext.request.contextPath}/import"
-                                                    class="btn-pill btn-pill-gray">
-                                                    <span>‹</span> Trở lại
-                                                </a>
-                                                <button type="button" class="btn-pill btn-pill-blue"
-                                                    onclick="openAddMedicineModal()">
-                                                    <span>+</span> Thêm thuốc
-                                                </button>
->>>>>>> main
                                             </div>
 
                                             <div class="custom-input-group">
