@@ -93,7 +93,8 @@
                                             sản phẩm</a>
                                         <a class="user-item" href="${pageContext.request.contextPath}/staff">Quản lí
                                             khách hàng</a>
-                                        <a class="user-item" href="${pageContext.request.contextPath}/import">Quản lí
+                                        <a class="user-item"
+                                            href="${pageContext.request.contextPath}/admin/imports">Quản lí
                                             nhập thuốc</a>
                                         <a class="user-item" href="${pageContext.request.contextPath}/manage-staff">Quản
                                             lí nhân viên</a>

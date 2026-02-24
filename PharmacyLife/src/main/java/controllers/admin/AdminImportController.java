@@ -1,4 +1,4 @@
-package controllers;
+package controllers.admin;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -19,9 +19,33 @@ import models.Import;
 import models.ImportDetail;
 import models.Medicine;
 
-public class ImportController extends HttpServlet {
+public class AdminImportController extends HttpServlet {
 
     private ImportDAO importDAO;
+
+    private boolean isAdmin(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        String roleName = (session != null) ? (String) session.getAttribute("roleName") : null;
+        return roleName != null && roleName.equalsIgnoreCase("admin");
+    }
+
+    private String getImportView(String name, HttpServletRequest request) {
+        // name: list, view, create, edit, details
+        switch (name) {
+            case "list":
+                return "/view/admin/import-list-for-dashboard.jsp";
+            case "view":
+                return "/view/admin/import-view-for-dashboard.jsp";
+            case "create":
+                return "/view/admin/import-create-for-dashboard.jsp";
+            case "edit":
+                return "/view/admin/import-edit-for-dashboard.jsp";
+            case "details":
+                return "/view/admin/import-details-for-dashboard.jsp";
+            default:
+                return "/view/admin/import-list-for-dashboard.jsp";
+        }
+    }
 
     @Override
     public void init() throws ServletException {
@@ -45,10 +69,9 @@ public class ImportController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Kiểm tra quyền admin
-        // if (!checkAdminPermission(request, response)) {
-        // return;
-        // }
+        if (!checkAdminPermission(request, response)) {
+            return;
+        }
 
         String action = request.getParameter("action");
         if (action == null) {
@@ -82,7 +105,7 @@ public class ImportController extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
-            request.getRequestDispatcher("/view/imports/list.jsp").forward(request, response);
+            request.getRequestDispatcher(getImportView("list", request)).forward(request, response);
         }
     }
 
@@ -90,10 +113,9 @@ public class ImportController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Kiểm tra quyền admin
-        // if (!checkAdminPermission(request, response)) {
-        // return;
-        // }
+        if (!checkAdminPermission(request, response)) {
+            return;
+        }
 
         String action = request.getParameter("action");
         if (action == null) {
@@ -124,7 +146,7 @@ public class ImportController extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
-            request.getRequestDispatcher("/view/imports/list.jsp").forward(request, response);
+            request.getRequestDispatcher(getImportView("list", request)).forward(request, response);
         }
     }
 
@@ -133,7 +155,7 @@ public class ImportController extends HttpServlet {
             throws ServletException, IOException {
         List<Import> imports = importDAO.getAllImports();
         request.setAttribute("imports", imports);
-        request.getRequestDispatcher("/view/imports/list.jsp").forward(request, response);
+        request.getRequestDispatcher(getImportView("list", request)).forward(request, response);
     }
 
     // Tìm kiếm phiếu nhập
@@ -150,7 +172,7 @@ public class ImportController extends HttpServlet {
 
         request.setAttribute("imports", imports);
         request.setAttribute("keyword", keyword);
-        request.getRequestDispatcher("/view/imports/list.jsp").forward(request, response);
+        request.getRequestDispatcher(getImportView("list", request)).forward(request, response);
     }
 
     // Xem chi tiết phiếu nhập
@@ -169,7 +191,7 @@ public class ImportController extends HttpServlet {
             List<ImportDetail> details = importDAO.getImportDetails(importId);
             request.setAttribute("importRecord", imp);
             request.setAttribute("details", details);
-            request.getRequestDispatcher("/view/imports/view.jsp").forward(request, response);
+            request.getRequestDispatcher(getImportView("view", request)).forward(request, response);
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Mã phiếu nhập không hợp lệ");
         }
@@ -187,7 +209,7 @@ public class ImportController extends HttpServlet {
         List<Object[]> suppliers = importDAO.getAllSuppliers();
         request.setAttribute("suppliers", suppliers);
 
-        request.getRequestDispatcher("/view/imports/create.jsp").forward(request, response);
+        request.getRequestDispatcher(getImportView("create", request)).forward(request, response);
     }
 
     // Hiển thị form chỉnh sửa
@@ -213,7 +235,7 @@ public class ImportController extends HttpServlet {
             List<Object[]> suppliers = importDAO.getAllSuppliers();
             request.setAttribute("suppliers", suppliers);
 
-            request.getRequestDispatcher("/view/imports/edit.jsp").forward(request, response);
+            request.getRequestDispatcher(getImportView("edit", request)).forward(request, response);
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Mã phiếu nhập không hợp lệ");
         }
@@ -243,14 +265,11 @@ public class ImportController extends HttpServlet {
             int staffId = 0;
 
             if (userIdObj != null) {
-                // If session stores int
                 try {
                     staffId = Integer.parseInt(userIdObj.toString());
                 } catch (NumberFormatException e) {
-                    // If session stores obj with toString? Or handle logic.
                 }
             }
-            // If session fail or not set, look at 'importerId' input
             if (staffId == 0) {
                 staffId = parseStaffId(request.getParameter("importerId"));
             }
@@ -272,33 +291,36 @@ public class ImportController extends HttpServlet {
             if (importDAO.createImport(imp)) {
                 int newImportId = imp.getImportId();
 
-                // Add details - parse medicines from form with indices [0], [1], etc.
                 Map<Integer, Map<String, String>> medicinesMap = new HashMap<>();
                 Enumeration<String> paramNames = request.getParameterNames();
 
-                // Collect all medicine-related parameters
                 while (paramNames.hasMoreElements()) {
                     String paramName = paramNames.nextElement();
                     if (paramName.startsWith("medicines[")) {
-                        // Extract index: medicines[0].medicineId -> 0
                         int startIdx = paramName.indexOf('[') + 1;
                         int endIdx = paramName.indexOf(']');
                         if (startIdx > 0 && endIdx > startIdx) {
                             try {
                                 int index = Integer.parseInt(paramName.substring(startIdx, endIdx));
-                                String fieldName = paramName.substring(endIdx + 2); // skip "].
+                                String fieldName = paramName.substring(endIdx + 2);
                                 String value = request.getParameter(paramName);
 
                                 medicinesMap.putIfAbsent(index, new HashMap<>());
                                 medicinesMap.get(index).put(fieldName, value);
                             } catch (NumberFormatException e) {
-                                // Skip invalid indices
                             }
                         }
                     }
                 }
 
-                // Process collected medicines
+                // Check if medicines list is empty
+                if (medicinesMap.isEmpty()) {
+                    importDAO.deleteImport(newImportId);
+                    request.setAttribute("error", "Vui lòng thêm ít nhất 1 loại thuốc vào phiếu nhập");
+                    showCreateForm(request, response);
+                    return;
+                }
+
                 for (Map<String, String> medicineData : medicinesMap.values()) {
                     String medicineIdStr = medicineData.get("medicineId");
                     String quantityStr = medicineData.get("quantity");
@@ -316,7 +338,6 @@ public class ImportController extends HttpServlet {
                                 importDAO.addImportDetail(detail);
                             }
                         } catch (NumberFormatException e) {
-                            // Skip invalid entries
                         }
                     }
                 }
@@ -327,7 +348,7 @@ public class ImportController extends HttpServlet {
                     importDAO.updateImport(imp);
                 }
 
-                response.sendRedirect(request.getContextPath() + "/import?action=edit&id=" + newImportId);
+                response.sendRedirect(request.getContextPath() + "/admin/imports?action=edit&id=" + newImportId);
             } else {
                 request.setAttribute("error", "Không thể tạo phiếu nhập");
                 showCreateForm(request, response);
@@ -362,7 +383,6 @@ public class ImportController extends HttpServlet {
                 imp.setSupplierId(supplierId);
             }
 
-            // Resolve Staff (Importer)
             String importerInput = request.getParameter("importerId");
             int staffId = parseStaffId(importerInput);
             if (staffId > 0) {
@@ -371,16 +391,14 @@ public class ImportController extends HttpServlet {
 
             imp.setImportDate(parseDate(request.getParameter("importDate")));
 
-            // Set Status
             String status = request.getParameter("status");
             if (status != null && !status.isEmpty()) {
                 imp.setStatus(status);
             }
 
-            // Add any new medicines submitted from edit form
             Map<Integer, Map<String, String>> newMedicinesMap = new HashMap<>();
             Enumeration<String> paramNames = request.getParameterNames();
-            
+
             while (paramNames.hasMoreElements()) {
                 String paramName = paramNames.nextElement();
                 if (paramName.startsWith("newMedicines[")) {
@@ -389,19 +407,17 @@ public class ImportController extends HttpServlet {
                     if (startIdx > 0 && endIdx > startIdx) {
                         try {
                             int index = Integer.parseInt(paramName.substring(startIdx, endIdx));
-                            String fieldName = paramName.substring(endIdx + 2); // skip "].
+                            String fieldName = paramName.substring(endIdx + 2);
                             String value = request.getParameter(paramName);
-                            
+
                             newMedicinesMap.putIfAbsent(index, new HashMap<>());
                             newMedicinesMap.get(index).put(fieldName, value);
                         } catch (NumberFormatException e) {
-                            // Skip invalid indices
                         }
                     }
                 }
             }
 
-            // Process new medicines
             for (Map<String, String> medicineData : newMedicinesMap.values()) {
                 String medicineIdStr = medicineData.get("medicineId");
                 String quantityStr = medicineData.get("quantity");
@@ -419,7 +435,6 @@ public class ImportController extends HttpServlet {
                             importDAO.addImportDetail(detail);
                         }
                     } catch (NumberFormatException e) {
-                        // Skip invalid entries
                     }
                 }
             }
@@ -427,15 +442,27 @@ public class ImportController extends HttpServlet {
             double total = importDAO.calculateTotalAmount(importId);
             imp.setTotalAmount(total);
 
+            // Check if the import has at least 1 medicine
+            List<ImportDetail> updatedDetails = importDAO.getImportDetails(importId);
+            if (updatedDetails == null || updatedDetails.isEmpty()) {
+                request.setAttribute("error", "Phiếu nhập phải có ít nhất 1 loại thuốc");
+                request.setAttribute("importRecord", imp);
+                request.setAttribute("details", updatedDetails);
+                List<Medicine> medicines = importDAO.getAllMedicines();
+                request.setAttribute("medicines", medicines);
+                List<Object[]> suppliers = importDAO.getAllSuppliers();
+                request.setAttribute("suppliers", suppliers);
+                request.getRequestDispatcher(getImportView("edit", request)).forward(request, response);
+                return;
+            }
+
             if (importDAO.updateImport(imp)) {
-                // Redirect to edit page to see changes or list page
-                response.sendRedirect(request.getContextPath() + "/import?action=list");
+                response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
             } else {
                 request.setAttribute("error", "Không thể cập nhật phiếu nhập");
                 request.setAttribute("importRecord", imp);
-                List<ImportDetail> details = importDAO.getImportDetails(importId);
-                request.setAttribute("details", details);
-                request.getRequestDispatcher("/view/imports/edit.jsp").forward(request, response);
+                request.setAttribute("details", updatedDetails);
+                request.getRequestDispatcher(getImportView("edit", request)).forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -449,7 +476,7 @@ public class ImportController extends HttpServlet {
             throws ServletException, IOException {
         int importId = getImportIdFromRequest(request);
         if (importId > 0 && importDAO.deleteImport(importId)) {
-            response.sendRedirect(request.getContextPath() + "/import?action=list");
+            response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
         } else {
             request.setAttribute("error", "Không thể xóa phiếu nhập");
             listImports(request, response);
@@ -462,7 +489,7 @@ public class ImportController extends HttpServlet {
         try {
             int importId = getImportIdFromRequest(request);
             if (importId == 0) {
-                response.sendRedirect(request.getContextPath() + "/import?action=list");
+                response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
                 return;
             }
 
@@ -471,7 +498,7 @@ public class ImportController extends HttpServlet {
 
             if (medicineId == 0) {
                 request.setAttribute("error", "Mã thuốc không hợp lệ: " + medInput);
-                response.sendRedirect(request.getContextPath() + "/import?action=edit&id=" + importId);
+                response.sendRedirect(request.getContextPath() + "/admin/imports?action=edit&id=" + importId);
                 return;
             }
 
@@ -487,17 +514,15 @@ public class ImportController extends HttpServlet {
                 imp.setTotalAmount(total);
                 importDAO.updateImport(imp);
             }
-            response.sendRedirect(request.getContextPath() + "/import?action=edit&id=" + importId);
+            response.sendRedirect(request.getContextPath() + "/admin/imports?action=edit&id=" + importId);
 
         } catch (Exception e) {
             e.printStackTrace();
-            // Redirect to list or edit?
-            // Try to find context from params
             int importId = getImportIdFromRequest(request);
             if (importId > 0) {
-                response.sendRedirect(request.getContextPath() + "/import?action=edit&id=" + importId);
+                response.sendRedirect(request.getContextPath() + "/admin/imports?action=edit&id=" + importId);
             } else {
-                response.sendRedirect(request.getContextPath() + "/import?action=list");
+                response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
             }
         }
     }
@@ -509,26 +534,42 @@ public class ImportController extends HttpServlet {
             int detailId = Integer.parseInt(request.getParameter("detailId"));
             int importId = getImportIdFromRequest(request);
 
+            if (importId > 0) {
+                // Check if this is the last detail
+                List<ImportDetail> details = importDAO.getImportDetails(importId);
+                if (details != null && details.size() <= 1) {
+                    // Cannot delete if it's the last item
+                    request.setAttribute("error", "Phiếu nhập phải có ít nhất 1 loại thuốc. Không thể xóa chi tiết cuối cùng.");
+                    showEditForm(request, response);
+                    return;
+                } else if (details == null) {
+                    // DAO error
+                    request.setAttribute("error", "Lỗi khi lấy danh sách thuốc");
+                    showEditForm(request, response);
+                    return;
+                }
+            }
+
             if (importDAO.deleteImportDetail(detailId)) {
                 if (importId > 0) {
                     Import imp = importDAO.getImportById(importId);
                     double total = importDAO.calculateTotalAmount(importId);
                     imp.setTotalAmount(total);
                     importDAO.updateImport(imp);
-                    response.sendRedirect(request.getContextPath() + "/import?action=edit&id=" + importId);
+                    response.sendRedirect(request.getContextPath() + "/admin/imports?action=edit&id=" + importId);
                 } else {
-                    response.sendRedirect(request.getContextPath() + "/import?action=list");
+                    response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
                 }
             } else {
                 if (importId > 0) {
-                    response.sendRedirect(request.getContextPath() + "/import?action=edit&id=" + importId);
+                    response.sendRedirect(request.getContextPath() + "/admin/imports?action=edit&id=" + importId);
                 } else {
-                    response.sendRedirect(request.getContextPath() + "/import?action=list");
+                    response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/import?action=list");
+            response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
         }
     }
 
@@ -539,22 +580,19 @@ public class ImportController extends HttpServlet {
         if (importId > 0) {
             List<ImportDetail> details = importDAO.getImportDetails(importId);
             request.setAttribute("details", details);
-            request.getRequestDispatcher("/view/imports/details.jsp").forward(request, response);
+            request.getRequestDispatcher(getImportView("details", request)).forward(request, response);
         }
     }
 
     // ================= HELPER METHODS ===============
-    // Lấy Import ID từ request (param 'id' hoặc 'code' hoặc 'importCode')
     private int getImportIdFromRequest(HttpServletRequest request) {
         String[] params = { "id", "code", "importCode", "importId" };
         for (String param : params) {
             String val = request.getParameter(param);
             if (val != null && !val.isEmpty()) {
-                // Try parse pure int
                 try {
                     return Integer.parseInt(val);
                 } catch (NumberFormatException e) {
-                    // Try parse IPxxx
                     if (val.toUpperCase().startsWith("IP")) {
                         try {
                             return Integer.parseInt(val.substring(2));

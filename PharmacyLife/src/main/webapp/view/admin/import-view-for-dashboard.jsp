@@ -68,7 +68,7 @@
                                 <div class="alert alert-danger" role="alert">
                                     <i class="fas fa-exclamation-circle me-2"></i>Không tìm thấy phiếu nhập
                                 </div>
-                                <a href="${pageContext.request.contextPath}/import" class="btn btn-secondary">
+                                <a href="${pageContext.request.contextPath}/admin/imports" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left me-2"></i>Trở lại
                                 </a>
                             </c:if>
@@ -159,10 +159,11 @@
                                 </c:if>
 
                                 <div class="mt-5 d-flex justify-content-between">
-                                    <a href="${pageContext.request.contextPath}/import" class="btn btn-secondary px-4">
+                                    <a href="${pageContext.request.contextPath}/admin/imports"
+                                        class="btn btn-secondary px-4">
                                         <i class="fas fa-arrow-left me-2"></i>Trở lại
                                     </a>
-                                    <a href="${pageContext.request.contextPath}/import?action=edit&code=${importRecord.importCode}"
+                                    <a href="${pageContext.request.contextPath}/admin/imports?action=edit&code=${importRecord.importCode}"
                                         class="btn btn-warning px-4">
                                         <i class="fas fa-edit me-2"></i>Chỉnh sửa
                                     </a>
