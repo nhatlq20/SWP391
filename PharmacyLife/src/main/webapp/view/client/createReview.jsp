@@ -11,11 +11,7 @@
 </head>
 <!-- kiên -->
 <body>
-
-<div class="header">
-    <div>NHÀ THUỐC<br>PHARMACY LIFE</div>
-    <div>User Name</div>
-</div>
+<%@ include file="../common/header.jsp" %>
 
 <div class="container">
     <h2 class="form-title">Đánh giá sản phẩm</h2>

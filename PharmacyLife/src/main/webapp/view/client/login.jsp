@@ -56,7 +56,7 @@
                         <div class="input-wrapper">
                             <input type="email" id="email" name="email" placeholder="Nhập email của bạn" 
                                    value="<%= request.getAttribute("email") != null ? request.getAttribute("email") : "" %>" required>
-                            <img src="${pageContext.request.contextPath}/assets/img/emaillogin.png" alt="Email Icon" class="input-icon">
+                            <img src="${pageContext.request.contextPath}/assets/img/email.png" alt="Email Icon" class="input-icon">
                         </div>
                     </div>
 
@@ -65,7 +65,7 @@
                         <label for="password">Mật Khẩu</label>
                         <div class="input-wrapper">
                             <input type="password" id="password" name="password" placeholder="Nhập mật khẩu của bạn" required>
-                            <img src="${pageContext.request.contextPath}/assets/img/pass.png" alt="Password Icon" class="input-icon">
+                            <img src="${pageContext.request.contextPath}/assets/img/Lock.png" alt="Password Icon" class="input-icon">
                         </div>
                     </div>
 

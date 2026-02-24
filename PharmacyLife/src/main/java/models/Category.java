@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 public class Category {
 
     private int categoryId;
+    private String categoryCode;
     private String categoryName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -48,6 +49,14 @@ public class Category {
 
     public String getCategoryName() {
         return categoryName;
+    }
+
+    public String getCategoryCode() {
+        return categoryCode;
+    }
+
+    public void setCategoryCode(String categoryCode) {
+        this.categoryCode = categoryCode;
     }
 
     public void setCategoryName(String categoryName) {
