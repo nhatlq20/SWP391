@@ -15,7 +15,7 @@ public class StaffDAO {
     public List<Staff> getAllStaff() {
         List<Staff> list = new ArrayList<>();
 
-        String sql = "SELECT s.StaffId, s.StaffCode, s.StaffName, s.StaffPhone, r.RoleName, s.StaffIsActive, s.StaffEmail, s.StaffGender "
+        String sql = "SELECT s.StaffId, s.StaffCode, s.StaffName, s.StaffPhone, s.StaffAddress, s.StaffDob, r.RoleName, s.StaffIsActive, s.StaffEmail, s.StaffGender "
                + "FROM Staff s JOIN Role r ON s.RoleId = r.RoleId";
 
         try (Connection conn = new DBContext().getConnection();
@@ -28,6 +28,8 @@ public class StaffDAO {
                 s.setStaffCode(rs.getString("StaffCode"));
                 s.setStaffName(rs.getString("StaffName"));
                 s.setStaffPhone(rs.getString("StaffPhone"));
+                s.setStaffAddress(rs.getString("StaffAddress"));
+                s.setStaffDob(rs.getDate("StaffDob"));
                 s.setRoleName(rs.getString("RoleName"));
                 s.setActive(rs.getBoolean("StaffIsActive"));
                 s.setStaffEmail(rs.getString("StaffEmail"));
@@ -46,7 +48,7 @@ public class StaffDAO {
     // 2. Lấy staff theo ID
     public Staff getStaffById(int id) {
 
-        String sql = "SELECT s.StaffId, s.StaffCode, s.StaffName, s.StaffPhone, r.RoleName, s.StaffIsActive, s.StaffEmail, s.StaffGender, s.RoleId "
+        String sql = "SELECT s.StaffId, s.StaffCode, s.StaffName, s.StaffPhone, s.StaffAddress, s.StaffDob, r.RoleName, s.StaffIsActive, s.StaffEmail, s.StaffGender, s.RoleId "
                + "FROM Staff s JOIN Role r ON s.RoleId = r.RoleId "
                + "WHERE s.StaffId = ?";
 
@@ -62,6 +64,8 @@ public class StaffDAO {
                 s.setStaffCode(rs.getString("StaffCode"));
                 s.setStaffName(rs.getString("StaffName"));
                 s.setStaffPhone(rs.getString("StaffPhone"));
+                s.setStaffAddress(rs.getString("StaffAddress"));
+                s.setStaffDob(rs.getDate("StaffDob"));
                 s.setRoleName(rs.getString("RoleName"));
                 s.setActive(rs.getBoolean("StaffIsActive"));
                 s.setStaffEmail(rs.getString("StaffEmail"));
@@ -129,8 +133,8 @@ public class StaffDAO {
         s.setStaffCode(staffCode);
         
         // Insert including StaffPassword (keep column order aligned with database)
-        String sql = "INSERT INTO Staff (StaffCode, StaffName, StaffEmail, StaffPassword, StaffPhone, StaffGender, RoleId, StaffIsActive) " +
-                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Staff (StaffCode, StaffName, StaffEmail, StaffPassword, StaffPhone, StaffAddress, StaffDob, StaffGender, RoleId, StaffIsActive) " +
+             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = new DBContext().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -146,9 +150,11 @@ public class StaffDAO {
             ps.setString(3, s.getStaffEmail());
             ps.setString(4, s.getStaffPassword() != null ? s.getStaffPassword() : ""); // StaffPassword
             ps.setString(5, "");  // StaffPhone
-            ps.setString(6, "");  // StaffGender
-            ps.setInt(7, s.getRoleId());
-            ps.setBoolean(8, true);  // StaffIsActive
+            ps.setString(6, "");  // StaffAddress
+            ps.setNull(7, java.sql.Types.DATE);  // StaffDob
+            ps.setString(8, "Khác");  // StaffGender
+            ps.setInt(9, s.getRoleId());
+            ps.setBoolean(10, true);  // StaffIsActive
             
             int result = ps.executeUpdate();
             System.out.println("Result: " + result + " row inserted");
@@ -175,5 +181,43 @@ public class StaffDAO {
         }
     }
 
+    // 5. Login - Authenticate user by email and password
+    public Staff login(String email, String password) {
+        String sql = "SELECT s.StaffId, s.StaffCode, s.StaffName, s.StaffEmail, s.StaffPassword, s.StaffPhone, s.StaffAddress, s.StaffDob, s.StaffGender, s.RoleId, r.RoleName, s.StaffIsActive " +
+                     "FROM Staff s JOIN Role r ON s.RoleId = r.RoleId " +
+                     "WHERE s.StaffEmail = ? AND s.StaffPassword = ? AND s.StaffIsActive = 1";
+
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+            ps.setString(2, password);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Staff staff = new Staff();
+                staff.setStaffId(rs.getInt("StaffId"));
+                staff.setStaffCode(rs.getString("StaffCode"));
+                staff.setStaffName(rs.getString("StaffName"));
+                staff.setStaffEmail(rs.getString("StaffEmail"));
+                staff.setStaffPassword(rs.getString("StaffPassword"));
+                staff.setStaffPhone(rs.getString("StaffPhone"));
+                staff.setStaffAddress(rs.getString("StaffAddress"));
+                staff.setStaffDob(rs.getDate("StaffDob"));
+                staff.setStaffGender(rs.getString("StaffGender"));
+                staff.setRoleId(rs.getInt("RoleId"));
+                staff.setRoleName(rs.getString("RoleName"));
+                staff.setActive(rs.getBoolean("StaffIsActive"));
+
+                return staff;
+            }
+
+        } catch (Exception e) {
+            System.out.println("Login error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
     
 }

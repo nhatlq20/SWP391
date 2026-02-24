@@ -6,12 +6,12 @@ import java.sql.SQLException;
 
 public class DBContext {
     // JDBC URL used to create new connections on demand
-    private final String url = "jdbc:sqlserver://localhost:1433;" +
-            "databaseName=SWP391_PHARMACYLIFE;" +
-            "user=sa;" +
-            "password=123456;" +
-            "encrypt=true;" +
-            "trustServerCertificate=true;";
+    private final String url = "jdbc:sqlserver://localhost:1433;"
+            + "databaseName=SWP391_Test7;"
+            + "user=sa;"
+            + "password=ndc2022005;"
+            + "encrypt=true;"
+            + "trustServerCertificate=true;";
 
     public DBContext() {
         try {

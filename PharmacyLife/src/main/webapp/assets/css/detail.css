@@ -3,6 +3,7 @@ body {
 }
 
 .detail-wrapper {
+    margin-top: 115px;
     padding: 30px 20px;
     min-height: calc(100vh - 200px);
 }
@@ -198,6 +199,30 @@ body {
 .btn-buy:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(63, 111, 217, 0.3);
+}
+
+.btn-rate {
+    flex: 0 1 auto;
+    padding: 14px 20px;
+    background: white;
+    color: #FFC107;
+    border: 2px solid #FFC107;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-rate:hover {
+    background: #FFC107;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 193, 7, 0.3);
 }
 
 .btn-back {
@@ -500,4 +525,115 @@ body {
     .review-text {
         font-size: 12px;
     }
+}
+
+/* Review Stats Styling */
+.review-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.stats-left {
+    display: flex;
+    gap: 20px;
+}
+
+.average-rating {
+    text-align: center;
+}
+
+.rating-number {
+    font-size: 32px;
+    font-weight: 600;
+    color: #FFD700;
+}
+
+.average-rating .rating-stars {
+    display: flex;
+    justify-content: center;
+    margin: 8px 0;
+    gap: 3px;
+}
+
+.average-rating .rating-stars i {
+    font-size: 16px;
+}
+
+.total-reviews {
+    margin: 8px 0 0 0;
+    color: #666;
+    font-size: 14px;
+}
+
+/* Reviews List */
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.no-reviews {
+    text-align: center;
+    color: #999;
+    padding: 40px 20px;
+    font-size: 16px;
+}
+
+.review-item {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+    background: white;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.reviewer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.reviewer-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.review-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.review-rating i {
+    font-size: 14px;
+}
+
+.rating-text {
+    font-size: 14px;
+    color: #666;
+}
+
+.review-date {
+    color: #999;
+    font-size: 12px;
+}
+
+.review-comment {
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 14px;
 }

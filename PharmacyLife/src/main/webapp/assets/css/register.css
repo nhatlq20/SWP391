@@ -1,0 +1,231 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.register-container {
+    display: flex;
+    width: 90%;
+    max-width: 1200px;
+    min-height: 700px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Left Side - Image */
+.register-left {
+    flex: 1;
+    background: linear-gradient(135deg, #e8f0ff 0%, #f5f8ff 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.register-left img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Right Side - Form */
+.register-right {
+    flex: 1;
+    padding: 50px 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow-y: auto;
+}
+
+.register-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.register-logo img.icon-logo {
+    width: 50px;
+    height: 50px;
+}
+
+.register-logo img.text-logo {
+    height: 45px;
+    width: auto;
+}
+
+.register-title {
+    color: #5b8def;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    color: #333;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    right: 15px;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 11px 45px 11px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #5b8def;
+    box-shadow: 0 0 0 3px rgba(91, 141, 239, 0.1);
+}
+
+.form-group input::placeholder {
+    color: #aaa;
+}
+
+.btn-register {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #5b8def 0%, #4a75d9 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(91, 141, 239, 0.3);
+}
+
+.divider {
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.login-link {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+}
+
+.login-link a {
+    color: #5b8def;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.login-link a:hover {
+    color: #4a75d9;
+}
+
+.error-message {
+    background-color: #ffe6e6;
+    border-left: 4px solid #ff4444;
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.error-message p {
+    color: #cc0000;
+    margin: 0;
+    font-size: 14px;
+}
+
+.success-message {
+    background-color: #e6f7e6;
+    border-left: 4px solid #44cc44;
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.success-message p {
+    color: #00aa00;
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+    .register-container {
+        flex-direction: column;
+        min-height: auto;
+    }
+    
+    .register-left {
+        padding: 30px;
+        min-height: 250px;
+    }
+    
+    .register-right {
+        padding: 35px 30px;
+    }
+}
+
+@media (max-width: 576px) {
+    body {
+        padding: 10px 0;
+    }
+    
+    .register-container {
+        width: 95%;
+        border-radius: 15px;
+    }
+    
+    .register-right {
+        padding: 30px 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 14px;
+    }
+}

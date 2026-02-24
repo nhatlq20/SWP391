@@ -60,9 +60,84 @@
                                                             alt="<c:out value='${medicine.medicineName}'/>" />
                                                     </c:otherwise>
                                                 </c:choose>
+
+                                            </div>
+                                        </div>
+
+                                        <!-- Review Section -->
+                                        <div class="review-section">
+                                            <h3 class="review-title">Đánh giá sản phẩm</h3>
+
+                                            <!-- Review Stats -->
+                                            <c:if test="${totalReviews > 0}">
+                                                <div class="review-stats">
+                                                    <div class="stats-left">
+                                                        <div class="average-rating">
+                                                            <span class="rating-number">${averageRating}</span>
+                                                            <div class="rating-stars">
+                                                                <c:forEach var="i" begin="1" end="5">
+                                                                    <c:choose>
+                                                                        <c:when test="${i <= averageRating}">
+                                                                            <i class="fas fa-star"
+                                                                                style="color: #FFD700;"></i>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <i class="fas fa-star"
+                                                                                style="color: #ddd;"></i>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </c:forEach>
+                                                            </div>
+                                                            <p class="total-reviews">dựa trên
+                                                                <strong>${totalReviews}</strong> đánh giá
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </c:if>
+
+                                            <!-- Reviews List -->
+                                            <div class="reviews-list">
+                                                <c:choose>
+                                                    <c:when test="${empty reviews}">
+                                                        <p class="no-reviews">Chưa có đánh giá nào cho sản phẩm này</p>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <c:forEach var="review" items="${reviews}">
+                                                            <div class="review-item">
+                                                                <div class="review-header">
+                                                                    <div class="reviewer-info">
+                                                                        <h5 class="reviewer-name">${review.customerName}
+                                                                        </h5>
+                                                                        <div class="review-rating">
+                                                                            <c:forEach var="i" begin="1" end="5">
+                                                                                <c:choose>
+                                                                                    <c:when
+                                                                                        test="${i <= review.rating}">
+                                                                                        <i class="fas fa-star"
+                                                                                            style="color: #FFD700; margin-right: 2px;"></i>
+                                                                                    </c:when>
+                                                                                    <c:otherwise>
+                                                                                        <i class="fas fa-star"
+                                                                                            style="color: #ddd; margin-right: 2px;"></i>
+                                                                                    </c:otherwise>
+                                                                                </c:choose>
+                                                                            </c:forEach>
+                                                                            <span
+                                                                                class="rating-text">${review.rating}/5</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <span class="review-date">${review.createdAt}</span>
+                                                                </div>
+                                                                <p class="review-comment">${review.comment}</p>
+                                                            </div>
+                                                        </c:forEach>
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </div>
                                         </div>
                                     </div>
+
 
                                     <!-- Right: Product Details -->
                                     <div class="col-12 col-lg-8 product-info-section">
@@ -70,6 +145,8 @@
                                         <h2>
                                             <c:out value='${medicine.medicineName}' />
                                         </h2>
+
+
 
                                         <!-- Rating & Comments -->
                                         <div class="rating-show">
@@ -149,67 +226,30 @@
                                         </div>
 
                                         <!-- Action Buttons -->
+                                        <!-- kien -->
                                         <div class="action-buttons">
                                             <button class="btn-buy btn btn-primary">Mua</button>
+                                            <c:choose>
+                                                <c:when test="${sessionScope.userType eq 'customer'}">
+                                                    <a class="btn-rate btn btn-outline-warning"
+                                                        href="${pageContext.request.contextPath}/create-review?medicineId=${medicine.medicineId}">
+                                                        <i class="fas fa-star"></i> Đánh giá sản phẩm
+                                                    </a>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <a class="btn-rate btn btn-outline-warning"
+                                                        href="${pageContext.request.contextPath}/login">
+                                                        <i class="fas fa-star"></i> Đăng nhập để đánh giá
+                                                    </a>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Review Section -->
-                                <div class="review-section">
-                                    <h3 class="review-title">Đánh giá sản phẩm</h3>
-
-                                    <!-- Rating Distribution -->
-                                    <div class="rating-distribution">
-                                        <div class="rating-item">
-                                            <div class="rating-stars-count">
-                                                <i class="fas fa-star" style="color: #FFD700;"></i>
-                                                <i class="fas fa-star" style="color: #FFD700;"></i>
-                                                <i class="fas fa-star" style="color: #FFD700;"></i>
-                                                <i class="fas fa-star" style="color: #FFD700;"></i>
-                                                <i class="fas fa-star" style="color: #FFD700;"></i>
-                                            </div>
-                                            <div class="rating-bar-wrapper">
-                                                <div class="rating-bar">
-                                                    <div class="rating-bar-fill" style="width: 100%;"></div>
-                                                </div>
-                                            </div>
-                                            <span>(1)</span>
-                                        </div>
-                                        <div class="rating-item">
-                                            <div class="rating-stars-count">
-                                                <i class="fas fa-star" style="color: #FFD700;"></i>
-                                                <i class="fas fa-star" style="color: #FFD700;"></i>
-                                                <i class="fas fa-star" style="color: #FFD700;"></i>
-                                                <i class="fas fa-star" style="color: #FFD700;"></i>
-                                                <i class="fas fa-star" style="color: #ddd;"></i>
-                                            </div>
-                                            <div class="rating-bar-wrapper">
-                                                <div class="rating-bar">
-                                                    <div class="rating-bar-fill" style="width: 0%;"></div>
-                                                </div>
-                                            </div>
-                                            <span>(0)</span>
-                                        </div>
-                                        <div class="rating-item">
-                                            <div class="rating-stars-count">
-                                                <i class="fas fa-star" style="color: #FFD700;"></i>
-                                                <i class="fas fa-star" style="color: #FFD700;"></i>
-                                                <i class="fas fa-star" style="color: #FFD700;"></i>
-                                                <i class="fas fa-star" style="color: #ddd;"></i>
-                                                <i class="fas fa-star" style="color: #ddd;"></i>
-                                            </div>
-                                            <div class="rating-bar-wrapper">
-                                                <div class="rating-bar">
-                                                    <div class="rating-bar-fill" style="width: 0%;"></div>
-                                                </div>
-                                            </div>
-                                            <span>(0)</span>
-                                        </div>
-                                    </div>
-                                    <script
-                                        src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
-                                    <script src="${pageContext.request.contextPath}/assets/js/detail.js"></script>
+                                <script
+                                    src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
+                                <script src="${pageContext.request.contextPath}/assets/js/detail.js"></script>
                 </body>
 
                 </html>

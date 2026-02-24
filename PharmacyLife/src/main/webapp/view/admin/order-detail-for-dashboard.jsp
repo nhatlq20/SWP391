@@ -26,7 +26,7 @@
                     }
 
                     .main-content {
-                        margin-left: 250px;
+                        margin-left: 310px;
                         padding: 30px;
                         margin-top: 115px;
                     }

@@ -28,7 +28,7 @@
                                             <c:forEach var="medicine" items="${allMedicines}">
                                                 <div class="col-6 col-md-4 col-lg-3">
                                                     <div class="card h-100 medicine-card"
-                                                        onclick="window.location.href='${pageContext.request.contextPath}/medicine/detail?id=${medicine.medicineID}'">
+                                                        onclick="window.location.href='${pageContext.request.contextPath}/medicine/detail?id=${medicine.medicineId}'">
                                                         <c:choose>
                                                             <c:when test="${not empty medicine.imageUrl}">
                                                                 <c:set var="imageUrlTrimmed"
@@ -77,7 +77,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <a class="btn btn-primary w-100"
-                                                                    href="${pageContext.request.contextPath}/medicine/detail?id=${medicine.medicineID}">Mua</a>
+                                                                    href="${pageContext.request.contextPath}/medicine/detail?id=${medicine.medicineId}">Mua</a>
                                                             </div>
                                                         </div>
                                                     </div>
