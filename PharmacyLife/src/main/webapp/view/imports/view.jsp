@@ -95,7 +95,6 @@
                                             value="${importRecord.staffName != null ? importRecord.staffName : importRecord.staffId}"
                                             readonly>
                                     </div>
-<<<<<<< HEAD
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-bold">Ngày nhập</label>
                                         <input type="text" class="form-control bg-light"
@@ -103,11 +102,6 @@
                                             readonly>
                                     </div>
                                 </div>
-=======
-                                    <a href="${pageContext.request.contextPath}/import" class="btn-secondary">Trở
-                                        lại</a>
-                                </c:if>
->>>>>>> main
 
                                 <div class="row mb-4">
                                     <div class="col-md-6 mb-3">
@@ -157,38 +151,9 @@
                                                                     type="number" maxFractionDigits="0" />₫
                                                             </td>
                                                         </tr>
-<<<<<<< HEAD
                                                     </c:forEach>
                                                 </tbody>
                                             </table>
-=======
-                                                    </thead>
-                                                    <tbody>
-                                                        <c:forEach var="detail" items="${details}">
-                                                            <tr>
-                                                                <td>${detail.medicineCode}</td>
-                                                                <td>${detail.medicineName != null ? detail.medicineName
-                                                                    : '-'}</td>
-                                                                <td>${detail.quantity}</td>
-                                                                <td class="amount-green">
-                                                                    <fmt:formatNumber value="${detail.price}"
-                                                                        type="number" maxFractionDigits="0" />₫
-                                                                </td>
-                                                                <td class="amount-green">
-                                                                    <fmt:formatNumber value="${detail.totalAmount}"
-                                                                        type="number" maxFractionDigits="0" />₫
-                                                                </td>
-                                                            </tr>
-                                                        </c:forEach>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </c:if>
-
-                                        <div class="view-footer">
-                                            <a href="${pageContext.request.contextPath}/import"
-                                                class="view-close-btn">Đóng</a>
->>>>>>> main
                                         </div>
                                     </div>
                                 </c:if>
