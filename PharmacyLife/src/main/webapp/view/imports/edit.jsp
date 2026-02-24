@@ -1,12 +1,18 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-            <!DOCTYPE html>
-            <html>
+            <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+                <!DOCTYPE html>
+                <html>
 
             <head>
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
                 <title>Chỉnh sửa phiếu nhập</title>
+<<<<<<< HEAD
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+=======
+>>>>>>> main
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
                 <style>
                     /* Shared overrides for the Edit Card to match design */
@@ -19,78 +25,54 @@
                         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
                     }
 
-                    .edit-title-center {
-                        text-align: center;
-                        color: #4a86e8;
-                        font-size: 28px;
-                        font-weight: bold;
-                        margin-bottom: 40px;
-                    }
+                    <style>
+                        body {
+                            background-color: #f4f6f9;
+                        }
 
-                    .edit-grid {
-                        display: grid;
-                        grid-template-columns: 1fr 1fr;
-                        gap: 30px;
-                        margin-bottom: 30px;
-                    }
+                        .sidebar-wrapper {
+                            top: 115px !important;
+                            height: calc(100vh - 115px) !important;
+                            z-index: 100;
+                        }
 
-                    .edit-label {
-                        display: block;
-                        margin-bottom: 10px;
-                        font-weight: 600;
-                        color: #333;
-                        font-size: 15px;
-                    }
+                        .main-content-dashboard {
+                            margin-left: 250px;
+                            padding: 30px;
+                            margin-top: 115px;
+                            max-width: 100%;
+                            width: calc(100% - 250px);
+                        }
 
-                    .edit-input-readonly {
-                        width: 100%;
-                        padding: 12px 15px;
-                        background-color: #f1f3f5;
-                        border: none;
-                        border-radius: 8px;
-                        font-size: 14px;
-                        color: #555;
-                        font-weight: 500;
-                    }
+                        .page-title-dashboard {
+                            font-size: 28px;
+                            font-weight: 700;
+                            color: #2c3e50;
+                            margin-bottom: 30px;
+                            display: flex;
+                            align-items: center;
+                            gap: 15px;
+                        }
 
-                    .edit-input {
-                        width: 100%;
-                        padding: 12px 15px;
-                        background-color: #f1f3f5;
-                        /* Light gray to match others but editable if needed, or white? Screenshot shows light gray for all fields, but distinctively input-like */
-                        /* Actually screenshot shows editable fields as light gray too but slightly cleaner? */
-                        /* Let's use light gray for consistence */
-                        border: 1px solid transparent;
-                        border-radius: 8px;
-                        font-size: 14px;
-                        color: #333;
-                        font-weight: 500;
-                        transition: all 0.3s;
-                    }
+                        .card-custom {
+                            background: white;
+                            border-radius: 12px;
+                            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+                            border: 1px solid #eef2f7;
+                            padding: 25px;
+                        }
+                    </style>
+                </head>
 
-                    .edit-input:focus {
-                        background-color: white;
-                        border: 1px solid #4a86e8;
-                        outline: none;
-                        box-shadow: 0 0 0 3px rgba(74, 134, 232, 0.1);
-                    }
+                <body>
+                    <jsp:include page="/view/common/header.jsp" />
+                    <jsp:include page="/view/common/sidebar.jsp" />
 
-                    .edit-select {
-                        width: 100%;
-                        padding: 12px 15px;
-                        background-color: #f1f3f5;
-                        border: 1px solid transparent;
-                        border-radius: 8px;
-                        font-size: 14px;
-                        color: #333;
-                        font-weight: 500;
-                        appearance: none;
-                        /* Custom arrow if needed */
-                        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-                        background-repeat: no-repeat;
-                        background-position: right 15px center;
-                        background-size: 16px;
-                    }
+                    <div class="main-content-dashboard">
+                        <div class="page-title-dashboard">
+                            <i class="fas fa-edit" style="color: #4F81E1;"></i>
+                            <span>Cập nhật phiếu nhập thuốc</span>
+                        </div>
 
                     .edit-footer {
                         display: flex;
@@ -139,17 +121,27 @@
             </head>
 
             <body>
-                <%@include file="header.jsp" %>
+                <jsp:include page="/view/common/header.jsp" />
+                <jsp:include page="/view/common/sidebar.jsp" />
 
-                    <div class="container">
-                        <%@include file="sidebar.jsp" %>
+                <div class="main-content-dashboard">
+                    <div class="page-title-dashboard">
+                        <i class="fas fa-edit" style="color: #4F81E1;"></i>
+                        <span>Chỉnh sửa phiếu nhập thuốc</span>
+                    </div>
 
-                            <div class="main-content">
-                                <div class="page-title">
-                                    <i>📥</i>
-                                    <span>Quản lý nhập thuốc</span>
-                                </div>
+                    <div class="card-custom">
+                        <c:if test="${not empty error}">
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>${error}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        </c:if>
 
+<<<<<<< HEAD
+                                <c:if test="${not empty importRecord}">
+                                    <form action="${pageContext.request.contextPath}/ImportController" method="POST">
+=======
                                 <c:if test="${not empty error}">
                                     <div
                                         style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
@@ -159,8 +151,9 @@
 
                                 <c:if test="${not empty import}">
                                     <form action="${pageContext.request.contextPath}/import" method="POST">
+>>>>>>> main
                                         <input type="hidden" name="action" value="update">
-                                        <input type="hidden" name="importId" value="${import.importId}">
+                                        <input type="hidden" name="importId" value="${importRecord.importId}">
                                         <!-- Pass original ID if implicit -->
 
                                         <div class="edit-card">
@@ -171,43 +164,51 @@
                                                 <div>
                                                     <label class="edit-label">Mã</label>
                                                     <input type="text" class="edit-input-readonly"
-                                                        value="${import.importCode}" readonly>
+                                                        value="${importRecord.importCode}" readonly>
                                                 </div>
                                                 <div>
                                                     <label class="edit-label">Nhà cung cấp</label>
-                                                    <input type="text" name="supplierId" class="edit-input"
-                                                        value="${import.supplierName != null ? import.supplierName : import.supplierId}"
-                                                        placeholder="Nhập tên hoặc ID nhà cung cấp">
+                                                    <select name="supplierId" class="edit-select" required>
+                                                        <option value="">-- Chọn nhà cung cấp --</option>
+                                                        <c:forEach var="supplier" items="${suppliers}">
+                                                            <option value="${supplier[0]}"
+                                                                ${supplier[0]==importRecord.supplierId ? 'selected' : ''
+                                                                }>
+                                                                ${supplier[1]}</option>
+                                                        </c:forEach>
+                                                    </select>
                                                 </div>
 
                                                 <!-- Row 2 -->
                                                 <div>
                                                     <label class="edit-label">Người nhập</label>
-                                                    <input type="text" name="importerId" class="edit-input"
-                                                        value="${import.staffName != null ? import.staffName : import.staffId}"
-                                                        placeholder="Nhập tên hoặc ID người nhập">
+                                                    <input type="text" class="edit-input-readonly"
+                                                        value="${importRecord.staffName}" readonly
+                                                        style="cursor: not-allowed;">
+                                                    <input type="hidden" name="importerId"
+                                                        value="${importRecord.staffId}">
                                                 </div>
                                                 <div>
                                                     <label class="edit-label">Ngày nhập</label>
                                                     <input type="date" name="importDate" class="edit-input"
-                                                        value="<fmt:formatDate value='${import.importDate}' pattern='yyyy-MM-dd'/>">
+                                                        value="<fmt:formatDate value='${importRecord.importDate}' pattern='yyyy-MM-dd'/>">
                                                 </div>
 
                                                 <!-- Row 3 -->
                                                 <div>
                                                     <label class="edit-label">Tổng tiền</label>
                                                     <input type="text" class="edit-input-readonly"
-                                                        value="<fmt:formatNumber value='${import.totalAmount}' type='number' maxFractionDigits='0'/>₫"
+                                                        value="<fmt:formatNumber value='${importRecord.totalAmount}' type='number' maxFractionDigits='0'/>₫"
                                                         readonly>
                                                 </div>
                                                 <div>
                                                     <label class="edit-label">Trạng thái</label>
                                                     <select name="status" class="edit-select">
-                                                        <option value="Đang chờ" ${import.status=='Đang chờ'
+                                                        <option value="Đang chờ" ${importRecord.status=='Đang chờ'
                                                             ? 'selected' : '' }>Đang chờ</option>
-                                                        <option value="Chưa duyệt" ${import.status=='Chưa duyệt'
+                                                        <option value="Chưa duyệt" ${importRecord.status=='Chưa duyệt'
                                                             ? 'selected' : '' }>Chưa duyệt</option>
-                                                        <option value="Đã duyệt" ${import.status=='Đã duyệt'
+                                                        <option value="Đã duyệt" ${importRecord.status=='Đã duyệt'
                                                             ? 'selected' : '' }>Đã duyệt</option>
                                                     </select>
                                                 </div>
@@ -228,11 +229,17 @@
                                                         style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
                                                         <label class="edit-label"
                                                             style="font-size: 18px; margin:0;">Danh sách thuốc</label>
+<<<<<<< HEAD
+                                                        <button type="button" class="btn-save" onclick="openAddMedicineModal()"
+                                                            style="padding: 5px 15px; font-size:13px; border: none; cursor: pointer;">+
+                                                            Thêm thuốc</button>
+=======
                                                         <a href="${pageContext.request.contextPath}/import?action=create"
                                                             class="btn-save"
                                                             style="padding: 5px 15px; font-size:13px; text-decoration:none;">+
                                                             Thêm thuốc (Tạo mới)</a>
                                                         <!-- Adding items to existing import might need a different flow or modal. Keeping it simple for now -->
+>>>>>>> main
                                                     </div>
 
                                                     <table class="clean-table">
@@ -254,7 +261,7 @@
                                                                         detail.medicineName : '-'}</td>
                                                                     <td>${detail.quantity}</td>
                                                                     <td class="amount-green">
-                                                                        <fmt:formatNumber value="${detail.price}"
+                                                                        <fmt:formatNumber value="${detail.unitPrice}"
                                                                             type="number" maxFractionDigits="0" />₫
                                                                     </td>
                                                                     <td class="amount-green">
@@ -262,7 +269,11 @@
                                                                             type="number" maxFractionDigits="0" />₫
                                                                     </td>
                                                                     <td>
+<<<<<<< HEAD
+                                                                        <a href="${pageContext.request.contextPath}/ImportController?action=deleteDetail&detailId=${detail.detailId}&importId=${importRecord.importId}"
+=======
                                                                         <a href="${pageContext.request.contextPath}/import?action=deleteDetail&detailId=${detail.detailId}&importId=${import.importId}"
+>>>>>>> main
                                                                             class="icon-trash"
                                                                             style="margin: 0 auto; text-decoration:none;"
                                                                             onclick="return confirm('Xóa thuốc này khỏi phiếu?')">🗑</a>
@@ -274,18 +285,256 @@
                                                 </div>
                                             </c:if>
 
+<<<<<<< HEAD
+                                            <!-- New Medicines Section -->
+                                            <div id="newMedicinesSection" style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px; display: none;">
+                                                <h6 style="font-weight: bold; margin-bottom: 15px;">Thuốc mới thêm</h6>
+                                                <table class="clean-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Mã thuốc</th>
+                                                            <th>Tên thuốc</th>
+                                                            <th>Số lượng</th>
+                                                            <th>Giá</th>
+                                                            <th>Thành tiền</th>
+                                                            <th>Thao tác</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="newMedicineListBody">
+                                                        <tr><td colspan="6" style="text-align: center; padding: 15px; color: #999;">Chưa thêm thuốc mới</td></tr>
+                                                    </tbody>
+                                                </table>
+                                                <div id="newHiddenInputsContainer"></div>
+=======
                                             <div class="edit-footer">
                                                 <a href="${pageContext.request.contextPath}/import"
                                                     class="btn-cancel">Đóng</a>
                                                 <button type="submit" class="btn-save">
                                                     <span>💾</span> Lưu
                                                 </button>
+>>>>>>> main
                                             </div>
-                                        </div>
-                                    </form>
-                                </c:if>
+
+                                            <div class="edit-footer">
+                                <a href="${pageContext.request.contextPath}/import" class="btn-cancel">Đóng</a>
+                                <button type="submit" class="btn-save">
+                                    <span>💾</span> Lưu
+                                </button>
                             </div>
+                        </div>
+                    </form>
+                </c:if>
+                    </div>  <!-- closes card-custom -->
+                </div>  <!-- closes main-content-dashboard -->
+
+                <!-- Modal for Adding Medicines -->
+                <div id="addMedicineModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+                    <div style="background: white; padding: 25px; border-radius: 8px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h5 style="margin: 0; font-weight: bold;">Thêm thuốc vào phiếu nhập</h5>
+                            <button type="button" onclick="closeAddMedicineModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Mã thuốc</label>
+                            <select id="modalMedicineId" class="form-select">
+                                <option value="">-- Chọn thuốc --</option>
+                                <c:forEach var="med" items="${medicines}">
+                                    <option value="${med.medicineId}">${med.medicineCode} - ${med.medicineName}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Số lượng</label>
+                            <input type="number" id="modalQuantity" class="form-control" min="1" placeholder="Nhập số lượng" oninput="calculateModalTotal()">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label">Giá</label>
+                            <input type="number" id="modalPrice" class="form-control" min="0" step="0.01" placeholder="Nhập giá" oninput="calculateModalTotal()">
+                        </div>
+                        <div class="form-group mb-3">
+                            <div style="font-size: 16px; font-weight: bold; color: #28a745; padding: 10px 0;">
+                                Thành tiền: <span id="modalTotalDisplay">0₫</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                            <button type="button" class="btn btn-secondary" onclick="closeAddMedicineModal()">Hủy</button>
+                            <button type="button" class="btn btn-primary" onclick="addMedicineFromModal()">+ Thêm</button>
+                        </div>
                     </div>
+                </div>
+
+                <script>
+                    let newMedicineList = [];
+
+                    function openAddMedicineModal() {
+                        document.getElementById('addMedicineModal').style.display = 'flex';
+                        document.getElementById('modalMedicineId').value = '';
+                        document.getElementById('modalQuantity').value = '';
+                        document.getElementById('modalPrice').value = '';
+                        document.getElementById('modalTotalDisplay').textContent = '0₫';
+                    }
+
+                    function closeAddMedicineModal() {
+                        document.getElementById('addMedicineModal').style.display = 'none';
+                    }
+
+                    document.getElementById('modalMedicineId').addEventListener('change', function () {
+                        const medicineId = this.value;
+                        if (medicineId && medicineId.trim() !== '') {
+                            fetch('${pageContext.request.contextPath}/MedicineAjaxController?action=getPrice&id=' + medicineId)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data && data.price !== undefined) {
+                                        document.getElementById('modalPrice').value = data.price;
+                                        calculateModalTotal();
+                                    }
+                                })
+                                .catch(err => console.error('Error fetching price:', err));
+                        } else {
+                            document.getElementById('modalPrice').value = '';
+                            calculateModalTotal();
+                        }
+                    });
+
+                    function calculateModalTotal() {
+                        const quantity = parseFloat(document.getElementById('modalQuantity').value) || 0;
+                        const price = parseFloat(document.getElementById('modalPrice').value) || 0;
+                        const total = quantity * price;
+                        document.getElementById('modalTotalDisplay').textContent = formatCurrency(total);
+                    }
+
+                    function addMedicineFromModal() {
+                        const medicineId = document.getElementById('modalMedicineId').value;
+                        const quantity = parseInt(document.getElementById('modalQuantity').value);
+                        const price = parseFloat(document.getElementById('modalPrice').value);
+                        
+                        if (!medicineId || !quantity || !price) {
+                            alert("Vui lòng nhập đầy đủ thông tin thuốc.");
+                            return;
+                        }
+                        
+                        const selectElement = document.getElementById('modalMedicineId');
+                        const selectedOption = selectElement.options[selectElement.selectedIndex];
+                        const medicineCode = selectedOption.text.split(' - ')[0];
+                        
+                        const total = quantity * price;
+                        newMedicineList.push({ 
+                            medicineId: medicineId, 
+                            medicineCode: medicineCode, 
+                            quantity: quantity, 
+                            price: price, 
+                            total: total 
+                        });
+
+                        updateNewMedicinesTable();
+                        closeAddMedicineModal();
+                    }
+
+                    function removeNewMedicine(index) {
+                        newMedicineList.splice(index, 1);
+                        updateNewMedicinesTable();
+                    }
+
+                    function updateNewMedicinesTable() {
+                        const tbody = document.getElementById('newMedicineListBody');
+                        const hiddenContainer = document.getElementById('newHiddenInputsContainer');
+                        const section = document.getElementById('newMedicinesSection');
+                        
+                        if (!tbody || !hiddenContainer) return;
+                        
+                        tbody.innerHTML = '';
+                        hiddenContainer.innerHTML = '';
+                        
+                        if (newMedicineList.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 15px; color: #999;">Chưa thêm thuốc mới</td></tr>';
+                            section.style.display = 'none';
+                        } else {
+                            section.style.display = 'block';
+                            newMedicineList.forEach((item, index) => {
+                                tbody.innerHTML += `<tr><td>\${item.medicineCode}</td><td>\${item.medicineName || '-'}</td><td>\${item.quantity}</td><td class="price-text">\${formatCurrency(item.price)}</td><td class="price-text">\${formatCurrency(item.total)}</td><td><button type="button" class="btn btn-sm btn-danger" onclick="removeNewMedicine(\${index})"><i class="fas fa-trash"></i></button></td></tr>`;
+                                hiddenContainer.innerHTML += `<input type="hidden" name="newMedicines[\${index}].medicineId" value="\${item.medicineId}"><input type="hidden" name="newMedicines[\${index}].quantity" value="\${item.quantity}"><input type="hidden" name="newMedicines[\${index}].price" value="\${item.price}">`;
+                            });
+                        }
+                    }
+
+                    function formatCurrency(amount) {
+                        return new Intl.NumberFormat('vi-VN').format(amount) + '₫';
+                    }
+
+                    window.onclick = function (event) {
+                        const modal = document.getElementById('addMedicineModal');
+                        if (event.target === modal) closeAddMedicineModal();
+                    }
+                </script>
+
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
             </body>
 
-            </html>
+                                    <!-- Medicine List -->
+                                    <div class="mt-5">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="fw-bold"><i class="fas fa-list me-2"></i>Danh sách thuốc</h5>
+                                            <button type="button" class="btn btn-primary btn-sm"
+                                                onclick="alert('Thêm thuốc mới sẽ được cập nhật sau')">
+                                                <i class="fas fa-plus me-1"></i>Thêm thuốc
+                                            </button>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover border">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Mã thuốc</th>
+                                                        <th>Tên thuốc</th>
+                                                        <th>Số lượng</th>
+                                                        <th>Giá</th>
+                                                        <th>Thành tiền</th>
+                                                        <th class="text-center">Thao tác</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <c:forEach var="detail" items="${details}">
+                                                        <tr>
+                                                            <td><strong>${detail.medicineCode}</strong></td>
+                                                            <td>${detail.medicineName != null ? detail.medicineName :
+                                                                '-'}</td>
+                                                            <td>${detail.quantity}</td>
+                                                            <td class="text-success">
+                                                                <fmt:formatNumber value="${detail.price}" type="number"
+                                                                    maxFractionDigits="0" />₫
+                                                            </td>
+                                                            <td class="text-success fw-bold">
+                                                                <fmt:formatNumber value="${detail.totalAmount}"
+                                                                    type="number" maxFractionDigits="0" />₫
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <a href="${pageContext.request.contextPath}/import?action=deleteDetail&detailId=${detail.detailId}&id=${import.importId}"
+                                                                    class="btn btn-sm btn-outline-danger"
+                                                                    onclick="return confirm('Xóa thuốc này khỏi phiếu?')">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-5 d-flex justify-content-between">
+                                        <a href="${pageContext.request.contextPath}/import"
+                                            class="btn btn-secondary px-4">
+                                            <i class="fas fa-arrow-left me-2"></i>Trở lại
+                                        </a>
+                                        <button type="submit" class="btn btn-success px-5">
+                                            <i class="fas fa-save me-2"></i>Lưu thay đổi
+                                        </button>
+                                    </div>
+                                </form>
+                            </c:if>
+                        </div>
+                    </div>
+
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+                </body>
+
+                </html>

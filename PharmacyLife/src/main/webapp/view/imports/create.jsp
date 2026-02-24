@@ -1,34 +1,106 @@
+
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-            <!DOCTYPE html>
-            <html>
+            <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+                <!DOCTYPE html>
+                <html>
 
+<<<<<<< HEAD
+                <head>
+                    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+                    <title>Tạo phiếu nhập - Admin</title>
+                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+                        rel="stylesheet">
+                    <link rel="stylesheet"
+                        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+                    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
+=======
             <head>
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
                 <title>Tạo phiếu nhập thuốc</title>
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
             </head>
+>>>>>>> main
 
-            <body>
-                <%@include file="header.jsp" %>
+                    <style>
+                        body {
+                            background-color: #f4f6f9;
+                        }
 
-                    <div class="container">
-                        <%@include file="sidebar.jsp" %>
+                        .sidebar-wrapper {
+                            top: 115px !important;
+                            height: calc(100vh - 115px) !important;
+                            z-index: 100;
+                        }
 
-                            <div class="main-content">
-                                <div class="page-title">
-                                    <i>📥</i>
-                                    <span>Quản lý nhập thuốc</span>
+                        .main-content-dashboard {
+                            margin-left: 250px;
+                            padding: 30px;
+                            margin-top: 115px;
+                            max-width: 100%;
+                            width: calc(100% - 250px);
+                        }
+
+                        .page-title-dashboard {
+                            font-size: 28px;
+                            font-weight: 700;
+                            color: #2c3e50;
+                            margin-bottom: 30px;
+                            display: flex;
+                            align-items: center;
+                            gap: 15px;
+                        }
+
+                        .card-custom {
+                            background: white;
+                            border-radius: 12px;
+                            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+                            border: 1px solid #eef2f7;
+                            padding: 25px;
+                        }
+
+                        /* Existing import styles will be used from import.css */
+                    </style>
+                </head>
+
+                <body>
+                    <jsp:include page="/view/common/header.jsp" />
+                    <jsp:include page="/view/common/sidebar.jsp" />
+
+                    <div class="main-content-dashboard">
+                        <div class="page-title-dashboard">
+                            <i class="fas fa-plus-circle" style="color: #4F81E1;"></i>
+                            <span>Tạo phiếu nhập thuốc</span>
+                        </div>
+
+                        <div class="card-custom">
+                            <c:if test="${not empty error}">
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-exclamation-circle me-2"></i>${error}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
                                 </div>
+                            </c:if>
 
-                                <c:if test="${not empty error}">
-                                    <div
-                                        style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-                                        ${error}
-                                    </div>
-                                </c:if>
+                            <form method="POST" action="${pageContext.request.contextPath}/import" id="importForm">
+                                <input type="hidden" name="action" value="create">
+                                <input type="hidden" name="importCode" value="${newCode != null ? newCode : 'IP001'}">
 
+<<<<<<< HEAD
+                                <div class="import-card-layout">
+                                    <div class="import-flex-content">
+                                        <!-- LEFT PANEL -->
+                                        <div class="left-panel">
+                                            <div class="custom-input-group">
+                                                <label class="custom-input-label">Nhà cung cấp</label>
+                                                <select name="supplierId" required class="custom-input">
+                                                    <option value="">-- Chọn nhà cung cấp --</option>
+                                                    <c:forEach var="supplier" items="${suppliers}">
+                                                        <option value="${supplier[0]}">${supplier[1]}</option>
+                                                    </c:forEach>
+                                                </select>
+=======
                                 <!-- Main Form -->
                                 <form method="POST" action="${pageContext.request.contextPath}/import" id="importForm">
                                     <input type="hidden" name="action" value="create">
@@ -74,41 +146,22 @@
                                                     Tổng tiền: <span class="amount-highlight"
                                                         id="totalDisplay">0₫</span>
                                                 </div>
+>>>>>>> main
                                             </div>
 
-                                            <!-- RIGHT PANEL -->
-                                            <div class="right-panel">
-                                                <div class="right-panel-title">Danh sách thuốc nhập</div>
-
-                                                <table class="clean-table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Mã thuốc</th>
-                                                            <th>SL</th>
-                                                            <th>Giá</th>
-                                                            <th>Thành tiền</th>
-                                                            <th style="text-align: center;">Xóa</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="medicineListBody">
-                                                        <tr>
-                                                            <td colspan="5" class="empty-state"
-                                                                style="padding: 40px 0; text-align: center;">
-                                                                <div>
-                                                                    <i
-                                                                        style="font-size: 32px; color: #ddd; display: block; margin-bottom: 10px;">📋</i>
-                                                                    <p style="font-size: 13px; color: #999;">Chưa có dữ
-                                                                        liệu</p>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-
-                                                <!-- Container for hidden inputs -->
-                                                <div id="hiddenInputsContainer"></div>
+                                            <div class="custom-input-group">
+                                                <label class="custom-input-label">Ngày nhập</label>
+                                                <input type="date" name="importDate" required class="custom-input"
+                                                    value="<fmt:formatDate value='<%=new java.util.Date()%>' pattern='yyyy-MM-dd'/>">
                                             </div>
 
+<<<<<<< HEAD
+                                            <div class="custom-input-group">
+                                                <label class="custom-input-label">Người nhập</label>
+                                                <input type="text" class="custom-input" value="${sessionScope.userName}"
+                                                    readonly style="background-color: #f0f0f0; cursor: not-allowed;">
+                                                <input type="hidden" name="importerId" value="${sessionScope.userId}">
+=======
                                         </div>
 
                                         <!-- FOOTER ACTIONS -->
@@ -122,18 +175,76 @@
                                                     onclick="openAddMedicineModal()">
                                                     <span>+</span> Thêm thuốc
                                                 </button>
+>>>>>>> main
                                             </div>
-                                            <div>
-                                                <button type="submit" class="btn-pill btn-pill-blue"
-                                                    style="padding-left: 30px; padding-right: 30px;">
-                                                    <span>💾</span> Lưu phiếu nhập
-                                                </button>
+
+                                            <div class="custom-input-group">
+                                                <label class="custom-input-label">Trạng thái</label>
+                                                <select name="status" class="custom-input">
+                                                    <option value="Đang chờ">Đang chờ</option>
+                                                    <option value="Đã duyệt">Đã duyệt</option>
+                                                    <option value="Chưa duyệt">Chưa duyệt</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="total-amount-display">
+                                                Tổng tiền: <span class="amount-highlight" id="totalDisplay">0₫</span>
                                             </div>
                                         </div>
 
+                                        <!-- RIGHT PANEL -->
+                                        <div class="right-panel">
+                                            <div class="right-panel-title">Danh sách thuốc nhập</div>
+                                            <table class="clean-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Mã thuốc</th>
+                                                        <th>SL</th>
+                                                        <th>Giá</th>
+                                                        <th>Thành tiền</th>
+                                                        <th style="text-align: center;">Xóa</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="medicineListBody">
+                                                    <tr>
+                                                        <td colspan="5" class="empty-state"
+                                                            style="padding: 40px 0; text-align: center;">
+                                                            <div>
+                                                                <i
+                                                                    style="font-size: 32px; color: #ddd; display: block; margin-bottom: 10px;">📋</i>
+                                                                <p style="font-size: 13px; color: #999;">Chưa có dữ liệu
+                                                                </p>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div id="hiddenInputsContainer"></div>
+                                        </div>
                                     </div>
-                                </form>
-                            </div>
+
+                                    <!-- FOOTER ACTIONS -->
+                                    <div class="footer-row mt-4">
+                                        <div style="display: flex; gap: 10px;">
+                                            <a href="${pageContext.request.contextPath}/import"
+                                                class="btn btn-secondary">
+                                                <i class="fas fa-arrow-left me-2"></i>Trở lại
+                                            </a>
+                                            <button type="button" class="btn btn-primary"
+                                                onclick="openAddMedicineModal()">
+                                                <i class="fas fa-plus me-2"></i>Thêm thuốc
+                                            </button>
+                                        </div>
+                                        <div>
+                                            <button type="submit" class="btn btn-success"
+                                                style="padding-left: 30px; padding-right: 30px;">
+                                                <i class="fas fa-save me-2"></i>Lưu phiếu nhập
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
 
                     <!-- Modal Form (Overlaid) -->
@@ -143,37 +254,35 @@
                                 <div class="modal-title">Thêm thuốc vào phiếu nhập</div>
                                 <button class="close-btn" onclick="closeAddMedicineModal()">&times;</button>
                             </div>
-
-                            <div class="form-group">
-                                <label>Mã thuốc</label>
-                                <select id="modalMedicineCode" class="custom-input">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Mã thuốc</label>
+                                <select id="modalMedicineId" class="form-select">
                                     <option value="">-- Chọn thuốc --</option>
                                     <c:forEach var="med" items="${medicines}">
-                                        <option value="${med.medicineCode}">${med.medicineCode} - ${med.medicineName}
+                                        <option value="${med.medicineId}">${med.medicineCode} - ${med.medicineName}
                                         </option>
                                     </c:forEach>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label>Số lượng</label>
-                                <input type="number" id="modalQuantity" class="custom-input" min="1"
+                            <div class="form-group mb-3">
+                                <label class="form-label">Số lượng</label>
+                                <input type="number" id="modalQuantity" class="form-control" min="1"
                                     placeholder="Nhập số lượng" oninput="calculateModalTotal()">
                             </div>
-                            <div class="form-group">
-                                <label>Giá</label>
-                                <input type="number" id="modalPrice" class="custom-input" min="0" step="0.01"
+                            <div class="form-group mb-3">
+                                <label class="form-label">Giá</label>
+                                <input type="number" id="modalPrice" class="form-control" min="0" step="0.01"
                                     placeholder="Nhập giá" oninput="calculateModalTotal()">
                             </div>
                             <div class="form-group">
-                                <div style="font-size: 16px; font-weight: bold; color: #28a745; padding: 10px 0;">
+                                <div style="font-size: 18px; font-weight: bold; color: #28a745; padding: 10px 0;">
                                     Thành tiền: <span id="modalTotalDisplay">0₫</span>
                                 </div>
                             </div>
-
-                            <div class="form-actions">
-                                <button type="button" class="btn-secondary"
+                            <div class="form-actions d-flex justify-content-end gap-2 mt-3">
+                                <button type="button" class="btn btn-secondary"
                                     onclick="closeAddMedicineModal()">Hủy</button>
-                                <button type="button" class="btn-primary" onclick="addMedicineFromModal()">+
+                                <button type="button" class="btn btn-primary" onclick="addMedicineFromModal()">+
                                     Thêm</button>
                             </div>
                         </div>
@@ -185,7 +294,7 @@
 
                         function openAddMedicineModal() {
                             document.getElementById('addMedicineModal').style.display = 'block';
-                            document.getElementById('modalMedicineCode').value = '';
+                            document.getElementById('modalMedicineId').value = '';
                             document.getElementById('modalQuantity').value = '';
                             document.getElementById('modalPrice').value = '';
                             document.getElementById('modalTotalDisplay').textContent = '0₫';
@@ -195,12 +304,10 @@
                             document.getElementById('addMedicineModal').style.display = 'none';
                         }
 
-                        // --- NEW: AJAX to fetch price ---
-                        // --- NEW: AJAX to fetch price ---
-                        document.getElementById('modalMedicineCode').addEventListener('change', function () {
-                            const code = this.value;
-                            if (code && code.trim() !== '') {
-                                fetch('${pageContext.request.contextPath}/MedicineAjaxController?action=getPrice&code=' + code)
+                        document.getElementById('modalMedicineId').addEventListener('change', function () {
+                            const medicineId = this.value;
+                            if (medicineId && medicineId.trim() !== '') {
+                                fetch('${pageContext.request.contextPath}/MedicineAjaxController?action=getPrice&id=' + medicineId)
                                     .then(response => response.json())
                                     .then(data => {
                                         if (data && data.price !== undefined) {
@@ -210,7 +317,6 @@
                                     })
                                     .catch(err => console.error('Error fetching price:', err));
                             } else {
-                                // Reset price if no medicine selected
                                 document.getElementById('modalPrice').value = '';
                                 calculateModalTotal();
                             }
@@ -224,24 +330,28 @@
                         }
 
                         function addMedicineFromModal() {
-                            const code = document.getElementById('modalMedicineCode').value;
+                            const medicineId = document.getElementById('modalMedicineId').value;
                             const quantity = parseInt(document.getElementById('modalQuantity').value);
                             const price = parseFloat(document.getElementById('modalPrice').value);
 
-                            if (!code || !quantity || !price) {
+                            if (!medicineId || !quantity || !price) {
                                 alert("Vui lòng nhập đầy đủ thông tin thuốc.");
                                 return;
                             }
 
-                            const total = quantity * price;
+                            // Lấy tên thuốc từ option
+                            const selectElement = document.getElementById('modalMedicineId');
+                            const selectedOption = selectElement.options[selectElement.selectedIndex];
+                            const medicineCode = selectedOption.text.split(' - ')[0];
 
+                            const total = quantity * price;
                             medicineList.push({
-                                medicineCode: code,
+                                medicineId: medicineId,
+                                medicineCode: medicineCode,
                                 quantity: quantity,
                                 price: price,
                                 total: total
                             });
-
                             updateTable();
                             closeAddMedicineModal();
                         }
@@ -254,48 +364,18 @@
                         function updateTable() {
                             const tbody = document.getElementById('medicineListBody');
                             const hiddenContainer = document.getElementById('hiddenInputsContainer');
-
                             tbody.innerHTML = '';
                             hiddenContainer.innerHTML = '';
                             totalAmount = 0;
-
                             if (medicineList.length === 0) {
-                                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="empty-state" style="padding: 40px 0; text-align: center;">
-                            <div>
-                                <i style="font-size: 32px; color: #ddd; display: block; margin-bottom: 10px;">📋</i>
-                                <p style="font-size: 13px; color: #999;">Chưa có dữ liệu</p>
-                            </div>
-                        </td>
-                    </tr>`;
+                                tbody.innerHTML = `<tr><td colspan="5" class="empty-state" style="padding: 40px 0; text-align: center;"><div><i>📋</i><p>Chưa có dữ liệu</p></div></td></tr>`;
                             } else {
                                 medicineList.forEach((item, index) => {
                                     totalAmount += item.total;
-
-                                    // Add Row
-                                    const row = `
-                        <tr>
-                            <td>\${item.medicineCode}</td>
-                            <td>\${item.quantity}</td>
-                            <td class="price-text">\${formatCurrency(item.price)}</td>
-                            <td class="price-text">\${formatCurrency(item.total)}</td>
-                            <td style="text-align: center;">
-                                <button type="button" class="icon-trash" onclick="removeMedicine(\${index})" style="margin: 0 auto;">🗑</button>
-                            </td>
-                        </tr>
-                    `;
-                                    tbody.innerHTML += row;
-
-                                    // Add Hidden Inputs
-                                    hiddenContainer.innerHTML += `
-                        <input type="hidden" name="medicines[\${index}].medicineCode" value="\${item.medicineCode}">
-                        <input type="hidden" name="medicines[\${index}].quantity" value="\${item.quantity}">
-                        <input type="hidden" name="medicines[\${index}].price" value="\${item.price}">
-                    `;
+                                    tbody.innerHTML += `<tr><td>\${item.medicineCode}</td><td>\${item.quantity}</td><td class="price-text">\${formatCurrency(item.price)}</td><td class="price-text">\${formatCurrency(item.total)}</td><td style="text-align: center;"><button type="button" class="btn btn-sm btn-link text-danger" onclick="removeMedicine(\${index})"><i class="fas fa-trash"></i></button></td></tr>`;
+                                    hiddenContainer.innerHTML += `<input type="hidden" name="medicines[\${index}].medicineId" value="\${item.medicineId}"><input type="hidden" name="medicines[\${index}].quantity" value="\${item.quantity}"><input type="hidden" name="medicines[\${index}].price" value="\${item.price}">`;
                                 });
                             }
-
                             document.getElementById('totalDisplay').textContent = formatCurrency(totalAmount);
                         }
 
@@ -303,14 +383,12 @@
                             return new Intl.NumberFormat('vi-VN').format(amount) + '₫';
                         }
 
-                        // Close modal when clicking outside
                         window.onclick = function (event) {
                             const modal = document.getElementById('addMedicineModal');
-                            if (event.target === modal) {
-                                closeAddMedicineModal();
-                            }
+                            if (event.target === modal) closeAddMedicineModal();
                         }
                     </script>
-            </body>
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+                </body>
 
-            </html>
+                </html>

@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import dao.ImportDAO;
 import jakarta.servlet.ServletException;
@@ -25,9 +28,27 @@ public class ImportController extends HttpServlet {
         importDAO = new ImportDAO();
     }
 
+    // Kiểm tra quyền admin
+    private boolean checkAdminPermission(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        String roleName = (session != null) ? (String) session.getAttribute("roleName") : null;
+
+        if (roleName == null || !roleName.equalsIgnoreCase("admin")) {
+            response.sendRedirect(request.getContextPath() + "/home");
+            return false;
+        }
+        return true;
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // Kiểm tra quyền admin
+        // if (!checkAdminPermission(request, response)) {
+        // return;
+        // }
 
         String action = request.getParameter("action");
         if (action == null) {
@@ -68,6 +89,11 @@ public class ImportController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        // Kiểm tra quyền admin
+        // if (!checkAdminPermission(request, response)) {
+        // return;
+        // }
 
         String action = request.getParameter("action");
         if (action == null) {
@@ -141,7 +167,7 @@ public class ImportController extends HttpServlet {
             }
 
             List<ImportDetail> details = importDAO.getImportDetails(importId);
-            request.setAttribute("import", imp);
+            request.setAttribute("importRecord", imp);
             request.setAttribute("details", details);
             request.getRequestDispatcher("/view/imports/view.jsp").forward(request, response);
         } else {
@@ -157,6 +183,9 @@ public class ImportController extends HttpServlet {
 
         List<Medicine> medicines = importDAO.getAllMedicines();
         request.setAttribute("medicines", medicines);
+
+        List<Object[]> suppliers = importDAO.getAllSuppliers();
+        request.setAttribute("suppliers", suppliers);
 
         request.getRequestDispatcher("/view/imports/create.jsp").forward(request, response);
     }
@@ -175,8 +204,15 @@ public class ImportController extends HttpServlet {
             }
 
             List<ImportDetail> details = importDAO.getImportDetails(importId);
-            request.setAttribute("import", imp);
+            request.setAttribute("importRecord", imp);
             request.setAttribute("details", details);
+
+            List<Medicine> medicines = importDAO.getAllMedicines();
+            request.setAttribute("medicines", medicines);
+
+            List<Object[]> suppliers = importDAO.getAllSuppliers();
+            request.setAttribute("suppliers", suppliers);
+
             request.getRequestDispatcher("/view/imports/edit.jsp").forward(request, response);
         } else {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Mã phiếu nhập không hợp lệ");
@@ -236,32 +272,51 @@ public class ImportController extends HttpServlet {
             if (importDAO.createImport(imp)) {
                 int newImportId = imp.getImportId();
 
-                // Add details
-                // View sends 'medicines[i].medicineCode' typically
-                String[] medicineInputs = request.getParameterValues("medicines[].medicineCode");
-                if (medicineInputs == null) {
-                    medicineInputs = request.getParameterValues("medicines[].medicineId");
+                // Add details - parse medicines from form with indices [0], [1], etc.
+                Map<Integer, Map<String, String>> medicinesMap = new HashMap<>();
+                Enumeration<String> paramNames = request.getParameterNames();
+
+                // Collect all medicine-related parameters
+                while (paramNames.hasMoreElements()) {
+                    String paramName = paramNames.nextElement();
+                    if (paramName.startsWith("medicines[")) {
+                        // Extract index: medicines[0].medicineId -> 0
+                        int startIdx = paramName.indexOf('[') + 1;
+                        int endIdx = paramName.indexOf(']');
+                        if (startIdx > 0 && endIdx > startIdx) {
+                            try {
+                                int index = Integer.parseInt(paramName.substring(startIdx, endIdx));
+                                String fieldName = paramName.substring(endIdx + 2); // skip "].
+                                String value = request.getParameter(paramName);
+
+                                medicinesMap.putIfAbsent(index, new HashMap<>());
+                                medicinesMap.get(index).put(fieldName, value);
+                            } catch (NumberFormatException e) {
+                                // Skip invalid indices
+                            }
+                        }
+                    }
                 }
 
-                if (medicineInputs != null && medicineInputs.length > 0) {
-                    for (int i = 0; i < medicineInputs.length; i++) {
-                        String medInput = medicineInputs[i];
-                        String quantityStr = request.getParameter("medicines[" + i + "].quantity");
-                        String priceStr = request.getParameter("medicines[" + i + "].price");
+                // Process collected medicines
+                for (Map<String, String> medicineData : medicinesMap.values()) {
+                    String medicineIdStr = medicineData.get("medicineId");
+                    String quantityStr = medicineData.get("quantity");
+                    String priceStr = medicineData.get("price");
 
-                        if (medInput != null && quantityStr != null && priceStr != null) {
-                            try {
-                                int medicineId = parseOrLookupMedicineId(medInput);
-                                if (medicineId > 0) {
-                                    int quantity = Integer.parseInt(quantityStr);
-                                    double price = Double.parseDouble(priceStr);
+                    if (medicineIdStr != null && quantityStr != null && priceStr != null) {
+                        try {
+                            int medicineId = Integer.parseInt(medicineIdStr);
+                            int quantity = Integer.parseInt(quantityStr);
+                            double price = Double.parseDouble(priceStr);
 
-                                    ImportDetail detail = new ImportDetail(newImportId, medicineId, quantity, price);
-                                    detail.recalculateTotal();
-                                    importDAO.addImportDetail(detail);
-                                }
-                            } catch (NumberFormatException e) {
+                            if (medicineId > 0) {
+                                ImportDetail detail = new ImportDetail(newImportId, medicineId, quantity, price);
+                                detail.recalculateTotal();
+                                importDAO.addImportDetail(detail);
                             }
+                        } catch (NumberFormatException e) {
+                            // Skip invalid entries
                         }
                     }
                 }
@@ -322,6 +377,53 @@ public class ImportController extends HttpServlet {
                 imp.setStatus(status);
             }
 
+            // Add any new medicines submitted from edit form
+            Map<Integer, Map<String, String>> newMedicinesMap = new HashMap<>();
+            Enumeration<String> paramNames = request.getParameterNames();
+            
+            while (paramNames.hasMoreElements()) {
+                String paramName = paramNames.nextElement();
+                if (paramName.startsWith("newMedicines[")) {
+                    int startIdx = paramName.indexOf('[') + 1;
+                    int endIdx = paramName.indexOf(']');
+                    if (startIdx > 0 && endIdx > startIdx) {
+                        try {
+                            int index = Integer.parseInt(paramName.substring(startIdx, endIdx));
+                            String fieldName = paramName.substring(endIdx + 2); // skip "].
+                            String value = request.getParameter(paramName);
+                            
+                            newMedicinesMap.putIfAbsent(index, new HashMap<>());
+                            newMedicinesMap.get(index).put(fieldName, value);
+                        } catch (NumberFormatException e) {
+                            // Skip invalid indices
+                        }
+                    }
+                }
+            }
+
+            // Process new medicines
+            for (Map<String, String> medicineData : newMedicinesMap.values()) {
+                String medicineIdStr = medicineData.get("medicineId");
+                String quantityStr = medicineData.get("quantity");
+                String priceStr = medicineData.get("price");
+
+                if (medicineIdStr != null && quantityStr != null && priceStr != null) {
+                    try {
+                        int medicineId = Integer.parseInt(medicineIdStr);
+                        int quantity = Integer.parseInt(quantityStr);
+                        double price = Double.parseDouble(priceStr);
+
+                        if (medicineId > 0) {
+                            ImportDetail detail = new ImportDetail(importId, medicineId, quantity, price);
+                            detail.recalculateTotal();
+                            importDAO.addImportDetail(detail);
+                        }
+                    } catch (NumberFormatException e) {
+                        // Skip invalid entries
+                    }
+                }
+            }
+
             double total = importDAO.calculateTotalAmount(importId);
             imp.setTotalAmount(total);
 
@@ -330,7 +432,7 @@ public class ImportController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/import?action=list");
             } else {
                 request.setAttribute("error", "Không thể cập nhật phiếu nhập");
-                request.setAttribute("import", imp);
+                request.setAttribute("importRecord", imp);
                 List<ImportDetail> details = importDAO.getImportDetails(importId);
                 request.setAttribute("details", details);
                 request.getRequestDispatcher("/view/imports/edit.jsp").forward(request, response);

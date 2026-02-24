@@ -1,8 +1,9 @@
 package controllers;
 
-import dao.ImportDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import dao.ImportDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,17 +28,24 @@ public class MedicineAjaxController extends HttpServlet {
 
         try {
             if ("getPrice".equals(action)) {
-                String medicineCode = request.getParameter("code");
-                // We need a method to get price by code.
-                // Since ImportDAO has connection to Medicine table, let's reuse/extend it or
-                // access MedicineDAO.
-                // Ideally, use MedicineDAO. But for now, we'll check ImportDAO or add a helper
-                // there if needed.
-                // Assuming we add getMedicinePriceByCode to ImportDAO or use existing
-                // facilities.
+                String code = request.getParameter("code");
+                String id = request.getParameter("id");
+                double price = 0;
 
-                // Let's create a quick helper DTO or use a Map
-                double price = importDAO.getMedicinePriceByCode(medicineCode);
+                if (code != null && !code.isEmpty()) {
+                    // Fetch by medicine code
+                    price = importDAO.getMedicinePriceByCode(code);
+                } else if (id != null && !id.isEmpty()) {
+                    // Fetch by medicine ID
+                    try {
+                        int medicineId = Integer.parseInt(id);
+                        price = importDAO.getMedicinePriceById(medicineId);
+                    } catch (NumberFormatException e) {
+                        out.print("{\"error\": \"Invalid medicine ID\"}");
+                        out.flush();
+                        return;
+                    }
+                }
 
                 // Return simple JSON: {"price": 5000}
                 String json = "{\"price\": " + price + "}";
