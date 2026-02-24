@@ -5,7 +5,6 @@
                 <!DOCTYPE html>
                 <html>
 
-<<<<<<< HEAD
                 <head>
                     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
                     <title>Chi tiết phiếu nhập - Admin</title>
@@ -14,23 +13,6 @@
                     <link rel="stylesheet"
                         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
                     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
-=======
-            <head>
-                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-                <title>Xem chi tiết phiếu nhập</title>
-                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
-                <style>
-                    /* Specific overrides for the View Details Card to match screenshot */
-                    .view-card {
-                        background-color: white;
-                        border-radius: 12px;
-                        padding: 40px;
-                        max-width: 900px;
-                        margin: 0 auto;
-                        /* Center horizontally in the main content */
-                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-                    }
->>>>>>> main
 
                     <style>
                         body {
@@ -113,7 +95,6 @@
                                             value="${importRecord.staffName != null ? importRecord.staffName : importRecord.staffId}"
                                             readonly>
                                     </div>
-<<<<<<< HEAD
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-bold">Ngày nhập</label>
                                         <input type="text" class="form-control bg-light"
@@ -121,11 +102,6 @@
                                             readonly>
                                     </div>
                                 </div>
-=======
-                                    <a href="${pageContext.request.contextPath}/import" class="btn-secondary">Trở
-                                        lại</a>
-                                </c:if>
->>>>>>> main
 
                                 <div class="row mb-4">
                                     <div class="col-md-6 mb-3">
@@ -175,38 +151,9 @@
                                                                     type="number" maxFractionDigits="0" />₫
                                                             </td>
                                                         </tr>
-<<<<<<< HEAD
                                                     </c:forEach>
                                                 </tbody>
                                             </table>
-=======
-                                                    </thead>
-                                                    <tbody>
-                                                        <c:forEach var="detail" items="${details}">
-                                                            <tr>
-                                                                <td>${detail.medicineCode}</td>
-                                                                <td>${detail.medicineName != null ? detail.medicineName
-                                                                    : '-'}</td>
-                                                                <td>${detail.quantity}</td>
-                                                                <td class="amount-green">
-                                                                    <fmt:formatNumber value="${detail.price}"
-                                                                        type="number" maxFractionDigits="0" />₫
-                                                                </td>
-                                                                <td class="amount-green">
-                                                                    <fmt:formatNumber value="${detail.totalAmount}"
-                                                                        type="number" maxFractionDigits="0" />₫
-                                                                </td>
-                                                            </tr>
-                                                        </c:forEach>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </c:if>
-
-                                        <div class="view-footer">
-                                            <a href="${pageContext.request.contextPath}/import"
-                                                class="view-close-btn">Đóng</a>
->>>>>>> main
                                         </div>
                                     </div>
                                 </c:if>

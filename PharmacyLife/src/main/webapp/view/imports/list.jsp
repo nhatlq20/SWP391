@@ -41,7 +41,6 @@
                             width: calc(100% - 250px);
                         }
 
-<<<<<<< HEAD
                         .action-bar {
                             display: flex;
                             justify-content: space-between;
@@ -50,26 +49,6 @@
                             flex-wrap: wrap;
                             gap: 15px;
                         }
-=======
-                                <div class="action-bar">
-                                    <div class="search-filter">
-                                        <form method="POST" action="${pageContext.request.contextPath}/import"
-                                            style="display: flex; gap: 10px; flex: 1; max-width: 500px;">
-                                            <input type="hidden" name="action" value="search">
-                                            <input type="text" name="keyword" class="search-input"
-                                                placeholder="Tìm mã phiếu, nhà cung cấp..."
-                                                value="${param.keyword != null ? param.keyword : ''}">
-                                            <button type="button" class="filter-btn"
-                                                style="cursor: pointer;">🔽</button>
-                                        </form>
-                                    </div>
-                                    <a href="${pageContext.request.contextPath}/import?action=create"
-                                        class="btn-primary">
-                                        <span style="font-size: 18px; font-weight: bold;">+</span>
-                                        <span>Tạo phiếu nhập thuốc</span>
-                                    </a>
-                                </div>
->>>>>>> main
 
                         .table-container {
                             overflow-x: auto;
@@ -79,7 +58,6 @@
                             min-width: 100%;
                         }
 
-<<<<<<< HEAD
                         .btn-primary-theme {
                             background-color: #4F81E1;
                             color: white;
@@ -210,39 +188,6 @@
                                 <i class="fas fa-exclamation-circle me-2"></i>${error}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"
                                     aria-label="Close"></button>
-=======
-                                                            <td>
-                                                                <div class="action-buttons">
-                                                                    <a href="${pageContext.request.contextPath}/import?action=view&code=${imp.importCode}"
-                                                                        class="action-btn view-btn"
-                                                                        title="Xem chi tiết">👁</a>
-                                                                    <a href="${pageContext.request.contextPath}/import?action=edit&code=${imp.importCode}"
-                                                                        class="action-btn edit-btn"
-                                                                        title="Chỉnh sửa">✏</a>
-                                                                    <a href="${pageContext.request.contextPath}/import?action=delete&code=${imp.importCode}"
-                                                                        class="action-btn delete-btn"
-                                                                        onclick="return confirm('Bạn có chắc chắn muốn xóa phiếu nhập này?')"
-                                                                        title="Xóa">🗑</a>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    </c:forEach>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <tr>
-                                                        <td colspan="6" class="empty-state">
-                                                            <div>
-                                                                <i>📋</i>
-                                                                <p>Không có dữ liệu</p>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </tbody>
-                                    </table>
-                                </div>
->>>>>>> main
                             </div>
                         </c:if>
 
