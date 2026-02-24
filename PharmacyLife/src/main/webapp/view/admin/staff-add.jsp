@@ -34,7 +34,7 @@
                         </div>
 
                         <div class="staff-card" style="max-width: 600px; margin: 0 auto;">
-                            <form method="POST" action="${pageContext.request.contextPath}/Staffmanage?action=insert"
+                            <form method="POST" action="${pageContext.request.contextPath}/manage-staff?action=insert"
                                 class="staff-form">
 
                                 <div class="form-group">
@@ -88,7 +88,7 @@
 
                                 <div class="form-actions"
                                     style="display:flex; gap:12px; justify-content:center; margin-top:30px;">
-                                    <a href="${pageContext.request.contextPath}/Staffmanage" class="btn-cancel"
+                                    <a href="${pageContext.request.contextPath}/manage-staff" class="btn-cancel"
                                         style="padding:10px 28px; background:#9CA3AF; color:white; border:none; border-radius:18px; text-decoration:none; cursor:pointer; font-weight:600;">Hủy
                                         bỏ</a>
                                     <button type="submit" class="btn-submit"

@@ -56,8 +56,8 @@
                         </a>
 
                         <c:if test="${userRole eq 'admin'}">
-                            <a href="${pageContext.request.contextPath}/Staffmanage"
-                                class="sidebar-item ${fn:contains(uri, 'Staffmanage') ? 'active' : ''}">
+                            <a href="${pageContext.request.contextPath}/manage-staff"
+                                class="sidebar-item ${fn:contains(uri, 'manage-staff') ? 'active' : ''}">
                                 <i class="fas fa-user-shield"></i> Quản lý nhân viên
                             </a>
                         </c:if>
