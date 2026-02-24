@@ -10,17 +10,23 @@ import jakarta.servlet.http.HttpSession;
 import models.Cart;
 import models.Order;
 
-@WebServlet(name = "CheckoutController", urlPatterns = { "/checkout" })
+@WebServlet(name = "CheckoutController", urlPatterns = { "/checkout", "/checkout-success" })
 public class CheckoutController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String path = request.getServletPath();
+
+        if ("/checkout-success".equals(path)) {
+            request.getRequestDispatcher("view/client/checkout-success.jsp").forward(request, response);
+            return;
+        }
+
         HttpSession session = request.getSession();
         Cart cart = (Cart) session.getAttribute("cart");
 
         if (cart == null || cart.getItems().isEmpty()) {
-            // Redirect to cart if empty
             response.sendRedirect("cart");
             return;
         }
@@ -51,13 +57,18 @@ public class CheckoutController extends HttpServlet {
         if (cart != null && !cart.getItems().isEmpty()) {
             // Create new Order
             Order order = new Order();
-            order.setCustomerId(1); // Default user ID since no login
+            Integer customerId = (Integer) session.getAttribute("customerId");
+            if (customerId != null) {
+                order.setCustomerId(customerId);
+            } else {
+                order.setCustomerId(1); // Default/Guest for now
+            }
             order.setOrderDate(new java.util.Date());
             order.setShippingName(fullName);
             order.setShippingPhone(phone);
             order.setShippingAddress(address);
 
-            order.setStatus("Pending");
+            order.setStatus("Đang chờ");
             order.setTotalAmount(cart.getTotalMoney());
 
             // Convert Cart Items to Order Items
@@ -72,16 +83,27 @@ public class CheckoutController extends HttpServlet {
             order.setItems(orderItems);
 
             // Save order to database
+            System.out.println("CheckoutController: Attempting to save order for CustomerID: " + order.getCustomerId());
             dao.OrderDAO orderDAO = new dao.OrderDAO();
-            orderDAO.saveOrder(order);
+            boolean isSaved = orderDAO.saveOrder(order);
+            System.out.println("CheckoutController: Save result = " + isSaved);
 
-            // Clear cart after successful order
-            session.removeAttribute("cart");
+            if (isSaved) {
+                // Clear cart after successful order
+                session.removeAttribute("cart");
+                // Redirect to success page to prevent double submission
+                response.sendRedirect(request.getContextPath() + "/checkout-success");
+            } else {
+                // If saving failed, stay on checkout page and show error
+                request.setAttribute("error",
+                        "Lỗi: Không thể lưu đơn hàng vào hệ thống. Vui lòng kiểm tra lại thông tin!");
+                // Re-populate attributes for the checkout page
+                request.setAttribute("cart", cart);
+                request.setAttribute("totalMoney", cart.getTotalMoney());
+                request.getRequestDispatcher("view/client/checkout.jsp").forward(request, response);
+            }
+        } else {
+            response.sendRedirect("cart");
         }
-
-        // Redirect to a success page or home with a success message
-        // For simplicity, redirecting to home with a flag
-        request.setAttribute("orderSuccess", true);
-        request.getRequestDispatcher("view/client/checkout-success.jsp").forward(request, response);
     }
 }

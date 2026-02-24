@@ -13,7 +13,7 @@ public class OrderDAO {
 
     public List<Order> getAllOrders() {
         List<Order> orders = new ArrayList<>();
-        String sql = "SELECT * FROM [Order] ORDER BY OrderDate DESC";
+        String sql = "SELECT * FROM Orders ORDER BY OrderDate DESC";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
@@ -26,8 +26,27 @@ public class OrderDAO {
         return orders;
     }
 
+    public List<Order> getOrdersByCustomerId(int customerId) {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT * FROM Orders WHERE CustomerId = ? ORDER BY OrderDate DESC";
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Order order = mapResultSetToOrder(rs);
+                    order.setItems(getOrderItems(order.getOrderId()));
+                    orders.add(order);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return orders;
+    }
+
     public Order getOrderById(int orderId) {
-        String sql = "SELECT * FROM [Order] WHERE OrderId = ?";
+        String sql = "SELECT * FROM Orders WHERE OrderId = ?";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, orderId);
@@ -47,7 +66,7 @@ public class OrderDAO {
     public List<OrderItem> getOrderItems(int orderId) {
         List<OrderItem> items = new ArrayList<>();
         String sql = "SELECT oi.*, m.MedicineName, m.MedicineCode, m.ImageUrl " +
-                "FROM OrderItem oi " +
+                "FROM OrderItems oi " +
                 "JOIN Medicine m ON oi.MedicineId = m.MedicineId " +
                 "WHERE oi.OrderId = ?";
         try (Connection conn = dbContext.getConnection();
@@ -58,7 +77,7 @@ public class OrderDAO {
                     OrderItem item = new OrderItem();
                     item.setOrderId(rs.getInt("OrderId"));
                     item.setMedicineId(rs.getInt("MedicineId"));
-                    item.setQuantity(rs.getInt("Quantity"));
+                    item.setQuantity(rs.getInt("OrderQuantity"));
                     item.setUnitPrice(rs.getDouble("UnitPrice"));
 
                     Medicine m = new Medicine();
@@ -78,7 +97,7 @@ public class OrderDAO {
     }
 
     public boolean updateStatus(int orderId, String status) {
-        String sql = "UPDATE [Order] SET Status = ? WHERE OrderId = ?";
+        String sql = "UPDATE Orders SET Status = ? WHERE OrderId = ?";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status);
@@ -91,10 +110,10 @@ public class OrderDAO {
     }
 
     public boolean saveOrder(Order order) {
-        String sqlOrder = "INSERT INTO [Order] (CustomerId, StaffId, OrderDate, ShippingName, ShippingPhone, ShippingAddress, Status, TotalAmount) "
+        String sqlOrder = "INSERT INTO Orders (CustomerId, StaffId, OrderDate, ShippingName, ShippingPhone, ShippingAddress, Status, TotalAmount) "
                 +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        String sqlItem = "INSERT INTO OrderItem (OrderId, MedicineId, Quantity, UnitPrice) VALUES (?, ?, ?, ?)";
+        String sqlItem = "INSERT INTO OrderItems (OrderId, MedicineId, OrderQuantity, UnitPrice) VALUES (?, ?, ?, ?)";
 
         Connection conn = null;
         try {
@@ -146,8 +165,12 @@ public class OrderDAO {
             conn.commit();
             return true;
         } catch (SQLException e) {
+            System.err.println("CRITICAL DB ERROR in saveOrder:");
+            System.err.println("Message: " + e.getMessage());
+            System.err.println("SQL State: " + e.getSQLState());
             if (conn != null) {
                 try {
+                    System.out.println("OrderDAO: Rolling back transaction...");
                     conn.rollback();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
