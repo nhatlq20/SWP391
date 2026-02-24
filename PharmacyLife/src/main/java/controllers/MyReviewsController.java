@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import models.Customer;
 import models.Medicine;
 import models.Review;
 
@@ -22,8 +23,19 @@ public class MyReviewsController extends HttpServlet {
     private final ReviewDAO reviewDAO = new ReviewDAO();
     private final MedicineDAO medicineDAO = new MedicineDAO();
 
-    private int resolveCustomerId(HttpServletRequest request) {
-        HttpSession session = request.getSession();
+    private Integer resolveCustomerId(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return null;
+        }
+
+        Object userTypeObj = session.getAttribute("userType");
+        String userType = userTypeObj == null ? "" : userTypeObj.toString();
+
+        Object loggedInUser = session.getAttribute("loggedInUser");
+        if ("customer".equalsIgnoreCase(userType) && loggedInUser instanceof Customer) {
+            return ((Customer) loggedInUser).getCustomerId();
+        }
 
         Object customerIdInSession = session.getAttribute("customerId");
         if (customerIdInSession instanceof Integer) {
@@ -36,25 +48,30 @@ public class MyReviewsController extends HttpServlet {
             }
         }
 
-        String customerIdParam = request.getParameter("customerId");
-        if (customerIdParam != null && !customerIdParam.isBlank()) {
-            try {
-                int customerId = Integer.parseInt(customerIdParam);
-                if (customerId > 0) {
-                    session.setAttribute("customerId", customerId);
-                    return customerId;
+        if ("customer".equalsIgnoreCase(userType)) {
+            Object userId = session.getAttribute("userId");
+            if (userId instanceof Integer) {
+                return (Integer) userId;
+            }
+            if (userId instanceof String) {
+                try {
+                    return Integer.parseInt((String) userId);
+                } catch (NumberFormatException ignored) {
                 }
-            } catch (NumberFormatException ignored) {
             }
         }
 
-        return 1;
+        return null;
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int customerId = resolveCustomerId(request);
+        Integer customerId = resolveCustomerId(request);
+        if (customerId == null) {
+            response.sendRedirect(request.getContextPath() + "/Login");
+            return;
+        }
         String message = request.getParameter("message");
 
         List<Review> reviews = reviewDAO.getReviewByCustomer(customerId);
@@ -84,7 +101,11 @@ public class MyReviewsController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Lấy customer hiện tại từ session/request để đảm bảo chỉ thao tác trên review của chính user.
-        int customerId = resolveCustomerId(request);
+        Integer customerId = resolveCustomerId(request);
+        if (customerId == null) {
+            response.sendRedirect(request.getContextPath() + "/Login");
+            return;
+        }
         // action dùng để phân biệt các thao tác POST (hiện tại có delete).
         String action = request.getParameter("action");
 

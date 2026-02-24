@@ -7,7 +7,7 @@
             <head>
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
                 <title>Xem chi tiết phiếu nhập</title>
-                <link rel="stylesheet" href="${pageContext.request.contextPath}/view/css/import.css">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
                 <style>
                     /* Specific overrides for the View Details Card to match screenshot */
                     .view-card {

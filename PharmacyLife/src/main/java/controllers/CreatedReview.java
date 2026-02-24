@@ -14,9 +14,17 @@ import jakarta.servlet.http.HttpSession;
  * @author PC
  */
 public class CreatedReview extends HttpServlet {
+//  check 
+    private Integer getLoggedInCustomerId(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return null;
+        }
 
-    private int resolveCustomerId(HttpServletRequest request) {
-        HttpSession session = request.getSession();
+        Object userType = session.getAttribute("userType");
+        if (userType == null || !"customer".equalsIgnoreCase(String.valueOf(userType))) {
+            return null;
+        }
 
         Object customerIdInSession = session.getAttribute("customerId");
         if (customerIdInSession instanceof Integer) {
@@ -28,26 +36,26 @@ public class CreatedReview extends HttpServlet {
             } catch (NumberFormatException ignored) {
             }
         }
+        return null;
+    }
 
-        String customerIdParam = request.getParameter("customerId");
-        if (customerIdParam != null && !customerIdParam.isBlank()) {
-            try {
-                int customerId = Integer.parseInt(customerIdParam);
-                if (customerId > 0) {
-                    session.setAttribute("customerId", customerId);
-                    return 2;
-                }
-            } catch (NumberFormatException ignored) {
-            }
+    private boolean requireCustomerLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Integer customerId = getLoggedInCustomerId(request);
+        if (customerId == null) {
+            response.sendRedirect(request.getContextPath() + "/Login");
+            return false;
         }
-
-        return 1;
+        request.setAttribute("customerId", customerId);
+        return true;
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int customerId = resolveCustomerId(request);
+        if (!requireCustomerLogin(request, response)) {
+            return;
+        }
+        Integer customerId = (Integer) request.getAttribute("customerId");
         
         String medicineIdStr = request.getParameter("medicineId");
         String ratingStr = request.getParameter("rating");
@@ -82,7 +90,11 @@ public class CreatedReview extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int customerId = resolveCustomerId(request);
+        if (!requireCustomerLogin(request, response)) {
+            return;
+        }
+
+        Integer customerId = (Integer) request.getAttribute("customerId");
         String medicineIdStr = request.getParameter("medicineId");
         if (medicineIdStr != null && !medicineIdStr.isEmpty()) {
             try {

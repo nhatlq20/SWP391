@@ -17,44 +17,44 @@ public class CustomerControllerForDashboard extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String path = request.getServletPath();
-
-        if ("/admin/customers-dashboard".equals(path)) {
-            showCustomerList(request, response);
-        } else if ("/admin/customer-detail-dashboard".equals(path)) {
-            showCustomerDetail(request, response);
-        }
-    }
-
-    private void showCustomerList(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        // List<Customer> customers = customerDAO.getAllCustomers();
-        List<Customer> customers = getMockCustomers();
-        request.setAttribute("customers", customers);
-        request.getRequestDispatcher("/view/admin/customer-list-for-dashboard.jsp").forward(request, response);
-    }
-
-    private void showCustomerDetail(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String idParam = request.getParameter("id");
-        if (idParam != null) {
-            try {
-                int customerId = Integer.parseInt(idParam);
-                // Customer customer = customerDAO.getCustomerById(customerId);
-                Customer customer = getMockCustomers().stream()
-                        .filter(c -> c.getCustomerId() == customerId)
-                        .findFirst()
-                        .orElse(null);
-
-                if (customer != null) {
-                    request.setAttribute("customer", customer);
-                    request.getRequestDispatcher("/view/admin/customer-detail-for-dashboard.jsp").forward(request,
-                            response);
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                // Invalid ID
-            }
-        }
+//
+//        if ("/admin/customers-dashboard".equals(path)) {
+//            showCustomerList(request, response);
+//        } else if ("/admin/customer-detail-dashboard".equals(path)) {
+//            showCustomerDetail(request, response);
+//        }
+//    }
+//
+//    private void showCustomerList(HttpServletRequest request, HttpServletResponse response)
+//            throws ServletException, IOException {
+//        // List<Customer> customers = customerDAO.getAllCustomers();
+//        List<Customer> customers = getMockCustomers();
+//        request.setAttribute("customers", customers);
+//        request.getRequestDispatcher("/view/admin/customer-list-for-dashboard.jsp").forward(request, response);
+//    }
+//
+//    private void showCustomerDetail(HttpServletRequest request, HttpServletResponse response)
+//            throws ServletException, IOException {
+//        String idParam = request.getParameter("id");
+//        if (idParam != null) {
+//            try {
+//                int customerId = Integer.parseInt(idParam);
+//                // Customer customer = customerDAO.getCustomerById(customerId);
+//                Customer customer = getMockCustomers().stream()
+//                        .filter(c -> c.getCustomerId() == customerId)
+//                        .findFirst()
+//                        .orElse(null);
+//
+//                if (customer != null) {
+//                    request.setAttribute("customer", customer);
+//                    request.getRequestDispatcher("/view/admin/customer-detail-for-dashboard.jsp").forward(request,
+//                            response);
+//                    return;
+//                }
+//            } catch (NumberFormatException e) {
+//                // Invalid ID
+//            }
+//        }
 
         // Redirect back to list if not found
         response.sendRedirect(request.getContextPath() + "/admin/customers-dashboard");
