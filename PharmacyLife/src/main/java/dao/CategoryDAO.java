@@ -15,7 +15,7 @@ public class CategoryDAO {
 
     public List<Category> getAllCategories() {
         List<Category> categories = new ArrayList<>();
-        String sql = "SELECT CategoryID, CategoryCode, CategoryName, CreatedAt, UpdatedAt FROM Category ORDER BY CategoryName";
+        String sql = "SELECT CategoryID, CategoryCode, CategoryName FROM Category ORDER BY CategoryName";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
@@ -26,17 +26,6 @@ public class CategoryDAO {
                 category.setCategoryId(rs.getInt("CategoryID"));
                 category.setCategoryCode(rs.getString("CategoryCode"));
                 category.setCategoryName(rs.getString("CategoryName"));
-
-                Timestamp createdAt = rs.getTimestamp("CreatedAt");
-                if (createdAt != null) {
-                    category.setCreatedAt(createdAt.toLocalDateTime());
-                }
-
-                Timestamp updatedAt = rs.getTimestamp("UpdatedAt");
-                if (updatedAt != null) {
-                    category.setUpdatedAt(updatedAt.toLocalDateTime());
-                }
-
                 categories.add(category);
             }
         } catch (SQLException e) {
@@ -208,7 +197,8 @@ public class CategoryDAO {
         }
         return map;
     }
-// kien
+
+    // kien
     public List<Medicine> getMedicineByCategory(int categoryId) {
         List<Medicine> list = new ArrayList<>();
         String sql = "SELECT * FROM Medicine WHERE CategoryId = ?";
@@ -257,6 +247,4 @@ public class CategoryDAO {
         return searchCategoriesByName(keyword);
     }
 
-
-    
 }

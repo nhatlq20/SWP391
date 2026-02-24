@@ -12,14 +12,14 @@ import dao.CategoryDAO;
 import models.Medicine;
 import models.Category;
 
-@WebServlet(name = "ProductControllerForDashboard", urlPatterns = {
-        "/admin/products-dashboard",
+@WebServlet(name = "MedicineControllerForDashboard", urlPatterns = {
+        "/admin/medicines-dashboard",
         "/admin/medicine-add-dashboard",
         "/admin/medicine-edit-dashboard",
         "/admin/medicine-detail-dashboard",
         "/admin/medicine-delete-dashboard"
 })
-public class ProductControllerForDashboard extends HttpServlet {
+public class MedicineControllerForDashboard extends HttpServlet {
 
     private MedicineDAO medicineDAO = new MedicineDAO();
     private CategoryDAO categoryDAO = new CategoryDAO();
@@ -30,7 +30,7 @@ public class ProductControllerForDashboard extends HttpServlet {
         String path = request.getServletPath();
 
         switch (path) {
-            case "/admin/products-dashboard":
+            case "/admin/medicines-dashboard":
                 showMedicineList(request, response);
                 break;
             case "/admin/medicine-add-dashboard":
@@ -46,7 +46,7 @@ public class ProductControllerForDashboard extends HttpServlet {
                 deleteMedicine(request, response);
                 break;
             default:
-                response.sendRedirect(request.getContextPath() + "/admin/products-dashboard");
+                response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
                 break;
         }
     }
@@ -65,7 +65,7 @@ public class ProductControllerForDashboard extends HttpServlet {
                 updateMedicine(request, response);
                 break;
             default:
-                response.sendRedirect(request.getContextPath() + "/admin/products-dashboard");
+                response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
                 break;
         }
     }
@@ -105,7 +105,7 @@ public class ProductControllerForDashboard extends HttpServlet {
                 // Invalid ID
             }
         }
-        response.sendRedirect(request.getContextPath() + "/admin/products-dashboard");
+        response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
     }
 
     private void showMedicineDetail(HttpServletRequest request, HttpServletResponse response)
@@ -125,7 +125,7 @@ public class ProductControllerForDashboard extends HttpServlet {
                 // Invalid ID
             }
         }
-        response.sendRedirect(request.getContextPath() + "/admin/products-dashboard");
+        response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
     }
 
     private void deleteMedicine(HttpServletRequest request, HttpServletResponse response)
@@ -139,7 +139,7 @@ public class ProductControllerForDashboard extends HttpServlet {
                 // Invalid ID
             }
         }
-        response.sendRedirect(request.getContextPath() + "/admin/products-dashboard");
+        response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
     }
 
     // ========== POST handlers ==========
@@ -175,7 +175,7 @@ public class ProductControllerForDashboard extends HttpServlet {
 
             boolean success = medicineDAO.createMedicine(medicine);
             if (success) {
-                response.sendRedirect(request.getContextPath() + "/admin/products-dashboard");
+                response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
             } else {
                 request.setAttribute("errorMessage", "Không thể thêm thuốc. Vui lòng thử lại.");
                 List<Category> categories = categoryDAO.getAllCategories();
@@ -198,7 +198,7 @@ public class ProductControllerForDashboard extends HttpServlet {
             Medicine medicine = medicineDAO.getMedicineById(medicineId);
 
             if (medicine == null) {
-                response.sendRedirect(request.getContextPath() + "/admin/products-dashboard");
+                response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
                 return;
             }
 
@@ -229,7 +229,7 @@ public class ProductControllerForDashboard extends HttpServlet {
 
             boolean success = medicineDAO.updateMedicine(medicine);
             if (success) {
-                response.sendRedirect(request.getContextPath() + "/admin/products-dashboard");
+                response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
             } else {
                 request.setAttribute("errorMessage", "Không thể cập nhật thuốc. Vui lòng thử lại.");
                 List<Category> categories = categoryDAO.getAllCategories();
@@ -240,7 +240,7 @@ public class ProductControllerForDashboard extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "Lỗi: " + e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/admin/products-dashboard");
+            response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
         }
     }
 }

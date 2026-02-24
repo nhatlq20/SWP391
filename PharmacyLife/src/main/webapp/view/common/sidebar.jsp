@@ -35,8 +35,8 @@
                     <c:if test="${userRole eq 'admin' || userRole eq 'staff'}">
                         <div class="sidebar-heading text-muted small text-uppercase fw-bold mb-2 px-3">Quản Trị</div>
 
-                        <a href="${pageContext.request.contextPath}/medicine"
-                            class="sidebar-item ${fn:contains(uri, 'medicine') ? 'active' : ''}">
+                        <a href="${pageContext.request.contextPath}/admin/medicines-dashboard"
+                            class="sidebar-item ${fn:contains(uri, 'medicine') || fn:contains(uri, 'medicines-dashboard') ? 'active' : ''}">
                             <i class="fas fa-pills"></i> Quản lý thuốc
                         </a>
 
