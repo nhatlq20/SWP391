@@ -45,19 +45,24 @@
                             color: #856404;
                         }
 
-                        .status-completed {
+                        .status-confirmed {
                             background-color: #d1e7dd;
-                            color: #0f5132;
-                        }
-
-                        .status-cancelled {
-                            background-color: #f8d7da;
-                            color: #842029;
+                            color: #0c4128;
                         }
 
                         .status-shipping {
                             background-color: #cfe2ff;
                             color: #084298;
+                        }
+
+                        .status-delivered {
+                            background-color: #c3e6cb;
+                            color: #155724;
+                        }
+
+                        .status-cancelled {
+                            background-color: #f8d7da;
+                            color: #842029;
                         }
 
                         .btn-detail {
@@ -151,19 +156,38 @@
                                                         </td>
                                                         <td class="text-center">
                                                             <span class="status-badge 
-                                                <c:choose>
-                                                    <c:when test=" ${o.status=='Pending' }">status-pending</c:when>
-                                                                <c:when test="${o.status == 'Completed'}">
-                                                                    status-completed
-                                                                </c:when>
-                                                                <c:when test="${o.status == 'Cancelled'}">
-                                                                    status-cancelled
-                                                                </c:when>
+                                                                <c:choose>
+                                                                    <c:when test=" ${o.status=='Pending' ||
+                                                                o.status=='Đang chờ' }">status-pending</c:when>
+                                                                <c:when
+                                                                    test="${o.status == 'Confirmed' || o.status == 'Đã xác nhận'}">
+                                                                    status-confirmed</c:when>
+                                                                <c:when
+                                                                    test="${o.status == 'Shipping' || o.status == 'Đang giao hàng'}">
+                                                                    status-shipping</c:when>
+                                                                <c:when
+                                                                    test="${o.status == 'Completed' || o.status == 'Delivered' || o.status == 'Đã giao hàng'}">
+                                                                    status-delivered</c:when>
+                                                                <c:when
+                                                                    test="${o.status == 'Cancelled' || o.status == 'Đã hủy'}">
+                                                                    status-cancelled</c:when>
                                                                 <c:otherwise>status-shipping</c:otherwise>
                                                                 </c:choose>
                                                                 ">
-                                                                ${o.status}
-                                                            </span>
+                                                                <c:choose>
+                                                                    <c:when test="${o.status == 'Pending'}">Đang chờ
+                                                                    </c:when>
+                                                                    <c:when test="${o.status == 'Confirmed'}">Đã xác
+                                                                        nhận</c:when>
+                                                                    <c:when test="${o.status == 'Shipping'}">Đang giao
+                                                                        hàng</c:when>
+                                                                    <c:when
+                                                                        test="${o.status == 'Completed' || o.status == 'Delivered'}">
+                                                                        Đã giao hàng</c:when>
+                                                                    <c:when test="${o.status == 'Cancelled'}">Đã hủy
+                                                                    </c:when>
+                                                                    <c:otherwise>${o.status}</c:otherwise>
+                                                                </c:choose>
                                                         </td>
                                                         <td class="text-center">
                                                             <a href="order-detail?id=${o.orderId}"

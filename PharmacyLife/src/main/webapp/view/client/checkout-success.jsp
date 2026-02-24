@@ -115,7 +115,11 @@
                     <h1 class="success-title">Đặt hàng thành công!</h1>
                     <p class="success-message">Cảm ơn bạn đã mua hàng.<br /> Chúng tôi sẽ liên hệ sớm nhất để xác nhận
                         đơn hàng.</p>
-                    <div>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="${pageContext.request.contextPath}/order-list"
+                            class="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold">
+                            <i class="fas fa-list me-2"></i>Xem đơn hàng
+                        </a>
                         <a href="home" class="btn btn-primary-custom text-decoration-none">
                             <i class="fas fa-home me-2"></i>Về trang chủ
                         </a>
