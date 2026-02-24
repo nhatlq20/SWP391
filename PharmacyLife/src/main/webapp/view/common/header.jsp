@@ -45,7 +45,7 @@
                                         tôi</a>
                                     <a class="user-item" href="${pageContext.request.contextPath}/my-orders">Xem đơn
                                         hàng</a>
-                                    <% String roleName=(String)session.getAttribute("roleName"); if
+                                    <% String roleName=(String) session.getAttribute("roleName"); if
                                         ("Admin".equalsIgnoreCase(roleName)) { %>
                                         <div style="border-top:1px solid #eef2f7; margin:6px 6px 8px;"></div>
                                         <a class="user-item" href="${pageContext.request.contextPath}/order">Quản lí đơn
@@ -54,28 +54,20 @@
                                             sản phẩm</a>
                                         <a class="user-item" href="${pageContext.request.contextPath}/staff">Quản lí
                                             khách hàng</a>
-                                        <a class="user-item"
-                                            href="${pageContext.request.contextPath}/import">Quản lí nhập
-                                            thuốc</a>
-                                        <% } %>
-                                            <a class="user-item"
-                                                href="${pageContext.request.contextPath}/auth?action=logout">Đăng
-                                                xuất</a>
+                                        <a class="user-item" href="${pageContext.request.contextPath}/import">Quản lí
+                                            nhập thuốc</a>
                                         <a class="user-item" href="${pageContext.request.contextPath}/manage-staff">Quản
-                                            lí
-                                            nhân viên</a>
+                                            lí nhân viên</a>
                                         <% } else if ("Staff".equalsIgnoreCase(roleName)) { %>
                                             <div style="border-top:1px solid #eef2f7; margin:6px 6px 8px;"></div>
                                             <a class="user-item" href="${pageContext.request.contextPath}/order">Quản lí
-                                                đơn
-                                                hàng</a>
+                                                đơn hàng</a>
                                             <a class="user-item" href="${pageContext.request.contextPath}/product">Quản
-                                                lí
-                                                sản phẩm</a>
+                                                lí sản phẩm</a>
                                             <% } %>
+                                                <div style="border-top:1px solid #eef2f7; margin:6px 6px 8px;"></div>
                                                 <a class="user-item"
-                                                    href="${pageContext.request.contextPath}/logout">Đăng
-                                                    xuất</a>
+                                                    href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
                                 </div>
                             </div>
                             <% } else { %>
