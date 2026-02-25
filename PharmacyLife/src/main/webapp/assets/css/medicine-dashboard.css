@@ -305,7 +305,7 @@
 
 .price {
     font-weight: 700;
-    color: #16a34a;
+    color: #22c55e;
 }
 
 .category-badge {
@@ -327,8 +327,9 @@
 }
 
 .badge-stock {
-    background-color: #dcfce7;
-    color: #16a34a;
+    background-color: #15803d;
+    color: #15803d;
+
 }
 
 .badge-low {
@@ -358,8 +359,9 @@
 }
 
 .badge-delivered {
-    background-color: #dcfce7;
-    color: #16a34a;
+    background-color: #15803d;
+    color: #15803d;
+
 }
 
 .badge-cancelled {
@@ -509,7 +511,7 @@
 }
 
 .price-value {
-    color: #16a34a;
+    color: #22c55e;
     font-weight: 700;
     font-size: 1.1rem;
 }
