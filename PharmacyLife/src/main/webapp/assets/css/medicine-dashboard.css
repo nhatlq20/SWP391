@@ -346,9 +346,8 @@
 }
 
 .badge-stock {
-    background-color: #15803d;
-    color: #15803d;
-
+    background-color: #dcfce7;
+    color: #16a34a;
 }
 
 .badge-low {
@@ -363,29 +362,38 @@
 
 /* Order specific badges */
 .badge-pending {
-    background-color: #fef9c3;
-    color: #ca8a04;
+    background-color: #fbbf24;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 6px 14px;
 }
 
 .badge-confirmed {
-    background-color: #e0f2fe;
-    color: #0284c7;
+    background-color: #0369a1;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 6px 14px;
 }
 
 .badge-shipping {
-    background-color: #e0f2fe;
-    color: #3b82f6;
+    background-color: #0369a1;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 6px 14px;
 }
 
 .badge-delivered {
-    background-color: #15803d;
-    color: #15803d;
-
+    background-color: #16a34a;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 6px 14px;
 }
 
 .badge-cancelled {
-    background-color: #fee2e2;
-    color: #dc2626;
+    background-color: #dc2626;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 6px 14px;
 }
 
 .badge-secondary {
