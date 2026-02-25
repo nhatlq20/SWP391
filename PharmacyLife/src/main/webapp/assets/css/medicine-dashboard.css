@@ -216,6 +216,23 @@
     font-size: 14px;
     transition: all 0.2s;
     cursor: pointer;
+    text-decoration: none !important;
+}
+
+.btn-action:hover,
+.btn-action:focus,
+.btn-action:active {
+    text-decoration: none !important;
+}
+
+.btn-view {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.btn-view:hover {
+    background: #bfdbfe;
+    color: #2563eb;
 }
 
 .btn-view {
@@ -234,6 +251,7 @@
 
 .btn-edit:hover {
     background: #fde68a;
+    color: #d97706;
 }
 
 .btn-delete {
@@ -243,6 +261,7 @@
 
 .btn-delete:hover {
     background: #fecaca;
+    color: #dc2626;
 }
 
 /* ---------- Table ---------- */

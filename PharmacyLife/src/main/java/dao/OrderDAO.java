@@ -13,7 +13,7 @@ public class OrderDAO {
 
     public List<Order> getAllOrders() {
         List<Order> orders = new ArrayList<>();
-        String sql = "SELECT * FROM Orders ORDER BY OrderDate DESC";
+        String sql = "SELECT * FROM Orders ORDER BY OrderId ASC";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {

@@ -1,14 +1,10 @@
 package models;
 
-import java.time.LocalDateTime;
-
 public class Category {
 
     private int categoryId;
     private String categoryCode;
     private String categoryName;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
     private int medicineCount;
 
@@ -26,16 +22,15 @@ public class Category {
     public Category() {
     }
 
-    public Category(int categoryId, String categoryName) {
+    public Category(int categoryId, String categoryCode, String categoryName) {
         this.categoryId = categoryId;
+        this.categoryCode = categoryCode;
         this.categoryName = categoryName;
     }
 
-    public Category(int categoryId, String categoryName, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Category(int categoryId, String categoryName) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     // Getters and Setters
@@ -47,10 +42,6 @@ public class Category {
         this.categoryId = categoryId;
     }
 
-    public String getCategoryName() {
-        return categoryName;
-    }
-
     public String getCategoryCode() {
         return categoryCode;
     }
@@ -59,33 +50,20 @@ public class Category {
         this.categoryCode = categoryCode;
     }
 
+    public String getCategoryName() {
+        return categoryName;
+    }
+
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     @Override
     public String toString() {
         return "Category{"
                 + "categoryId=" + categoryId
+                + ", categoryCode='" + categoryCode + '\''
                 + ", categoryName='" + categoryName + '\''
-                + ", createdAt=" + createdAt
-                + ", updatedAt=" + updatedAt
                 + '}';
     }
 }
