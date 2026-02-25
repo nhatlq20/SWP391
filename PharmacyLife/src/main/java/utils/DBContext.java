@@ -9,7 +9,7 @@ public class DBContext {
     private final String url = "jdbc:sqlserver://localhost:1433;"
             + "databaseName=SWP391_Test7;"
             + "user=sa;"
-            + "password=123456;"
+            + "password=hao0915;"
             + "encrypt=true;"
             + "trustServerCertificate=true;";
 
@@ -21,7 +21,8 @@ public class DBContext {
         }
     }
 
-    // Return a new connection each time to avoid sharing/closing the same Connection instance
+    // Return a new connection each time to avoid sharing/closing the same
+    // Connection instance
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(url);
     }
