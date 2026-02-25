@@ -77,7 +77,7 @@
                         <c:if test="${userRole eq 'admin'}">
                             <a href="${pageContext.request.contextPath}/admin/imports"
                                 class="sidebar-item ${fn:contains(uri, 'imports') ? 'active' : ''}">
-                                <i class="fas fa-file-import"></i> <span>Quản lý nhập thuốc</span>
+                                  <i class="fas fa-file-import"></i> <span style="font-size: 1em;">Quản lý nhập thuốc</span>
                             </a>
 
                             <a href="${pageContext.request.contextPath}/admin/revenue"
