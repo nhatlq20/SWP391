@@ -56,8 +56,8 @@
                         </a>
 
                         <c:if test="${userRole eq 'admin'}">
-                            <a href="${pageContext.request.contextPath}/Staffmanage"
-                                class="sidebar-item ${fn:contains(uri, 'Staffmanage') ? 'active' : ''}">
+                            <a href="${pageContext.request.contextPath}/manage-staff"
+                                class="sidebar-item ${fn:contains(uri, 'manage-staff') ? 'active' : ''}">
                                 <i class="fas fa-user-shield"></i> Quản lý nhân viên
                             </a>
                         </c:if>
@@ -65,7 +65,7 @@
                 </div>
                 <div class="sidebar-footer">
                     <c:if test="${not empty sessionScope.loggedInUser}">
-                        <a href="${pageContext.request.contextPath}/logout" class="sidebar-item sidebar-logout">
+                        <a href="${pageContext.request.contextPath}/logout-page" class="sidebar-item sidebar-logout">
                             <i class="fas fa-sign-out-alt"></i> Đăng xuất
                         </a>
                     </c:if>

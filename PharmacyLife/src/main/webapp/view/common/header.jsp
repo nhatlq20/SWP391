@@ -95,7 +95,8 @@
                                             sản phẩm</a>
                                         <a class="user-item" href="${pageContext.request.contextPath}/staff">Quản lí
                                             khách hàng</a>
-                                        <a class="user-item" href="${pageContext.request.contextPath}/import">Quản lí
+                                        <a class="user-item"
+                                            href="${pageContext.request.contextPath}/admin/imports">Quản lí
                                             nhập thuốc</a>
                                         <a class="user-item" href="${pageContext.request.contextPath}/manage-staff">Quản
                                             lí nhân viên</a>
@@ -108,7 +109,7 @@
                                             <% } %>
                                                 <div style="border-top:1px solid #eef2f7; margin:6px 6px 8px;"></div>
                                                 <a class="user-item"
-                                                    href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
+                                                    href="${pageContext.request.contextPath}/logout-page">Đăng xuất</a>
                                 </div>
                             </div>
                             <% } else { %>

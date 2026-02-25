@@ -74,7 +74,8 @@
                                 </div>
                             </c:if>
 
-                            <form method="POST" action="${pageContext.request.contextPath}/import" id="importForm">
+                            <form method="POST" action="${pageContext.request.contextPath}/admin/imports"
+                                id="importForm">
                                 <input type="hidden" name="action" value="create">
                                 <input type="hidden" name="importCode" value="${newCode != null ? newCode : 'IP001'}">
 
@@ -153,7 +154,7 @@
                                     <!-- FOOTER ACTIONS -->
                                     <div class="footer-row mt-4">
                                         <div style="display: flex; gap: 10px;">
-                                            <a href="${pageContext.request.contextPath}/import"
+                                            <a href="${pageContext.request.contextPath}/admin/imports"
                                                 class="btn btn-secondary">
                                                 <i class="fas fa-arrow-left me-2"></i>Trở lại
                                             </a>
@@ -234,15 +235,9 @@
                         document.getElementById('modalMedicineId').addEventListener('change', function () {
                             const medicineId = this.value;
                             if (medicineId && medicineId.trim() !== '') {
-                                fetch('${pageContext.request.contextPath}/MedicineAjaxController?action=getPrice&id=' + medicineId)
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data && data.price !== undefined) {
-                                            document.getElementById('modalPrice').value = data.price;
-                                            calculateModalTotal();
-                                        }
-                                    })
-                                    .catch(err => console.error('Error fetching price:', err));
+                                // Clear price field - user must enter manually
+                                document.getElementById('modalPrice').value = '';
+                                calculateModalTotal();
                             } else {
                                 document.getElementById('modalPrice').value = '';
                                 calculateModalTotal();

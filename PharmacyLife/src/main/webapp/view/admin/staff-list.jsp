@@ -34,7 +34,7 @@
                                             <img src="${pageContext.request.contextPath}/assets/img/filter.png"
                                                 alt="filter" style="width:20px;height:20px;" />
                                         </div>
-                                        <a href="${pageContext.request.contextPath}/Staffmanage?action=add"
+                                        <a href="${pageContext.request.contextPath}/manage-staff?action=add"
                                             class="add-btn">
                                             <span style="display:inline-flex; align-items:center; gap:6px;">
                                                 <img class="add-btn-icon"
@@ -64,14 +64,14 @@
                                                             <td>${s.staffName}</td>
                                                             <td style="text-align:center;">
                                                                 <span class="action-icons">
-                                                                    <a href="${pageContext.request.contextPath}/Staffmanage?action=detail&id=${s.staffId}"
+                                                                    <a href="${pageContext.request.contextPath}/manage-staff?action=detail&id=${s.staffId}"
                                                                         title="View" class="view">
                                                                         <img src="${pageContext.request.contextPath}/assets/img/edit.svg"
                                                                             alt="view" />
                                                                     </a>
                                                                     <a href="javascript:void(0)" title="Delete"
                                                                         class="delete"
-                                                                        onclick="showDeleteModal('${pageContext.request.contextPath}/Staffmanage?action=delete&id=${s.staffId}', '${s.staffName}');">
+                                                                        onclick="showDeleteModal('${pageContext.request.contextPath}/manage-staff?action=delete&id=${s.staffId}', '${s.staffName}');">
                                                                         <img src="${pageContext.request.contextPath}/assets/img/delete.svg"
                                                                             alt="delete" />
                                                                     </a>
@@ -236,10 +236,9 @@
                                 }
                             }
 
-                            // Close modal when clicking outside of it
-                            document.addEventListener('click', function (event) {
-                                var modal = document.getElementById('deleteModal');
-                                if (event.target === modal) {
+                            // Close modal when clicking outside
+                            document.getElementById('deleteModal').addEventListener('click', function (e) {
+                                if (e.target === this) {
                                     closeDeleteModal();
                                 }
                             });

@@ -83,7 +83,7 @@
 
                                 <div style="text-align:right; margin-top:18px;">
                                     <a class="add-btn detail-close-btn"
-                                        href="${pageContext.request.contextPath}/Staffmanage">Đóng</a>
+                                        href="${pageContext.request.contextPath}/manage-staff">Đóng</a>
                                 </div>
                             </div>
 

@@ -76,7 +76,7 @@
 
                                             <!-- Forgot Password -->
                                             <div class="forgot-password">
-                                                <a href="#">Quên mật khẩu?</a>
+                                                <a href="${pageContext.request.contextPath}/forgot-password">Quên mật khẩu?</a>
                                             </div>
 
                                             <!-- Login Button -->
