@@ -41,7 +41,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CategoryController</servlet-name>
-        <url-pattern>/category</url-pattern>
+        <url-pattern>/1</url-pattern>
     </servlet-mapping>
     <servlet>
         <servlet-name>CartController</servlet-name>
@@ -83,6 +83,10 @@
         <servlet-name>ViewReviewsController</servlet-name>
         <servlet-class>controllers.ViewReviewsController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ReplyReviewController</servlet-name>
+        <servlet-class>controllers.ReplyReviewController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>CartController</servlet-name>
         <url-pattern>/cart</url-pattern>
@@ -123,6 +127,10 @@
         <servlet-name>ViewReviewsController</servlet-name>
         <url-pattern>/view-reviews</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ReplyReviewController</servlet-name>
+        <url-pattern>/reply-review</url-pattern>
+    </servlet-mapping>
     <servlet>
         <servlet-name>CreateReview</servlet-name>
         <servlet-class>controllers.CreatedReview</servlet-class>
@@ -138,6 +146,10 @@
     <servlet-mapping>
         <servlet-name>MyReviewsController</servlet-name>
         <url-pattern>/reviews</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MyReviewsController</servlet-name>
+        <url-pattern>/my-reviews</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

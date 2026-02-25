@@ -125,12 +125,12 @@ public class MyReviewsController extends HttpServlet {
                 boolean deleted = reviewDAO.deleteReviewByCustomer(reviewId, customerId, medicineId);
                 String message = deleted ? "Xóa đánh giá thành công" : "Không thể xóa đánh giá";
                 // Redirect để tránh submit lại form khi refresh (Post/Redirect/Get).
-                response.sendRedirect(request.getContextPath() + "/my-reviews?message="
+                response.sendRedirect(request.getContextPath() + "/reviews?message="
                         + java.net.URLEncoder.encode(message, "UTF-8"));
                 return;
             } catch (NumberFormatException e) {
                 // Trường hợp dữ liệu ID không hợp lệ từ request.
-                response.sendRedirect(request.getContextPath() + "/my-reviews?message="
+                response.sendRedirect(request.getContextPath() + "/reviews?message="
                         + java.net.URLEncoder.encode("Dữ liệu xóa không hợp lệ", "UTF-8"));
                 return;
             }

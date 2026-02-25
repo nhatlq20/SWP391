@@ -7,10 +7,15 @@ import java.sql.Timestamp;
  * @author PC
  */
 public class ReviewCustomer {
+    private int reviewId;
     private String customerName;
     private int rating;
     private String comment;
     private Timestamp createdAt;
+    private String replyContent;
+    private Integer replyBy;
+    private Timestamp replyCreatedAt;
+    private String replyStaffName;
 
     public ReviewCustomer() {
     }
@@ -20,6 +25,14 @@ public class ReviewCustomer {
         this.rating = rating;
         this.comment = comment;
         this.createdAt = createdAt;
+    }
+
+    public int getReviewId() {
+        return reviewId;
+    }
+
+    public void setReviewId(int reviewId) {
+        this.reviewId = reviewId;
     }
 
     public String getCustomerName() {
@@ -52,5 +65,37 @@ public class ReviewCustomer {
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getReplyContent() {
+        return replyContent;
+    }
+
+    public void setReplyContent(String replyContent) {
+        this.replyContent = replyContent;
+    }
+
+    public Integer getReplyBy() {
+        return replyBy;
+    }
+
+    public void setReplyBy(Integer replyBy) {
+        this.replyBy = replyBy;
+    }
+
+    public Timestamp getReplyCreatedAt() {
+        return replyCreatedAt;
+    }
+
+    public void setReplyCreatedAt(Timestamp replyCreatedAt) {
+        this.replyCreatedAt = replyCreatedAt;
+    }
+
+    public String getReplyStaffName() {
+        return replyStaffName;
+    }
+
+    public void setReplyStaffName(String replyStaffName) {
+        this.replyStaffName = replyStaffName;
     }
 }

@@ -137,15 +137,20 @@
                                             <c:set var="imgSrc" value="${pageContext.request.contextPath}/assets/img/${imageUrlTrimmed}" />
                                         </c:otherwise>
                                     </c:choose>
-                                    <img class="review-medicine-thumb"
-                                         src="${imgSrc}"
-                                         alt="${not empty med ? med.medicineName : 'Medicine'}"
-                                         onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/img/no-image.png';">
+                                    <!-- lấy id thuốc -->
+                                    <a href="${pageContext.request.contextPath}/medicine/detail?id=${review.medicineId}">
+                                        <img class="review-medicine-thumb"
+                                             src="${imgSrc}"
+                                             alt="${not empty med ? med.medicineName : 'Medicine'}"
+                                             onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/img/no-image.png';">
+                                    </a>
                                 </c:when>
                                 <c:otherwise>
-                                    <img class="review-medicine-thumb"
-                                         src="${pageContext.request.contextPath}/assets/img/no-image.png"
-                                         alt="Medicine">
+                                    <a href="${pageContext.request.contextPath}/medicine/detail?id=${review.medicineId}">
+                                        <img class="review-medicine-thumb"
+                                             src="${pageContext.request.contextPath}/assets/img/no-image.png"
+                                             alt="Medicine">
+                                    </a>
                                 </c:otherwise>
                             </c:choose>
 
@@ -171,10 +176,15 @@
 
                                 <div class="mb-2">${review.comment}</div>
                                 <div class="meta">
-                                    Thuốc: ${not empty med ? med.medicineName : 'N/A'} (ID: ${review.medicineId})
+                                    <!-- đây để lấy id thuốc  -->
+                    
+                                    <a href="${pageContext.request.contextPath}/medicine/detail?id=${review.medicineId}">
+                                        ${not empty med ? med.medicineName : 'N/A'}
+                                    </a>
+                                    (ID: ${review.medicineId})
                                 </div>
                                 <div class="review-actions">
-                                    <form method="post" action="${pageContext.request.contextPath}/my-reviews" onsubmit="return confirm('Bạn chắc chắn muốn xóa đánh giá này?');">
+                                    <form method="post" action="${pageContext.request.contextPath}/reviews" onsubmit="return confirm('Bạn chắc chắn muốn xóa đánh giá này?');">
                                         <input type="hidden" name="action" value="delete" />
                                         <input type="hidden" name="reviewId" value="${review.reviewId}" />
                                         <input type="hidden" name="medicineId" value="${review.medicineId}" />

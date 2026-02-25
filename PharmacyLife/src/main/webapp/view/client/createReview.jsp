@@ -42,7 +42,7 @@
                         <div class="form-group">
                             <label class="form-label">Bình luận <span class="required">*</span></label>
                             <textarea class="form-input" name="comment" id="comment"
-                                placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."></textarea>
+                                placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."><c:if test="${not empty replyTo}">Trả lời @<c:out value="${replyTo}"/>: </c:if></textarea>
                             <div class="error-message" id="commentError"></div>
                         </div>
 

@@ -96,6 +96,7 @@ public class CreatedReview extends HttpServlet {
 
         Integer customerId = (Integer) request.getAttribute("customerId");
         String medicineIdStr = request.getParameter("medicineId");
+        String replyTo = request.getParameter("replyTo");
         if (medicineIdStr != null && !medicineIdStr.isEmpty()) {
             try {
                 int medicineId = Integer.parseInt(medicineIdStr);
@@ -103,6 +104,9 @@ public class CreatedReview extends HttpServlet {
             } catch (NumberFormatException e) {
                 // Ignore
             }
+        }
+        if (replyTo != null && !replyTo.trim().isEmpty()) {
+            request.setAttribute("replyTo", replyTo.trim());
         }
         request.setAttribute("customerId", customerId);
         request.getRequestDispatcher("/view/client/createReview.jsp").forward(request, response);

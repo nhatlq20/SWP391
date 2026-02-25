@@ -2,6 +2,7 @@ package models;
 
 import java.sql.Timestamp;
 
+import java.sql.Date;
 /**
  *kien
  * @author PC
@@ -14,6 +15,36 @@ public class Review {
     private int rating;
     private String comment;
     private Timestamp reviewCreatedAt;
+
+
+    private String replyContent;
+    private int replyBy;
+    private Date replyCreatedAt;
+
+
+     public String getReplyContent() {
+        return replyContent;
+    }
+
+    public void setReplyContent(String replyContent) {
+        this.replyContent = replyContent;
+    }
+
+    public int getReplyBy() {
+        return replyBy;
+    }
+
+    public void setReplyBy(int replyBy) {
+        this.replyBy = replyBy;
+    }
+
+    public Date getReplyCreatedAt() {
+        return replyCreatedAt;
+    }
+
+    public void setReplyCreatedAt(Date replyCreatedAt) {
+        this.replyCreatedAt = replyCreatedAt;
+    }
 
     public Review() {
     }
