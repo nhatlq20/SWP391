@@ -56,8 +56,7 @@
                                             <div class="input-wrapper">
                                                 <input type="text" id="fullName" name="fullName"
                                                     placeholder="Nhập họ và tên của bạn"
-                                                    value="<%= request.getAttribute(" fullName") !=null ?
-                                                    request.getAttribute("fullName") : "" %>" required>
+                                                    value="<%= request.getAttribute("fullName") != null ? request.getAttribute("fullName") : "" %>" required>
                                                 <img src="${pageContext.request.contextPath}/assets/img/emaillogin.png"
                                                     alt="Name Icon" class="input-icon">
                                             </div>
@@ -69,8 +68,7 @@
                                             <div class="input-wrapper">
                                                 <input type="tel" id="phone" name="phone"
                                                     placeholder="Nhập số điện thoại của bạn"
-                                                    value="<%= request.getAttribute(" phone") !=null ?
-                                                    request.getAttribute("phone") : "" %>" required>
+                                                    value="<%= request.getAttribute("phone") != null ? request.getAttribute("phone") : "" %>" required>
                                                 <img src="${pageContext.request.contextPath}/assets/img/phonereg.png"
                                                     alt="Phone Icon" class="input-icon">
                                             </div>
@@ -81,8 +79,8 @@
                                             <label for="email">Địa chỉ email</label>
                                             <div class="input-wrapper">
                                                 <input type="email" id="email" name="email"
-                                                    placeholder="Nhập email của bạn" value="<%= request.getAttribute("
-                                                    email") !=null ? request.getAttribute("email") : "" %>" required>
+                                                    placeholder="Nhập email của bạn"
+                                                    value="<%= request.getAttribute("email") != null ? request.getAttribute("email") : "" %>" required>
                                                 <img src="${pageContext.request.contextPath}/assets/img/emaillogin.png"
                                                     alt="Email Icon" class="input-icon">
                                             </div>
