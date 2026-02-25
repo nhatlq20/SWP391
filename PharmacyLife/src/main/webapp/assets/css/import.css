@@ -719,6 +719,32 @@ body {
     }
 }
 
+
+/* ========================================================================= */
+/*          OVERRIDE: Compatibility with medicine-dashboard.css            */
+/* ========================================================================= */
+
+/* Reset old styles for new layout structure */
+body {
+    background-color: #f8fafc !important;
+}
+
+.sidebar-wrapper {
+    top: 115px !important;
+    height: calc(100vh - 115px) !important;
+    z-index: 100;
+}
+
+.main-content {
+    margin-left: 290px !important;
+    padding: 25px 30px !important;
+    margin-top: 115px !important;
+    min-height: auto !important;
+    background-color: transparent !important;
+    flex: none !important;
+    display: block !important;
+}
+
 /* Ensure table takes available width and rows wrap nicely on very small screens */
 @media (max-width: 576px) {
 
@@ -733,4 +759,33 @@ body {
     .left-panel {
         padding: 0;
     }
+}
+
+
+/* ========================================================================= */
+/*                    Status Badge Style Overrides                          */
+/* ========================================================================= */
+
+.badge {
+    padding: 6px 14px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    border: none !important;
+    display: inline-block !important;
+}
+
+.badge-pending {
+    background-color: #fbbf24 !important;
+    color: #ffffff !important;
+}
+
+.badge-confirmed {
+    background-color: #0369a1 !important;
+    color: #ffffff !important;
+}
+
+.badge-cancelled {
+    background-color: #dc2626 !important;
+    color: #ffffff !important;
 }
