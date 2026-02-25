@@ -1,104 +1,310 @@
 /* Styles for staff-list.jsp extracted from inline styles */
-.staff-page {
-    max-width: 1180px;
-    margin: 0 auto;
-    width: 100%;
+
+/* Heavily forced override to clear the large fixed header and avoid sidebar overlap */
+body .main-content.staff-main {
+    margin-left: 290px !important; /* Fixed margin slightly wider than sidebar (280px) */
+    margin-top: 180px !important; 
+    padding: 30px !important;
+    min-height: calc(100vh - 180px);
+    box-sizing: border-box;
+    display: block !important;
+    background-color: #f8fafc;
+    position: relative !important;
+    z-index: 1 !important;
+    overflow-x: auto; /* Handle narrow windows by allowing internal scroll */
 }
 
-/* Push content right so sidebar doesn't cover it (adjust to match sidebar width) */
-.staff-main {
-    margin-left: 240px;
+/* Ensure content adapts when browser is stretched or shrunk */
+.staff-page {
+    width: 100%;
+    max-width: 1400px; /* Increase max width for very large screens */
+    margin: 0 auto;
+    box-sizing: border-box;
 }
-.staff-header {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:18px;
-}
-.staff-title {
-    display:flex;
-    align-items:center;
-    gap:12px;
-    font-size:26px;
-    font-weight:700;
+
+@media (max-width: 1200px) {
+    .staff-main {
+        padding: 20px;
+    }
 }
 .staff-title img {
-    width:34px;
-    height:34px;
+    width: 32px;
+    height: 32px;
 }
 .staff-actions {
-    display:flex;
-    gap:12px;
-    align-items:center;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
 }
 .staff-search {
-    display:flex;
-    align-items:center;
-    gap:8px;
-    background:#ffffff;
-    padding:10px 16px;
-    border-radius:28px;
-    border:1px solid #bcd6ff;
-    box-shadow: 0 0 0 2px rgba(75, 155, 255, 0.12);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    padding: 6px 16px;
+    border-radius: 30px; /* More rounded */
+    border: 1px solid #e2e8f0;
+    width: 320px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 .staff-search input {
-    border:none;
-    outline:none;
-    width:260px;
-    font-size:14px;
-    background:transparent;
-    color:#1f2937;
+    border: none;
+    outline: none;
+    flex-grow: 1;
+    font-size: 14px;
+    background: transparent;
+    color: #475569;
 }
 
 .staff-search input::placeholder {
-    color:#6b7280;
-    opacity:1;
+    color: #94a3b8;
 }
 
 .staff-search img {
-    opacity:0.9;
+    width: 18px;
+    height: 18px;
+    opacity: 0.6;
 }
 .add-btn {
-    background:#4B9BFF;
-    color:#fff;
-    padding:8px 14px;
-    border-radius:18px;
-    text-decoration:none;
+    background: #4B9BFF;
+    color: #fff !important;
+    padding: 8px 24px;
+    border-radius: 30px; /* More rounded pill */
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(75, 155, 255, 0.2);
+}
+
+.add-btn:hover {
+    background: #3b82f6;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 10px -1px rgba(75, 155, 255, 0.3);
 }
 
 .add-btn-icon {
-    width:18px;
-    height:18px;
-    object-fit:contain;
-    display:block;
+    width: 14px;
+    height: 14px;
+    filter: brightness(0) invert(1); /* Ensure white icon */
 }
 .staff-card {
-    background:#dfe8f6;
-    padding:18px;
-    border-radius:18px;
+    background: #ffffff;
+    padding: 0; /* Remove padding to let table headers hit edges if desired, or keep light */
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+    border: 1px solid #f1f5f9;
+    overflow: hidden;
+}
+.table-responsive {
+    overflow-x: auto;
+    background: #fff;
 }
 table.staff-table {
-    width:100%;
-    border-collapse:collapse;
-    background:#fff;
-    border-radius:14px;
-    overflow:hidden;
+    width: 100%;
+    border-collapse: collapse;
 }
 table.staff-table th, table.staff-table td {
-    padding:22px 24px;
-    text-align:left;
-    border-bottom:1px solid #d9e3f3;
-    vertical-align:middle;
+    padding: 16px 24px;
+    text-align: left;
+    border-bottom: 1px solid #f1f5f9;
 }
 table.staff-table th {
-    background:#ffffff;
-    font-weight:700;
+    background: #f8fafc; /* Very light blue/grey */
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 13px;
+    text-transform: none;
+}
+table.staff-table td {
+    color: #334155;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+table.staff-table tr:last-child td {
+    border-bottom: none;
 }
 .action-icons img {
-    width:20px;
-    height:20px;
-    margin-left:8px;
-    cursor:pointer;
+    width: 18px;
+    height: 18px;
+    margin-left: 0;
+    cursor: pointer;
+}
+
+/* Form Styles for Add/Edit */
+.add-staff-card {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label-with-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.form-label-with-icon img {
+    width: 20px;
+    height: 20px;
+}
+
+.staff-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.staff-input:focus {
+    border-color: #4B9BFF;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(75, 155, 255, 0.1);
+}
+
+.staff-readonly-field {
+    width: 100%;
+    padding: 12px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #4b5563;
+    border: 1px solid #e5e7eb;
+}
+
+.form-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 32px;
+}
+
+.btn-cancel {
+    padding: 10px 24px;
+    background: #9ca3af;
+    color: white !important;
+    border: none;
+    border-radius: 24px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #6b7280;
+}
+
+.btn-submit {
+    padding: 10px 32px;
+    background: #4B9BFF;
+    color: white;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-submit:hover {
+    background: #3b82f6;
+}
+
+/* Modal Styles */
+.delete-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.delete-modal {
+    background: white;
+    border-radius: 12px;
+    padding: 32px 24px;
+    max-width: 380px;
+    width: 90%;
+    position: relative;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #9ca3af;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    display: block;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 8px;
+    color: #1f2937;
+}
+
+.modal-text {
+    font-size: 14px;
+    color: #4b5563;
+    margin: 0 0 24px;
+    line-height: 1.5;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-confirm {
+    padding: 10px 24px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-confirm:hover {
+    background: #dc2626;
 }
 .action-icons a {
     display:inline-flex;
@@ -115,33 +321,78 @@ table.staff-table th {
 .action-icons a.delete img { filter: none; }
 
 /* small responsive tweaks */
-@media (max-width: 900px) {
-    .staff-page {
-        padding: 0 12px;
+@media (max-width: 1024px) {
+    body .main-content.staff-main {
+        margin-left: 280px !important; /* DO NOT shift to 0 because sidebar is still visible */
+        margin-top: 180px !important;
+        padding: 20px !important;
     }
-    .staff-main {
-        margin-left: 0;
+}
+
+@media (max-width: 768px) {
+    body .main-content.staff-main {
+        margin-left: 280px !important; /* Keep margin even on small screens */
+        margin-top: 180px !important;
+        padding: 15px !important;
+    }
+    .staff-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .staff-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .staff-search {
+        flex: 1;
     }
     .staff-search input {
-        width:140px;
+        width: 100%;
     }
-    table.staff-table th, table.staff-table td {
-        padding:10px;
+    .detail-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+    .staff-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .add-btn {
+        justify-content: center;
     }
 }
 
 /* Detail card styles */
 .detail-card {
-    background: #eef4ff;
-    padding: 28px;
-    border-radius: 14px;
-    border: 1px solid #d8e4fb;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    max-width: 880px;
-    margin: 8px auto 40px;
+    background: #f8fafc;
+    padding: 32px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    max-width: 800px;
+    margin: 0 auto 40px;
 }
-.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 28px; margin-top: 8px; }
-.form-field label { display:block; font-weight:700; margin-bottom:8px; color:#1f2937; }
+
+@media (max-width: 640px) {
+    .detail-card {
+        padding: 20px;
+    }
+}
+
+.detail-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 20px 24px; 
+    margin-top: 16px; 
+}
+
+.form-field label { 
+    display: block; 
+    font-weight: 600; 
+    margin-bottom: 8px; 
+    color: #475569; 
+    font-size: 14px;
+}
 .field-box {
     background:#ffffff;
     border: 1px solid #d4deef;
