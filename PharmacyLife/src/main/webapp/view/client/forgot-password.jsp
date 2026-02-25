@@ -27,7 +27,7 @@
                                 <h2>Quên mật khẩu</h2>
                                 <p class="subtitle">Nhập email để nhận mã OTP</p>
 
-                                <form action="#" method="post">
+                                <form action="${pageContext.request.contextPath}/forgot-password" method="post">
                                     <div class="form-group-forgot">
                                         <label>
                                             <i class="fas fa-envelope"></i>

@@ -62,6 +62,7 @@
     border-radius: 25px;
     font-size: 15px;
     font-weight: 600;
+    color: #fff;
     cursor: pointer;
     transition: all 0.3s ease;
     min-width: 130px;
@@ -69,7 +70,7 @@
 
 .btn-logout {
     background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    color: white;
+    color: #fff !important;
 }
 
 .btn-logout:hover {
@@ -79,10 +80,11 @@
 
 .btn-cancel {
     background: linear-gradient(135deg, #4F81E1 0%, #3d6bc7 100%);
-    color: white;
+    color: #fff !important;
 }
 
 .btn-cancel:hover {
+    border:none;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(79, 129, 225, 0.3);
 }

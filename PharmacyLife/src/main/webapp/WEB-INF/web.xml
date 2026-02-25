@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- <web-app version="5.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" 
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"> -->
-<web-app version="5.0" xmlns="https://jakarta.ee/xml/ns/jakartaee"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd">
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"> -->
+<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
     <servlet>
         <servlet-name>HomeController</servlet-name>
         <servlet-class>controllers.HomeController</servlet-class>
@@ -52,7 +49,7 @@ https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"> -->
     </servlet>
     <servlet>
         <servlet-name>StaffController</servlet-name>
-        <servlet-class>controllers.StaffController</servlet-class>
+        <servlet-class>controllers.admin.StaffController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>LoginController</servlet-name>
@@ -81,6 +78,14 @@ https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"> -->
     <servlet>
         <servlet-name>ForgotPasswordController</servlet-name>
         <servlet-class>controllers.ForgotPasswordController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>VerifyOTPController</servlet-name>
+        <servlet-class>controllers.VerifyOTPController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ResetPasswordController</servlet-name>
+        <servlet-class>controllers.ResetPasswordController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViewReviewsController</servlet-name>
@@ -121,6 +126,14 @@ https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"> -->
     <servlet-mapping>
         <servlet-name>ForgotPasswordController</servlet-name>
         <url-pattern>/forgot-password</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VerifyOTPController</servlet-name>
+        <url-pattern>/verify-otp</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ResetPasswordController</servlet-name>
+        <url-pattern>/reset-password</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ViewReviewsController</servlet-name>
