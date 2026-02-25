@@ -6,18 +6,19 @@
 /* Sidebar Styles */
 .sidebar-wrapper {
     background-color: white;
-    padding: 20px;
+    padding: 15px 10px;
+    /* Reduced vertical padding */
     width: 280px;
-    /* Fixed width */
+    /* Restored to 280px */
     height: calc(100vh - var(--header-height));
     position: fixed;
-    /* Fixed position */
     top: var(--header-height);
     left: 0;
     z-index: 100;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    border-right: 1px solid #ebebeb;
 }
 
 .sidebar-menu {
@@ -25,18 +26,27 @@
 }
 
 .sidebar-item {
-    display: flex;
-    align-items: center;
-    padding: 15px 25px;
-    color: #6c757d;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    /* Strictly no wrapping */
+    padding: 12px 15px;
+    color: #555;
     text-decoration: none;
     font-weight: 500;
-    margin-bottom: 4px;
-    transition: all 0.2s ease-in-out;
+    margin-bottom: 5px;
+    transition: all 0.2s ease;
+    white-space: nowrap !important;
+    /* Force single line */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-radius: 8px;
 }
 
 .sidebar-item i {
-    width: 25px;
+    width: 20px;
+    flex-shrink: 0 !important;
+    /* Prevent icon from shrinking */
     margin-right: 12px;
     font-size: 1.1rem;
     text-align: center;
@@ -60,8 +70,21 @@
     margin: 15px 0;
 }
 
+.sidebar-heading {
+    padding: 12px 15px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #999;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    white-space: nowrap;
+}
+
 .sidebar-section-title {
-    padding: 12px 25px;
+    padding: 12px 15px;
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -70,6 +93,7 @@
     display: flex;
     align-items: center;
     margin-top: 5px;
+    white-space: nowrap;
 }
 
 .sidebar-section-title i {

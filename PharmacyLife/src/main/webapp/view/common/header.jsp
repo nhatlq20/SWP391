@@ -81,7 +81,8 @@
                                     <a class="user-item" href="${pageContext.request.contextPath}/profile">Thông tin cá
                                         nhân</a>
                                     <c:if test="${sessionScope.userType eq 'customer'}">
-                                        <a class="user-item" href="${pageContext.request.contextPath}/reviews">Đánh giá của
+                                        <a class="user-item" href="${pageContext.request.contextPath}/reviews">Đánh giá
+                                            của
                                             tôi</a>
                                     </c:if>
                                     <a class="user-item" href="${pageContext.request.contextPath}/order-list">Xem đơn
@@ -89,11 +90,14 @@
                                     <% String roleName=(String) session.getAttribute("roleName"); if
                                         ("Admin".equalsIgnoreCase(roleName)) { %>
                                         <div style="border-top:1px solid #eef2f7; margin:6px 6px 8px;"></div>
-                                        <a class="user-item" href="${pageContext.request.contextPath}/order">Quản lí đơn
+                                        <a class="user-item"
+                                            href="${pageContext.request.contextPath}/admin/orders-dashboard">Quản lí đơn
                                             hàng</a>
-                                        <a class="user-item" href="${pageContext.request.contextPath}/product">Quản lí
-                                            sản phẩm</a>
-                                        <a class="user-item" href="${pageContext.request.contextPath}/staff">Quản lí
+                                        <a class="user-item"
+                                            href="${pageContext.request.contextPath}/admin/medicines-dashboard">Quản lí
+                                            thuốc</a>
+                                        <a class="user-item"
+                                            href="${pageContext.request.contextPath}/admin/customers-dashboard">Quản lí
                                             khách hàng</a>
                                         <a class="user-item"
                                             href="${pageContext.request.contextPath}/admin/imports">Quản lí
@@ -104,8 +108,9 @@
                                             <div style="border-top:1px solid #eef2f7; margin:6px 6px 8px;"></div>
                                             <a class="user-item" href="${pageContext.request.contextPath}/order">Quản lí
                                                 đơn hàng</a>
-                                            <a class="user-item" href="${pageContext.request.contextPath}/product">Quản
-                                                lí sản phẩm</a>
+                                            <a class="user-item"
+                                                href="${pageContext.request.contextPath}/admin/medicines-dashboard">Quản
+                                                lí thuốc</a>
                                             <% } %>
                                                 <div style="border-top:1px solid #eef2f7; margin:6px 6px 8px;"></div>
                                                 <a class="user-item"
