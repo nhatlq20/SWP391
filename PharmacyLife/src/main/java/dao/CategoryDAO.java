@@ -4,7 +4,6 @@ import models.Category;
 import models.Medicine;
 import utils.DBContext;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +14,7 @@ public class CategoryDAO {
 
     public List<Category> getAllCategories() {
         List<Category> categories = new ArrayList<>();
-        String sql = "SELECT CategoryID, CategoryCode, CategoryName FROM Category ORDER BY CategoryName";
+        String sql = "SELECT CategoryID, CategoryCode, CategoryName FROM Category ORDER BY CategoryCode";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
@@ -36,7 +35,7 @@ public class CategoryDAO {
     }
 
     public Category getCategoryById(int categoryID) {
-        String sql = "SELECT CategoryID, CategoryCode, CategoryName, CreatedAt, UpdatedAt FROM Category WHERE CategoryID = ?";
+        String sql = "SELECT CategoryID, CategoryCode, CategoryName FROM Category WHERE CategoryID = ?";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -49,17 +48,6 @@ public class CategoryDAO {
                     category.setCategoryId(rs.getInt("CategoryID"));
                     category.setCategoryCode(rs.getString("CategoryCode"));
                     category.setCategoryName(rs.getString("CategoryName"));
-
-                    Timestamp createdAt = rs.getTimestamp("CreatedAt");
-                    if (createdAt != null) {
-                        category.setCreatedAt(createdAt.toLocalDateTime());
-                    }
-
-                    Timestamp updatedAt = rs.getTimestamp("UpdatedAt");
-                    if (updatedAt != null) {
-                        category.setUpdatedAt(updatedAt.toLocalDateTime());
-                    }
-
                     return category;
                 }
             }
@@ -71,16 +59,13 @@ public class CategoryDAO {
     }
 
     public boolean createCategory(Category category) {
-        String sql = "INSERT INTO Category (CategoryName, CreatedAt, UpdatedAt) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Category (CategoryCode, CategoryName) VALUES (?, ?)";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, category.getCategoryName());
-
-            LocalDateTime now = LocalDateTime.now();
-            ps.setTimestamp(2, Timestamp.valueOf(now));
-            ps.setTimestamp(3, Timestamp.valueOf(now));
+            ps.setString(1, category.getCategoryCode());
+            ps.setString(2, category.getCategoryName());
 
             int result = ps.executeUpdate();
             return result > 0;
@@ -92,13 +77,13 @@ public class CategoryDAO {
     }
 
     public boolean updateCategory(Category category) {
-        String sql = "UPDATE Category SET CategoryName = ?, UpdatedAt = ? WHERE CategoryID = ?";
+        String sql = "UPDATE Category SET CategoryCode = ?, CategoryName = ? WHERE CategoryID = ?";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, category.getCategoryName());
-            ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setString(1, category.getCategoryCode());
+            ps.setString(2, category.getCategoryName());
             ps.setInt(3, category.getCategoryId());
 
             int result = ps.executeUpdate();
@@ -149,7 +134,7 @@ public class CategoryDAO {
 
     public List<Category> searchCategoriesByName(String searchTerm) {
         List<Category> categories = new ArrayList<>();
-        String sql = "SELECT CategoryID, CategoryCode, CategoryName, CreatedAt, UpdatedAt FROM Category WHERE CategoryName LIKE ? ORDER BY CategoryName";
+        String sql = "SELECT CategoryID, CategoryCode, CategoryName FROM Category WHERE CategoryName LIKE ? ORDER BY CategoryName";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -162,17 +147,6 @@ public class CategoryDAO {
                     category.setCategoryId(rs.getInt("CategoryID"));
                     category.setCategoryCode(rs.getString("CategoryCode"));
                     category.setCategoryName(rs.getString("CategoryName"));
-
-                    Timestamp createdAt = rs.getTimestamp("CreatedAt");
-                    if (createdAt != null) {
-                        category.setCreatedAt(createdAt.toLocalDateTime());
-                    }
-
-                    Timestamp updatedAt = rs.getTimestamp("UpdatedAt");
-                    if (updatedAt != null) {
-                        category.setUpdatedAt(updatedAt.toLocalDateTime());
-                    }
-
                     categories.add(category);
                 }
             }
