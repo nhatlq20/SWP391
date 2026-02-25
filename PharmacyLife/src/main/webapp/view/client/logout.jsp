@@ -27,10 +27,10 @@
                 <p>Bạn có muốn đăng xuất hay không?</p>
                 
                 <div class="button-group">
-                    <button class="btn-cancel" onclick="window.history.back()">
+                    <button class="btn btn-cancel" onclick="window.history.back()">
                         Đóng
                     </button>
-                    <button class="btn-logout" onclick="window.location.href='${pageContext.request.contextPath}/logout'">
+                    <button class="btn btn-logout" onclick="window.location.href='${pageContext.request.contextPath}/logout'">
                         Đăng xuất
                     </button>
                 </div>

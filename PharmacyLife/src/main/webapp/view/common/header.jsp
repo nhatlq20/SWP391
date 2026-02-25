@@ -106,7 +106,7 @@
                                             <% } %>
                                                 <div style="border-top:1px solid #eef2f7; margin:6px 6px 8px;"></div>
                                                 <a class="user-item"
-                                                    href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
+                                                    href="${pageContext.request.contextPath}/logout-page">Đăng xuất</a>
                                 </div>
                             </div>
                             <% } else { %>

@@ -1,4 +1,4 @@
-package controllers;
+package controllers.admin;
 
 import dao.StaffDAO;
 import dao.RoleDAO;
@@ -15,7 +15,6 @@ public class StaffController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Security check - Only Admin can access staff management
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("loggedInUser") == null) {
             response.sendRedirect(request.getContextPath() + "/login");
@@ -24,8 +23,7 @@ public class StaffController extends HttpServlet {
 
         String roleName = (String) session.getAttribute("roleName");
         if (!"Admin".equalsIgnoreCase(roleName)) {
-            // User is not Admin, redirect to home or error page
-            response.sendRedirect(request.getContextPath() + "/cart");
+            response.sendRedirect(request.getContextPath() + "/home");
             return;
         }
 
@@ -43,7 +41,6 @@ public class StaffController extends HttpServlet {
                 if (staffList == null) {
                     staffList = new ArrayList<>();
                 }
-                // Exclude currently logged-in staff (if the session user is a Staff)
                 if (session != null) {
                     Object currentUser = session.getAttribute("loggedInUser");
                     if (currentUser instanceof Staff) {
@@ -54,7 +51,7 @@ public class StaffController extends HttpServlet {
 
                 System.out.println("DAO size = " + staffList.size());
                 request.setAttribute("staffList", staffList);
-                request.getRequestDispatcher("/view/autho/staff-list.jsp").forward(request, response);
+                request.getRequestDispatcher("/view/admin/staff-list.jsp").forward(request, response);
                 break;
 
             case "detail":
@@ -62,7 +59,7 @@ public class StaffController extends HttpServlet {
                     int did = Integer.parseInt(request.getParameter("id"));
                     Staff sd = dao.getStaffById(did);
                     request.setAttribute("staff", sd);
-                    request.getRequestDispatcher("/view/autho/staff-detail.jsp").forward(request, response);
+                    request.getRequestDispatcher("/view/admin/staff-detail.jsp").forward(request, response);
                 } catch (Exception e) {
                     e.printStackTrace();
                     response.sendRedirect(request.getContextPath() + "/manage-staff");
@@ -92,7 +89,7 @@ public class StaffController extends HttpServlet {
                     System.out.println("Error loading roles: " + e.getMessage());
                     e.printStackTrace();
                 }
-                request.getRequestDispatcher("/view/autho/staff-add.jsp").forward(request, response);
+                request.getRequestDispatcher("/view/admin/staff-add.jsp").forward(request, response);
                 break;
 
             case "insert":
@@ -106,7 +103,6 @@ public class StaffController extends HttpServlet {
                     System.out.println("Email: " + staffEmail);
                     System.out.println("Password provided: " + (staffPassword != null && !staffPassword.isEmpty()));
 
-                    // Validate input
                     if (staffName == null || staffName.trim().isEmpty()) {
                         System.out.println("ERROR: Staff name is required");
                         response.sendRedirect(request.getContextPath() + "/manage-staff");
@@ -124,7 +120,6 @@ public class StaffController extends HttpServlet {
                         return;
                     }
 
-                    // Get roleId for "nhân viên"
                     RoleDAO roleDao = new RoleDAO();
                     Integer roleId = roleDao.getRoleIdByName("Staff");
 
@@ -135,7 +130,6 @@ public class StaffController extends HttpServlet {
                     }
                     System.out.println("Role ID: " + roleId);
 
-                    // Create Staff object with only required fields
                     Staff newStaff = new Staff();
                     newStaff.setStaffCode("ST" + System.currentTimeMillis());
                     newStaff.setStaffName(staffName.trim());
@@ -145,7 +139,6 @@ public class StaffController extends HttpServlet {
 
                     System.out.println("Staff Code: " + newStaff.getStaffCode());
 
-                    // Insert into database
                     boolean success = dao.insertStaff(newStaff);
 
                     if (success) {

@@ -49,7 +49,7 @@
     </servlet>
     <servlet>
         <servlet-name>StaffController</servlet-name>
-        <servlet-class>controllers.StaffController</servlet-class>
+        <servlet-class>controllers.admin.StaffController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>LoginController</servlet-name>
