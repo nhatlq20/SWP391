@@ -10,7 +10,8 @@
 }
 
 .main-content {
-    margin-left: 250px;
+    margin-left: 290px;
+    /* 280px sidebar + 10px gap */
     padding: 25px 30px;
     margin-top: 115px;
 }
@@ -44,10 +45,21 @@
     margin-top: 6px;
 }
 
-.stat-total .stat-number  { color: #3b82f6; }
-.stat-instock .stat-number { color: #22c55e; }
-.stat-low .stat-number     { color: #f59e0b; }
-.stat-out .stat-number     { color: #ef4444; }
+.stat-total .stat-number {
+    color: #3b82f6;
+}
+
+.stat-instock .stat-number {
+    color: #22c55e;
+}
+
+.stat-low .stat-number {
+    color: #f59e0b;
+}
+
+.stat-out .stat-number {
+    color: #ef4444;
+}
 
 /* ---------- Card Containers ---------- */
 .medicine-card,
@@ -206,12 +218,32 @@
     cursor: pointer;
 }
 
-.btn-view   { background: #dbeafe; color: #2563eb; }
-.btn-view:hover  { background: #bfdbfe; }
-.btn-edit   { background: #fef3c7; color: #d97706; }
-.btn-edit:hover  { background: #fde68a; }
-.btn-delete { background: #fee2e2; color: #dc2626; }
-.btn-delete:hover { background: #fecaca; }
+.btn-view {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.btn-view:hover {
+    background: #bfdbfe;
+}
+
+.btn-edit {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.btn-edit:hover {
+    background: #fde68a;
+}
+
+.btn-delete {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-delete:hover {
+    background: #fecaca;
+}
 
 /* ---------- Table ---------- */
 .medicine-table thead th {
@@ -286,9 +318,59 @@
 }
 
 /* ---------- Status Badges ---------- */
-.badge-stock { background-color: #22c55e; color: #fff; }
-.badge-low   { background-color: #f59e0b; color: #1e293b; }
-.badge-out   { background-color: #ef4444; color: #fff; }
+.badge {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    border: none;
+}
+
+.badge-stock {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.badge-low {
+    background-color: #fef9c3;
+    color: #ca8a04;
+}
+
+.badge-out {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+/* Order specific badges */
+.badge-pending {
+    background-color: #fef9c3;
+    color: #ca8a04;
+}
+
+.badge-confirmed {
+    background-color: #e0f2fe;
+    color: #0284c7;
+}
+
+.badge-shipping {
+    background-color: #e0f2fe;
+    color: #3b82f6;
+}
+
+.badge-delivered {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.badge-cancelled {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.badge-secondary {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
 
 /* ---------- Delete Confirmation Modal ---------- */
 .modal-confirm .modal-content {
