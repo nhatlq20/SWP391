@@ -6,159 +6,128 @@
 
             <head>
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-                <title>Quản lý khách hàng - Quản trị nhà thuốc</title>
-                <!-- Bootstrap CSS -->
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-                <!-- Font Awesome -->
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-                <style>
-                    body {
-                        background-color: #f4f6f9;
-                    }
-
-                    /* Adjust sidebar top position to account for header */
-                    .sidebar-wrapper {
-                        top: 115px !important;
-                        /* Height of header */
-                        height: calc(100vh - 115px) !important;
-                        z-index: 100;
-                    }
-
-                    .main-content {
-                        margin-left: 310px;
-                        padding: 30px;
-                        margin-top: 115px;
-                        /* Push content down */
-                    }
-
-                    .card {
-                        border: none;
-                        box-shadow: 0 0 1px rgba(0, 0, 0, .125), 0 1px 3px rgba(0, 0, 0, .2);
-                        margin-bottom: 30px;
-                    }
-
-                    .table th {
-                        border-top: none;
-                    }
-
-                    .badge-status {
-                        font-size: 90%;
-                        padding: 5px 10px;
-                    }
-
-                    :root {
-                        --primary-theme: #4F81E1;
-                    }
-
-                    .text-theme {
-                        color: var(--primary-theme) !important;
-                    }
-
-                    .bg-theme {
-                        background-color: var(--primary-theme) !important;
-                    }
-
-                    .btn-outline-theme {
-                        color: var(--primary-theme);
-                        border-color: var(--primary-theme);
-                    }
-
-                    .btn-outline-theme:hover {
-                        background-color: var(--primary-theme);
-                        color: white;
-                    }
-                </style>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Quản lý khách hàng - PharmacyLife</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/medicine-dashboard.css">
             </head>
 
-            <body>
-                <!-- Header -->
+            <body class="bg-light">
                 <jsp:include page="/view/common/header.jsp" />
-
-                <!-- Sidebar -->
                 <jsp:include page="/view/common/sidebar.jsp" />
 
-                <!-- Main Content -->
                 <div class="main-content">
+                    <!-- Page Header: Title + Search -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2>Quản lý khách hàng</h2>
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Khách hàng</li>
-                            </ol>
-                        </nav>
+                        <h3 class="fw-bold mb-0"><i class="fas fa-users me-2 text-primary"></i>Quản lí khách hàng</h3>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="customerSearchInput" placeholder="Tìm tên khách hàng, email..."
+                                    oninput="filterTable()">
+                            </div>
+                            <button class="btn-action btn-view" title="Lọc" style="width:40px;height:40px;">
+                                <i class="fas fa-filter"></i>
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="card">
-                        <div class="card-header bg-white py-3">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <h5 class="mb-0">Tất cả khách hàng</h5>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="input-group input-group-sm">
-                                        <input type="text" class="form-control" placeholder="Tìm kiếm khách hàng...">
-                                        <button class="btn btn-outline-secondary" type="button"><i
-                                                class="fas fa-search"></i></button>
-                                    </div>
-                                </div>
-                            </div>
+                    <!-- Statistics -->
+                    <div class="stats-row">
+                        <div class="stat-card stat-total">
+                            <div class="stat-number">${customers.size()}</div>
+                            <div class="stat-label">Tổng khách hàng</div>
                         </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead class="bg-light">
-                                        <tr>
-                                            <th class="ps-4">Mã</th>
-                                            <th>Tên</th>
-                                            <th>Liên hệ</th>
-                                            <th>Địa chỉ</th>
-                                            <th>Trạng thái</th>
-                                            <th class="text-end pe-4">Thao tác</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:forEach items="${customers}" var="c">
-                                            <tr>
-                                                <td class="ps-4 fw-bold">
-                                                    ${c.customerCode}
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
+                        <div class="stat-card stat-instock">
+                            <c:set var="activeCount" value="0" />
+                            <c:forEach items="${customers}" var="c">
+                                <c:if test="${c.status}">
+                                    <c:set var="activeCount" value="${activeCount + 1}" />
+                                </c:if>
+                            </c:forEach>
+                            <div class="stat-number">${activeCount}</div>
+                            <div class="stat-label">Hoạt động</div>
+                        </div>
+                        <div class="stat-card stat-out">
+                            <c:set var="inactiveCount" value="0" />
+                            <c:forEach items="${customers}" var="c">
+                                <c:if test="${!c.status}">
+                                    <c:set var="inactiveCount" value="${inactiveCount + 1}" />
+                                </c:if>
+                            </c:forEach>
+                            <div class="stat-number">${inactiveCount}</div>
+                            <div class="stat-label">Ngừng hoạt động</div>
+                        </div>
+                    </div>
 
-                                                        <div>${c.fullName}</div>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div><i class="fas fa-envelope me-1 text-muted"></i> ${c.email}
-                                                    </div>
-                                                    <small class="text-muted"><i class="fas fa-phone me-1"></i>
-                                                        ${c.phone}</small>
-                                                </td>
-                                                <td>${c.address}</td>
-                                                <td>
-                                                    <span
-                                                        class="badge rounded-pill badge-status ${c.status ? 'bg-success' : 'bg-secondary'}">
-                                                        ${c.status ? 'Hoạt động' : 'Không hoạt động'}
-                                                    </span>
-                                                </td>
-                                                <td class="text-end pe-4">
-                                                    <a href="customer-detail-dashboard?id=${c.customerId}"
-                                                        class="text-theme" title="Xem chi tiết">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
-                                    </tbody>
-                                </table>
-                            </div>
+                    <!-- Customers Table Card -->
+                    <div class="medicine-card">
+                        <div class="table-responsive">
+                            <table class="table medicine-table align-middle" id="customerTable">
+                                <thead>
+                                    <tr>
+                                        <th class="ps-4">Mã KH</th>
+                                        <th>Họ và tên</th>
+                                        <th>Liên hệ</th>
+                                        <th>Địa chỉ</th>
+                                        <th>Trạng thái</th>
+                                        <th class="text-center" style="width:100px">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach items="${customers}" var="c">
+                                        <tr>
+                                            <td class="ps-4"><strong>${c.customerCode}</strong></td>
+                                            <td>
+                                                <div class="medicine-name-cell">
+                                                    <div class="name">${c.fullName}</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div><i class="fas fa-envelope me-1 text-muted" style="width:14px"></i>
+                                                    ${c.email}</div>
+                                                <div class="desc"><i class="fas fa-phone me-1 text-muted"
+                                                        style="width:14px"></i> ${c.phone}</div>
+                                            </td>
+                                            <td>
+                                                <div class="desc" style="-webkit-line-clamp: 2;">${c.address}</div>
+                                            </td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${c.status}">
+                                                        <span class="badge badge-stock">Hoạt động</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="badge badge-out">Khóa</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="customer-detail-dashboard?id=${c.customerId}"
+                                                    class="btn-action btn-view" title="Xem chi tiết">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
 
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                <script>
+                    function filterTable() {
+                        var input = document.getElementById('customerSearchInput').value.toLowerCase();
+                        var rows = document.querySelectorAll('#customerTable tbody tr');
+                        rows.forEach(function (row) {
+                            var text = row.textContent.toLowerCase();
+                            row.style.display = text.includes(input) ? '' : 'none';
+                        });
+                    }
+                </script>
             </body>
 
             </html>
