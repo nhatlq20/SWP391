@@ -346,18 +346,18 @@
 }
 
 .badge-stock {
-    background-color: #dcfce7;
-    color: #16a34a;
+    background-color: #22c55e;
+    color: #fff;
 }
 
 .badge-low {
-    background-color: #fef9c3;
-    color: #ca8a04;
+    background-color: #f59e0b;
+    color: #fff;
 }
 
 .badge-out {
-    background-color: #fee2e2;
-    color: #dc2626;
+    background-color: #ef4444;
+    color: #fff;
 }
 
 /* Order specific badges */
