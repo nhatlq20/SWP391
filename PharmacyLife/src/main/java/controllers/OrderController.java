@@ -1,5 +1,6 @@
 package controllers;
 
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import jakarta.servlet.ServletException;
@@ -29,9 +30,17 @@ public class OrderController extends HttpServlet {
 
     private void showOrderList(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Since we don't have user authentication fully integrated here yet,
-        // we'll fetch all orders or you could filter by session user if available.
-        List<Order> orders = orderDAO.getAllOrders();
+        HttpSession session = request.getSession();
+        Integer customerId = (Integer) session.getAttribute("customerId");
+
+        List<Order> orders;
+        if (customerId != null) {
+            orders = orderDAO.getOrdersByCustomerId(customerId);
+        } else {
+            // If not logged in, show empty list or redirect
+            orders = new java.util.ArrayList<>();
+        }
+
         request.setAttribute("orders", orders);
         request.getRequestDispatcher("view/client/order-list.jsp").forward(request, response);
     }

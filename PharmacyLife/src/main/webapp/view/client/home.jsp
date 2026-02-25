@@ -76,8 +76,8 @@
                                                                         <c:out value='${medicine.unit}' />
                                                                     </div>
                                                                 </div>
-                                                                <a class="btn btn-primary w-100"
-                                                                    href="${pageContext.request.contextPath}/medicine/detail?id=${medicine.medicineId}">Mua</a>
+                                                                <button type="button" class="btn btn-primary w-100"
+                                                                    onclick="event.stopPropagation(); addToCartAjax(this, ${medicine.medicineId})">Mua</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -97,6 +97,52 @@
                         <%@ include file="../common/footer.jsp" %>
 
                             <script src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
+                            <script>
+                                function addToCartAjax(btn, id) {
+                                    const card = btn.closest('.medicine-card');
+                                    const img = card.querySelector('img');
+
+                                    const formData = new URLSearchParams();
+                                    formData.append('action', 'add');
+                                    formData.append('id', id);
+                                    formData.append('quantity', 1);
+
+                                    fetch('${pageContext.request.contextPath}/cart', {
+                                        method: 'POST',
+                                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                                        body: formData
+                                    })
+                                        .then(response => {
+                                            if (response.headers.get('content-type')?.includes('application/json')) {
+                                                return response.json();
+                                            } else {
+                                                window.location.href = '${pageContext.request.contextPath}/login';
+                                                throw new Error('Redirected');
+                                            }
+                                        })
+                                        .then(data => {
+                                            if (data.success) {
+                                                // Start flying animation
+                                                if (typeof animateFlyToCart === 'function') {
+                                                    animateFlyToCart(img);
+                                                }
+                                                // Update count
+                                                if (typeof updateHeaderCartCount === 'function') {
+                                                    setTimeout(() => {
+                                                        updateHeaderCartCount(data.cartCount);
+                                                        // Refresh if it was empty to show actual items in dropdown
+                                                        if (document.querySelector('#miniCartItems .text-center')) {
+                                                            location.reload();
+                                                        }
+                                                    }, 800);
+                                                }
+                                            }
+                                        })
+                                        .catch(error => {
+                                            if (error.message !== 'Redirected') console.error(error);
+                                        });
+                                }
+                            </script>
                 </body>
 
                 </html>

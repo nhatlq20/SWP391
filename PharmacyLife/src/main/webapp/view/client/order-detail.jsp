@@ -75,15 +75,33 @@
                                             <fmt:formatDate value="${order.orderDate}" pattern="dd/MM/yyyy HH:mm" />
                                         </span>
                                     </div>
-                                    <span class="badge bg-secondary p-2 fs-6
-                            <c:choose>
-                                <c:when test='${order.status == " Pending"}'>bg-warning text-dark</c:when>
-                                        <c:when test='${order.status == "Completed"}'>bg-success</c:when>
-                                        <c:when test='${order.status == "Cancelled"}'>bg-danger</c:when>
-                                        <c:otherwise>bg-primary</c:otherwise>
+                                    <span class="badge p-2 fs-6
+                                        <c:choose>
+                                            <c:when test='${order.status == " Pending" || order.status=="Đang chờ"
+                                        }'>bg-warning text-dark</c:when>
+                                        <c:when test='${order.status == "Confirmed" || order.status == "Đã xác nhận"}'>
+                                            bg-info text-dark</c:when>
+                                        <c:when
+                                            test='${order.status == "Shipping" || order.status == "Đang giao hàng"}'>
+                                            bg-primary</c:when>
+                                        <c:when
+                                            test='${order.status == "Completed" || order.status == "Delivered" || order.status == "Đã giao hàng"}'>
+                                            bg-success</c:when>
+                                        <c:when test='${order.status == "Cancelled" || order.status == "Đã hủy"}'>
+                                            bg-danger</c:when>
+                                        <c:otherwise>bg-secondary</c:otherwise>
                                         </c:choose>
                                         ">
-                                        ${order.status}
+                                        <c:choose>
+                                            <c:when test="${order.status == 'Pending'}">Đang chờ</c:when>
+                                            <c:when test="${order.status == 'Confirmed'}">Đã xác nhận</c:when>
+                                            <c:when test="${order.status == 'Shipping'}">Đang giao hàng</c:when>
+                                            <c:when
+                                                test="${order.status == 'Completed' || order.status == 'Delivered'}">Đã
+                                                giao hàng</c:when>
+                                            <c:when test="${order.status == 'Cancelled'}">Đã hủy</c:when>
+                                            <c:otherwise>${order.status}</c:otherwise>
+                                        </c:choose>
                                     </span>
                                 </div>
 

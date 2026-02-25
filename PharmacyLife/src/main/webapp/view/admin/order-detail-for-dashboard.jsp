@@ -100,7 +100,7 @@
                 <!-- Sidebar -->
                 <jsp:include page="/view/common/sidebar.jsp" />
 
-                <div class="main-content container">
+                <div class="main-content">
                     <!-- Alert Message -->
                     <c:if test="${not empty sessionScope.message}">
                         <div class="alert alert-${sessionScope.messageType} alert-dismissible fade show" role="alert">

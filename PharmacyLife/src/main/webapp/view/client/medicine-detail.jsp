@@ -228,7 +228,14 @@
                                         <!-- Action Buttons -->
                                         <!-- kien -->
                                         <div class="action-buttons">
-                                            <button class="btn-buy btn btn-primary">Mua</button>
+                                            <form id="addToCartForm" action="${pageContext.request.contextPath}/cart"
+                                                method="POST" style="display: none;">
+                                                <input type="hidden" name="action" value="add">
+                                                <input type="hidden" name="id" value="${medicine.medicineId}">
+                                                <input type="hidden" name="quantity" id="formQuantity" value="1">
+                                            </form>
+                                            <button class="btn-buy btn btn-primary"
+                                                onclick="submitAddToCart()">Mua</button>
                                             <c:choose>
                                                 <c:when test="${sessionScope.userType eq 'customer'}">
                                                     <a class="btn-rate btn btn-outline-warning"
@@ -250,6 +257,46 @@
                                 <script
                                     src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
                                 <script src="${pageContext.request.contextPath}/assets/js/detail.js"></script>
+                                <script>
+                                    function submitAddToCart() {
+                                        const qty = document.getElementById('quantity').value;
+                                        const mainImg = document.querySelector('.main-img');
+
+                                        const formData = new URLSearchParams();
+                                        formData.append('action', 'add');
+                                        formData.append('id', '${medicine.medicineId}');
+                                        formData.append('quantity', qty);
+
+                                        fetch('${pageContext.request.contextPath}/cart', {
+                                            method: 'POST',
+                                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                                            body: formData
+                                        })
+                                            .then(response => {
+                                                if (response.headers.get('content-type')?.includes('application/json')) {
+                                                    return response.json();
+                                                } else {
+                                                    window.location.href = '${pageContext.request.contextPath}/login';
+                                                    throw new Error('Redirected');
+                                                }
+                                            })
+                                            .then(data => {
+                                                if (data.success) {
+                                                    // Start fly animation
+                                                    if (typeof animateFlyToCart === 'function') {
+                                                        animateFlyToCart(mainImg);
+                                                    }
+                                                    // Update header count
+                                                    if (typeof updateHeaderCartCount === 'function') {
+                                                        setTimeout(() => updateHeaderCartCount(data.cartCount), 800);
+                                                    }
+                                                }
+                                            })
+                                            .catch(error => {
+                                                if (error.message !== 'Redirected') console.error(error);
+                                            });
+                                    }
+                                </script>
                 </body>
 
                 </html>

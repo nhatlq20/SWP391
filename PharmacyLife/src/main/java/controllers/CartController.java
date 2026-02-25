@@ -2,6 +2,7 @@ package controllers;
 
 import dao.MedicineDAO;
 import java.io.IOException;
+import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,31 +12,26 @@ import models.Cart;
 
 import models.Medicine;
 
-
 public class CartController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
+
+        // Check if user is logged in
+        if (session.getAttribute("userId") == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
         Cart cart = (Cart) session.getAttribute("cart");
         if (cart == null) {
             cart = new Cart();
             session.setAttribute("cart", cart);
         }
 
-        // --- HARDCODED DATA FOR TESTING ---
-        if (cart.getItems().isEmpty()) {
-            Medicine m1 = new Medicine(1, "MED001", "Paracetamol 500mg", 5000, "/assets/img/thuoc-giam-dau/gd3.png",
-                    "Thuoc giam dau ha so");
-            Medicine m2 = new Medicine(2, "MED002", "Vitamin C 1000mg", 1000, "assets/img/thuoc-bo-vitamin/vitc.png",
-                    "Tang cuong suc de kháng");
-
-            cart.addItem(new Cart.Item(m1, 2, m1.getSellingPrice()));
-            cart.addItem(new Cart.Item(m2, 1, m2.getSellingPrice()));
-
-        }
-        // ----------------------------------
+        // Remove hardcoded data
 
         // Calculate total amount
         double totalMoney = cart.getTotalMoney();
@@ -50,6 +46,13 @@ public class CartController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
+
+        // Check if user is logged in
+        if (session.getAttribute("userId") == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
         Cart cart = (Cart) session.getAttribute("cart");
         if (cart == null) {
             cart = new Cart();
@@ -90,7 +93,23 @@ public class CartController extends HttpServlet {
         }
 
         session.setAttribute("cart", cart);
-        response.sendRedirect("cart"); // Redirect to avoid resubmission on refresh
+
+        String requestedWith = request.getHeader("X-Requested-With");
+        if ("XMLHttpRequest".equals(requestedWith)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter out = response.getWriter();
+            int count = 0;
+            if (cart != null && cart.getItems() != null) {
+                for (models.Cart.Item item : cart.getItems()) {
+                    count += item.getQuantity();
+                }
+            }
+            out.print("{\"success\": true, \"cartCount\": " + count + "}");
+            out.flush();
+        } else {
+            response.sendRedirect("cart");
+        }
     }
 
     @Override
