@@ -8,72 +8,20 @@
                 <head>
                     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
                     <title>Chỉnh sửa phiếu nhập</title>
-                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-                        rel="stylesheet">
-                    <link rel="stylesheet"
-                        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-                    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
-                    <style>
-                        /* Shared overrides for the Edit Card to match design */
-                        .edit-card {
-                            background-color: white;
-                            border-radius: 12px;
-                            padding: 40px;
-                            max-width: 900px;
-                            margin: 0 auto;
-                            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-                        }
-
-
-                        body {
-                            background-color: #f4f6f9;
-                        }
-
-                        .sidebar-wrapper {
-                            top: 115px !important;
-                            height: calc(100vh - 115px) !important;
-                            z-index: 100;
-                        }
-
-                        .main-content-dashboard {
-                            margin-left: 250px;
-                            padding: 30px;
-                            margin-top: 115px;
-                            max-width: 100%;
-                            width: calc(100% - 250px);
-                        }
-
-                        .page-title-dashboard {
-                            font-size: 28px;
-                            font-weight: 700;
-                            color: #2c3e50;
-                            margin-bottom: 30px;
-                            display: flex;
-                            align-items: center;
-                            gap: 15px;
-                        }
-
-                        .card-custom {
-                            background: white;
-                            border-radius: 12px;
-                            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-                            border: 1px solid #eef2f7;
-                            padding: 25px;
-                        }
-                    </style>
+                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/medicine-dashboard.css">
                 </head>
 
                 <body>
                     <jsp:include page="/view/common/header.jsp" />
                     <jsp:include page="/view/common/sidebar.jsp" />
 
-                    <div class="main-content-dashboard">
-                        <div class="page-title-dashboard">
-                            <i class="fas fa-edit" style="color: #4F81E1;"></i>
-                            <span>Chỉnh sửa phiếu nhập thuốc</span>
+                    <div class="main-content">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="fw-bold mb-0"><i class="fas fa-file-import me-2 text-primary"></i>Chỉnh sửa phiếu nhập</h3>
                         </div>
-
-                        <div class="card-custom">
+                        <div class="medicine-card">
                             <c:if test="${not empty error}">
                                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                     <i class="fas fa-exclamation-circle me-2"></i>${error}
@@ -389,7 +337,7 @@
                             if (event.target === modal) closeAddMedicineModal();
                         }
                     </script>
-                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
                 </body>
 
                 </html>

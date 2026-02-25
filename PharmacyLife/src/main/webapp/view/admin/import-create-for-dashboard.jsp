@@ -8,80 +8,32 @@
                 <head>
                     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
                     <title>Tạo phiếu nhập - Admin</title>
-                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-                        rel="stylesheet">
-                    <link rel="stylesheet"
-                        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-                    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
-
-                    <style>
-                        body {
-                            background-color: #f4f6f9;
-                        }
-
-                        .sidebar-wrapper {
-                            top: 115px !important;
-                            height: calc(100vh - 115px) !important;
-                            z-index: 100;
-                        }
-
-                        .main-content-dashboard {
-                            margin-left: 250px;
-                            padding: 30px;
-                            margin-top: 115px;
-                            max-width: 100%;
-                            width: calc(100% - 250px);
-                        }
-
-                        .page-title-dashboard {
-                            font-size: 28px;
-                            font-weight: 700;
-                            color: #2c3e50;
-                            margin-bottom: 30px;
-                            display: flex;
-                            align-items: center;
-                            gap: 15px;
-                        }
-
-                        .card-custom {
-                            background: white;
-                            border-radius: 12px;
-                            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-                            border: 1px solid #eef2f7;
-                            padding: 25px;
-                        }
-
-                        /* Existing import styles will be used from import.css */
-                    </style>
+                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/medicine-dashboard.css">
                 </head>
 
                 <body>
                     <jsp:include page="/view/common/header.jsp" />
                     <jsp:include page="/view/common/sidebar.jsp" />
 
-                    <div class="main-content-dashboard">
-                        <div class="page-title-dashboard">
-                            <i class="fas fa-plus-circle" style="color: #4F81E1;"></i>
-                            <span>Tạo phiếu nhập thuốc</span>
+                    <div class="main-content">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="fw-bold mb-0"><i class="fas fa-file-import me-2 text-primary"></i>Tạo phiếu nhập</h3>
                         </div>
-
-                        <div class="card-custom">
+                        <div class="medicine-card">
                             <c:if test="${not empty error}">
                                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                     <i class="fas fa-exclamation-circle me-2"></i>${error}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                        aria-label="Close"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             </c:if>
-
-                            <form method="POST" action="${pageContext.request.contextPath}/admin/imports"
-                                id="importForm">
+                            <form method="POST" action="${pageContext.request.contextPath}/admin/imports" id="importForm">
                                 <input type="hidden" name="action" value="create">
                                 <input type="hidden" name="importCode" value="${newCode != null ? newCode : 'IP001'}">
-
                                 <div class="import-card-layout">
                                     <div class="import-flex-content">
-                                        <!-- LEFT PANEL -->
+                                        <!-- LEFT PANEL (giữ nguyên logic, chỉ đổi class/layout ngoài) -->
                                         <div class="left-panel">
                                             <div class="custom-input-group">
                                                 <label class="custom-input-label">Nhà cung cấp</label>
@@ -92,11 +44,9 @@
                                                     </c:forEach>
                                                 </select>
                                             </div>
-
                                             <div class="custom-input-group">
                                                 <label class="custom-input-label">Ngày nhập</label>
-                                                <input type="date" name="importDate" required class="custom-input"
-                                                    value="<fmt:formatDate value='<%=new java.util.Date()%>' pattern='yyyy-MM-dd'/>">
+                                                <input type="date" name="importDate" required class="custom-input" value="<fmt:formatDate value='<%=new java.util.Date()%>' pattern='yyyy-MM-dd'/>">
                                             </div>
 
                                             <div class="custom-input-group">
@@ -310,7 +260,7 @@
                             if (event.target === modal) closeAddMedicineModal();
                         }
                     </script>
-                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
                 </body>
 
                 </html>
