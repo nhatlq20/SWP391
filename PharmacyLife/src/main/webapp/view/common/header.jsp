@@ -70,141 +70,162 @@
 
                     <!-- Navigation Section -->
                     <div class="nav-section">
-                        <% if (session.getAttribute("loggedInUser") !=null) { %>
-                            <div class="user-menu">
-                                <a class="user-trigger" href="${pageContext.request.contextPath}/profile">
-                                    <span class="avatar"><i class="fas fa-user"></i></span>
-                                    <span class="name">${sessionScope.userName}</span>
-                                    <i class="fas fa-chevron-down caret ms-1" style="font-size: 0.8rem;"></i>
-                                </a>
-                                <div class="user-dropdown">
-                                    <a class="user-item" href="${pageContext.request.contextPath}/profile">Thông tin cá
-                                        nhân</a>
-                                    <c:if test="${sessionScope.userType eq 'customer'}">
-                                        <a class="user-item" href="${pageContext.request.contextPath}/reviews">Đánh giá
-                                            của
-                                            tôi</a>
-                                    </c:if>
-                                    <a class="user-item" href="${pageContext.request.contextPath}/order-list">Xem đơn
-                                        hàng</a>
-                                    <% String roleName=(String) session.getAttribute("roleName"); if
-                                        ("Admin".equalsIgnoreCase(roleName)) { %>
-                                        <div style="border-top:1px solid #eef2f7; margin:6px 6px 8px;"></div>
-                                        <a class="user-item"
-                                            href="${pageContext.request.contextPath}/admin/orders-dashboard">Quản lí đơn
-                                            hàng</a>
-                                        <a class="user-item"
-                                            href="${pageContext.request.contextPath}/admin/medicines-dashboard">Quản lí
-                                            thuốc</a>
-                                        <a class="user-item"
-                                            href="${pageContext.request.contextPath}/admin/customers-dashboard">Quản lí
-                                            khách hàng</a>
-                                        <a class="user-item"
-                                            href="${pageContext.request.contextPath}/admin/imports">Quản lí
-                                            nhập thuốc</a>
-                                        <a class="user-item" href="${pageContext.request.contextPath}/manage-staff">Quản
-                                            lí nhân viên</a>
-                                        <% } else if ("Staff".equalsIgnoreCase(roleName)) { %>
-                                            <div style="border-top:1px solid #eef2f7; margin:6px 6px 8px;"></div>
-                                            <a class="user-item" href="${pageContext.request.contextPath}/order">Quản lí
-                                                đơn hàng</a>
-                                            <a class="user-item"
-                                                href="${pageContext.request.contextPath}/admin/medicines-dashboard">Quản
-                                                lí thuốc</a>
-                                            <% } %>
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.loggedInUser}">
+                                <div class="user-menu">
+                                    <c:set var="userRole" value="${fn:toLowerCase(fn:trim(sessionScope.roleName))}" />
+                                    <a class="user-trigger" href="${pageContext.request.contextPath}/profile">
+                                        <span class="avatar"><i class="fas fa-user"></i></span>
+                                        <span class="name">${sessionScope.userName}</span>
+                                        <i class="fas fa-chevron-down caret ms-1" style="font-size: 0.8rem;"></i>
+                                    </a>
+                                    <div class="user-dropdown">
+                                        <a class="user-item" href="${pageContext.request.contextPath}/profile">
+                                            Thông tin cá nhân
+                                        </a>
+
+                                        <c:choose>
+                                            <c:when test="${userRole eq 'customer'}">
+                                                <a class="user-item"
+                                                    href="${pageContext.request.contextPath}/order-list">
+                                                    Đơn hàng của tôi
+                                                </a>
+                                                <a class="user-item" href="${pageContext.request.contextPath}/cart">
+                                                    Giỏ hàng của tôi
+                                                </a>
+                                                <a class="user-item" href="${pageContext.request.contextPath}/reviews">
+                                                    Đánh giá của tôi
+                                                </a>
+                                            </c:when>
+
+                                            <c:when test="${userRole eq 'admin' || userRole eq 'staff'}">
                                                 <div style="border-top:1px solid #eef2f7; margin:6px 6px 8px;"></div>
                                                 <a class="user-item"
-                                                    href="${pageContext.request.contextPath}/logout-page">Đăng xuất</a>
+                                                    href="${pageContext.request.contextPath}/admin/medicines-dashboard">
+                                                    Quản lý thuốc
+                                                </a>
+                                                <a class="user-item"
+                                                    href="${pageContext.request.contextPath}/category?action=list">
+                                                    Quản lý danh mục
+                                                </a>
+                                                <a class="user-item"
+                                                    href="${pageContext.request.contextPath}/admin/orders-dashboard">
+                                                    Quản lý đơn hàng
+                                                </a>
+                                                <a class="user-item"
+                                                    href="${pageContext.request.contextPath}/admin/customers-dashboard">
+                                                    Quản lý khách hàng
+                                                </a>
+
+                                                <c:if test="${userRole eq 'admin'}">
+                                                    <a class="user-item"
+                                                        href="${pageContext.request.contextPath}/admin/imports">
+                                                        Quản lý nhập thuốc
+                                                    </a>
+                                                    <a class="user-item"
+                                                        href="${pageContext.request.contextPath}/admin/revenue">
+                                                        Quản lý doanh thu
+                                                    </a>
+                                                    <a class="user-item"
+                                                        href="${pageContext.request.contextPath}/manage-staff">
+                                                        Quản lý nhân viên
+                                                    </a>
+                                                </c:if>
+                                            </c:when>
+                                        </c:choose>
+
+                                        <div style="border-top:1px solid #eef2f7; margin:6px 6px 8px;"></div>
+                                        <a class="user-item" href="${pageContext.request.contextPath}/logout-page">
+                                            Đăng xuất
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
-                            <% } else { %>
+                            </c:when>
+                            <c:otherwise>
                                 <a href="${pageContext.request.contextPath}/login" class="login-btn">
                                     <i class="fas fa-user-circle"></i>
                                     <span>Tài khoản</span>
                                 </a>
-                                <% } %>
+                            </c:otherwise>
+                        </c:choose>
 
-                                    <!-- Cart Dropdown -->
-                                    <div class="cart-wrapper">
-                                        <a href="${pageContext.request.contextPath}/cart" class="cart-btn"
-                                            style="text-decoration: none;">
-                                            <i class="fas fa-shopping-cart"></i><span class="cart-badge" id="cartCount">
-                                                <c:out value="${cartCount != null ? cartCount : 0}" />
-                                            </span>
-                                        </a>
-                                        <!-- Dropdown -->
-                                        <div class="cart-dropdown shadow-sm" id="cartDropdown">
-                                            <div class="cart-header fw-semibold px-3 py-2 border-bottom">Giỏ hàng</div>
-                                            <div class="cart-items" id="miniCartItems">
-                                                <c:choose>
-                                                    <c:when
-                                                        test="${empty sessionScope.cart.items or fn:length(sessionScope.cart.items) == 0}">
-                                                        <div class="text-center text-muted py-3 small">Giỏ hàng trống
+                        <!-- Cart Dropdown -->
+                        <div class="cart-wrapper">
+                            <a href="${pageContext.request.contextPath}/cart" class="cart-btn"
+                                style="text-decoration: none;">
+                                <i class="fas fa-shopping-cart"></i><span class="cart-badge" id="cartCount">
+                                    <c:out value="${cartCount != null ? cartCount : 0}" />
+                                </span>
+                            </a>
+                            <!-- Dropdown -->
+                            <div class="cart-dropdown shadow-sm" id="cartDropdown">
+                                <div class="cart-header fw-semibold px-3 py-2 border-bottom">Giỏ hàng</div>
+                                <div class="cart-items" id="miniCartItems">
+                                    <c:choose>
+                                        <c:when
+                                            test="${empty sessionScope.cart.items or fn:length(sessionScope.cart.items) == 0}">
+                                            <div class="text-center text-muted py-3 small">Giỏ hàng trống
+                                            </div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:forEach var="it" items="${sessionScope.cart.items}">
+                                                <div class="cart-item d-flex align-items-center p-2 border-bottom">
+                                                    <div class="cart-img-wrapper">
+                                                        <c:choose>
+                                                            <c:when test="${not empty it.medicine.imageUrl}">
+                                                                <c:set var="imageUrlTrimmed"
+                                                                    value="${fn:trim(it.medicine.imageUrl)}" />
+                                                                <c:choose>
+                                                                    <c:when
+                                                                        test="${fn:startsWith(imageUrlTrimmed, 'http://') or fn:startsWith(imageUrlTrimmed, 'https://')}">
+                                                                        <c:set var="imgSrc"
+                                                                            value="${imageUrlTrimmed}" />
+                                                                    </c:when>
+                                                                    <c:when
+                                                                        test="${fn:startsWith(imageUrlTrimmed, '/')}">
+                                                                        <c:set var="imgSrc"
+                                                                            value="${pageContext.request.contextPath}${imageUrlTrimmed}" />
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <c:set var="imgSrc"
+                                                                            value="${pageContext.request.contextPath}/assets/img/${imageUrlTrimmed}" />
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                                <img src="<c:out value='${imgSrc}'/>"
+                                                                    alt="${it.medicine.medicineName}" class="cart-img"
+                                                                    onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/img/no-image.png';">
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <img src="${pageContext.request.contextPath}/assets/img/no-image.png"
+                                                                    alt="No image" class="cart-img">
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-2" style="min-width: 0;">
+                                                        <div class="cart-name text-truncate"
+                                                            title="${it.medicine.medicineName}">
+                                                            ${it.medicine.medicineName}
                                                         </div>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <c:forEach var="it" items="${sessionScope.cart.items}">
-                                                            <div
-                                                                class="cart-item d-flex align-items-center p-2 border-bottom">
-                                                                <div class="cart-img-wrapper">
-                                                                    <c:choose>
-                                                                        <c:when
-                                                                            test="${not empty it.medicine.imageUrl}">
-                                                                            <c:set var="imageUrlTrimmed"
-                                                                                value="${fn:trim(it.medicine.imageUrl)}" />
-                                                                            <c:choose>
-                                                                                <c:when
-                                                                                    test="${fn:startsWith(imageUrlTrimmed, 'http://') or fn:startsWith(imageUrlTrimmed, 'https://')}">
-                                                                                    <c:set var="imgSrc"
-                                                                                        value="${imageUrlTrimmed}" />
-                                                                                </c:when>
-                                                                                <c:when
-                                                                                    test="${fn:startsWith(imageUrlTrimmed, '/')}">
-                                                                                    <c:set var="imgSrc"
-                                                                                        value="${pageContext.request.contextPath}${imageUrlTrimmed}" />
-                                                                                </c:when>
-                                                                                <c:otherwise>
-                                                                                    <c:set var="imgSrc"
-                                                                                        value="${pageContext.request.contextPath}/assets/img/${imageUrlTrimmed}" />
-                                                                                </c:otherwise>
-                                                                            </c:choose>
-                                                                            <img src="<c:out value='${imgSrc}'/>"
-                                                                                alt="${it.medicine.medicineName}"
-                                                                                class="cart-img"
-                                                                                onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/img/no-image.png';">
-                                                                        </c:when>
-                                                                        <c:otherwise>
-                                                                            <img src="${pageContext.request.contextPath}/assets/img/no-image.png"
-                                                                                alt="No image" class="cart-img">
-                                                                        </c:otherwise>
-                                                                    </c:choose>
-                                                                </div>
-                                                                <div class="flex-grow-1 ms-2" style="min-width: 0;">
-                                                                    <div class="cart-name text-truncate"
-                                                                        title="${it.medicine.medicineName}">
-                                                                        ${it.medicine.medicineName}
-                                                                    </div>
-                                                                    <div class="cart-price text-primary fw-semibold">
-                                                                        <fmt:formatNumber value="${it.price}"
-                                                                            type="number" groupingUsed="true" />₫
-                                                                        <small
-                                                                            class="text-muted">x${it.quantity}</small>
-                                                                    </div>
-                                                                </div>
-                                                                <a href="${pageContext.request.contextPath}/cart?action=remove&id=${it.medicine.medicineId}"
-                                                                    class="text-danger small ms-2">
-                                                                    <i class="fas fa-trash"></i>
-                                                                </a>
-                                                            </div>
-                                                        </c:forEach>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </div>
-                                            <div class="cart-footer text-center p-2">
-                                                <a href="cart" class="btn btn-primary btn-sm px-3">Xem giỏ hàng</a>
-                                            </div>
-                                        </div>
-                                    </div>
+                                                        <div class="cart-price text-primary fw-semibold">
+                                                            <fmt:formatNumber value="${it.price}" type="number"
+                                                                groupingUsed="true" />₫
+                                                            <small class="text-muted">x${it.quantity}</small>
+                                                        </div>
+                                                    </div>
+                                                    <a href="${pageContext.request.contextPath}/cart?action=remove&id=${it.medicine.medicineId}"
+                                                        class="text-danger small ms-2">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </c:forEach>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                                <div class="cart-footer text-center p-2">
+                                    <a href="cart" class="btn btn-primary btn-sm px-3">Xem giỏ hàng</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </header>
                 <script src="${pageContext.request.contextPath}/assets/js/header.js"></script>
