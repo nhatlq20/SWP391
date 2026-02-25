@@ -41,9 +41,10 @@ public class ReviewDAO {
     public List<ReviewCustomer> getReviewsWithCustomerByMedicine(int medicineId) {
         //lấy danh sách review của 1 loại thuốc
         List<ReviewCustomer> list = new ArrayList<>();
-        String sql = "SELECT c.FullName, r.Rating, r.Comment, r.ReviewCreatedAt " +
+        String sql = "SELECT r.ReviewId, c.FullName, r.Rating, r.Comment, r.ReviewCreatedAt, r.ReplyContent, r.ReplyBy, r.ReplyCreatedAt, s.StaffName AS ReplyStaffName " +
                      "FROM Reviews r " +
                      "JOIN Customer c ON c.CustomerId = r.CustomerId " +
+                 "LEFT JOIN Staff s ON s.StaffId = r.ReplyBy " +
                      "WHERE r.MedicineId = ? " +
                      "ORDER BY r.ReviewCreatedAt DESC";
         
@@ -54,10 +55,20 @@ public class ReviewDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     ReviewCustomer review = new ReviewCustomer();
+                    review.setReviewId(rs.getInt("ReviewId"));
                     review.setCustomerName(rs.getString("FullName"));
                     review.setRating(rs.getInt("Rating"));
                     review.setComment(rs.getString("Comment"));
                     review.setCreatedAt(rs.getTimestamp("ReviewCreatedAt"));
+                    review.setReplyContent(rs.getString("ReplyContent"));
+                    int replyBy = rs.getInt("ReplyBy");
+                    if (rs.wasNull()) {
+                        review.setReplyBy(null);
+                    } else {
+                        review.setReplyBy(replyBy);
+                    }
+                    review.setReplyCreatedAt(rs.getTimestamp("ReplyCreatedAt"));
+                    review.setReplyStaffName(rs.getString("ReplyStaffName"));
                     list.add(review);
                 }
             }
@@ -153,6 +164,65 @@ public class ReviewDAO {
         return false;
     }
 
+    public boolean deleteReviewByAdminOrStaff(int reviewId) {
+        String sql = "DELETE FROM Reviews WHERE ReviewId = ?";
+
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, reviewId);
+            int row = ps.executeUpdate();
+            return row > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public void DeleteReview(int reviewId) {
+        deleteReviewByAdminOrStaff(reviewId);
+    }
+
+    public boolean replyReview(int reviewId, String replyContent, int staffId) {
+        String sql = "UPDATE Reviews SET ReplyContent = ?, ReplyBy = ?, ReplyCreatedAt = GETDATE() WHERE ReviewId = ?";
+
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, replyContent);
+            ps.setInt(2, staffId);
+            ps.setInt(3, reviewId);
+
+            int row = ps.executeUpdate();
+            return row > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+// kien
+    public List<Review> getAllReviews() {
+        List<Review> reviews = new ArrayList<>();
+        String sql = "SELECT * FROM Reviews ORDER BY ReviewCreatedAt DESC";
+
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                reviews.add(mapResultSetToReview(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return reviews;
+    }
+
+    public List<Review> getAllReview() {
+        return getAllReviews();
+    }
+
     private Review mapResultSetToReview(ResultSet rs) throws SQLException {
         Review review = new Review();
         review.setReviewId(rs.getInt("ReviewId"));
@@ -161,6 +231,9 @@ public class ReviewDAO {
         review.setRating(rs.getInt("Rating"));
         review.setComment(rs.getString("Comment"));
         review.setReviewCreatedAt(rs.getTimestamp("ReviewCreatedAt"));
+        review.setReplyContent(rs.getString("ReplyContent"));
+        review.setReplyBy(rs.getInt("ReplyBy"));
+        review.setReplyCreatedAt(rs.getDate("ReplyCreatedAt"));
         return review;
     }
 }

@@ -130,6 +130,19 @@
                                                                     <span class="review-date">${review.createdAt}</span>
                                                                 </div>
                                                                 <p class="review-comment">${review.comment}</p>
+                                                                <div class="mt-2">
+                                                                    <c:if test="${sessionScope.userType eq 'staff'}">
+                                                                        <a class="btn btn-sm btn-primary"
+                                                                           href="${pageContext.request.contextPath}/view-reviews?medicineId=${medicine.medicineId}&selectedReviewId=${review.reviewId}">
+                                                                            Reply
+                                                                        </a>
+                                                                    </c:if>
+                                                                    <c:if test="${not empty review.replyContent}">
+                                                                        <div class="mt-2 text-muted small">
+                                                                            Đã phản hồi bởi <strong><c:out value="${not empty review.replyStaffName ? review.replyStaffName : 'Nhân viên nhà thuốc'}" /></strong>: ${review.replyContent}
+                                                                        </div>
+                                                                    </c:if>
+                                                                </div>
                                                             </div>
                                                         </c:forEach>
                                                     </c:otherwise>
@@ -226,7 +239,7 @@
                                         </div>
 
                                         <!-- Action Buttons -->
-                                        <!-- kien -->
+                                 
                                         <div class="action-buttons">
                                             <form id="addToCartForm" action="${pageContext.request.contextPath}/cart"
                                                 method="POST" style="display: none;">
@@ -234,6 +247,7 @@
                                                 <input type="hidden" name="id" value="${medicine.medicineId}">
                                                 <input type="hidden" name="quantity" id="formQuantity" value="1">
                                             </form>
+
                                             <button class="btn-buy btn btn-primary"
                                                 onclick="submitAddToCart()">Mua</button>
                                             <c:choose>
