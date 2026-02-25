@@ -257,6 +257,8 @@
                                                         <i class="fas fa-star"></i> Đánh giá sản phẩm
                                                     </a>
                                                 </c:when>
+                                                <c:when test="${sessionScope.userType eq 'staff'}">
+                                                </c:when>
                                                 <c:otherwise>
                                                     <a class="btn-rate btn btn-outline-warning"
                                                         href="${pageContext.request.contextPath}/login">
