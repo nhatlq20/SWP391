@@ -185,16 +185,60 @@ public class ImportDAO {
         // Xóa chi tiết trước
         deleteImportDetailsByImportId(importId);
 
-        String sql = "DELETE FROM Import WHERE ImportId = ?";
+        String deleteSql = "DELETE FROM Import WHERE ImportId = ?";
         try (Connection conn = dbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(deleteSql)) {
 
             ps.setInt(1, importId);
-            return ps.executeUpdate() > 0;
+            if (ps.executeUpdate() > 0) {
+                // Sau khi xóa, rename lại các phiếu sau nó để giữ thứ tự liên tục
+                renumberImportsAfter(conn, importId);
+                return true;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
+    }
+
+    private void renumberImportsAfter(Connection conn, int deletedImportId) {
+        try {
+            // Lấy tất cả phiếu có ID > deletedImportId
+            String selectSql = "SELECT ImportId FROM Import WHERE ImportId > ? ORDER BY ImportId ASC";
+            try (PreparedStatement selectPs = conn.prepareStatement(selectSql)) {
+                selectPs.setInt(1, deletedImportId);
+                ResultSet rs = selectPs.executeQuery();
+                java.util.List<Integer> idsToRename = new java.util.ArrayList<>();
+                while (rs.next()) {
+                    idsToRename.add(rs.getInt("ImportId"));
+                }
+
+                // Update từng phiếu, giảm ID đi 1
+                for (Integer oldId : idsToRename) {
+                    int newId = oldId - 1;
+                    String newCode = formatImportCode(newId);
+
+                    // Update Import
+                    String updateImportSql = "UPDATE Import SET ImportId = ?, ImportCode = ? WHERE ImportId = ?";
+                    try (PreparedStatement updateImportPs = conn.prepareStatement(updateImportSql)) {
+                        updateImportPs.setInt(1, newId);
+                        updateImportPs.setString(2, newCode);
+                        updateImportPs.setInt(3, oldId);
+                        updateImportPs.executeUpdate();
+                    }
+
+                    // Update ImportDetail (FK)
+                    String updateDetailSql = "UPDATE ImportDetail SET ImportId = ? WHERE ImportId = ?";
+                    try (PreparedStatement updateDetailPs = conn.prepareStatement(updateDetailSql)) {
+                        updateDetailPs.setInt(1, newId);
+                        updateDetailPs.setInt(2, oldId);
+                        updateDetailPs.executeUpdate();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     // ======================== IMPORT DETAIL ========================
