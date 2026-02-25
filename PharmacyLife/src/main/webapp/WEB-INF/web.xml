@@ -97,7 +97,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>StaffController</servlet-name>
-        <url-pattern>/manage-staff</url-pattern>
+        <url-pattern>/admin/manage-staff</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>

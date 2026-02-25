@@ -46,6 +46,101 @@
                     .cart-pop {
                         animation: cartPop 0.3s ease-out;
                     }
+
+                    /* Logout Modal Styles */
+                    .logout-modal-overlay {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: rgba(0, 0, 0, 0.4);
+                        display: none;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 9999;
+                        backdrop-filter: blur(2px);
+                    }
+
+                    .logout-modal {
+                        background: #fff;
+                        width: 90%;
+                        max-width: 400px;
+                        border-radius: 24px;
+                        padding: 35px 30px;
+                        text-align: center;
+                        position: relative;
+                        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+                    }
+
+                    .logout-modal-icon {
+                        width: 85px;
+                        height: 85px;
+                        margin: 0 auto 20px;
+                        display: block;
+                    }
+
+                    .logout-modal-title {
+                        font-size: 28px;
+                        font-weight: 700;
+                        color: #1a1a1a;
+                        margin-bottom: 12px;
+                        font-family: 'Inter', sans-serif;
+                    }
+
+                    .logout-modal-text {
+                        font-size: 16px;
+                        color: #4a4a4a;
+                        margin-bottom: 30px;
+                        font-family: 'Inter', sans-serif;
+                    }
+
+                    .logout-modal-actions {
+                        display: flex;
+                        gap: 15px;
+                        justify-content: center;
+                    }
+
+                    .btn-logout-confirm {
+                        background: #ff5a5f;
+                        color: white !important;
+                        border: none;
+                        padding: 10px 30px;
+                        border-radius: 30px;
+                        font-weight: 600;
+                        font-size: 16px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        min-width: 130px;
+                        box-shadow: 0 4px 12px rgba(255, 90, 95, 0.3);
+                        text-decoration: none;
+                    }
+
+                    .btn-logout-confirm:hover {
+                        background: #e04a4e;
+                        transform: translateY(-2px);
+                        box-shadow: 0 6px 15px rgba(255, 90, 95, 0.4);
+                    }
+
+                    .btn-logout-close {
+                        background: #4B9BFF;
+                        color: white !important;
+                        border: none;
+                        padding: 10px 30px;
+                        border-radius: 30px;
+                        font-weight: 600;
+                        font-size: 16px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        min-width: 130px;
+                        box-shadow: 0 4px 12px rgba(75, 155, 255, 0.3);
+                    }
+
+                    .btn-logout-close:hover {
+                        background: #3b82f6;
+                        transform: translateY(-2px);
+                        box-shadow: 0 6px 15px rgba(75, 155, 255, 0.4);
+                    }
                 </style>
 
 
@@ -127,7 +222,7 @@
                                                         Quản lý doanh thu
                                                     </a>
                                                     <a class="user-item"
-                                                        href="${pageContext.request.contextPath}/manage-staff">
+                                                        href="${pageContext.request.contextPath}/admin/manage-staff">
                                                         Quản lý nhân viên
                                                     </a>
                                                 </c:if>
@@ -135,7 +230,7 @@
                                         </c:choose>
 
                                         <div style="border-top:1px solid #eef2f7; margin:6px 6px 8px;"></div>
-                                        <a class="user-item" href="${pageContext.request.contextPath}/logout-page">
+                                        <a class="user-item" href="javascript:void(0);" onclick="openLogoutModal()">
                                             Đăng xuất
                                         </a>
                                     </div>
@@ -228,8 +323,40 @@
                         </div>
                     </div>
                 </header>
+
+                <!-- Logout Modal -->
+                <div id="logoutModal" class="logout-modal-overlay">
+                    <div class="logout-modal">
+                        <img src="${pageContext.request.contextPath}/assets/img/logout.png" alt="Logout Icon" class="logout-modal-icon">
+                        <h2 class="logout-modal-title">Đăng xuất</h2>
+                        <p class="logout-modal-text">Bạn có muốn đăng xuất hay không ?</p>
+                        <div class="logout-modal-actions">
+                            <a href="${pageContext.request.contextPath}/logout" class="btn-logout-confirm">Đăng xuất</a>
+                            <button class="btn-logout-close" onclick="closeLogoutModal()">Đóng</button>
+                        </div>
+                    </div>
+                </div>
+
                 <script src="${pageContext.request.contextPath}/assets/js/header.js"></script>
                 <script>
+                    function openLogoutModal() {
+                        document.getElementById('logoutModal').style.display = 'flex';
+                        document.body.style.overflow = 'hidden';
+                    }
+
+                    function closeLogoutModal() {
+                        document.getElementById('logoutModal').style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }
+
+                    // Smooth closing by clicking outside
+                    window.onclick = function(event) {
+                        const modal = document.getElementById('logoutModal');
+                        if (event.target == modal) {
+                            closeLogoutModal();
+                        }
+                    }
+
                     function animateFlyToCart(imgElement) {
                         if (!imgElement) return;
 

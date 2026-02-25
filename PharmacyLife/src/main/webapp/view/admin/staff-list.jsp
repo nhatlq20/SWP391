@@ -9,122 +9,134 @@
                     <html>
 
                     <head>
-                        <title>Manage Staff</title>
+                        <title>Quản lý nhân viên - PharmacyLife</title>
                         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
                         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/staff.css">
+                        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/medicine-dashboard.css">
+                        <link rel="stylesheet"
+                            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
                         <style>
-                            /* Balanced Override: Lowered slightly to prevent header overlap */
+                            /* Sync with Medicine Management Layout */
                             body .main-content.staff-main {
-                                margin-top: 110px !important; /* Balanced: was 85px (too high), 110px should clear header */
-                                margin-left: 280px !important; 
-                                padding-top: 20px !important; /* Moderate padding */
-                                position: relative !important;
-                                z-index: 1 !important;
+                                margin-top: 115px !important; 
+                                margin-left: 290px !important; 
+                                padding: 25px 30px !important;
+                                min-height: calc(100vh - 115px) !important;
                             }
                             
-                            /* Adjust sidebar margin for list only if needed */
-                            @media (min-width: 1025px) {
-                                body .main-content.staff-main {
-                                    margin-left: 280px !important;
-                                }
+                            .staff-page {
+                                width: 100% !important;
+                                max-width: none !important;
+                                margin: 0 !important;
+                                padding: 0 !important;
                             }
-                            
-                            /* Force title, search and add button on the SAME horizontal line */
+
                             .staff-header {
                                 display: flex !important;
                                 flex-direction: row !important;
                                 align-items: center !important;
                                 justify-content: space-between !important;
-                                flex-wrap: nowrap !important;
                                 gap: 20px !important;
-                                margin-bottom: 25px !important;
+                                margin-bottom: 24px !important;
                             }
 
-                            .staff-title {
-                                display: flex !important;
-                                align-items: center !important;
-                                gap: 15px !important;
-                                flex-shrink: 0 !important;
-                                font-size: 24px !important;
-                                font-weight: 700 !important;
-                                color: #1e293b !important;
-                            }
-
-                            .staff-title img {
-                                width: 32px !important;
-                                height: 32px !important;
-                                background: #1e293b;
-                                border-radius: 6px;
-                                padding: 4px;
-                            }
-
-                            .staff-actions {
-                                display: flex !important;
-                                align-items: center !important;
-                                gap: 15px !important;
-                                flex-grow: 1 !important;
-                                justify-content: flex-end !important;
-                            }
-
-                            @media (max-width: 1100px) {
-                                .staff-header {
-                                    flex-wrap: wrap !important;
-                                }
-                            }
-
-                            @media (max-width: 1024px) {
-                                .staff-main {
-                                    margin-left: 290px !important;
-                                    margin-top: 115px !important;
-                                }
+                            /* Table Header Sync with Medicine */
+                            table.staff-table th {
+                                background: linear-gradient(90deg, #eef3ff, #e8efff) !important;
+                                color: #1e3a8a !important;
+                                font-weight: 600 !important;
+                                font-size: 0.85rem !important;
+                                padding: 14px 24px !important;
+                                border-bottom: none !important;
+                                white-space: nowrap !important;
                             }
 
                             /* Action Icon Styling */
                             .action-icons {
                                 display: flex !important;
-                                flex-direction: row !important;
+                                gap: 8px !important;
                                 justify-content: center !important;
-                                gap: 12px !important;
-                                align-items: center !important;
                             }
                             
-                            .action-icons a {
+                            .btn-action {
+                                width: 34px !important;
+                                height: 34px !important;
+                                border-radius: 8px !important;
                                 display: inline-flex !important;
                                 align-items: center !important;
                                 justify-content: center !important;
-                                width: 32px !important;
-                                height: 32px !important;
-                                border-radius: 50% !important;
+                                text-decoration: none !important;
                                 transition: all 0.2s !important;
                             }
 
-                            .action-icons a.view {
-                                background-color: #e0f2fe !important;
-                            }
-                            
-                            .action-icons a.view img {
-                                width: 18px !important;
-                                height: 18px !important;
-                                filter: invert(58%) sepia(87%) saturate(1637%) hue-rotate(167deg) brightness(98%) contrast(97%);
+                            .btn-view {
+                                background: #dbeafe !important;
+                                color: #2563eb !important;
                             }
 
-                            .action-icons a.delete {
-                                background-color: #fee2e2 !important;
+                            .btn-view:hover {
+                                background: #bfdbfe !important;
+                                color: #2563eb !important;
                             }
 
-                            .action-icons a.delete img {
-                                width: 16px !important;
-                                height: 16px !important;
-                                filter: invert(27%) sepia(91%) saturate(5437%) hue-rotate(346deg) brightness(101%) contrast(106%);
+                            .btn-delete {
+                                background: #fee2e2 !important;
+                                color: #dc2626 !important;
                             }
 
-                            .action-icons a:hover {
-                                transform: scale(1.1) !important;
+                            .btn-delete:hover {
+                                background: #fecaca !important;
+                                color: #dc2626 !important;
+                            }
+
+                            .btn-add-staff {
+                                background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+                                color: #fff !important;
+                                border: none !important;
+                                border-radius: 10px !important;
+                                padding: 10px 22px !important;
+                                font-weight: 600 !important;
+                                font-size: 0.9rem !important;
+                                transition: all 0.2s !important;
+                                text-decoration: none !important;
+                                display: inline-flex !important;
+                                align-items: center !important;
+                                gap: 8px !important;
+                                box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2) !important;
+                            }
+
+                            .btn-add-staff:hover {
+                                background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+                                color: #fff !important;
+                                transform: translateY(-1px) !important;
+                                box-shadow: 0 6px 10px -1px rgba(37, 99, 235, 0.3) !important;
+                            }
+
+                            /* Search Box Sync */
+                            .search-box {
+                                position: relative !important;
+                                width: 280px !important;
+                            }
+
+                            .search-box input {
+                                border: 1px solid #e5e7eb !important;
+                                border-radius: 10px !important;
+                                padding: 8px 14px 8px 38px !important;
+                                font-size: 0.9rem !important;
+                                width: 100% !important;
+                            }
+
+                            .search-box i {
+                                position: absolute !important;
+                                left: 12px !important;
+                                top: 50% !important;
+                                transform: translateY(-50%) !important;
+                                color: #9ca3af !important;
                             }
                         </style>
                     </head>
 
-                    <body>
+                    <body class="bg-light">
 
                         <jsp:include page="/view/common/header.jsp" />
                         <jsp:include page="/view/common/sidebar.jsp" />
@@ -133,32 +145,32 @@
                         <div class="main-content staff-main">
                             <div class="staff-page">
                                 <div class="staff-header">
-                                    <div class="staff-title">
-                                        <img src="${pageContext.request.contextPath}/assets/img/Manage.png"
-                                            alt="manage" />
-                                        <div>Quản lí nhân viên</div>
-                                    </div>
-                                    <div class="staff-actions">
-                                        <div class="staff-search">
-                                            <input type="text" name="q" placeholder="Tìm tên, mã nhân viên" />
-                                            <img src="${pageContext.request.contextPath}/assets/img/filter.png"
-                                                alt="filter" style="width:20px;height:20px;" />
+                                    <h3 class="fw-bold mb-0">
+                                        <i class="fas fa-users me-2 text-primary"></i>Quản lí nhân viên
+                                    </h3>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="search-box">
+                                            <i class="fas fa-search"></i>
+                                            <input type="text" name="q" id="staffSearchInput"
+                                                placeholder="Tìm tên, mã nhân viên..."
+                                                oninput="filterStaffTable()" />
                                         </div>
-                                        <a href="${pageContext.request.contextPath}/manage-staff?action=add"
-                                            class="add-btn">
-                                            <span style="display:inline-flex; align-items:center;">
-                                                <img class="add-btn-icon"
-                                                    src="${pageContext.request.contextPath}/assets/img/plus.png"
-                                                    alt="plus" />
-                                                <span>Thêm nhân viên mới</span>
-                                            </span>
-                                        </a>
+                                        <button class="btn-action btn-view" title="Lọc" style="width:40px;height:40px;">
+                                            <i class="fas fa-filter"></i>
+                                        </button>
                                     </div>
+                                </div>
+
+                                <div class="d-flex justify-content-end mb-3">
+                                    <a href="${pageContext.request.contextPath}/admin/manage-staff?action=add"
+                                        class="btn-add-staff">
+                                        <i class="fas fa-plus"></i> Thêm nhân viên mới
+                                    </a>
                                 </div>
 
                                 <div class="staff-card">
                                     <div class="table-responsive">
-                                        <table class="staff-table">
+                                        <table class="staff-table" id="staffTable">
                                             <thead>
                                                 <tr>
                                                     <th style="width:200px;">Mã nhân viên</th>
@@ -171,22 +183,20 @@
                                                 <c:when test="${not empty staffList}">
                                                     <c:forEach var="s" items="${staffList}">
                                                         <tr>
-                                                            <td>${s.staffCode}</td>
+                                                            <td><strong>${s.staffCode}</strong></td>
                                                             <td>${s.staffName}</td>
                                                             <td style="text-align:center;">
-                                                                <span class="action-icons">
-                                                                    <a href="${pageContext.request.contextPath}/manage-staff?action=detail&id=${s.staffId}"
-                                                                        title="View" class="view">
-                                                                        <img src="${pageContext.request.contextPath}/assets/img/edit.svg"
-                                                                            alt="view" />
+                                                                <div class="action-icons">
+                                                                    <a href="${pageContext.request.contextPath}/admin/manage-staff?action=detail&id=${s.staffId}"
+                                                                        class="btn-action btn-view" title="Xem chi tiết">
+                                                                        <i class="fas fa-eye"></i>
                                                                     </a>
-                                                                    <a href="javascript:void(0)" title="Delete"
-                                                                        class="delete"
-                                                                        onclick="showDeleteModal('${pageContext.request.contextPath}/manage-staff?action=delete&id=${s.staffId}', '${s.staffName}');">
-                                                                        <img src="${pageContext.request.contextPath}/assets/img/delete.svg"
-                                                                            alt="delete" />
+                                                                    <a href="javascript:void(0)" 
+                                                                        class="btn-action btn-delete" title="Xóa"
+                                                                        onclick="showDeleteModal('${pageContext.request.contextPath}/admin/manage-staff?action=delete&id=${s.staffId}', '${s.staffName}');">
+                                                                        <i class="fas fa-trash"></i>
                                                                     </a>
-                                                                </span>
+                                                                </div>
                                                             </td>
                                                         </tr>
                                                     </c:forEach>
@@ -210,8 +220,9 @@
                             <div class="delete-modal">
                                 <button class="modal-close-btn" onclick="closeDeleteModal()">×</button>
                                 <div class="modal-content">
-                                    <img src="${pageContext.request.contextPath}/assets/img/x.png" alt="delete"
-                                        class="modal-icon" />
+                                    <div class="modal-icon-box" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #fee2e2; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                                        <i class="fas fa-times" style="font-size: 36px; color: #ef4444;"></i>
+                                    </div>
                                     <h2 class="modal-title">Bạn có chắc không?</h2>
                                     <p class="modal-text">Bạn thực sự muốn xóa nhân viên <strong
                                             id="staffNameToDelete"></strong> sao? Quá trình này không thể hoàn tác.</p>
@@ -224,6 +235,15 @@
                         </div>
 
                         <script>
+                            function filterStaffTable() {
+                                var input = document.getElementById('staffSearchInput').value.toLowerCase();
+                                var rows = document.querySelectorAll('#staffTable tbody tr');
+                                rows.forEach(function (row) {
+                                    var text = row.textContent.toLowerCase();
+                                    row.style.display = text.includes(input) ? '' : 'none';
+                                });
+                            }
+
                             var deleteUrl = '';
 
                             function showDeleteModal(url, staffName) {

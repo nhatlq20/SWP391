@@ -3,9 +3,9 @@
 /* Heavily forced override to clear the large fixed header and avoid sidebar overlap */
 body .main-content.staff-main {
     margin-left: 290px !important; /* Fixed margin slightly wider than sidebar (280px) */
-    margin-top: 180px !important; 
-    padding: 30px !important;
-    min-height: calc(100vh - 180px);
+    margin-top: 115px !important; 
+    padding: 25px 30px !important;
+    min-height: calc(100vh - 115px);
     box-sizing: border-box;
     display: block !important;
     background-color: #f8fafc;

@@ -85,7 +85,7 @@
                                 <i class="fas fa-chart-line"></i> <span>Quản lý doanh thu</span>
                             </a>
 
-                            <a href="${pageContext.request.contextPath}/manage-staff"
+                            <a href="${pageContext.request.contextPath}/admin/manage-staff"
                                 class="sidebar-item ${fn:contains(uri, 'manage-staff') ? 'active' : ''}">
                                 <i class="fas fa-user-shield"></i> <span>Quản lý nhân viên</span>
                             </a>
@@ -94,7 +94,7 @@
                 </div>
                 <div class="sidebar-footer">
                     <c:if test="${not empty sessionScope.loggedInUser}">
-                        <a href="${pageContext.request.contextPath}/logout-page" class="sidebar-item sidebar-logout">
+                        <a href="javascript:void(0);" onclick="openLogoutModal()" class="sidebar-item sidebar-logout">
                             <i class="fas fa-sign-out-alt"></i> Đăng xuất
                         </a>
                     </c:if>

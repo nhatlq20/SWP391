@@ -11,33 +11,38 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/profile.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/sidebar.css">
     <style>
-        /* Override to match the screenshot precisely */
+        /* Override to match the screenshot precisely and sync with medicine-dashboard */
         .profile-container {
-            margin-left: 280px !important;
-            margin-top: 110px !important; /* Adjusted to match previous requests */
-            padding: 40px 50px !important; /* More top padding for title gap */
-            background-color: #f1f5f9 !important; /* Slightly more greyish background */
-            min-height: calc(100vh - 110px) !important;
-            width: calc(100% - 280px) !important;
+            margin-left: 290px !important; /* Standardized 280px sidebar + 10px gap */
+            margin-top: 115px !important; /* Clear sticky header */
+            padding: 25px 30px !important;
+            background-color: transparent !important; /* Remove individual background to fix "color separation" */
+            min-height: calc(100vh - 115px) !important;
+            width: calc(100% - 290px) !important;
             display: flex !important;
-            flex-direction: column !important; /* Title on top of card */
-            align-items: flex-start !important; /* Align to the LEFT */
+            flex-direction: column !important;
+            align-items: flex-start !important;
+        }
+
+        /* Essential: Ensure body background is consistent throughout the right side */
+        body {
+            background-color: #f8fafc !important; 
         }
 
         .profile-card {
             background: white !important;
-            border-radius: 20px !important; /* More rounded */
-            padding: 35px 50px !important; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05) !important;
-            border: 2px solid #4B9AFF !important; 
-            max-width: 90% !important; /* Allow it to be wider but controlled */
+            border-radius: 16px !important; 
+            padding: 30px 40px !important; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
+            border: none !important; /* Remove blue border line and any other border */
+            max-width: none !important; 
             width: 100% !important;
             position: relative !important;
-            margin-bottom: 50px !important; /* Reduced bottom empty space */
+            margin-bottom: 30px !important;
         }
 
         .profile-title-top {
-            font-size: 28px !important;
+            font-size: 24px !important; 
             font-weight: 700 !important;
             color: #1e293b !important;
             margin-bottom: 25px !important;
@@ -47,31 +52,31 @@
         }
 
         .profile-title-top i {
-            color: #4B9AFF !important;
+            color: #3b82f6 !important; 
         }
 
         .profile-form {
             display: flex !important;
             flex-direction: column !important;
-            gap: 20px !important; 
+            gap: 24px !important; 
         }
 
         .form-row {
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
-            gap: 30px !important; /* Reduced gap between columns */
+            gap: 30px !important;
         }
 
         .form-field {
             display: flex !important;
             flex-direction: column !important;
-            gap: 6px !important; /* Reduced gap between label and input */
+            gap: 8px !important;
         }
 
         .form-field label {
-            font-size: 14px !important; /* Slightly smaller labels */
-            font-weight: 500 !important;
-            color: #1e293b !important;
+            font-size: 0.9rem !important; 
+            font-weight: 600 !important;
+            color: #475569 !important;
             margin-bottom: 0 !important;
             display: flex !important;
             align-items: center !important;
@@ -79,43 +84,50 @@
         }
 
         .form-field label img {
-            width: 16px !important; /* Smaller icons */
-            height: 16px !important;
+            width: 18px !important;
+            height: 18px !important;
         }
 
         .form-field input,
         .form-field select {
             width: 100% !important;
-            padding: 10px 16px !important; /* More compact input padding */
-            border: none !important;
+            padding: 12px 16px !important; 
+            border: 1px solid #e2e8f0 !important; 
             border-radius: 10px !important;
-            font-size: 13px !important;
-            color: #475569 !important;
-            background-color: #f3f6f9 !important; /* Light grey background from screenshot */
+            font-size: 0.95rem !important;
+            color: #1e293b !important;
+            background-color: #f8fafc !important; 
             transition: all 0.2s ease !important;
         }
 
         .form-field input:focus,
         .form-field select:focus {
             outline: none !important;
+            border-color: #3b82f6 !important;
             background-color: #ffffff !important;
-            box-shadow: 0 0 0 2px rgba(75, 154, 255, 0.2) !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+        }
+
+        .form-field input:disabled {
+            background-color: #f1f5f9 !important;
+            color: #94a3b8 !important;
+            cursor: not-allowed !important;
         }
 
         .button-group {
             display: flex !important;
             justify-content: flex-start !important;
-            gap: 15px !important;
-            margin-top: 10px !important; /* Reduced top margin */
-            padding-top: 0 !important;
-            border-top: none !important;
+            gap: 16px !important;
+            margin-top: 15px !important;
+            padding-top: 25px !important;
+            border-top: 1px solid #f1f5f9 !important;
         }
 
         .btn {
-            padding: 8px 30px !important; /* More compact buttons */
+            padding: 10px 24px !important;
             border: none !important;
-            border-radius: 30px !important; /* Pill shape */
-            font-size: 14px !important;
+            border-radius: 12px !important; 
+            font-size: 15px !important;
             font-weight: 600 !important;
             cursor: pointer !important;
             display: inline-flex !important;
@@ -124,34 +136,62 @@
             gap: 8px !important;
             transition: all 0.2s ease !important;
             color: white !important;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
         }
         
-        /* Blue/Lavender buttons from screenshot */
-        .btn-primary, .btn-warning, .btn-secondary {
-            background: #628ce6 !important; /* Matching the screenshot blue */
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
         }
 
-        .btn-primary:hover, .btn-warning:hover, .btn-secondary:hover {
-            opacity: 0.9 !important;
+        .btn-warning {
+            background: #f59e0b !important;
+        }
+
+        .btn-secondary {
+            background: #64748b !important;
+        }
+
+        .btn:hover {
             transform: translateY(-1px) !important;
-            box-shadow: 0 6px 10px -1px rgba(0, 0, 0, 0.15) !important;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1) !important;
+            opacity: 0.95 !important;
         }
 
         .btn img {
-            width: 16px !important;
-            height: 16px !important;
-            filter: brightness(0) invert(1) !important; /* Make icons white */
+            width: 18px !important;
+            height: 18px !important;
+            filter: brightness(0) invert(1) !important;
+        }
+
+        .alert {
+            padding: 14px 20px !important;
+            border-radius: 12px !important;
+            margin-bottom: 25px !important;
+            font-weight: 500 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            font-size: 15px !important;
+        }
+
+        .alert-success {
+            background-color: #f0fdf4 !important;
+            color: #16a34a !important;
+            border: 1px solid #bbf7d0 !important;
+        }
+
+        .alert-error {
+            background-color: #fef2f2 !important;
+            color: #dc2626 !important;
+            border: 1px solid #fecaca !important;
         }
 
         @media (max-width: 1024px) {
             .profile-container {
-                margin-left: 280px !important;
-                padding: 20px !important;
+                margin-left: 290px !important;
             }
             .form-row {
                 grid-template-columns: 1fr !important;
-                gap: 20px !important;
             }
         }
     </style>
