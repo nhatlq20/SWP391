@@ -26,7 +26,7 @@
                     <c:if test="${not empty sessionScope.loggedInUser}">
                         <a href="${pageContext.request.contextPath}/profile"
                             class="sidebar-item ${fn:contains(uri, 'profile') ? 'active' : ''}">
-                            <i class="fas fa-user-circle"></i> <span></span>Thông tin cá nhân</span>
+                            <i class="fas fa-user-circle"></i> <span>Thông tin cá nhân</span>
                         </a>
                     </c:if>
 
