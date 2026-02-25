@@ -199,11 +199,13 @@
                                                         <td>
                                                             <div class="d-flex gap-1">
                                                                 <a href="${pageContext.request.contextPath}/medicine/detail?id=${medicine.medicineId}"
-                                                                    class="btn-action btn-view" title="Xem chi tiết">
+                                                                    class="btn-action btn-view" title="Xem chi tiết"
+                                                                    style="text-decoration:none">
                                                                     <i class="fas fa-eye"></i>
                                                                 </a>
                                                                 <a href="${pageContext.request.contextPath}/admin/medicine-edit-dashboard?id=${medicine.medicineId}"
-                                                                    class="btn-action btn-edit" title="Sửa">
+                                                                    class="btn-action btn-edit" title="Sửa"
+                                                                    style="text-decoration:none">
                                                                     <i class="fas fa-pen"></i>
                                                                 </a>
                                                                 <button class="btn-action btn-delete" title="Xóa"

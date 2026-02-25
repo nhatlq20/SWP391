@@ -44,10 +44,21 @@
     margin-top: 6px;
 }
 
-.stat-total .stat-number  { color: #3b82f6; }
-.stat-instock .stat-number { color: #22c55e; }
-.stat-low .stat-number     { color: #f59e0b; }
-.stat-out .stat-number     { color: #ef4444; }
+.stat-total .stat-number {
+    color: #3b82f6;
+}
+
+.stat-instock .stat-number {
+    color: #22c55e;
+}
+
+.stat-low .stat-number {
+    color: #f59e0b;
+}
+
+.stat-out .stat-number {
+    color: #ef4444;
+}
 
 /* ---------- Card Containers ---------- */
 .medicine-card,
@@ -204,14 +215,44 @@
     font-size: 14px;
     transition: all 0.2s;
     cursor: pointer;
+    text-decoration: none !important;
 }
 
-.btn-view   { background: #dbeafe; color: #2563eb; }
-.btn-view:hover  { background: #bfdbfe; }
-.btn-edit   { background: #fef3c7; color: #d97706; }
-.btn-edit:hover  { background: #fde68a; }
-.btn-delete { background: #fee2e2; color: #dc2626; }
-.btn-delete:hover { background: #fecaca; }
+.btn-action:hover,
+.btn-action:focus,
+.btn-action:active {
+    text-decoration: none !important;
+}
+
+.btn-view {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.btn-view:hover {
+    background: #bfdbfe;
+    color: #2563eb;
+}
+
+.btn-edit {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.btn-edit:hover {
+    background: #fde68a;
+    color: #d97706;
+}
+
+.btn-delete {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-delete:hover {
+    background: #fecaca;
+    color: #dc2626;
+}
 
 /* ---------- Table ---------- */
 .medicine-table thead th {
@@ -286,9 +327,20 @@
 }
 
 /* ---------- Status Badges ---------- */
-.badge-stock { background-color: #22c55e; color: #fff; }
-.badge-low   { background-color: #f59e0b; color: #1e293b; }
-.badge-out   { background-color: #ef4444; color: #fff; }
+.badge-stock {
+    background-color: #22c55e;
+    color: #fff;
+}
+
+.badge-low {
+    background-color: #f59e0b;
+    color: #1e293b;
+}
+
+.badge-out {
+    background-color: #ef4444;
+    color: #fff;
+}
 
 /* ---------- Delete Confirmation Modal ---------- */
 .modal-confirm .modal-content {
