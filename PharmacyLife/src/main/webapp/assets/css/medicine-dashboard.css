@@ -10,7 +10,8 @@
 }
 
 .main-content {
-    margin-left: 250px;
+    margin-left: 290px;
+    /* 280px sidebar + 10px gap */
     padding: 25px 30px;
     margin-top: 115px;
 }
@@ -234,6 +235,15 @@
     color: #2563eb;
 }
 
+.btn-view {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.btn-view:hover {
+    background: #bfdbfe;
+}
+
 .btn-edit {
     background: #fef3c7;
     color: #d97706;
@@ -314,7 +324,7 @@
 
 .price {
     font-weight: 700;
-    color: #16a34a;
+    color: #22c55e;
 }
 
 .category-badge {
@@ -327,19 +337,60 @@
 }
 
 /* ---------- Status Badges ---------- */
+.badge {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    border: none;
+}
+
 .badge-stock {
-    background-color: #22c55e;
-    color: #fff;
+    background-color: #15803d;
+    color: #15803d;
+
 }
 
 .badge-low {
-    background-color: #f59e0b;
-    color: #1e293b;
+    background-color: #fef9c3;
+    color: #ca8a04;
 }
 
 .badge-out {
-    background-color: #ef4444;
-    color: #fff;
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+/* Order specific badges */
+.badge-pending {
+    background-color: #fef9c3;
+    color: #ca8a04;
+}
+
+.badge-confirmed {
+    background-color: #e0f2fe;
+    color: #0284c7;
+}
+
+.badge-shipping {
+    background-color: #e0f2fe;
+    color: #3b82f6;
+}
+
+.badge-delivered {
+    background-color: #15803d;
+    color: #15803d;
+
+}
+
+.badge-cancelled {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.badge-secondary {
+    background-color: #f3f4f6;
+    color: #4b5563;
 }
 
 /* ---------- Delete Confirmation Modal ---------- */
@@ -479,7 +530,7 @@
 }
 
 .price-value {
-    color: #16a34a;
+    color: #22c55e;
     font-weight: 700;
     font-size: 1.1rem;
 }

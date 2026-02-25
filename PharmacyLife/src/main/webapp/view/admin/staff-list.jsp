@@ -12,6 +12,116 @@
                         <title>Manage Staff</title>
                         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
                         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/staff.css">
+                        <style>
+                            /* Balanced Override: Lowered slightly to prevent header overlap */
+                            body .main-content.staff-main {
+                                margin-top: 110px !important; /* Balanced: was 85px (too high), 110px should clear header */
+                                margin-left: 280px !important; 
+                                padding-top: 20px !important; /* Moderate padding */
+                                position: relative !important;
+                                z-index: 1 !important;
+                            }
+                            
+                            /* Adjust sidebar margin for list only if needed */
+                            @media (min-width: 1025px) {
+                                body .main-content.staff-main {
+                                    margin-left: 280px !important;
+                                }
+                            }
+                            
+                            /* Force title, search and add button on the SAME horizontal line */
+                            .staff-header {
+                                display: flex !important;
+                                flex-direction: row !important;
+                                align-items: center !important;
+                                justify-content: space-between !important;
+                                flex-wrap: nowrap !important;
+                                gap: 20px !important;
+                                margin-bottom: 25px !important;
+                            }
+
+                            .staff-title {
+                                display: flex !important;
+                                align-items: center !important;
+                                gap: 15px !important;
+                                flex-shrink: 0 !important;
+                                font-size: 24px !important;
+                                font-weight: 700 !important;
+                                color: #1e293b !important;
+                            }
+
+                            .staff-title img {
+                                width: 32px !important;
+                                height: 32px !important;
+                                background: #1e293b;
+                                border-radius: 6px;
+                                padding: 4px;
+                            }
+
+                            .staff-actions {
+                                display: flex !important;
+                                align-items: center !important;
+                                gap: 15px !important;
+                                flex-grow: 1 !important;
+                                justify-content: flex-end !important;
+                            }
+
+                            @media (max-width: 1100px) {
+                                .staff-header {
+                                    flex-wrap: wrap !important;
+                                }
+                            }
+
+                            @media (max-width: 1024px) {
+                                .staff-main {
+                                    margin-left: 290px !important;
+                                    margin-top: 115px !important;
+                                }
+                            }
+
+                            /* Action Icon Styling */
+                            .action-icons {
+                                display: flex !important;
+                                flex-direction: row !important;
+                                justify-content: center !important;
+                                gap: 12px !important;
+                                align-items: center !important;
+                            }
+                            
+                            .action-icons a {
+                                display: inline-flex !important;
+                                align-items: center !important;
+                                justify-content: center !important;
+                                width: 32px !important;
+                                height: 32px !important;
+                                border-radius: 50% !important;
+                                transition: all 0.2s !important;
+                            }
+
+                            .action-icons a.view {
+                                background-color: #e0f2fe !important;
+                            }
+                            
+                            .action-icons a.view img {
+                                width: 18px !important;
+                                height: 18px !important;
+                                filter: invert(58%) sepia(87%) saturate(1637%) hue-rotate(167deg) brightness(98%) contrast(97%);
+                            }
+
+                            .action-icons a.delete {
+                                background-color: #fee2e2 !important;
+                            }
+
+                            .action-icons a.delete img {
+                                width: 16px !important;
+                                height: 16px !important;
+                                filter: invert(27%) sepia(91%) saturate(5437%) hue-rotate(346deg) brightness(101%) contrast(106%);
+                            }
+
+                            .action-icons a:hover {
+                                transform: scale(1.1) !important;
+                            }
+                        </style>
                     </head>
 
                     <body>
@@ -20,7 +130,7 @@
                         <jsp:include page="/view/common/sidebar.jsp" />
 
 
-                        <div class="main-content staff-main" style="padding:20px; margin-top:110px;">
+                        <div class="main-content staff-main">
                             <div class="staff-page">
                                 <div class="staff-header">
                                     <div class="staff-title">
@@ -36,7 +146,7 @@
                                         </div>
                                         <a href="${pageContext.request.contextPath}/manage-staff?action=add"
                                             class="add-btn">
-                                            <span style="display:inline-flex; align-items:center; gap:6px;">
+                                            <span style="display:inline-flex; align-items:center;">
                                                 <img class="add-btn-icon"
                                                     src="${pageContext.request.contextPath}/assets/img/plus.png"
                                                     alt="plus" />
@@ -47,15 +157,16 @@
                                 </div>
 
                                 <div class="staff-card">
-                                    <table class="staff-table">
-                                        <thead>
-                                            <tr>
-                                                <th style="width:200px;">Mã nhân viên</th>
-                                                <th>Tên nhân viên</th>
-                                                <th style="width:160px; text-align:center;">Thao tác</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
+                                    <div class="table-responsive">
+                                        <table class="staff-table">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width:200px;">Mã nhân viên</th>
+                                                    <th>Tên nhân viên</th>
+                                                    <th style="width:160px; text-align:center;">Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
                                             <c:choose>
                                                 <c:when test="${not empty staffList}">
                                                     <c:forEach var="s" items="${staffList}">
@@ -89,6 +200,7 @@
                                             </c:choose>
                                         </tbody>
                                     </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -110,111 +222,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <style>
-                            .delete-modal-overlay {
-                                position: fixed;
-                                top: 0;
-                                left: 0;
-                                right: 0;
-                                bottom: 0;
-                                background-color: rgba(0, 0, 0, 0.5);
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                z-index: 1000;
-                            }
-
-                            .delete-modal {
-                                background: white;
-                                border-radius: 12px;
-                                padding: 40px 30px;
-                                max-width: 380px;
-                                width: 90%;
-                                position: relative;
-                                text-align: center;
-                                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-                            }
-
-                            .modal-close-btn {
-                                position: absolute;
-                                top: 12px;
-                                right: 12px;
-                                background: none;
-                                border: none;
-                                font-size: 28px;
-                                color: #999;
-                                cursor: pointer;
-                                width: 32px;
-                                height: 32px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                            }
-
-                            .modal-close-btn:hover {
-                                color: #333;
-                            }
-
-                            .modal-icon {
-                                width: 80px;
-                                height: 80px;
-                                margin: 0 auto 20px;
-                                display: block;
-                            }
-
-                            .modal-title {
-                                font-size: 20px;
-                                font-weight: 700;
-                                margin: 0 0 12px;
-                                color: #333;
-                            }
-
-                            .modal-text {
-                                font-size: 14px;
-                                color: #666;
-                                margin: 0 0 30px;
-                                line-height: 1.6;
-                            }
-
-                            .modal-actions {
-                                display: flex;
-                                gap: 12px;
-                                justify-content: center;
-                            }
-
-                            .btn-cancel {
-                                background: #4B9BFF;
-                                color: white;
-                                border: none;
-                                padding: 10px 28px;
-                                border-radius: 18px;
-                                font-size: 14px;
-                                font-weight: 600;
-                                cursor: pointer;
-                                transition: background 0.3s;
-                            }
-
-                            .btn-cancel:hover {
-                                background: #357ABD;
-                            }
-
-                            .btn-confirm {
-                                background: #FF5252;
-                                color: white;
-                                border: none;
-                                padding: 10px 28px;
-                                border-radius: 18px;
-                                font-size: 14px;
-                                font-weight: 600;
-                                cursor: pointer;
-                                transition: background 0.3s;
-                            }
-
-                            .btn-confirm:hover {
-                                background: #E63946;
-                            }
-                        </style>
 
                         <script>
                             var deleteUrl = '';
