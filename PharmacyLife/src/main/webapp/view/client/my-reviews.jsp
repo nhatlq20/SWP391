@@ -20,16 +20,25 @@
 
         .page-wrap {
             margin-top: 130px;
+            margin-left: 300px;
             padding: 24px 16px;
+            width: calc(100% - 300px);
         }
 
         .content-box {
-            max-width: 980px;
+            max-width: 1040px;
             margin: 0 auto;
             background: #fff;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             padding: 24px;
+        }
+
+        @media (max-width: 992px) {
+            .page-wrap {
+                margin-left: 0;
+                width: 100%;
+            }
         }
 
         .review-item {
@@ -79,7 +88,7 @@
 <!-- kiên -->
 <body>
 <%@ include file="../common/header.jsp" %>
-
+ <jsp:include page="/view/common/sidebar.jsp" />
 <div class="page-wrap">
     <div class="content-box">
         <div class="d-flex justify-content-between align-items-center mb-3">

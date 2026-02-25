@@ -80,8 +80,10 @@
                                 <div class="user-dropdown">
                                     <a class="user-item" href="${pageContext.request.contextPath}/profile">Thông tin cá
                                         nhân</a>
-                                    <a class="user-item" href="${pageContext.request.contextPath}/reviews">Đánh giá của
-                                        tôi</a>
+                                    <c:if test="${sessionScope.userType eq 'customer'}">
+                                        <a class="user-item" href="${pageContext.request.contextPath}/reviews">Đánh giá của
+                                            tôi</a>
+                                    </c:if>
                                     <a class="user-item" href="${pageContext.request.contextPath}/order-list">Xem đơn
                                         hàng</a>
                                     <% String roleName=(String) session.getAttribute("roleName"); if

@@ -40,7 +40,7 @@
                             <i class="fas fa-pills"></i> Quản lý thuốc
                         </a>
 
-                        <a href="${pageContext.request.contextPath}/admin/category"
+                        <a href="${pageContext.request.contextPath}/category?action=list"
                             class="sidebar-item ${fn:contains(uri, 'category') ? 'active' : ''}">
                             <i class="fas fa-th-list"></i> Quản lý danh mục
                         </a>

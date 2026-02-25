@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+        <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
         <!DOCTYPE html>
         <html>
 
@@ -7,7 +8,7 @@
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
             <title>Quản lí danh mục</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">            
             <style>
                 body {
                     background: #f3f4f8;
@@ -115,7 +116,7 @@
                                     class="fas fa-search me-1"></i>Tìm</button>
                         </form>
                         <c:if
-                            test="${sessionScope.userType eq 'staff' and (sessionScope.roleId == 1 or sessionScope.roleId eq '1')}">
+                            test="${sessionScope.userType eq 'staff' and fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
                             <a href="${pageContext.request.contextPath}/category?action=show"
                                 class="btn btn-primary btn-radius">
                                 <i class="fas fa-plus me-1"></i>Thêm danh mục mới
@@ -149,7 +150,7 @@
                                                                 class="fas fa-pen"></i></a>
                                                         <!-- nếu là rolde là 1 thì xuất hiện nút xóa  -->
                                                         <c:if
-                                                            test="${sessionScope.userType eq 'staff' and (sessionScope.roleId == 1 or sessionScope.roleId eq '1')}">
+                                                            test="${sessionScope.userType eq 'staff' and fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
                                                             <a href="category?action=delete&id=${c.categoryId}"
                                                                 class="action-delete js-delete-btn" title="Xóa"><i
                                                                     class="fas fa-trash"></i><span>Xóa</span></a>

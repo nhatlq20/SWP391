@@ -246,7 +246,7 @@
                                                 <c:otherwise>
                                                     <a class="btn-rate btn btn-outline-warning"
                                                         href="${pageContext.request.contextPath}/login">
-                                                        <i class="fas fa-star"></i> Đăng nhập để đánh giá
+                                                        <i class="fas fa-star"></i> Đánh giá sản phẩm
                                                     </a>
                                                 </c:otherwise>
                                             </c:choose>

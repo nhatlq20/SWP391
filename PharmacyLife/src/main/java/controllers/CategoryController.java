@@ -171,6 +171,11 @@ public class CategoryController extends HttpServlet {
 			return false;
 		}
 
+		Object roleNameObj = session.getAttribute("roleName");
+		if (roleNameObj != null && "admin".equalsIgnoreCase(String.valueOf(roleNameObj).trim())) {
+			return true;
+		}
+
 		Object roleIdObj = session.getAttribute("roleId");
 		if (roleIdObj instanceof Integer) {
 			return ((Integer) roleIdObj) == ADMIN_ROLE_ID;
