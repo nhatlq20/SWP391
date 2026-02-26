@@ -158,8 +158,8 @@
 
                     <div class="search-section">
                         <form action="${pageContext.request.contextPath}/search" method="GET" style="width: 100%;">
-                            <input type="text" class="search-bar" placeholder="Tìm tên thuốc, bệnh lý,..." name="q"
-                                id="searchInput">
+                            <input type="text" class="search-bar" placeholder="Tìm tên thuốc, bệnh lý,..."
+                                name="keyword" id="searchInput">
                         </form>
                     </div>
 
@@ -327,7 +327,8 @@
                 <!-- Logout Modal -->
                 <div id="logoutModal" class="logout-modal-overlay">
                     <div class="logout-modal">
-                        <img src="${pageContext.request.contextPath}/assets/img/logout.png" alt="Logout Icon" class="logout-modal-icon">
+                        <img src="${pageContext.request.contextPath}/assets/img/logout.png" alt="Logout Icon"
+                            class="logout-modal-icon">
                         <h2 class="logout-modal-title">Đăng xuất</h2>
                         <p class="logout-modal-text">Bạn có muốn đăng xuất hay không ?</p>
                         <div class="logout-modal-actions">
@@ -350,7 +351,7 @@
                     }
 
                     // Smooth closing by clicking outside
-                    window.onclick = function(event) {
+                    window.onclick = function (event) {
                         const modal = document.getElementById('logoutModal');
                         if (event.target == modal) {
                             closeLogoutModal();

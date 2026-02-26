@@ -17,27 +17,35 @@ body {
     margin: 0 auto;
 }
 
-.product-image-section {
+.medicine-image-section {
     text-align: center;
 }
 
-.product-image-box {
-    background: #f9f9f9;
-    border-radius: 8px;
-    padding: 20px;
-    min-height: 400px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.medicine-image-box {
+    background: transparent !important;
+    padding: 12px !important;
+    width: 100%;
+    margin: 0 auto;
+    min-height: 350px;
+    aspect-ratio: 1 / 1;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    position: relative;
+    margin-top: 10px;
 }
 
-.product-image-box img {
-    max-width: 100%;
-    max-height: 400px;
-    object-fit: contain;
+.medicine-image-box .main-img {
+    width: 100% !important;
+    height: 90% !important;
+    object-fit: cover !important;
+    display: block;
+    margin-top: -200px;
+    /* Điều chỉnh giá trị này để điều chỉnh vị trí ảnh */
 }
 
-.product-info-section h2 {
+.medicine-info-section h2 {
     font-size: 18px;
     font-weight: 600;
     color: #1a1a1a;
@@ -89,7 +97,7 @@ body {
 
 .price-unit {
     font-size: 13px;
-    color: #999;
+    color: #1a1a1a;
     margin-left: 10px;
 }
 
@@ -103,11 +111,6 @@ body {
     font-weight: 600;
     color: #1a1a1a;
     margin-bottom: 10px;
-}
-
-.unit-options {
-    display: flex;
-    gap: 15px;
 }
 
 .radio-option {
@@ -129,7 +132,7 @@ body {
     border-color: #3B6FD9;
 }
 
-.radio-option input[type="radio"]:checked + label {
+.radio-option input[type="radio"]:checked+label {
     color: #3B6FD9;
 }
 
@@ -137,7 +140,60 @@ body {
     accent-color: #3B6FD9;
 }
 
-/* Quantity UI replaced by Bootstrap input-group; removed custom qty styles */
+/* Quantity pill selector */
+.qty-pill {
+    display: inline-flex;
+    align-items: stretch;
+    border: 1.5px solid #d0d0d0;
+    border-radius: 50px;
+    overflow: hidden;
+    background: #fff;
+    height: 38px;
+    width: fit-content;
+}
+
+.qty-btn {
+    flex: 0 0 auto;
+    background: none;
+    border: none;
+    width: 38px;
+    font-size: 18px;
+    font-weight: 400;
+    color: #555;
+    cursor: pointer;
+    line-height: 38px;
+    text-align: center;
+    transition: background 0.15s;
+}
+
+.qty-btn:hover {
+    background: #f0f0f0;
+}
+
+.qty-input {
+    flex: 0 0 42px;
+    width: 42px;
+    min-width: 0;
+    border: none;
+    border-left: 1.5px solid #d0d0d0;
+    border-right: 1.5px solid #d0d0d0;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    outline: none;
+    background: #fff;
+    color: #333;
+    padding: 0;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 
 .category-section {
     padding: 15px;
@@ -347,7 +403,7 @@ body {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 550px) {
     .detail-wrapper {
         padding: 20px 15px;
     }
@@ -356,15 +412,18 @@ body {
         padding: 20px;
     }
 
-    .product-image-box {
+    .medicine-image-box {
         min-height: 300px;
+        height: 300px;
     }
 
-    .product-image-box img {
-        max-height: 300px;
+    .medicine-image-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
-    .product-info-section h2 {
+    .medicine-info-section h2 {
         font-size: 16px;
     }
 
@@ -414,14 +473,17 @@ body {
 
     .product-image-box {
         min-height: 250px;
-        padding: 15px;
+        height: 250px;
+        padding: 0;
     }
 
-    .product-image-box img {
-        max-height: 250px;
+    .medicine-image-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
-    .product-info-section h2 {
+    .medicine-info-section h2 {
         font-size: 14px;
         margin-bottom: 10px;
     }
