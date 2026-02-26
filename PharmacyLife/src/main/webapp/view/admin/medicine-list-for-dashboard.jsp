@@ -46,7 +46,7 @@
                             <div class="stat-card stat-instock">
                                 <c:set var="inStockCount" value="0" />
                                 <c:forEach var="med" items="${medicines}">
-                                    <c:if test="${med.remainingQuantity > 0}">
+                                    <c:if test="${med.remainingQuantity > 20}">
                                         <c:set var="inStockCount" value="${inStockCount + 1}" />
                                     </c:if>
                                 </c:forEach>
