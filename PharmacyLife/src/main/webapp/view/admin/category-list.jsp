@@ -72,30 +72,53 @@
                     border-top: 0;
                 }
 
-                .action-icons a {
-                    margin-right: 12px;
-                    text-decoration: none;
-                }
-
-                .action-icons a:last-child {
-                    margin-right: 0;
-                }
-
-                .action-delete {
-                    display: inline-flex;
+                .action-icons {
+                    display: flex;
                     align-items: center;
-                    gap: 6px;
-                    padding: 4px 10px;
-                    border: 1px solid #dc3545;
-                    border-radius: 999px;
-                    color: #dc3545;
-                    font-size: 14px;
-                    transition: all .2s ease;
+                    justify-content:flex-start;
+                    gap: 4px;
+                    /* margin-left: 10px; */
                 }
 
-                .action-delete:hover {
-                    background: #dc3545;
-                    color: #fff !important;
+                .btn-action {
+                    width: 34px;
+                    height: 34px;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: none;
+                    font-size: 14px;
+                    transition: all 0.2s;
+                    cursor: pointer;
+                    text-decoration: none !important;
+                }
+
+                .btn-action:hover,
+                .btn-action:focus,
+                .btn-action:active {
+                    text-decoration: none !important;
+                }
+
+                .btn-view {
+                    background: #dbeafe;
+                    color: #2563eb;
+                    /* margin-left: 50px; */
+                }
+
+                .btn-view:hover {
+                    background: #bfdbfe;
+                    color: #2563eb;
+                }
+
+                .btn-delete {
+                    background: #fee2e2;
+                    color: #dc2626;
+                }
+
+                .btn-delete:hover {
+                    background: #fecaca;
+                    color: #dc2626;
                 }
             </style>
         </head>
@@ -143,18 +166,19 @@
                                                 <tr>
                                                     <td class="ps-3">${c.categoryCode}</td>
                                                     <td>${c.categoryName}</td>
-                                                    <td class="action-icons">
+                                                    <td class="text-center">
+                                                        <div class="action-icons">
                                                         <a href="${pageContext.request.contextPath}/category?action=detail&id=${c.categoryId}"
-                                                            class="text-info" title="Xem"><i class="fas fa-eye"></i></a>
-                                                        <a href="#" class="text-warning" title="Sửa"><i
-                                                                class="fas fa-pen"></i></a>
+                                                            class="btn-action btn-view" title="Xem chi tiết"><i class="fas fa-eye"></i></a>
+                                                        
                                                         <!-- nếu là rolde là 1 thì xuất hiện nút xóa  -->
                                                         <c:if
                                                             test="${sessionScope.userType eq 'staff' and fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
-                                                            <a href="category?action=delete&id=${c.categoryId}"
-                                                                class="action-delete js-delete-btn" title="Xóa"><i
-                                                                    class="fas fa-trash"></i><span>Xóa</span></a>
+                                                            <a href="${pageContext.request.contextPath}/category?action=delete&id=${c.categoryId}"
+                                                                class="btn-action btn-delete js-delete-btn" title="Xóa"><i
+                                                                    class="fas fa-trash"></i></a>
                                                         </c:if>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             </c:forEach>

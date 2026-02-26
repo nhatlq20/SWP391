@@ -209,7 +209,7 @@
                                                                     <i class="fas fa-pen"></i>
                                                                 </a>
                                                                 <button class="btn-action btn-delete" title="Xóa"
-                                                                    onclick="openDeleteModal(${medicine.medicineId}, '${medicine.medicineName}')">
+                                                                    onclick="openDeleteModal('${medicine.medicineId}', '${medicine.medicineName}')">
                                                                     <i class="fas fa-trash"></i>
                                                                 </button>
                                                             </div>
