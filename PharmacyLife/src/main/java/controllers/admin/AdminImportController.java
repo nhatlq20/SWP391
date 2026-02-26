@@ -163,15 +163,15 @@ public class AdminImportController extends HttpServlet {
             throws ServletException, IOException {
         String keyword = request.getParameter("keyword");
         List<Import> imports;
-
-        if (keyword != null && !keyword.trim().isEmpty()) {
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        if (hasKeyword) {
             imports = importDAO.searchImports(keyword);
         } else {
             imports = importDAO.getAllImports();
         }
-
         request.setAttribute("imports", imports);
         request.setAttribute("keyword", keyword);
+        request.setAttribute("hasKeyword", hasKeyword);
         request.getRequestDispatcher(getImportView("list", request)).forward(request, response);
     }
 
@@ -333,11 +333,13 @@ public class AdminImportController extends HttpServlet {
                             double price = Double.parseDouble(priceStr);
 
                             if (quantity <= 0) {
-                                request.setAttribute("error", "Quantity must be greater than 0.");
+                                request.setAttribute("error", "Số lượng phải lớn hơn 0.");
+                                importDAO.deleteImport(newImportId);
                                 showCreateForm(request, response);
                                 return;
                             } else if (quantity > 1000) {
-                                request.setAttribute("error", "Quantity cannot exceed 1000 units per import item.");
+                                request.setAttribute("error", "Số lượng không được vượt quá 1000.");
+                                importDAO.deleteImport(newImportId);
                                 showCreateForm(request, response);
                                 return;
                             }
@@ -358,7 +360,7 @@ public class AdminImportController extends HttpServlet {
                     importDAO.updateImport(imp);
                 }
 
-                response.sendRedirect(request.getContextPath() + "/admin/imports?action=edit&id=" + newImportId);
+                response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
             } else {
                 request.setAttribute("error", "Không thể tạo phiếu nhập");
                 showCreateForm(request, response);

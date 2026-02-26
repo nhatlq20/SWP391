@@ -1,3 +1,41 @@
+    <script>
+    // Realtime filter for Import List
+    document.addEventListener('DOMContentLoaded', function() {
+        const keywordInput = document.querySelector('input[name="keyword"]');
+        const tableBody = document.querySelector('#importTable tbody');
+        const rows = Array.from(tableBody.querySelectorAll('tr'));
+        keywordInput.addEventListener('input', function() {
+            const keyword = keywordInput.value.trim().toLowerCase();
+            let found = false;
+            rows.forEach(row => {
+                // Only filter data rows (not empty state)
+                if (row.querySelector('td') && row.querySelector('td strong')) {
+                    const code = row.querySelector('td strong').textContent.toLowerCase();
+                    const supplier = row.querySelectorAll('td')[1].textContent.toLowerCase();
+                    if (keyword === '' || code.includes(keyword) || supplier.includes(keyword)) {
+                        row.style.display = '';
+                        found = true;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+            // Show/hide empty state
+            let emptyRow = tableBody.querySelector('.empty-state-row');
+            if (!found) {
+                if (!emptyRow) {
+                    emptyRow = document.createElement('tr');
+                    emptyRow.className = 'empty-state-row';
+                    emptyRow.innerHTML = `<td colspan="6" class="text-center py-5 text-muted"><i class="fas fa-box-open fa-3x mb-3 d-block"></i><p>Không tìm thấy dữ liệu phù hợp</p></td>`;
+                    tableBody.appendChild(emptyRow);
+                }
+                emptyRow.style.display = '';
+            } else if (emptyRow) {
+                emptyRow.style.display = 'none';
+            }
+        });
+    });
+    </script>
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -85,12 +123,16 @@
                                 </c:forEach>
                             </c:when>
                             <c:otherwise>
-                                <tr>
-                                    <td colspan="6" class="text-center py-5 text-muted">
-                                        <i class="fas fa-box-open fa-3x mb-3 d-block"></i>
-                                        <p>Không có dữ liệu phiếu nhập</p>
-                                    </td>
-                                </tr>
+                                <c:choose>
+                                    <c:when test="${hasKeyword}">
+                                        <tr>
+                                            <td colspan="6" class="text-center py-5 text-muted">
+                                                <i class="fas fa-box-open fa-3x mb-3 d-block"></i>
+                                                <p>Không tìm thấy dữ liệu phù hợp</p>
+                                            </td>
+                                        </tr>
+                                    </c:when>
+                                </c:choose>
                             </c:otherwise>
                         </c:choose>
                     </tbody>
