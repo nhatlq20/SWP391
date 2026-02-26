@@ -26,11 +26,11 @@ public class ImportDAO {
         List<Import> imports = new ArrayList<>();
 
         String sql = "SELECT i.ImportId, i.SupplierId, s.SupplierName, " +
-                "       i.StaffId, st.StaffName, i.ImportCreateAt, i.TotalPrice, i.Status " +
-                "FROM   Import i " +
-                "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
-                "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
-                "ORDER BY i.ImportCreateAt DESC";
+            "       i.StaffId, st.StaffName, i.ImportCreateAt, i.TotalPrice, i.ImportStatus " +
+            "FROM   Import i " +
+            "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
+            "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
+            "ORDER BY i.ImportCreateAt DESC";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
@@ -51,13 +51,13 @@ public class ImportDAO {
         List<Import> imports = new ArrayList<>();
 
         String sql = "SELECT i.ImportId, i.SupplierId, s.SupplierName, " +
-                "       i.StaffId, st.StaffName, i.ImportCreateAt, i.TotalPrice, i.Status " +
-                "FROM   Import i " +
-                "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
-                "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
-                "WHERE  CAST(i.ImportId AS VARCHAR(10)) LIKE ? " +
-                "   OR  s.SupplierName LIKE ? " +
-                "ORDER BY i.ImportCreateAt DESC";
+            "       i.StaffId, st.StaffName, i.ImportCreateAt, i.TotalPrice, i.ImportStatus " +
+            "FROM   Import i " +
+            "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
+            "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
+            "WHERE  CAST(i.ImportId AS VARCHAR(10)) LIKE ? " +
+            "   OR  s.SupplierName LIKE ? " +
+            "ORDER BY i.ImportCreateAt DESC";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -83,11 +83,11 @@ public class ImportDAO {
         Import imp = null;
 
         String sql = "SELECT i.ImportId, i.SupplierId, s.SupplierName, " +
-                "       i.StaffId, st.StaffName, i.ImportCreateAt, i.TotalPrice, i.Status " +
-                "FROM   Import i " +
-                "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
-                "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
-                "WHERE  i.ImportId = ?";
+            "       i.StaffId, st.StaffName, i.ImportCreateAt, i.TotalPrice, i.ImportStatus " +
+            "FROM   Import i " +
+            "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
+            "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
+            "WHERE  i.ImportId = ?";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -107,8 +107,8 @@ public class ImportDAO {
 
     // Tạo phiếu nhập mới
     public boolean createImport(Import imp) {
-        String sql = "INSERT INTO Import (SupplierId, StaffId, ImportCreateAt, TotalPrice, Status) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Import (SupplierId, StaffId, ImportCreateAt, TotalPrice, ImportStatus) " +
+            "VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -154,8 +154,8 @@ public class ImportDAO {
     // Cập nhật phiếu nhập
     public boolean updateImport(Import imp) {
         String sql = "UPDATE Import " +
-                "SET SupplierId = ?, StaffId = ?, ImportCreateAt = ?, TotalPrice = ?, Status = ? " +
-                "WHERE ImportId = ?";
+            "SET SupplierId = ?, StaffId = ?, ImportCreateAt = ?, TotalPrice = ?, ImportStatus = ? " +
+            "WHERE ImportId = ?";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -408,7 +408,7 @@ public class ImportDAO {
         imp.setStaffName(rs.getString("StaffName"));
         imp.setImportDate(rs.getDate("ImportCreateAt"));
         imp.setTotalAmount(rs.getDouble("TotalPrice"));
-        imp.setStatus(rs.getString("Status")); // Set Status
+        imp.setStatus(rs.getString("ImportStatus")); // Set ImportStatus
         // Sinh mã hiển thị từ ImportId
         imp.setImportCode(formatImportCode(importId));
         return imp;

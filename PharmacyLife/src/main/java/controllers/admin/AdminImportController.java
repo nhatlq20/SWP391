@@ -332,6 +332,16 @@ public class AdminImportController extends HttpServlet {
                             int quantity = Integer.parseInt(quantityStr);
                             double price = Double.parseDouble(priceStr);
 
+                            if (quantity <= 0) {
+                                request.setAttribute("error", "Quantity must be greater than 0.");
+                                showCreateForm(request, response);
+                                return;
+                            } else if (quantity > 1000) {
+                                request.setAttribute("error", "Quantity cannot exceed 1000 units per import item.");
+                                showCreateForm(request, response);
+                                return;
+                            }
+
                             if (medicineId > 0) {
                                 ImportDetail detail = new ImportDetail(newImportId, medicineId, quantity, price);
                                 detail.recalculateTotal();
@@ -428,6 +438,16 @@ public class AdminImportController extends HttpServlet {
                         int medicineId = Integer.parseInt(medicineIdStr);
                         int quantity = Integer.parseInt(quantityStr);
                         double price = Double.parseDouble(priceStr);
+
+                        if (quantity <= 0) {
+                            request.setAttribute("error", "Quantity must be greater than 0.");
+                            showEditForm(request, response);
+                            return;
+                        } else if (quantity > 1000) {
+                            request.setAttribute("error", "Quantity cannot exceed 1000 units per import item.");
+                            showEditForm(request, response);
+                            return;
+                        }
 
                         if (medicineId > 0) {
                             ImportDetail detail = new ImportDetail(importId, medicineId, quantity, price);

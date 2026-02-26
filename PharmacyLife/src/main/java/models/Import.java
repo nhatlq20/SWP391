@@ -38,8 +38,8 @@ public class Import {
     // Tổng tiền (map với TotalPrice)
     private double totalAmount;
 
-    // Trạng thái phiếu nhập
-    private String status;
+    // Trạng thái phiếu nhập (ImportStatus)
+    private String importStatus;
 
     public Import() {
     }
@@ -122,10 +122,11 @@ public class Import {
     }
 
     public String getStatus() {
-        return status;
+
+        return importStatus;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setStatus(String importStatus) {
+        this.importStatus = importStatus;
     }
 }
