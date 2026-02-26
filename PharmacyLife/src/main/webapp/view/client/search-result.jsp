@@ -114,6 +114,10 @@
                                                 <p>Không có kết quả cho từ khóa "
                                                     <c:out value='${keyword}' />". Hãy thử tìm kiếm với từ khóa khác.
                                                 </p>
+                                                <a href="${pageContext.request.contextPath}/home"
+                                                    class="btn btn-primary">
+                                                    <i class="fas fa-home mb-2 mt-2"></i>
+                                                </a>
                                             </div>
                                         </c:if>
                                     </c:otherwise>
