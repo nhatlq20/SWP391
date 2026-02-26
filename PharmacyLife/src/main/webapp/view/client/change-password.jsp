@@ -29,7 +29,6 @@
             border-radius: 20px !important;
             padding: 35px 50px !important;
             box-shadow: 0 4px 20px rgba(0,0,0,0.05) !important;
-            border: 2px solid #4B9AFF !important; /* Blue border to match profile */
             max-width: 500px !important;
             width: 100% !important;
             margin-top: 20px !important;
