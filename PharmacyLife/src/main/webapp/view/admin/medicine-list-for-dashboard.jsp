@@ -259,10 +259,26 @@
                         function filterTable() {
                             var input = document.getElementById('medicineSearchInput').value.toLowerCase();
                             var rows = document.querySelectorAll('#medicineTable tbody tr');
+                            var found = false;
                             rows.forEach(function (row) {
+                                if (row.classList.contains('empty-state-row')) return;
                                 var text = row.textContent.toLowerCase();
-                                row.style.display = text.includes(input) ? '' : 'none';
+                                var show = text.includes(input);
+                                row.style.display = show ? '' : 'none';
+                                if (show) found = true;
                             });
+                            var emptyRow = document.querySelector('#medicineTable .empty-state-row');
+                            if (!found && input !== '') {
+                                if (!emptyRow) {
+                                    emptyRow = document.createElement('tr');
+                                    emptyRow.className = 'empty-state-row';
+                                    emptyRow.innerHTML = '<td colspan="9" class="text-center py-5 text-muted"><i class="fas fa-box-open fa-3x mb-3 d-block"></i><p>Không tìm thấy dữ liệu phù hợp</p></td>';
+                                    document.querySelector('#medicineTable tbody').appendChild(emptyRow);
+                                }
+                                emptyRow.style.display = '';
+                            } else if (emptyRow) {
+                                emptyRow.style.display = 'none';
+                            }
                         }
                     </script>
                 </body>
