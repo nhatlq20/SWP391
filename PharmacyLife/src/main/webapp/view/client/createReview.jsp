@@ -110,13 +110,7 @@
                             errorDiv.textContent = 'Vui lòng nhập bình luận';
                             return false;
                         }
-
-                        if (comment.length < 5) {
-                            e.preventDefault();
-                            errorDiv.textContent = 'Bình luận phải có ít nhất 5 ký tự';
-                            return false;
-                        }
-
+                        
                         errorDiv.textContent = '';
                     });
 

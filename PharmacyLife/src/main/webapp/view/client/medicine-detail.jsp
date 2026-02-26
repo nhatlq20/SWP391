@@ -123,24 +123,23 @@
                                                                                     </c:otherwise>
                                                                                 </c:choose>
                                                                             </c:forEach>
-                                                                            <span
-                                                                                class="rating-text">${review.rating}/5</span>
+                                                                           
                                                                         </div>
                                                                     </div>
                                                                     <span class="review-date">${review.createdAt}</span>
                                                                 </div>
                                                                 <p class="review-comment">${review.comment}</p>
                                                                 <div class="mt-2">
-                                                                    <c:if test="${sessionScope.userType eq 'staff'}">
-                                                                        <a class="btn btn-sm btn-primary"
-                                                                           href="${pageContext.request.contextPath}/view-reviews?medicineId=${medicine.medicineId}&selectedReviewId=${review.reviewId}">
-                                                                            Reply
-                                                                        </a>
-                                                                    </c:if>
                                                                     <c:if test="${not empty review.replyContent}">
-                                                                        <div class="mt-2 text-muted small">
-                                                                            Đã phản hồi bởi <strong><c:out value="${not empty review.replyStaffName ? review.replyStaffName : 'Nhân viên nhà thuốc'}" /></strong>: ${review.replyContent}
+                                                                        <div class="text-muted small">
+                                                                            Đã phản hồi bởi <strong><c:out value="${not empty review.replyStaffName ? review.replyStaffName : 'Nhân viên nhà thuốc'}" /></strong>: <c:out value="${review.replyContent}" />
                                                                         </div>
+                                                                    </c:if>
+                                                                    <c:if test="${sessionScope.userType eq 'staff'}">
+                                                                        <a class="btn btn-sm btn-primary mt-2"
+                                                                           href="${pageContext.request.contextPath}/view-reviews?medicineId=${medicine.medicineId}&selectedReviewId=${review.reviewId}">
+                                                                            Trả lời
+                                                                        </a>
                                                                     </c:if>
                                                                 </div>
                                                             </div>
@@ -256,6 +255,8 @@
                                                         href="${pageContext.request.contextPath}/create-review?medicineId=${medicine.medicineId}">
                                                         <i class="fas fa-star"></i> Đánh giá sản phẩm
                                                     </a>
+                                                </c:when>
+                                                <c:when test="${sessionScope.userType eq 'staff'}">
                                                 </c:when>
                                                 <c:otherwise>
                                                     <a class="btn-rate btn btn-outline-warning"
