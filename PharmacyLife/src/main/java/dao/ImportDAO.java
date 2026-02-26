@@ -57,14 +57,17 @@ public class ImportDAO {
             "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
             "WHERE  CAST(i.ImportId AS VARCHAR(10)) LIKE ? " +
             "   OR  s.SupplierName LIKE ? " +
+            "   OR  ('IP' + RIGHT('000' + CAST(i.ImportId AS VARCHAR(10)), 3)) LIKE ? " +
             "ORDER BY i.ImportCreateAt DESC";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
+
             String pattern = "%" + keyword + "%";
             ps.setString(1, pattern);
             ps.setString(2, pattern);
+            ps.setString(3, pattern.toUpperCase());
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {

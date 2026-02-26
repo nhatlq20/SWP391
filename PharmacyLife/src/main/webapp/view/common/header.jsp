@@ -158,8 +158,8 @@
 
                     <div class="search-section">
                         <form action="${pageContext.request.contextPath}/search" method="GET" style="width: 100%;">
-                            <input type="text" class="search-bar" placeholder="Tìm tên thuốc, bệnh lý,..." name="q"
-                                id="searchInput">
+                            <input type="text" class="search-bar" placeholder="Tìm tên thuốc, bệnh lý,..."
+                                name="keyword" id="searchInput">
                         </form>
                     </div>
 

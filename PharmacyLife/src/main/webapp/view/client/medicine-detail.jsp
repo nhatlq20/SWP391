@@ -23,12 +23,12 @@
 
                         <div class="detail-wrapper">
                             <div class="detail-content">
-                                <!-- Main Product Info -->
+                                <!-- Main Medicine Info -->
                                 <div class="row g-5">
-                                    <!-- Left: Product Image -->
-                                    <div class="col-12 col-lg-4">
-                                        <div class="product-image-section">
-                                            <div class="product-image-box">
+                                    <!-- Left: Medicine Image -->
+                                    <div class="col-12 col-lg-5">
+                                        <div class="medicine-image-section">
+                                            <div class="medicine-image-box rounded-3 overflow-hidden">
                                                 <c:choose>
                                                     <c:when test="${not empty medicine.imageUrl}">
                                                         <c:set var="imageUrlTrimmed"
@@ -53,11 +53,13 @@
                                                             </c:otherwise>
                                                         </c:choose>
                                                         <img src="<c:out value='${imgSrc}'/>"
-                                                            alt="<c:out value='${medicine.medicineName}'/>" />
+                                                            alt="<c:out value='${medicine.medicineName}'/>"
+                                                            class="main-img zoom-img" />
                                                     </c:when>
                                                     <c:otherwise>
                                                         <img src="${pageContext.request.contextPath}/assets/img/no-image.png"
-                                                            alt="<c:out value='${medicine.medicineName}'/>" />
+                                                            alt="<c:out value='${medicine.medicineName}'/>"
+                                                            class="main-img zoom-img" />
                                                     </c:otherwise>
                                                 </c:choose>
 
@@ -123,7 +125,7 @@
                                                                                     </c:otherwise>
                                                                                 </c:choose>
                                                                             </c:forEach>
-                                                                           
+
                                                                         </div>
                                                                     </div>
                                                                     <span class="review-date">${review.createdAt}</span>
@@ -132,12 +134,16 @@
                                                                 <div class="mt-2">
                                                                     <c:if test="${not empty review.replyContent}">
                                                                         <div class="text-muted small">
-                                                                            Đã phản hồi bởi <strong><c:out value="${not empty review.replyStaffName ? review.replyStaffName : 'Nhân viên nhà thuốc'}" /></strong>: <c:out value="${review.replyContent}" />
+                                                                            Đã phản hồi bởi <strong>
+                                                                                <c:out
+                                                                                    value="${not empty review.replyStaffName ? review.replyStaffName : 'Nhân viên nhà thuốc'}" />
+                                                                            </strong>:
+                                                                            <c:out value="${review.replyContent}" />
                                                                         </div>
                                                                     </c:if>
                                                                     <c:if test="${sessionScope.userType eq 'staff'}">
                                                                         <a class="btn btn-sm btn-primary mt-2"
-                                                                           href="${pageContext.request.contextPath}/view-reviews?medicineId=${medicine.medicineId}&selectedReviewId=${review.reviewId}">
+                                                                            href="${pageContext.request.contextPath}/view-reviews?medicineId=${medicine.medicineId}&selectedReviewId=${review.reviewId}">
                                                                             Trả lời
                                                                         </a>
                                                                     </c:if>
@@ -151,32 +157,12 @@
                                     </div>
 
 
-                                    <!-- Right: Product Details -->
-                                    <div class="col-12 col-lg-8 product-info-section">
+                                    <!-- Right: Medicine Details -->
+                                    <div class="col-12 col-lg-7 medicine-info-section">
                                         <!-- Title -->
                                         <h2>
                                             <c:out value='${medicine.medicineName}' />
                                         </h2>
-
-
-
-                                        <!-- Rating & Comments -->
-                                        <div class="rating-show">
-                                            <div class="rating-stars">
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star"></i>
-                                                <i class="fas fa-star-half-alt"></i>
-                                            </div>
-                                            <span class="rating-text">5 • <strong>88 bình luận</strong></span>
-                                        </div>
-
-                                        <!-- Meta Info -->
-                                        <div class="meta-info">
-                                            <span><strong>MED001</strong></span>
-                                            <span>Đánh giá sản phẩm (1 đánh giá)</span>
-                                        </div>
 
                                         <!-- Price -->
                                         <div class="price-section">
@@ -187,9 +173,7 @@
                                                         <fmt:formatNumber value="${medicine.sellingPrice}" type="number"
                                                             groupingUsed="true" />₫
                                                     </c:when>
-                                                    <c:otherwise>
-                                                        Giá tham khảo
-                                                    </c:otherwise>
+                                                    <c:otherwise>Giá tham khảo</c:otherwise>
                                                 </c:choose>
                                             </span>
                                             <span class="price-unit">/
@@ -197,25 +181,17 @@
                                             </span>
                                         </div>
 
-                                        <!-- Unit (display only) -->
-                                        <div class="form-group">
-                                            <label>Đơn vị tính</label>
-                                            <div class="unit-options">
-                                                <span class="unit-text">
-                                                    <c:out value='${medicine.unit}' />
-                                                </span>
-                                            </div>
-                                        </div>
 
                                         <!-- Quantity Selection -->
-                                        <div class="mb-3">
-                                            <label class="form-label">Chọn số lượng</label>
-                                            <div class="input-group" style="max-width:180px">
-                                                <button class="btn btn-outline-secondary" type="button"
+                                        <div class="mb-3 d-flex align-items-center gap-3">
+                                            <label class="form-label text-muted mb-0">Chọn số lượng</label>
+                                            <div class="input-group rounded-pill border"
+                                                style="max-width: 130px; overflow: hidden;">
+                                                <button type="button" class="btn btn-light px-3"
                                                     onclick="decreaseQty()">−</button>
-                                                <input type="number" id="quantity" class="form-control text-center"
-                                                    value="1" min="1">
-                                                <button class="btn btn-outline-secondary" type="button"
+                                                <input type="number" id="quantity" value="1" min="1"
+                                                    class="form-control text-center border-0 shadow-none qty-input">
+                                                <button type="button" class="btn btn-light px-3"
                                                     onclick="increaseQty()">+</button>
                                             </div>
                                         </div>
@@ -238,7 +214,7 @@
                                         </div>
 
                                         <!-- Action Buttons -->
-                                 
+
                                         <div class="action-buttons">
                                             <form id="addToCartForm" action="${pageContext.request.contextPath}/cart"
                                                 method="POST" style="display: none;">
@@ -308,7 +284,8 @@
                                                 }
                                             })
                                             .catch(error => {
-                                                if (error.message !== 'Redirected') console.error(error);
+                                                if (error.message !== 'Redirected')
+                                                    console.error(error);
                                             });
                                     }
                                 </script>
