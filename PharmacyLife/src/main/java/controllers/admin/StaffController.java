@@ -131,13 +131,11 @@ public class StaffController extends HttpServlet {
                     System.out.println("Role ID: " + roleId);
 
                     Staff newStaff = new Staff();
-                    newStaff.setStaffCode("ST" + System.currentTimeMillis());
+                    // StaffCode will be generated automatically in DAO.insertStaff()
                     newStaff.setStaffName(staffName.trim());
                     newStaff.setStaffEmail(staffEmail.trim());
                     newStaff.setStaffPassword(staffPassword.trim());
                     newStaff.setRoleId(roleId);
-
-                    System.out.println("Staff Code: " + newStaff.getStaffCode());
 
                     boolean success = dao.insertStaff(newStaff);
 

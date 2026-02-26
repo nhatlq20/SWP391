@@ -100,30 +100,43 @@ public class StaffDAO {
 
     // Helper: Generate next staff code (ST001, ST002, etc)
     public String generateNextStaffCode() {
-        String sql = "SELECT MAX(CAST(SUBSTRING(StaffCode, 3, 3) AS INT)) as maxCode FROM Staff WHERE StaffCode LIKE 'ST%'";
-        
+        String sql = "SELECT StaffCode FROM Staff WHERE StaffCode LIKE 'ST%'";
+        long max = 0;
+
         try (Connection conn = new DBContext().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
-            if (rs.next()) {
-                int maxCode = rs.getInt("maxCode");
-                if (rs.wasNull()) {
-                    maxCode = 0;
+            while (rs.next()) {
+                String code = rs.getString("StaffCode");
+                if (code != null && code.startsWith("ST")) {
+                    try {
+                        // Extract number part after "ST"
+                        String numPart = code.substring(2).trim();
+                        if (!numPart.isEmpty()) {
+                            long num = Long.parseLong(numPart);
+                            if (num > max) {
+                                max = num;
+                            }
+                        }
+                    } catch (NumberFormatException e) {
+                        // Ignore codes that don't have a numeric suffix
+                    }
                 }
-                int nextCode = maxCode + 1;
-                String newCode = String.format("ST%03d", nextCode);
-                System.out.println("Generated StaffCode: " + newCode);
-                return newCode;
             }
 
         } catch (Exception e) {
             System.out.println("Error generating staff code: " + e.getMessage());
             e.printStackTrace();
         }
-        
-        // Fallback to ST001 if error
-        return "ST001";
+
+        long nextCode = max + 1;
+        // Format as ST001, ST002... if less than 1000, else just ST + number
+        if (nextCode < 1000) {
+            return String.format("ST%03d", nextCode);
+        } else {
+            return "ST" + nextCode;
+        }
     }
 
     // 4. Insert Staff
