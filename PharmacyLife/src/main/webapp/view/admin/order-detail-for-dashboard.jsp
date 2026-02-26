@@ -124,14 +124,16 @@
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td class="text-center">
+                                                        <td class="text-center"
+                                                            style="white-space: nowrap; min-width: 100px;">
                                                             <fmt:formatNumber value="${item.unitPrice}" type="number"
-                                                                groupingUsed="true" /> đ
+                                                                groupingUsed="true" />&nbsp;đ
                                                         </td>
                                                         <td class="text-center fw-bold">x${item.quantity}</td>
-                                                        <td class="text-end pe-4 fw-bold" style="color: #22c55e;">
+                                                        <td class="text-end pe-4 fw-bold"
+                                                            style="color: #22c55e; white-space: nowrap; min-width: 120px;">
                                                             <fmt:formatNumber value="${item.totalPrice}" type="number"
-                                                                groupingUsed="true" /> đ
+                                                                groupingUsed="true" />&nbsp;đ
                                                         </td>
                                                     </tr>
                                                 </c:forEach>
@@ -139,9 +141,10 @@
                                             <tfoot style="background-color: #f9fafb;">
                                                 <tr>
                                                     <td colspan="3" class="text-end fw-bold py-3">Tổng cộng:</td>
-                                                    <td class="text-end fs-5 fw-bold py-3 pe-4" style="color: #22c55e;">
+                                                    <td class="text-end fs-5 fw-bold py-3 pe-4"
+                                                        style="color: #22c55e; white-space: nowrap;">
                                                         <fmt:formatNumber value="${order.totalAmount}" type="number"
-                                                            groupingUsed="true" /> đ
+                                                            groupingUsed="true" />&nbsp;đ
                                                     </td>
                                                 </tr>
                                             </tfoot>

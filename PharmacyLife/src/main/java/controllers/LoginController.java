@@ -8,6 +8,8 @@ import dao.CustomerDAO;
 import dao.StaffDAO;
 import models.Customer;
 import models.Staff;
+import models.Cart;
+import dao.CartDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -99,6 +101,11 @@ public class LoginController extends HttpServlet {
             session.setAttribute("userName", customer.getFullName());
             session.setAttribute("userEmail", customer.getEmail());
             session.setAttribute("roleName", "Customer");
+
+            // Load persistent cart from database
+            CartDAO cartDAO_login = new CartDAO();
+            Cart cart_login = cartDAO_login.getCartByCustomerId(customer.getCustomerId());
+            session.setAttribute("cart", cart_login);
 
             // Redirect to welcome file (home)
             response.sendRedirect(request.getContextPath() + "/home");

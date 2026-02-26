@@ -21,22 +21,24 @@
                     <!-- Include Header -->
                     <jsp:include page="/view/common/header.jsp" />
 
-                    <div class="cart-page-layout">
-                        <div class="cart-sidebar-container">
-                            <jsp:include page="/view/common/sidebar.jsp" />
-                        </div>
+                    <div style="display: flex; padding-top: 115px;">
+                        <jsp:include page="/view/common/sidebar.jsp" />
 
                         <div class="cart-content-container">
-                            <div class="container py-4">
+                            <div class="container-fluid py-4">
                                 <div class="cart-container">
-                                    <div class="cart-header d-flex justify-content-between align-items-center">
-                                        <h4 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Giỏ hàng của bạn
+                                    <div class="cart-header">
+                                        <h4 class="mb-0">
+                                            <i class="fas fa-shopping-cart"></i>
+                                            Giỏ hàng của bạn
+                                            <span class="badge bg-light text-muted ms-2"
+                                                style="font-size: 0.8rem; font-weight: 500;">
+                                                ${fn:length(cart.items)} sản phẩm
+                                            </span>
                                         </h4>
-                                        <span class="badge bg-light text-dark">${fn:length(cart.items)} sản
-                                            phẩm</span>
                                     </div>
 
-                                    <div class="p-4">
+                                    <div class="cart-card-inner">
                                         <c:if test="${empty cart.items}">
                                             <div class="empty-cart">
                                                 <i class="fas fa-shopping-basket"></i>
@@ -50,17 +52,21 @@
                                         </c:if>
 
                                         <c:if test="${not empty cart.items}">
-                                            <div class="row">
-                                                <div class="col-lg-8">
-                                                    <div class="table-responsive mb-4">
+                                            <div class="row g-4">
+                                                <div class="col-xl-9 col-lg-8">
+                                                    <div class="mb-4">
                                                         <table class="table align-middle">
                                                             <thead>
                                                                 <tr>
-                                                                    <th scope="col" width="40%">Sản phẩm</th>
-                                                                    <th scope="col" class="text-center">Đơn giá</th>
-                                                                    <th scope="col" class="text-center">Số lượng</th>
-                                                                    <th scope="col" class="text-end">Thành tiền</th>
-                                                                    <th scope="col" class="text-center">Thao tác</th>
+                                                                    <th scope="col">Sản phẩm</th>
+                                                                    <th scope="col" class="text-center"
+                                                                        style="width: 110px;">Đơn giá</th>
+                                                                    <th scope="col" class="text-center"
+                                                                        style="width: 120px;">Số lượng</th>
+                                                                    <th scope="col" class="text-end"
+                                                                        style="width: 130px;">Thành tiền</th>
+                                                                    <th scope="col" class="text-center"
+                                                                        style="width: 80px;">Thao tác</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -72,8 +78,9 @@
                                                                                     alt="${item.medicine.medicineName}"
                                                                                     class="cart-item-img me-3"
                                                                                     onerror="this.src='https://via.placeholder.com/80'">
-                                                                                <div>
-                                                                                    <h6 class="mb-1">
+                                                                                <div style="min-width: 0; flex: 1;">
+                                                                                    <h6 class="cart-product-title mb-1"
+                                                                                        title="${item.medicine.medicineName}">
                                                                                         ${item.medicine.medicineName}
                                                                                     </h6>
                                                                                     <small class="text-muted">Code:
@@ -124,7 +131,7 @@
                                                                                 <input type="hidden" name="id"
                                                                                     value="${item.medicine.medicineId}">
                                                                                 <button type="submit"
-                                                                                    class="btn btn-outline-danger btn-sm rounded-circle"
+                                                                                    class="btn btn-outline-danger btn-sm rounded-circle btn-remove-item"
                                                                                     title="Xóa">
                                                                                     <i class="fas fa-trash-alt"></i>
                                                                                 </button>
@@ -137,47 +144,51 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="col-lg-4">
+                                                <div class="col-xl-3 col-lg-4">
                                                     <div class="total-section shadow-sm">
-                                                        <h5 class="mb-3 fw-bold">Thông tin đơn hàng</h5>
+                                                        <h5 class="summary-title">Thông tin đơn hàng</h5>
 
-                                                        <div class="input-group mb-3">
-                                                            <input type="text" class="form-control"
+                                                        <div class="coupon-container">
+                                                            <input type="text" class="coupon-input"
                                                                 placeholder="Mã giảm giá">
-                                                            <button class="btn btn-outline-primary-custom"
-                                                                type="button">Áp
-                                                                dụng</button>
+                                                            <button class="btn-apply-coupon" type="button">
+                                                                Áp dụng
+                                                            </button>
                                                         </div>
 
-                                                        <div class="d-flex justify-content-between mb-2">
-                                                            <span>Tạm tính:</span>
-                                                            <span class="fw-bold">
-                                                                <fmt:formatNumber value="${totalMoney}" type="currency"
-                                                                    currencySymbol="₫" maxFractionDigits="0" />
-                                                            </span>
-                                                        </div>
-                                                        <div class="d-flex justify-content-between mb-3">
-                                                            <span>Giảm giá:</span>
-                                                            <span class="text-success">-0 ₫</span>
-                                                        </div>
-                                                        <hr>
-                                                        <div class="d-flex justify-content-between mb-4">
-                                                            <h5 class="mb-0">Tổng cộng:</h5>
-                                                            <h4 class="mb-0 text-danger fw-bold">
-                                                                <fmt:formatNumber value="${totalMoney}" type="currency"
-                                                                    currencySymbol="₫" maxFractionDigits="0" />
-                                                            </h4>
+                                                        <div class="price-calculations">
+                                                            <div class="price-row">
+                                                                <span>Tạm tính:</span>
+                                                                <span class="fw-bold text-dark">
+                                                                    <fmt:formatNumber value="${totalMoney}"
+                                                                        type="currency" currencySymbol="₫"
+                                                                        maxFractionDigits="0" />
+                                                                </span>
+                                                            </div>
+                                                            <div class="price-row">
+                                                                <span>Giảm giá:</span>
+                                                                <span class="text-success">-0 ₫</span>
+                                                            </div>
+                                                            <div class="price-row total">
+                                                                <span class="total-label">Tổng cộng:</span>
+                                                                <span class="total-value" id="cart-total">
+                                                                    <fmt:formatNumber value="${totalMoney}"
+                                                                        type="currency" currencySymbol="₫"
+                                                                        maxFractionDigits="0" />
+                                                                </span>
+                                                            </div>
                                                         </div>
 
-                                                        <div class="d-grid gap-2">
-                                                            <a href="checkout" class="btn btn-primary-custom py-2">
-                                                                Tiến hành thanh toán <i
-                                                                    class="fas fa-arrow-right ms-1"></i>
-                                                            </a>
-                                                            <a href="home" class="btn btn-outline-secondary">
-                                                                <i class="fas fa-arrow-left me-1"></i> Mua thêm
-                                                            </a>
-                                                        </div>
+                                                        <a href="checkout" class="btn-checkout">
+                                                            Thanh toán
+                                                            <i class="fas fa-arrow-right"></i>
+                                                        </a>
+
+                                                        <a href="home"
+                                                            class="btn btn-outline-secondary w-100 mt-3 d-flex align-items-center justify-content-center"
+                                                            style="border-radius: 10px; height: 44px; font-weight: 600; font-size: 0.9rem;">
+                                                            <i class="fas fa-arrow-left me-2"></i> Mua thêm
+                                                        </a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -195,9 +206,18 @@
                     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
                     <script>
+                        function formatCurrency(amount) {
+                            return new Intl.NumberFormat('vi-VN', {
+                                style: 'currency',
+                                currency: 'VND'
+                            }).format(amount).replace(/\u20AB/g, '₫');
+                        }
+
                         function updateQuantity(btn, change) {
                             const form = btn.closest('form');
                             const input = form.querySelector('input[name="quantity"]');
+                            const id = form.querySelector('input[name="id"]').value;
+
                             let currentVal = parseInt(input.value);
                             if (isNaN(currentVal)) currentVal = 1;
 
@@ -206,7 +226,49 @@
 
                             if (newVal !== currentVal) {
                                 input.value = newVal;
-                                form.submit();
+
+                                // Disable button to prevent double clicks
+                                btn.disabled = true;
+
+                                // Send AJAX request
+                                const formData = new FormData(form);
+                                fetch('cart', {
+                                    method: 'POST',
+                                    body: new URLSearchParams(formData),
+                                    headers: {
+                                        'X-Requested-With': 'XMLHttpRequest'
+                                    }
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        btn.disabled = false;
+                                        if (data.success) {
+                                            // Update Item Total in table
+                                            const row = btn.closest('tr');
+                                            const itemTotalEl = document.getElementById(`item-total-${id}`) || row.querySelector('.price-text');
+                                            if (itemTotalEl) itemTotalEl.textContent = formatCurrency(data.itemTotal);
+
+                                            // Update Subtotal and Total in Sidebar
+                                            const sidebar = document.querySelector('.total-section');
+                                            const subtotalEl = document.getElementById('cart-subtotal') || sidebar.querySelector('.price-row:not(.total) span:last-child');
+                                            const totalEl = document.getElementById('cart-total') || sidebar.querySelector('.total-value');
+
+                                            if (subtotalEl) subtotalEl.textContent = formatCurrency(data.cartTotal);
+                                            if (totalEl) totalEl.textContent = formatCurrency(data.cartTotal);
+
+                                            // Update Header Cart Count
+                                            if (typeof updateHeaderCartCount === 'function') {
+                                                updateHeaderCartCount(data.cartCount);
+                                            } else {
+                                                const badge = document.getElementById('cartCount');
+                                                if (badge) badge.textContent = data.cartCount;
+                                            }
+                                        }
+                                    })
+                                    .catch(error => {
+                                        btn.disabled = false;
+                                        console.error('Error updating quantity:', error);
+                                    });
                             }
                         }
                     </script>
