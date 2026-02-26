@@ -110,44 +110,43 @@ public class StaffDAO {
         }
     }
 
-    // Helper: Generate next staff code (ST001, ST002, etc)
+    // Helper: Generate next staff code based on actual database identity value (ST001, ST002, etc)
     public String generateNextStaffCode() {
-        String sql = "SELECT StaffCode FROM Staff WHERE StaffCode LIKE 'ST%'";
-        long max = 0;
+        long nextId = 0;
+
+        // Try querying the system catalogs for the actual next identity value (SQL Server specific)
+        String sysSql = "SELECT CASE WHEN last_value IS NULL THEN seed_value ELSE (CAST(last_value AS BIGINT) + CAST(increment_value AS BIGINT)) END AS next_id "
+                      + "FROM sys.identity_columns WHERE object_id = OBJECT_ID('Staff')";
 
         try (Connection conn = new DBContext().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                String code = rs.getString("StaffCode");
-                if (code != null && code.startsWith("ST")) {
-                    try {
-                        // Extract number part after "ST"
-                        String numPart = code.substring(2).trim();
-                        if (!numPart.isEmpty()) {
-                            long num = Long.parseLong(numPart);
-                            if (num > max) {
-                                max = num;
-                            }
-                        }
-                    } catch (NumberFormatException e) {
-                        // Ignore codes that don't have a numeric suffix
-                    }
-                }
+                PreparedStatement ps = conn.prepareStatement(sysSql);
+                ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                nextId = rs.getLong("next_id");
             }
-
         } catch (Exception e) {
-            System.out.println("Error generating staff code: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("Error querying sys.identity_columns for staff: " + e.getMessage());
         }
 
-        long nextCode = max + 1;
+        // Fallback: use MAX(StaffId) if sys query fails or returns nothing
+        if (nextId <= 0) {
+            String sqlMax = "SELECT MAX(StaffId) FROM Staff";
+            try (Connection conn = new DBContext().getConnection();
+                    PreparedStatement ps = conn.prepareStatement(sqlMax);
+                    ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    nextId = rs.getLong(1) + 1;
+                }
+            } catch (Exception e) {
+                nextId = 1;
+            }
+        }
+
         // Format as ST001, ST002... if less than 1000, else just ST + number
-        if (nextCode < 1000) {
-            return String.format("ST%03d", nextCode);
+        if (nextId < 1000) {
+            return String.format("ST%03d", nextId);
         } else {
-            return "ST" + nextCode;
+            return "ST" + nextId;
         }
     }
 
