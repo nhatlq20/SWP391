@@ -23,13 +23,7 @@
                             <h3 class="fw-bold mb-0"><i class="fas fa-file-import me-2 text-primary"></i>Chỉnh sửa phiếu nhập</h3>
                         </div>
                         <div class="medicine-card">
-                            <c:if test="${not empty error}">
-                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                    <i class="fas fa-exclamation-circle me-2"></i>${error}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                        aria-label="Close"></button>
-                                </div>
-                            </c:if>
+                           
 
                             <c:if test="${not empty importRecord}">
                                 <form action="${pageContext.request.contextPath}/admin/imports" method="POST">
@@ -202,7 +196,8 @@
                             <div class="form-group mb-3">
                                 <label class="form-label">Số lượng</label>
                                 <input type="number" id="modalQuantity" class="form-control" min="1"
-                                    placeholder="Nhập số lượng" oninput="calculateModalTotal()">
+                                    placeholder="Nhập số lượng" oninput="validateQuantity(); calculateModalTotal();">
+                                <div id="quantityError" style="color: red; font-size: 13px; margin-top: 4px; display: none;"></div>
                             </div>
                             <div class="form-group mb-3">
                                 <label class="form-label">Giá</label>
@@ -271,13 +266,44 @@
                             document.getElementById('modalTotalDisplay').textContent = formatCurrency(total);
                         }
 
+                        function validateQuantity() {
+                            const quantityInput = document.getElementById('modalQuantity');
+                            const errorDiv = document.getElementById('quantityError');
+                            const value = quantityInput.value;
+                            if (value === '' || value === null) {
+                                errorDiv.textContent = "Vui lòng nhập số lượng.";
+                                errorDiv.style.display = 'block';
+                                return false;
+                            }
+                            const intValue = parseInt(value);
+                            if (isNaN(intValue) || intValue <= 0) {
+                                errorDiv.textContent = "Số lượng phải lớn hơn 0.";
+                                errorDiv.style.display = 'block';
+                                return false;
+                            } else if (intValue > 1000) {
+                                errorDiv.textContent = "Số lượng không được vượt quá 1000.";
+                                errorDiv.style.display = 'block';
+                                return false;
+                            } else {
+                                errorDiv.textContent = "";
+                                errorDiv.style.display = 'none';
+                                return true;
+                            }
+                        }
+
                         function addMedicineFromModal() {
                             const medicineId = document.getElementById('modalMedicineId').value;
-                            const quantity = parseInt(document.getElementById('modalQuantity').value);
+                            const quantityInput = document.getElementById('modalQuantity');
+                            const quantity = quantityInput.value;
                             const price = parseFloat(document.getElementById('modalPrice').value);
 
-                            if (!medicineId || !quantity || !price) {
+                            if (!medicineId || quantity === '' || quantity === null || isNaN(parseInt(quantity)) || !price) {
+                                validateQuantity();
                                 alert("Vui lòng nhập đầy đủ thông tin thuốc.");
+                                return;
+                            }
+                            if (!validateQuantity()) {
+                                quantityInput.focus();
                                 return;
                             }
 
@@ -285,11 +311,11 @@
                             const selectedOption = selectElement.options[selectElement.selectedIndex];
                             const medicineCode = selectedOption.text.split(' - ')[0];
 
-                            const total = quantity * price;
+                            const total = parseInt(quantity) * price;
                             medicineList.push({
                                 medicineId: medicineId,
                                 medicineCode: medicineCode,
-                                quantity: quantity,
+                                quantity: parseInt(quantity),
                                 price: price,
                                 total: total
                             });
