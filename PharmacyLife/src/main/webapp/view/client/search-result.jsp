@@ -15,8 +15,7 @@
                     <link href="<c:url value='/assets/css/header.css'/>" rel="stylesheet">
                     <link href="<c:url value='/assets/css/style.css'/>" rel="stylesheet">
                     <link href="<c:url value='/assets/css/home-page.css'/>" rel="stylesheet">
-                    \ href="
-                    <c:url value='/assets/css/search-result.css' />" rel="stylesheet">
+                    <link href="<c:url value='/assets/css/search-result.css' />" rel="stylesheet">
                 </head>
 
                 <body>
@@ -24,12 +23,6 @@
 
                         <div class="main-content">
                             <div class="container">
-
-                                <!-- Back link -->
-                                <a href="${pageContext.request.contextPath}/home" class="back-link">
-                                    <i class="fas fa-arrow-left"></i> Quay lại trang chủ
-                                </a>
-
                                 <!-- Search header -->
                                 <div class="search-header rounded p-4 mb-4">
                                     <c:choose>
@@ -56,7 +49,7 @@
                                             <c:forEach var="medicine" items="${medicines}">
                                                 <div class="col-6 col-md-4 col-lg-3">
                                                     <div class="card h-100 medicine-card"
-                                                        onclick="window.location.href='${pageContext.request.contextPath}/medicine/detail?id=${medicine.medicineID}'">
+                                                        onclick="window.location.href = '${pageContext.request.contextPath}/medicine/detail?id=${medicine.medicineId}'">
                                                         <c:choose>
                                                             <c:when test="${not empty medicine.imageUrl}">
                                                                 <c:set var="imageUrlTrimmed"
@@ -105,7 +98,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <a class="btn btn-primary w-100"
-                                                                    href="${pageContext.request.contextPath}/medicine/detail?id=${medicine.medicineID}">Mua</a>
+                                                                    href="${pageContext.request.contextPath}/medicine/detail?id=${medicine.medicineId}">Mua</a>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -121,10 +114,6 @@
                                                 <p>Không có kết quả cho từ khóa "
                                                     <c:out value='${keyword}' />". Hãy thử tìm kiếm với từ khóa khác.
                                                 </p>
-                                                <a href="${pageContext.request.contextPath}/home"
-                                                    class="btn btn-outline-primary mt-3">
-                                                    <i class="fas fa-home me-1"></i> Về trang chủ
-                                                </a>
                                             </div>
                                         </c:if>
                                     </c:otherwise>

@@ -124,7 +124,7 @@ public class MedicineDAO {
 
         String sql = "SELECT m.*, c.CategoryName FROM Medicine m " +
                 "LEFT JOIN Category c ON m.CategoryId = c.CategoryId " +
-                "WHERE m.MedicineName LIKE ? OR m.ShortDescription LIKE ? OR m.BrandOrigin LIKE ? " +
+                "WHERE m.MedicineName LIKE ? " +
                 "ORDER BY m.MedicineName";
 
         try (Connection conn = dbContext.getConnection();
@@ -132,8 +132,6 @@ public class MedicineDAO {
 
             String searchPattern = "%" + searchTerm + "%";
             ps.setString(1, searchPattern);
-            ps.setString(2, searchPattern);
-            ps.setString(3, searchPattern);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
