@@ -146,23 +146,43 @@
                             </a>
                         </c:if>
                     </div>
-                </div>
 
-                <div class="card">
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 220px;" class="ps-3">Mã mục</th>
-                                        <th>Tên danh mục</th>
-                                        <th style="width: 220px;">Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <c:choose>
-                                        <c:when test="${not empty categoryList}">
-                                            <c:forEach items="${categoryList}" var="c">
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 220px;" class="ps-3">Mã mục</th>
+                                            <th>Tên danh mục</th>
+                                            <th style="width: 220px;">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <c:choose>
+                                            <c:when test="${not empty categoryList}">
+                                                <c:forEach items="${categoryList}" var="c">
+                                                    <tr>
+                                                        <td class="ps-3">${c.categoryCode}</td>
+                                                        <td>${c.categoryName}</td>
+                                                        <td class="action-icons">
+                                                            <a href="${pageContext.request.contextPath}/category?action=detail&id=${c.categoryId}"
+                                                                class="text-info" title="Xem"><i
+                                                                    class="fas fa-eye"></i></a>
+                                                            <a href="#" class="text-warning" title="Sửa"><i
+                                                                    class="fas fa-pen"></i></a>
+                                                            <!-- nếu là rolde là 1 thì xuất hiện nút xóa  -->
+                                                            <c:if
+                                                                test="${sessionScope.userType eq 'staff' and fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
+                                                                <a href="category?action=delete&id=${c.categoryId}"
+                                                                    class="action-delete js-delete-btn" title="Xóa"><i
+                                                                        class="fas fa-trash"></i><span>Xóa</span></a>
+                                                            </c:if>
+                                                        </td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </c:when>
+                                            <c:otherwise>
                                                 <tr>
                                                     <td class="ps-3">${c.categoryCode}</td>
                                                     <td>${c.categoryName}</td>
@@ -181,63 +201,57 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            </c:forEach>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <tr>
-                                                <td colspan="3" class="text-center py-4 text-muted">Không có danh mục
-                                                    nào.</td>
-                                            </tr>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </tbody>
-                            </table>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content border-0 shadow">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Xác nhận xóa</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            Bạn có chắc muốn xóa danh mục này không?
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                            <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Xóa</button>
+                <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Xác nhận xóa</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Bạn có chắc muốn xóa danh mục này không?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Xóa</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-            <script>
-                (() => {
-                    let deleteUrl = null;
-                    const modalElement = document.getElementById('deleteCategoryModal');
-                    const modal = new bootstrap.Modal(modalElement);
-                    const confirmBtn = document.getElementById('confirmDeleteBtn');
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+                <script>
+                    (() => {
+                        let deleteUrl = null;
+                        const modalElement = document.getElementById('deleteCategoryModal');
+                        const modal = new bootstrap.Modal(modalElement);
+                        const confirmBtn = document.getElementById('confirmDeleteBtn');
 
-                    document.querySelectorAll('.js-delete-btn').forEach((button) => {
-                        button.addEventListener('click', (event) => {
-                            event.preventDefault();
-                            deleteUrl = button.getAttribute('href');
-                            modal.show();
+                        document.querySelectorAll('.js-delete-btn').forEach((button) => {
+                            button.addEventListener('click', (event) => {
+                                event.preventDefault();
+                                deleteUrl = button.getAttribute('href');
+                                modal.show();
+                            });
                         });
-                    });
 
-                    confirmBtn.addEventListener('click', () => {
-                        if (deleteUrl) {
-                            window.location.href = deleteUrl;
-                        }
-                    });
-                })();
-            </script>
-        </body>
+                        confirmBtn.addEventListener('click', () => {
+                            if (deleteUrl) {
+                                window.location.href = deleteUrl;
+                            }
+                        });
+                    })();
+                </script>
+            </body>
 
-        </html>
+            </html>
