@@ -133,6 +133,51 @@
                                 transform: translateY(-50%) !important;
                                 color: #9ca3af !important;
                             }
+
+                            /* Filter Dropdown Styling */
+                            .filter-dropdown {
+                                position: relative !important;
+                                display: inline-block !important;
+                            }
+
+                            .filter-menu {
+                                display: none !important;
+                                position: absolute !important;
+                                right: 0 !important;
+                                top: 45px !important;
+                                background-color: #fff !important;
+                                min-width: 180px !important;
+                                box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+                                border-radius: 10px !important;
+                                z-index: 1000 !important;
+                                padding: 8px 0 !important;
+                                border: 1px solid #e5e7eb !important;
+                            }
+
+                            .filter-menu.show {
+                                display: block !important;
+                            }
+
+                            .filter-item {
+                                padding: 10px 16px !important;
+                                text-decoration: none !important;
+                                display: block !important;
+                                color: #374151 !important;
+                                font-size: 0.9rem !important;
+                                transition: background-color 0.2s !important;
+                                cursor: pointer !important;
+                            }
+
+                            .filter-item:hover {
+                                background-color: #f3f4f6 !important;
+                                color: #2563eb !important;
+                            }
+
+                            .filter-item.active {
+                                background-color: #eff6ff !important;
+                                color: #2563eb !important;
+                                font-weight: 600 !important;
+                            }
                         </style>
                     </head>
 
@@ -155,9 +200,24 @@
                                                 placeholder="Tìm tên, mã nhân viên..."
                                                 oninput="filterStaffTable()" />
                                         </div>
-                                        <button class="btn-action btn-view" title="Lọc" style="width:40px;height:40px;">
-                                            <i class="fas fa-filter"></i>
-                                        </button>
+                                        <div class="filter-dropdown">
+                                            <button class="btn-action btn-view" title="Lọc" 
+                                                onclick="toggleFilterMenu(event)">
+                                                <i class="fas fa-filter"></i>
+                                            </button>
+                                            <div class="filter-menu" id="filterMenu">
+                                                <a href="${pageContext.request.contextPath}/admin/manage-staff?action=list" 
+                                                   class="filter-item ${empty currentSort ? 'active' : ''}">Mặc định</a>
+                                                <a href="${pageContext.request.contextPath}/admin/manage-staff?action=list&sort=asc" 
+                                                   class="filter-item ${currentSort == 'asc' ? 'active' : ''}">
+                                                   <i class="fas fa-arrow-up me-2"></i>Tăng dần
+                                                </a>
+                                                <a href="${pageContext.request.contextPath}/admin/manage-staff?action=list&sort=desc" 
+                                                   class="filter-item ${currentSort == 'desc' ? 'active' : ''}">
+                                                   <i class="fas fa-arrow-down me-2"></i>Giảm dần
+                                                </a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -235,6 +295,23 @@
                         </div>
 
                         <script>
+                            function toggleFilterMenu(event) {
+                                event.stopPropagation();
+                                document.getElementById('filterMenu').classList.toggle('show');
+                            }
+
+                            window.onclick = function(event) {
+                                if (!event.target.matches('.btn-view') && !event.target.matches('.fa-filter')) {
+                                    var dropdowns = document.getElementsByClassName("filter-menu");
+                                    for (var i = 0; i < dropdowns.length; i++) {
+                                        var openDropdown = dropdowns[i];
+                                        if (openDropdown.classList.contains('show')) {
+                                            openDropdown.classList.remove('show');
+                                        }
+                                    }
+                                }
+                            }
+
                             function filterStaffTable() {
                                 var input = document.getElementById('staffSearchInput').value.toLowerCase();
                                 var rows = document.querySelectorAll('#staffTable tbody tr');

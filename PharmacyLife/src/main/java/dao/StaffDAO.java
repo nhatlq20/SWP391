@@ -13,10 +13,22 @@ public class StaffDAO {
 
     // 1. Lấy danh sách staff
     public List<Staff> getAllStaff() {
+        return getAllStaff(null);
+    }
+
+    public List<Staff> getAllStaff(String sortOrder) {
         List<Staff> list = new ArrayList<>();
 
         String sql = "SELECT s.StaffId, s.StaffCode, s.StaffName, s.StaffPhone, s.StaffAddress, s.StaffDob, r.RoleName, s.StaffIsActive, s.StaffEmail, s.StaffGender "
                + "FROM Staff s JOIN Role r ON s.RoleId = r.RoleId";
+        
+        if (sortOrder != null && !sortOrder.isEmpty()) {
+            if ("asc".equalsIgnoreCase(sortOrder)) {
+                sql += " ORDER BY s.StaffCode ASC";
+            } else if ("desc".equalsIgnoreCase(sortOrder)) {
+                sql += " ORDER BY s.StaffCode DESC";
+            }
+        }
 
         try (Connection conn = new DBContext().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
