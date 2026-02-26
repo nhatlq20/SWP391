@@ -158,8 +158,8 @@
 
                     <div class="search-section">
                         <form action="${pageContext.request.contextPath}/search" method="GET" style="width: 100%;">
-                            <input type="text" class="search-bar" placeholder="Tìm tên thuốc, bệnh lý,..." name="q"
-                                id="searchInput">
+                            <input type="text" class="search-bar" placeholder="Tìm tên thuốc, bệnh lý,..."
+                                name="keyword" id="searchInput">
                         </form>
                     </div>
 
@@ -244,90 +244,95 @@
                             </c:otherwise>
                         </c:choose>
 
-                        <!-- Cart Dropdown -->
-                        <div class="cart-wrapper">
-                            <a href="${pageContext.request.contextPath}/cart" class="cart-btn"
-                                style="text-decoration: none;">
-                                <i class="fas fa-shopping-cart"></i><span class="cart-badge" id="cartCount">
-                                    <c:out value="${cartCount != null ? cartCount : 0}" />
-                                </span>
-                            </a>
-                            <!-- Dropdown -->
-                            <div class="cart-dropdown shadow-sm" id="cartDropdown">
-                                <div class="cart-header fw-semibold px-3 py-2 border-bottom">Giỏ hàng</div>
-                                <div class="cart-items" id="miniCartItems">
-                                    <c:choose>
-                                        <c:when
-                                            test="${empty sessionScope.cart.items or fn:length(sessionScope.cart.items) == 0}">
-                                            <div class="text-center text-muted py-3 small">Giỏ hàng trống
-                                            </div>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <c:forEach var="it" items="${sessionScope.cart.items}">
-                                                <div class="cart-item d-flex align-items-center p-2 border-bottom">
-                                                    <div class="cart-img-wrapper">
-                                                        <c:choose>
-                                                            <c:when test="${not empty it.medicine.imageUrl}">
-                                                                <c:set var="imageUrlTrimmed"
-                                                                    value="${fn:trim(it.medicine.imageUrl)}" />
-                                                                <c:choose>
-                                                                    <c:when
-                                                                        test="${fn:startsWith(imageUrlTrimmed, 'http://') or fn:startsWith(imageUrlTrimmed, 'https://')}">
-                                                                        <c:set var="imgSrc"
-                                                                            value="${imageUrlTrimmed}" />
-                                                                    </c:when>
-                                                                    <c:when
-                                                                        test="${fn:startsWith(imageUrlTrimmed, '/')}">
-                                                                        <c:set var="imgSrc"
-                                                                            value="${pageContext.request.contextPath}${imageUrlTrimmed}" />
-                                                                    </c:when>
-                                                                    <c:otherwise>
-                                                                        <c:set var="imgSrc"
-                                                                            value="${pageContext.request.contextPath}/assets/img/${imageUrlTrimmed}" />
-                                                                    </c:otherwise>
-                                                                </c:choose>
-                                                                <img src="<c:out value='${imgSrc}'/>"
-                                                                    alt="${it.medicine.medicineName}" class="cart-img"
-                                                                    onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/img/no-image.png';">
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <img src="${pageContext.request.contextPath}/assets/img/no-image.png"
-                                                                    alt="No image" class="cart-img">
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </div>
-                                                    <div class="flex-grow-1 ms-2" style="min-width: 0;">
-                                                        <div class="cart-name text-truncate"
-                                                            title="${it.medicine.medicineName}">
-                                                            ${it.medicine.medicineName}
-                                                        </div>
-                                                        <div class="cart-price text-primary fw-semibold">
-                                                            <fmt:formatNumber value="${it.price}" type="number"
-                                                                groupingUsed="true" />₫
-                                                            <small class="text-muted">x${it.quantity}</small>
-                                                        </div>
-                                                    </div>
-                                                    <a href="${pageContext.request.contextPath}/cart?action=remove&id=${it.medicine.medicineId}"
-                                                        class="text-danger small ms-2">
-                                                        <i class="fas fa-trash"></i>
-                                                    </a>
+                        <c:set var="lowerRole" value="${fn:toLowerCase(fn:trim(sessionScope.roleName))}" />
+                        <c:if test="${lowerRole ne 'admin' and lowerRole ne 'staff'}">
+                            <!-- Cart Dropdown -->
+                            <div class="cart-wrapper">
+                                <a href="${pageContext.request.contextPath}/cart" class="cart-btn"
+                                    style="text-decoration: none;">
+                                    <i class="fas fa-shopping-cart"></i><span class="cart-badge" id="cartCount">
+                                        <c:out value="${cartCount != null ? cartCount : 0}" />
+                                    </span>
+                                </a>
+                                <!-- Dropdown -->
+                                <div class="cart-dropdown shadow-sm" id="cartDropdown">
+                                    <div class="cart-header fw-semibold px-3 py-2 border-bottom">Giỏ hàng</div>
+                                    <div class="cart-items" id="miniCartItems">
+                                        <c:choose>
+                                            <c:when
+                                                test="${empty sessionScope.cart.items or fn:length(sessionScope.cart.items) == 0}">
+                                                <div class="text-center text-muted py-3 small">Giỏ hàng trống
                                                 </div>
-                                            </c:forEach>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </div>
-                                <div class="cart-footer text-center p-2">
-                                    <a href="cart" class="btn btn-primary btn-sm px-3">Xem giỏ hàng</a>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:forEach var="it" items="${sessionScope.cart.items}">
+                                                    <div class="cart-item d-flex align-items-center p-2 border-bottom">
+                                                        <div class="cart-img-wrapper">
+                                                            <c:choose>
+                                                                <c:when test="${not empty it.medicine.imageUrl}">
+                                                                    <c:set var="imageUrlTrimmed"
+                                                                        value="${fn:trim(it.medicine.imageUrl)}" />
+                                                                    <c:choose>
+                                                                        <c:when
+                                                                            test="${fn:startsWith(imageUrlTrimmed, 'http://') or fn:startsWith(imageUrlTrimmed, 'https://')}">
+                                                                            <c:set var="imgSrc"
+                                                                                value="${imageUrlTrimmed}" />
+                                                                        </c:when>
+                                                                        <c:when
+                                                                            test="${fn:startsWith(imageUrlTrimmed, '/')}">
+                                                                            <c:set var="imgSrc"
+                                                                                value="${pageContext.request.contextPath}${imageUrlTrimmed}" />
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <c:set var="imgSrc"
+                                                                                value="${pageContext.request.contextPath}/assets/img/${imageUrlTrimmed}" />
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                    <img src="<c:out value='${imgSrc}'/>"
+                                                                        alt="${it.medicine.medicineName}"
+                                                                        class="cart-img"
+                                                                        onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/img/no-image.png';">
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <img src="${pageContext.request.contextPath}/assets/img/no-image.png"
+                                                                        alt="No image" class="cart-img">
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </div>
+                                                        <div class="flex-grow-1 ms-2" style="min-width: 0;">
+                                                            <div class="cart-name text-truncate"
+                                                                title="${it.medicine.medicineName}">
+                                                                ${it.medicine.medicineName}
+                                                            </div>
+                                                            <div class="cart-price text-primary fw-semibold">
+                                                                <fmt:formatNumber value="${it.price}" type="number"
+                                                                    groupingUsed="true" />₫
+                                                                <small class="text-muted">x${it.quantity}</small>
+                                                            </div>
+                                                        </div>
+                                                        <a href="${pageContext.request.contextPath}/cart?action=remove&id=${it.medicine.medicineId}"
+                                                            class="text-danger small ms-2">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </c:forEach>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </div>
+                                    <div class="cart-footer text-center p-2">
+                                        <a href="cart" class="btn btn-primary btn-sm px-3">Xem giỏ hàng</a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </c:if>
                     </div>
                 </header>
 
                 <!-- Logout Modal -->
                 <div id="logoutModal" class="logout-modal-overlay">
                     <div class="logout-modal">
-                        <img src="${pageContext.request.contextPath}/assets/img/logout.png" alt="Logout Icon" class="logout-modal-icon">
+                        <img src="${pageContext.request.contextPath}/assets/img/logout.png" alt="Logout Icon"
+                            class="logout-modal-icon">
                         <h2 class="logout-modal-title">Đăng xuất</h2>
                         <p class="logout-modal-text">Bạn có muốn đăng xuất hay không ?</p>
                         <div class="logout-modal-actions">
@@ -350,7 +355,7 @@
                     }
 
                     // Smooth closing by clicking outside
-                    window.onclick = function(event) {
+                    window.onclick = function (event) {
                         const modal = document.getElementById('logoutModal');
                         if (event.target == modal) {
                             closeLogoutModal();

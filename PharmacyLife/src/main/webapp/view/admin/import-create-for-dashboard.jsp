@@ -146,7 +146,8 @@
                             <div class="form-group mb-3">
                                 <label class="form-label">Số lượng</label>
                                 <input type="number" id="modalQuantity" class="form-control" min="1"
-                                    placeholder="Nhập số lượng" oninput="calculateModalTotal()">
+                                    placeholder="Nhập số lượng" oninput="validateQuantityInput()">
+                                <div id="quantityError" style="color: red; font-size: 13px; margin-top: 4px; display: none;"></div>
                             </div>
                             <div class="form-group mb-3">
                                 <label class="form-label">Giá</label>
@@ -202,14 +203,56 @@
                             document.getElementById('modalTotalDisplay').textContent = formatCurrency(total);
                         }
 
+                        function validateQuantityInput() {
+                            const quantityInput = document.getElementById('modalQuantity');
+                            const errorDiv = document.getElementById('quantityError');
+                            const value = quantityInput.value;
+                            let errorMsg = '';
+                            if (value === '' || value === null) {
+                                errorMsg = 'Vui lòng nhập số lượng.';
+                            } else if (isNaN(value) || parseInt(value) <= 0) {
+                                errorMsg = 'Số lượng phải lớn hơn 0.';
+                            } else if (parseInt(value) > 1000) {
+                                errorMsg = 'Số lượng không được vượt quá 1000.';
+                            }
+                            if (errorMsg !== '') {
+                                errorDiv.textContent = errorMsg;
+                                errorDiv.style.display = 'block';
+                            } else {
+                                errorDiv.textContent = '';
+                                errorDiv.style.display = 'none';
+                            }
+                            calculateModalTotal();
+                        }
+
                         function addMedicineFromModal() {
                             const medicineId = document.getElementById('modalMedicineId').value;
-                            const quantity = parseInt(document.getElementById('modalQuantity').value);
+                            const quantityInput = document.getElementById('modalQuantity');
                             const price = parseFloat(document.getElementById('modalPrice').value);
+                            const errorDiv = document.getElementById('quantityError');
+                            const quantity = parseInt(quantityInput.value);
 
-                            if (!medicineId || !quantity || !price) {
+                            // Validate quantity
+                            let errorMsg = '';
+                            if (quantityInput.value === '' || quantityInput.value === null) {
+                                errorMsg = 'Vui lòng nhập số lượng.';
+                            } else if (isNaN(quantity) || quantity <= 0) {
+                                errorMsg = 'Số lượng phải lớn hơn 0.';
+                            } else if (quantity > 1000) {
+                                errorMsg = 'Số lượng không được vượt quá 1000.';
+                            }
+                            if (!medicineId || !price) {
                                 alert("Vui lòng nhập đầy đủ thông tin thuốc.");
                                 return;
+                            }
+                            if (errorMsg !== '') {
+                                errorDiv.textContent = errorMsg;
+                                errorDiv.style.display = 'block';
+                                quantityInput.focus();
+                                return;
+                            } else {
+                                errorDiv.textContent = '';
+                                errorDiv.style.display = 'none';
                             }
 
                             // Lấy tên thuốc từ option
@@ -260,6 +303,21 @@
                             const modal = document.getElementById('addMedicineModal');
                             if (event.target === modal) closeAddMedicineModal();
                         }
+                        // Prevent form submit if any invalid quantity
+                        document.getElementById('importForm').addEventListener('submit', function(e) {
+                            let hasError = false;
+                            for (let i = 0; i < medicineList.length; i++) {
+                                const qty = medicineList[i].quantity;
+                                if (!qty || qty <= 0 || qty > 1000) {
+                                    hasError = true;
+                                    break;
+                                }
+                            }
+                            if (hasError) {
+                                alert('Có thuốc với số lượng không hợp lệ. Vui lòng kiểm tra lại.');
+                                e.preventDefault();
+                            }
+                        });
                     </script>
                     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
                 </body>
