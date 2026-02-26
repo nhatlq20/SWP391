@@ -34,10 +34,10 @@
                 }
 
                 .page-title {
-                    font-size: 44px;
+                    font-size: 1.75rem;
                     font-weight: 700;
                     margin: 0;
-                    color: #2a2d34;
+                    color: #080808;
                 }
 
                 .actions {
@@ -62,6 +62,7 @@
                 }
 
                 .card {
+
                     border: 0;
                     border-radius: 12px;
                     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
@@ -75,7 +76,7 @@
                 .action-icons {
                     display: flex;
                     align-items: center;
-                    justify-content:center;
+                   margin-left: 100px;
                     gap: 4px;
         
                 }
@@ -92,6 +93,7 @@
                     transition: all 0.2s;
                     cursor: pointer;
                     text-decoration: none !important;
+                  
                 }
 
                 .btn-action:hover,
@@ -129,7 +131,7 @@
 
             <div class="main-content">
                 <div class="page-header">
-                    <h2 class="page-title"><i class="fas fa-list me-2"></i>Quản lí danh mục</h2>
+                    <h2 class="page-title"><i class="fas fa-list me-2 text-primary"></i>Quản lí danh mục</h2>
                     <div class="actions">
                         <form class="search-form" action="${pageContext.request.contextPath}/category" method="get">
                             <input type="hidden" name="action" value="search" />
@@ -141,7 +143,7 @@
                             test="${sessionScope.userType eq 'staff' and fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
                             <a href="${pageContext.request.contextPath}/category?action=show"
                                 class="btn btn-primary btn-radius">
-                                <i class="fas fa-plus me-1"></i>Thêm danh mục mới
+                                <i class="fas fa-plus me-1 text-primary" ></i>Thêm danh mục mới
                             </a>
                         </c:if>
                     </div>

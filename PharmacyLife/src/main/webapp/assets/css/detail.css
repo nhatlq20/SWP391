@@ -295,10 +295,145 @@ body {
 }
 
 .review-item {
-    padding: 20px;
-    background: #f9f9f9;
-    border-radius: 8px;
-    margin-bottom: 15px;
+    padding: 16px;
+    background: #ffffff;
+    border: 1px solid #e9edf3;
+    border-radius: 14px;
+    margin-bottom: 16px;
+}
+
+.review-thread {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.thread-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.thread-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.customer-avatar {
+    background: #c4c8ce;
+}
+
+.staff-avatar {
+    background: #c4c8ce;
+}
+
+.thread-main-content {
+    flex: 1;
+}
+
+.reviewer-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #2f3648;
+    margin-bottom: 2px;
+}
+
+.review-score-line {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #f59e0b;
+    margin-bottom: 7px;
+}
+
+.score-number {
+    font-size: 15px;
+    font-weight: 600;
+    color: #475066;
+}
+
+.review-score-line .fa-star {
+    font-size: 14px;
+}
+
+.review-score-line .review-date {
+    margin-left: auto;
+    font-size: 11px;
+    color: #9aa3b2;
+}
+
+.review-comment {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #3f465d;
+}
+
+.thread-reply-wrap {
+    position: relative;
+    margin-left: 20px;
+    padding-left: 28px;
+}
+
+.thread-reply-line {
+    position: absolute;
+    left: 0;
+    top: -22px;
+    width: 26px;
+    height: 46px;
+    border-left: 3px solid #cfd6e2;
+    border-bottom: 3px solid #cfd6e2;
+    border-bottom-left-radius: 18px;
+}
+
+.thread-reply {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.thread-reply-content {
+    flex: 1;
+    background: #f6f8fc;
+    border: 1px solid #e3e8f2;
+    border-radius: 12px;
+    padding: 10px 12px;
+}
+
+.thread-reply-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.reply-staff-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f39c1;
+}
+
+.reply-role-tag {
+    font-size: 11px;
+    font-weight: 600;
+    color: #1d4ed8;
+    background: #dbeafe;
+    border-radius: 6px;
+    padding: 2px 6px;
+}
+
+.thread-reply-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #4a5168;
 }
 
 .review-header {
@@ -338,6 +473,53 @@ body {
 .review-rating {
     font-size: 12px;
     color: #FFD700;
+}
+
+.review-meta-right {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.reply-status {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.status-replied {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-pending {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.review-reply-box {
+    margin-top: 10px;
+    background: #eff6ff;
+    border-left: 3px solid #3b82f6;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.reply-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 4px;
+}
+
+.reply-content {
+    font-size: 13px;
+    color: #334155;
+    line-height: 1.5;
 }
 
 .review-text {
@@ -398,6 +580,25 @@ body {
     .review-section {
         margin-top: 30px;
         padding-top: 20px;
+    }
+
+    .review-item {
+        padding: 14px;
+    }
+
+    .thread-avatar {
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
+    }
+
+    .reviewer-name {
+        font-size: 14px;
+    }
+
+    .review-comment,
+    .thread-reply-text {
+        font-size: 13px;
     }
 }
 
@@ -579,13 +780,13 @@ body {
 
 .no-reviews {
     text-align: center;
-    color: #999;
+    color: #999999a9;
     padding: 40px 20px;
     font-size: 16px;
 }
 
 .review-item {
-    border: 1px solid #eee;
+    /* border: 1px solid #9d9d9d; */
     border-radius: 8px;
     padding: 20px;
     background: white;
