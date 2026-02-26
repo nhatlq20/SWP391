@@ -10,8 +10,8 @@ public class EmailUtils {
 
     private static final String HOST = "smtp.gmail.com";
     private static final String PORT = "587"; // Use 587 for STARTTLS
-    private static final String EMAIL = "phainon33m5@gmail.com";
-    private static final String PASSWORD = "qknl cwhu swnr vaod";
+    private static final String EMAIL = "pharmacylifeg2@gmail.com";
+    private static final String PASSWORD = "oeer qkry weja mbkk";
 
     public static String generateOTP() {
         Random random = new Random();

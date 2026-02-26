@@ -62,7 +62,7 @@ public class StaffController extends HttpServlet {
                     request.getRequestDispatcher("/view/admin/staff-detail.jsp").forward(request, response);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    response.sendRedirect(request.getContextPath() + "/manage-staff");
+                    response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
                 }
                 break;
 
@@ -73,7 +73,7 @@ public class StaffController extends HttpServlet {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                response.sendRedirect(request.getContextPath() + "/manage-staff");
+                response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
                 break;
 
             case "add":
@@ -105,18 +105,18 @@ public class StaffController extends HttpServlet {
 
                     if (staffName == null || staffName.trim().isEmpty()) {
                         System.out.println("ERROR: Staff name is required");
-                        response.sendRedirect(request.getContextPath() + "/manage-staff");
+                        response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
                         return;
                     }
                     if (staffEmail == null || staffEmail.trim().isEmpty()) {
                         System.out.println("ERROR: Staff email is required");
-                        response.sendRedirect(request.getContextPath() + "/manage-staff");
+                        response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
                         return;
                     }
 
                     if (staffPassword == null || staffPassword.trim().isEmpty()) {
                         System.out.println("ERROR: Staff password is required");
-                        response.sendRedirect(request.getContextPath() + "/manage-staff");
+                        response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
                         return;
                     }
 
@@ -125,7 +125,7 @@ public class StaffController extends HttpServlet {
 
                     if (roleId == null) {
                         System.out.println("ERROR: Role 'nhân viên' not found in database");
-                        response.sendRedirect(request.getContextPath() + "/manage-staff");
+                        response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
                         return;
                     }
                     System.out.println("Role ID: " + roleId);
@@ -148,16 +148,16 @@ public class StaffController extends HttpServlet {
                     }
                     System.out.println("===  END ===\n");
 
-                    response.sendRedirect(request.getContextPath() + "/manage-staff");
+                    response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
                 } catch (Exception e) {
                     System.out.println("ERROR: " + e.getMessage());
                     e.printStackTrace();
-                    response.sendRedirect(request.getContextPath() + "/manage-staff");
+                    response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
                 }
                 break;
 
             default:
-                response.sendRedirect(request.getContextPath() + "/manage-staff");
+                response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
         }
     }
 
