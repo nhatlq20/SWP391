@@ -1,7 +1,9 @@
 package controllers;
 
+import dao.MedicineDAO;
 import dao.ReviewDAO;
 import models.Review;
+import models.Medicine;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -97,14 +99,28 @@ public class CreatedReview extends HttpServlet {
         Integer customerId = (Integer) request.getAttribute("customerId");
         String medicineIdStr = request.getParameter("medicineId");
         String replyTo = request.getParameter("replyTo");
+
         if (medicineIdStr != null && !medicineIdStr.isEmpty()) {
             try {
                 int medicineId = Integer.parseInt(medicineIdStr);
+                MedicineDAO medicineDAO = new MedicineDAO();
+                Medicine medicine = medicineDAO.getMedicineById(medicineId);
+                if (medicine == null) {
+                    response.sendRedirect(request.getContextPath() + "/home");
+                    return;
+                }
+
                 request.setAttribute("medicineId", medicineId);
+                request.setAttribute("medicine", medicine);
             } catch (NumberFormatException e) {
-                // Ignore
+                response.sendRedirect(request.getContextPath() + "/home");
+                return;
             }
+        } else {
+            response.sendRedirect(request.getContextPath() + "/home");
+            return;
         }
+
         if (replyTo != null && !replyTo.trim().isEmpty()) {
             request.setAttribute("replyTo", replyTo.trim());
         }

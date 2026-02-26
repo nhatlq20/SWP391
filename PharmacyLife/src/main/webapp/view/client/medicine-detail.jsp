@@ -107,44 +107,44 @@
                                                     <c:otherwise>
                                                         <c:forEach var="review" items="${reviews}">
                                                             <div class="review-item">
-                                                                <div class="review-header">
-                                                                    <div class="reviewer-info">
-                                                                        <h5 class="reviewer-name">${review.customerName}
-                                                                        </h5>
-                                                                        <div class="review-rating">
-                                                                            <c:forEach var="i" begin="1" end="5">
-                                                                                <c:choose>
-                                                                                    <c:when
-                                                                                        test="${i <= review.rating}">
-                                                                                        <i class="fas fa-star"
-                                                                                            style="color: #FFD700; margin-right: 2px;"></i>
-                                                                                    </c:when>
-                                                                                    <c:otherwise>
-                                                                                        <i class="fas fa-star"
-                                                                                            style="color: #ddd; margin-right: 2px;"></i>
-                                                                                    </c:otherwise>
-                                                                                </c:choose>
-                                                                            </c:forEach>
-
+                                                                <div class="review-thread">
+                                                                    <div class="thread-main">
+                                                                        <div class="thread-avatar customer-avatar">
+                                                                            <c:out value="${fn:toUpperCase(fn:substring(fn:trim(review.customerName), 0, 1))}" />
+                                                                        </div>
+                                                                        <div class="thread-main-content">
+                                                                            <div class="reviewer-name"><c:out value="${review.customerName}" /></div>
+                                                                            <div class="review-score-line">
+                                                                                <span class="score-number">${review.rating}</span>
+                                                                                <i class="fas fa-star"></i>
+                                                                                <span class="review-date">${review.createdAt}</span>
+                                                                            </div>
+                                                                            <p class="review-comment"><c:out value="${review.comment}" /></p>
                                                                         </div>
                                                                     </div>
-                                                                    <span class="review-date">${review.createdAt}</span>
-                                                                </div>
-                                                                <p class="review-comment">${review.comment}</p>
-                                                                <div class="mt-2">
+
                                                                     <c:if test="${not empty review.replyContent}">
-                                                                        <div class="text-muted small">
-                                                                            Đã phản hồi bởi <strong>
-                                                                                <c:out
-                                                                                    value="${not empty review.replyStaffName ? review.replyStaffName : 'Nhân viên nhà thuốc'}" />
-                                                                            </strong>:
-                                                                            <c:out value="${review.replyContent}" />
+                                                                        <div class="thread-reply-wrap">
+                                                                            <div class="thread-reply-line"></div>
+                                                                            <div class="thread-reply">
+                                                                                <div class="thread-avatar staff-avatar">
+                                                                                    <c:out value="${fn:toUpperCase(fn:substring(fn:trim(not empty review.replyStaffName ? review.replyStaffName : 'N'), 0, 1))}" />
+                                                                                </div>
+                                                                                <div class="thread-reply-content">
+                                                                                    <div class="thread-reply-header">
+                                                                                        <span class="reply-staff-name"><c:out value="${not empty review.replyStaffName ? review.replyStaffName : 'Nhân viên nhà thuốc'}" /></span>
+                                                                                        <span class="reply-role-tag">Dược sĩ</span>
+                                                                                    </div>
+                                                                                    <div class="thread-reply-text"><c:out value="${review.replyContent}" /></div>
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
                                                                     </c:if>
+
                                                                     <c:if test="${sessionScope.userType eq 'staff'}">
                                                                         <a class="btn btn-sm btn-primary mt-2"
-                                                                            href="${pageContext.request.contextPath}/view-reviews?medicineId=${medicine.medicineId}&selectedReviewId=${review.reviewId}">
-                                                                            Trả lời
+                                                                           href="${pageContext.request.contextPath}/view-reviews?medicineId=${medicine.medicineId}&selectedReviewId=${review.reviewId}">
+                                                                            ${not empty review.replyContent ? 'Chỉnh sửa phản hồi' : 'Trả lời'}
                                                                         </a>
                                                                     </c:if>
                                                                 </div>

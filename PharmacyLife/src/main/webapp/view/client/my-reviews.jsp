@@ -93,7 +93,7 @@
     <div class="content-box">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="mb-0">Đánh giá của tôi</h4>
-            <span class="meta">Customer ID: ${customerId}</span>
+            <!-- <span class="meta">Customer ID: ${customerId}</span> -->
         </div>
 
         <c:if test="${not empty message}">
@@ -181,7 +181,7 @@
                                     <a href="${pageContext.request.contextPath}/medicine/detail?id=${review.medicineId}">
                                         ${not empty med ? med.medicineName : 'N/A'}
                                     </a>
-                                    (ID: ${review.medicineId})
+                                    <!-- (ID: ${review.medicineId}) -->
                                 </div>
                                 <div class="review-actions">
                                     <form method="post" action="${pageContext.request.contextPath}/reviews" onsubmit="return confirm('Bạn chắc chắn muốn xóa đánh giá này?');">
