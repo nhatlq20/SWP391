@@ -331,8 +331,8 @@
                         <h2 class="logout-modal-title">Đăng xuất</h2>
                         <p class="logout-modal-text">Bạn có muốn đăng xuất hay không ?</p>
                         <div class="logout-modal-actions">
-                            <a href="${pageContext.request.contextPath}/logout" class="btn-logout-confirm">Đăng xuất</a>
                             <button class="btn-logout-close" onclick="closeLogoutModal()">Đóng</button>
+                            <a href="${pageContext.request.contextPath}/logout" class="btn-logout-confirm">Đăng xuất</a>
                         </div>
                     </div>
                 </div>

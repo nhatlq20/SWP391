@@ -37,7 +37,8 @@ public class StaffController extends HttpServlet {
         switch (action) {
 
             case "list":
-                List<Staff> staffList = dao.getAllStaff();
+                String sort = request.getParameter("sort");
+                List<Staff> staffList = dao.getAllStaff(sort);
                 if (staffList == null) {
                     staffList = new ArrayList<>();
                 }
@@ -51,6 +52,7 @@ public class StaffController extends HttpServlet {
 
                 System.out.println("DAO size = " + staffList.size());
                 request.setAttribute("staffList", staffList);
+                request.setAttribute("currentSort", sort);
                 request.getRequestDispatcher("/view/admin/staff-list.jsp").forward(request, response);
                 break;
 
