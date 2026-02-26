@@ -75,9 +75,9 @@
                 .action-icons {
                     display: flex;
                     align-items: center;
-                    justify-content:flex-start;
+                    justify-content:center;
                     gap: 4px;
-                    /* margin-left: 10px; */
+        
                 }
 
                 .btn-action {
@@ -103,7 +103,7 @@
                 .btn-view {
                     background: #dbeafe;
                     color: #2563eb;
-                    /* margin-left: 50px; */
+                 
                 }
 
                 .btn-view:hover {
@@ -135,8 +135,7 @@
                             <input type="hidden" name="action" value="search" />
                             <input type="text" name="keyword" class="form-control" placeholder="Tìm tên danh mục..."
                                 value="${param.keyword}">
-                            <button type="submit" class="btn btn-primary btn-radius"><i
-                                    class="fas fa-search me-1"></i>Tìm</button>
+                     
                         </form>
                         <c:if
                             test="${sessionScope.userType eq 'staff' and fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
@@ -146,69 +145,55 @@
                             </a>
                         </c:if>
                     </div>
+                </div>
 
-                    <div class="card">
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 220px;" class="ps-3">Mã mục</th>
-                                            <th>Tên danh mục</th>
-                                            <th style="width: 220px;">Thao tác</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:choose>
-                                            <c:when test="${not empty categoryList}">
-                                                <c:forEach items="${categoryList}" var="c">
-                                                    <tr>
-                                                        <td class="ps-3">${c.categoryCode}</td>
-                                                        <td>${c.categoryName}</td>
-                                                        <td class="action-icons">
-                                                            <a href="${pageContext.request.contextPath}/category?action=detail&id=${c.categoryId}"
-                                                                class="text-info" title="Xem"><i
-                                                                    class="fas fa-eye"></i></a>
-                                                            <a href="#" class="text-warning" title="Sửa"><i
-                                                                    class="fas fa-pen"></i></a>
-                                                            <!-- nếu là rolde là 1 thì xuất hiện nút xóa  -->
-                                                            <c:if
-                                                                test="${sessionScope.userType eq 'staff' and fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
-                                                                <a href="category?action=delete&id=${c.categoryId}"
-                                                                    class="action-delete js-delete-btn" title="Xóa"><i
-                                                                        class="fas fa-trash"></i><span>Xóa</span></a>
-                                                            </c:if>
-                                                        </td>
-                                                    </tr>
-                                                </c:forEach>
-                                            </c:when>
-                                            <c:otherwise>
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 220px;" class="ps-3">Mã mục</th>
+                                        <th>Tên danh mục</th>
+                                        <th style="width: 220px;" class="text-center">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:choose>
+                                        <c:when test="${not empty categoryList}">
+                                            <c:forEach items="${categoryList}" var="c">
                                                 <tr>
                                                     <td class="ps-3">${c.categoryCode}</td>
                                                     <td>${c.categoryName}</td>
                                                     <td class="text-center">
                                                         <div class="action-icons">
-                                                        <a href="${pageContext.request.contextPath}/category?action=detail&id=${c.categoryId}"
-                                                            class="btn-action btn-view" title="Xem chi tiết"><i class="fas fa-eye"></i></a>
-                                                        
-                                                        <!-- nếu là rolde là 1 thì xuất hiện nút xóa  -->
-                                                        <c:if
-                                                            test="${sessionScope.userType eq 'staff' and fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
-                                                            <a href="${pageContext.request.contextPath}/category?action=delete&id=${c.categoryId}"
-                                                                class="btn-action btn-delete js-delete-btn" title="Xóa"><i
-                                                                    class="fas fa-trash"></i></a>
-                                                        </c:if>
+                                                            <a href="${pageContext.request.contextPath}/category?action=detail&id=${c.categoryId}"
+                                                                class="btn-action btn-view" title="Xem chi tiết"><i
+                                                                    class="fas fa-eye"></i></a>
+                                                            <c:if
+                                                                test="${sessionScope.userType eq 'staff' and fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
+                                                                <a href="${pageContext.request.contextPath}/category?action=delete&id=${c.categoryId}"
+                                                                    class="btn-action btn-delete js-delete-btn" title="Xóa"><i
+                                                                        class="fas fa-trash"></i></a>
+                                                            </c:if>
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </tbody>
-                                </table>
-                            </div>
+                                            </c:forEach>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <tr>
+                                                <td colspan="3" class="text-center py-4 text-muted">Không có danh mục
+                                                    nào.</td>
+                                            </tr>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
+            </div>
 
                 <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
