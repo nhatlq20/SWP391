@@ -392,29 +392,4 @@ public class MedicineDAO {
 
         return sb.toString();
     }
-
-    public List<Medicine> getBestSellers(int limit) {
-        List<Medicine> medicines = new ArrayList<>();
-        String sql = "SELECT TOP 5 m.*, c.CategoryName, COUNT(DISTINCT o.CustomerId) as Popularity " +
-                "FROM Medicine m " +
-                "LEFT JOIN Category c ON m.CategoryId = c.CategoryId " +
-                "LEFT JOIN OrderItems oi ON m.MedicineId = oi.MedicineId " +
-                "LEFT JOIN Orders o ON oi.OrderId = o.OrderId " +
-                "GROUP BY m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, " +
-                "m.Unit, m.OriginalPrice, m.SellingPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, c.CategoryName "
-                +
-                "ORDER BY Popularity DESC";
-
-        try (Connection conn = dbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    medicines.add(mapResultSetToMedicine(rs));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return medicines;
-    }
 }

@@ -14,10 +14,7 @@ public class CategoryDAO {
 
     public List<Category> getAllCategories() {
         List<Category> categories = new ArrayList<>();
-        String sql = "SELECT c.CategoryID, c.CategoryCode, c.CategoryName, COUNT(m.MedicineId) AS MedicineCount " +
-                "FROM Category c LEFT JOIN Medicine m ON c.CategoryID = m.CategoryId " +
-                "GROUP BY c.CategoryID, c.CategoryCode, c.CategoryName " +
-                "ORDER BY c.CategoryCode";
+        String sql = "SELECT CategoryID, CategoryCode, CategoryName FROM Category ORDER BY CategoryCode";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
@@ -28,7 +25,6 @@ public class CategoryDAO {
                 category.setCategoryId(rs.getInt("CategoryID"));
                 category.setCategoryCode(rs.getString("CategoryCode"));
                 category.setCategoryName(rs.getString("CategoryName"));
-                category.setMedicineCount(rs.getInt("MedicineCount"));
                 categories.add(category);
             }
         } catch (SQLException e) {
