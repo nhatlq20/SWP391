@@ -33,8 +33,8 @@
                             <div class="row g-4">
                                 <div class="col-md-6">
                                     <label class="form-label">Mã thuốc</label>
-                                    <input name="medicineCode" class="form-control" placeholder="Nhập mã thuốc"
-                                        required>
+                                    <input name="medicineCode" class="form-control" value="${nextMedicineCode}" readonly
+                                        style="background-color:#e9ecef; cursor:not-allowed;">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Danh mục</label>

@@ -48,13 +48,35 @@
 
                 .search-form {
                     display: flex;
-                    gap: 10px;
                     align-items: center;
                 }
 
-                .search-form input {
-                    border-radius: 24px;
-                    min-width: 260px;
+                .search-box {
+                    position: relative;
+                    max-width: 280px;
+                    width: 280px;
+                }
+
+                .search-box input {
+                    border: 1px solid #e5e7eb;
+                    border-radius: 10px;
+                    padding: 8px 14px 8px 38px;
+                    font-size: 0.9rem;
+                    width: 100%;
+                }
+
+                .search-box input:focus {
+                    outline: none;
+                    border-color: #3b82f6;
+                    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+                }
+
+                .search-box i {
+                    position: absolute;
+                    left: 12px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #9ca3af;
                 }
 
                 .btn-radius {
@@ -135,8 +157,13 @@
                     <div class="actions">
                         <form class="search-form" action="${pageContext.request.contextPath}/category" method="get">
                             <input type="hidden" name="action" value="search" />
-                            <input type="text" name="keyword" class="form-control" placeholder="Tìm tên danh mục..."
-                                value="${param.keyword}">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="categorySearchInput" name="keyword"
+                                    placeholder="Tìm tên danh mục, mã mục..." value="${param.keyword}"
+                                    oninput="filterCategoryTable()"
+                                    onkeydown="if(event.key==='Enter'){event.preventDefault(); filterCategoryTable();}">
+                            </div>
                      
                         </form>
                         <c:if
@@ -152,7 +179,7 @@
                 <div class="card">
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
+                            <table class="table table-hover align-middle mb-0" id="categoryTable">
                                 <thead>
                                     <tr>
                                         <th style="width: 220px;" class="ps-3">Mã mục</th>
@@ -164,7 +191,7 @@
                                     <c:choose>
                                         <c:when test="${not empty categoryList}">
                                             <c:forEach items="${categoryList}" var="c">
-                                                <tr>
+                                                <tr class="category-row">
                                                     <td class="ps-3">${c.categoryCode}</td>
                                                     <td>${c.categoryName}</td>
                                                     <td class="text-center">
@@ -238,6 +265,37 @@
                             }
                         });
                     })();
+
+                    function filterCategoryTable() {
+                        var input = document.getElementById('categorySearchInput').value.toLowerCase();
+                        var rows = document.querySelectorAll('#categoryTable tbody .category-row');
+                        var found = false;
+
+                        if (rows.length === 0) {
+                            return;
+                        }
+
+                        rows.forEach(function (row) {
+                            var text = row.textContent.toLowerCase();
+                            var show = text.includes(input);
+                            row.style.display = show ? '' : 'none';
+                            if (show) found = true;
+                        });
+
+                        var emptyRow = document.querySelector('#categoryTable tbody .empty-state-row');
+
+                        if (!found && input !== '') {
+                            if (!emptyRow) {
+                                emptyRow = document.createElement('tr');
+                                emptyRow.className = 'empty-state-row';
+                                emptyRow.innerHTML = '<td colspan="3" class="text-center py-5 text-muted"><i class="fas fa-box-open fa-3x mb-3 d-block"></i><p class="mb-0">Không tìm thấy dữ liệu phù hợp</p></td>';
+                                document.querySelector('#categoryTable tbody').appendChild(emptyRow);
+                            }
+                            emptyRow.style.display = '';
+                        } else if (emptyRow) {
+                            emptyRow.style.display = 'none';
+                        }
+                    }
                 </script>
             </body>
 

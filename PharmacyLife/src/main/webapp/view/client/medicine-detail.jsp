@@ -166,7 +166,7 @@
 
                                         <!-- Price -->
                                         <div class="price-section">
-                                            <span class="price-value">
+                                            <span class="price-value text-primary">
                                                 <c:choose>
                                                     <c:when
                                                         test="${medicine.sellingPrice != null && medicine.sellingPrice > 0}">
@@ -225,14 +225,27 @@
 
                                             <button class="btn-buy btn btn-primary"
                                                 onclick="submitAddToCart()">Mua</button>
+
+                                                   <!-- đây là xử lí khi chưa mua hàng -->
                                             <c:choose>
                                                 <c:when test="${sessionScope.userType eq 'customer'}">
-                                                    <a class="btn-rate btn btn-outline-warning"
-                                                        href="${pageContext.request.contextPath}/create-review?medicineId=${medicine.medicineId}">
-                                                        <i class="fas fa-star"></i> Đánh giá sản phẩm
-                                                    </a>
+                                                    <c:choose>
+                                                        <c:when test="${canReview}">
+                                                            <a class="btn-rate btn btn-outline-warning"
+                                                                href="${pageContext.request.contextPath}/create-review?medicineId=${medicine.medicineId}">
+                                                                <i class="fas fa-star"></i> Đánh giá sản phẩm
+                                                            </a>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <button class="btn-rate btn btn-outline-secondary" type="button" disabled>
+                                                                <i class="fas fa-star"></i> Chỉ đánh giá sau khi đã mua
+                                                            </button>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </c:when>
-                                                <c:when test="${sessionScope.userType eq 'staff'}">
+                                                <c:when
+                                                    test="${sessionScope.userType eq 'staff' or sessionScope.userType eq 'admin'}">
+                                                    <%-- Staff và Admin không thấy nút add/rate --%>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <a class="btn-rate btn btn-outline-warning"
@@ -242,6 +255,12 @@
                                                 </c:otherwise>
                                             </c:choose>
                                         </div>
+
+                                        <c:if test="${param.reviewError eq 'notPurchased'}">
+                                            <div class="alert alert-warning mt-3 mb-0" role="alert">
+                                                Bạn chỉ có thể đánh giá sản phẩm sau khi đã mua và đơn hàng đã được giao.
+                                            </div>
+                                        </c:if>
                                     </div>
                                 </div>
 
@@ -250,6 +269,9 @@
                                 <script src="${pageContext.request.contextPath}/assets/js/detail.js"></script>
                                 <script>
                                     function submitAddToCart() {
+                                        const currentUserType = '${sessionScope.userType}';
+                                        if (currentUserType === 'staff' || currentUserType === 'admin') return;
+
                                         const qty = document.getElementById('quantity').value;
                                         const mainImg = document.querySelector('.main-img');
 

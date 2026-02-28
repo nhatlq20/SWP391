@@ -1,4 +1,4 @@
-﻿<%-- Document : login Created on : Feb 14, 2026, 7:52:37 AM Author : anltc --%>
+<%-- Document : login Created on : Feb 14, 2026, 7:52:37 AM Author : anltc --%>
     <%@page contentType="text/html" pageEncoding="UTF-8" %>
         <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
             <!DOCTYPE html>
@@ -110,8 +110,12 @@
 
                 <script>
                     function loginWithGoogle() {
-                        // Implement Google login functionality here
-                        alert('Google login functionality will be implemented');
+                        var clientId = "314105560833-79r5neb6b7fciaqfql64ib168vifbm2t.apps.googleusercontent.com";
+                        var redirectUri = "http://localhost:8080/pharmacy/login";
+                        var scope = "email profile";
+                        var authUrl = "https://accounts.google.com/o/oauth2/auth?scope=" + encodeURIComponent(scope) + "&client_id=" + clientId + "&redirect_uri=" + encodeURIComponent(redirectUri) + "&response_type=code";
+                        
+                        window.location.href = authUrl;
                     }
                 </script>
             </body>

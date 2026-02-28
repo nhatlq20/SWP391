@@ -25,7 +25,10 @@ public class AdminRoute implements Filter {
         if (session != null) {
             role = (String) session.getAttribute("roleName");
         }
-        if (role == null || !role.equalsIgnoreCase("admin")) {
+        boolean isAdminOrStaff = role != null
+                && (role.equalsIgnoreCase("admin") || role.equalsIgnoreCase("staff"));
+
+        if (!isAdminOrStaff) {
             res.sendRedirect(req.getContextPath() + "/unauthorized");
             return;
         }
