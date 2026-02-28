@@ -22,13 +22,13 @@
 
     <dependencies>
 
-            <!-- Jakarta Servlet API for Tomcat 10+ compatibility -->
-            <dependency>
-                <groupId>jakarta.servlet</groupId>
-                <artifactId>jakarta.servlet-api</artifactId>
-                <version>5.0.0</version>
-                <scope>provided</scope>
-            </dependency>
+        <!-- Jakarta Servlet API for Tomcat 10+ compatibility -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>5.0.0</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- Jakarta EE API -->
         <dependency>
             <groupId>jakarta.platform</groupId>
@@ -65,7 +65,7 @@
             <artifactId>angus-activation</artifactId>
             <version>1.1.0</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.10.1</version>
@@ -74,6 +74,11 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>fluent-hc</artifactId>
             <version>4.5.14</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>3.0.0</version>
         </dependency>
     </dependencies>
 
