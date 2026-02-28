@@ -1,6 +1,7 @@
 package controllers;
 
 import dao.MedicineDAO;
+import dao.OrderDAO;
 import dao.ReviewDAO;
 import models.Review;
 import models.Medicine;
@@ -51,6 +52,11 @@ public class CreatedReview extends HttpServlet {
         return true;
     }
 
+    private boolean hasPurchasedMedicine(int customerId, int medicineId) {
+        OrderDAO orderDAO = new OrderDAO();
+        return orderDAO.hasCustomerPurchasedMedicine(customerId, medicineId);
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -72,6 +78,11 @@ public class CreatedReview extends HttpServlet {
         try {
             int medicineId = Integer.parseInt(medicineIdStr);
             int rating = Integer.parseInt(ratingStr);
+
+            if (!hasPurchasedMedicine(customerId, medicineId)) {
+                response.sendRedirect(request.getContextPath() + "/medicine/detail?id=" + medicineId + "&reviewError=notPurchased");
+                return;
+            }
 
             Review r = new Review();
             r.setCustomerId(customerId);
@@ -103,6 +114,12 @@ public class CreatedReview extends HttpServlet {
         if (medicineIdStr != null && !medicineIdStr.isEmpty()) {
             try {
                 int medicineId = Integer.parseInt(medicineIdStr);
+
+                if (!hasPurchasedMedicine(customerId, medicineId)) {
+                    response.sendRedirect(request.getContextPath() + "/medicine/detail?id=" + medicineId + "&reviewError=notPurchased");
+                    return;
+                }
+
                 MedicineDAO medicineDAO = new MedicineDAO();
                 Medicine medicine = medicineDAO.getMedicineById(medicineId);
                 if (medicine == null) {

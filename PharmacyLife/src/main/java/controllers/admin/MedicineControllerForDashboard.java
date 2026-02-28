@@ -83,6 +83,7 @@ public class MedicineControllerForDashboard extends HttpServlet {
             throws ServletException, IOException {
         List<Category> categories = categoryDAO.getAllCategories();
         request.setAttribute("categories", categories);
+        request.setAttribute("nextMedicineCode", medicineDAO.getNextMedicineCode());
         request.getRequestDispatcher("/view/admin/medicine-add-for-dashboard.jsp").forward(request, response);
     }
 
@@ -148,7 +149,8 @@ public class MedicineControllerForDashboard extends HttpServlet {
             throws ServletException, IOException {
         try {
             Medicine medicine = new Medicine();
-            medicine.setMedicineCode(request.getParameter("medicineCode"));
+            // Auto-generate medicine code
+            medicine.setMedicineCode(medicineDAO.getNextMedicineCode());
             medicine.setMedicineName(request.getParameter("medicineName"));
             medicine.setCategoryId(Integer.parseInt(request.getParameter("categoryId")));
             medicine.setImageUrl(request.getParameter("imageUrl"));

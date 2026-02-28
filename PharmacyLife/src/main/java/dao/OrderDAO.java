@@ -108,6 +108,29 @@ public class OrderDAO {
         }
         return false;
     }
+// xử lí dao để coi trạng thái
+    public boolean hasCustomerPurchasedMedicine(int customerId, int medicineId) {
+        String sql = "SELECT TOP 1 1 "
+                + "FROM Orders o "
+                + "JOIN OrderItems oi ON oi.OrderId = o.OrderId "
+                + "WHERE o.CustomerId = ? "
+                + "AND oi.MedicineId = ? "
+                + "AND LOWER(o.Status) IN (N'completed', N'delivered', N'đã giao', N'đã giao hàng')";
+
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.setInt(2, medicineId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 
     public boolean saveOrder(Order order) {
         String sqlOrder = "INSERT INTO Orders (CustomerId, StaffId, OrderDate, ShippingName, ShippingPhone, ShippingAddress, Status, TotalAmount) "

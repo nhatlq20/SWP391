@@ -240,7 +240,7 @@
                                 <img src="${pageContext.request.contextPath}/assets/img/phonea.png" alt="Phone">
                                 Số điện thoại
                             </label>
-                            <input type="tel" name="phone" value="${user.phone}" placeholder="Số điện thoại của bạn" required>
+                            <input type="tel" name="phone" value="${user.phone}" placeholder="Số điện thoại của bạn">
                         </div>
                     </div>
 

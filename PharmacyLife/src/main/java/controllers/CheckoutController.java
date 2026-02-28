@@ -69,7 +69,7 @@ public class CheckoutController extends HttpServlet {
             order.setShippingPhone(phone);
             order.setShippingAddress(address);
 
-            order.setStatus("Đang chờ");
+            order.setStatus("Pending");
             order.setTotalAmount(cart.getTotalMoney());
 
             // Convert Cart Items to Order Items
