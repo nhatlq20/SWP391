@@ -42,9 +42,11 @@
                                         <li><a class="dropdown-item" href="#"
                                                 onclick="sortTable(0, 'text', this); return false;">Mã</a></li>
                                         <li><a class="dropdown-item" href="#"
-                                                onclick="sortTable(3, 'number', this); return false;">Giá</a></li>
+                                                onclick="sortTable(3, 'number', this); return false;">Giá bán</a></li>
                                         <li><a class="dropdown-item" href="#"
-                                                onclick="sortTable(6, 'number', this); return false;">Số lượng</a></li>
+                                                onclick="sortTable(4, 'number', this); return false;">Giá gốc</a></li>
+                                        <li><a class="dropdown-item" href="#"
+                                                onclick="sortTable(7, 'number', this); return false;">Số lượng</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -119,7 +121,8 @@
                                                     <th>Mã</th>
                                                     <th>Ảnh</th>
                                                     <th>Tên thuốc</th>
-                                                    <th>Giá</th>
+                                                    <th>Giá bán</th>
+                                                    <th>Giá gốc</th>
                                                     <th>Đơn vị</th>
                                                     <th>Danh mục</th>
                                                     <th>Số lượng</th>
@@ -180,6 +183,12 @@
                                                         <td>
                                                             <span class="price">
                                                                 <fmt:formatNumber value="${medicine.sellingPrice}"
+                                                                    type="number" groupingUsed="true" />đ
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="price" style="color:#6c757d;">
+                                                                <fmt:formatNumber value="${medicine.originalPrice}"
                                                                     type="number" groupingUsed="true" />đ
                                                             </span>
                                                         </td>
