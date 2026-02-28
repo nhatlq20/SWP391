@@ -28,12 +28,25 @@
                                 <div class="search-box">
                                     <i class="fas fa-search"></i>
                                     <input type="text" id="medicineSearchInput"
-                                        placeholder="Tìm tên thuốc, mã thuốc,..." oninput="filterTable()"
-                                        onkeydown="if(event.key==='Enter'){event.preventDefault(); filterTable();}">
+                                        placeholder="Tìm tên thuốc, mã thuốc,..." oninput="filterTable()" onkeydown="if (event.key === 'Enter') {
+                                                    event.preventDefault();
+                                                    filterTable();
+                                                }">
                                 </div>
-                                <button class="btn-action btn-view" title="Lọc" style="width:40px;height:40px;">
-                                    <i class="fas fa-filter"></i>
-                                </button>
+                                <div class="position-relative">
+                                    <button class="btn-action btn-view" title="Lọc" onclick="toggleFilterMenu(event)">
+                                        <i class="fas fa-filter"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end" id="filterDropdown"
+                                        style="right:0; left:auto;">
+                                        <li><a class="dropdown-item" href="#"
+                                                onclick="sortTable(0, 'text', this); return false;">Mã</a></li>
+                                        <li><a class="dropdown-item" href="#"
+                                                onclick="sortTable(3, 'number', this); return false;">Giá</a></li>
+                                        <li><a class="dropdown-item" href="#"
+                                                onclick="sortTable(6, 'number', this); return false;">Số lượng</a></li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
 
@@ -254,6 +267,58 @@
                                 '${pageContext.request.contextPath}/admin/medicine-delete-dashboard?id=' + id;
                             var modal = new bootstrap.Modal(document.getElementById('deleteModal'));
                             modal.show();
+                        }
+
+                        var _sortState = { col: -1, asc: true };
+
+                        function sortTable(colIndex, type, el) {
+                            // Toggle direction if same column clicked again
+                            if (_sortState.col === colIndex) {
+                                _sortState.asc = !_sortState.asc;
+                            } else {
+                                _sortState.col = colIndex;
+                                _sortState.asc = true;
+                            }
+                            var asc = _sortState.asc;
+
+                            // Update active indicator on menu items
+                            document.querySelectorAll('#filterDropdown .dropdown-item').forEach(function (item) {
+                                item.classList.remove('active');
+                                item.querySelector('.sort-icon') && item.querySelector('.sort-icon').remove();
+                            });
+                            el.classList.add('active');
+                            var icon = document.createElement('i');
+                            icon.className = 'fas fa-sort-' + (asc ? 'up' : 'down') + ' ms-1 sort-icon';
+                            el.appendChild(icon);
+
+                            var tbody = document.querySelector('#medicineTable tbody');
+                            var rows = Array.from(tbody.querySelectorAll('tr'));
+                            rows.sort(function (a, b) {
+                                var aText = (a.cells[colIndex] ? a.cells[colIndex].textContent.trim() : '');
+                                var bText = (b.cells[colIndex] ? b.cells[colIndex].textContent.trim() : '');
+                                if (type === 'number') {
+                                    var aNum = parseFloat(aText.replace(/[^\d.]/g, '')) || 0;
+                                    var bNum = parseFloat(bText.replace(/[^\d.]/g, '')) || 0;
+                                    return asc ? aNum - bNum : bNum - aNum;
+                                }
+                                return asc ? aText.localeCompare(bText, 'vi') : bText.localeCompare(aText, 'vi');
+                            });
+                            rows.forEach(function (row) { tbody.appendChild(row); });
+
+                            // Close menu
+                            document.getElementById('filterDropdown').classList.remove('show');
+                        }
+
+                        function toggleFilterMenu(event) {
+                            event.stopPropagation();
+                            var menu = document.getElementById('filterDropdown');
+                            menu.classList.toggle('show');
+                            document.addEventListener('click', function closeMenu(e) {
+                                if (!menu.contains(e.target)) {
+                                    menu.classList.remove('show');
+                                    document.removeEventListener('click', closeMenu);
+                                }
+                            });
                         }
 
                         function filterTable() {
