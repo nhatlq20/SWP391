@@ -310,10 +310,7 @@
                                                                 <small class="text-muted">x${it.quantity}</small>
                                                             </div>
                                                         </div>
-                                                        <a href="${pageContext.request.contextPath}/cart?action=remove&id=${it.medicine.medicineId}"
-                                                            class="text-danger small ms-2">
-                                                            <i class="fas fa-trash"></i>
-                                                        </a>
+
                                                     </div>
                                                 </c:forEach>
                                             </c:otherwise>
