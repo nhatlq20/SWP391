@@ -41,10 +41,12 @@ public class ReviewDAO {
     public List<ReviewCustomer> getReviewsWithCustomerByMedicine(int medicineId) {
         //lấy danh sách review của 1 loại thuốc
         List<ReviewCustomer> list = new ArrayList<>();
-        String sql = "SELECT r.ReviewId, c.FullName, r.Rating, r.Comment, r.ReviewCreatedAt, r.ReplyContent, r.ReplyBy, r.ReplyCreatedAt, s.StaffName AS ReplyStaffName " +
+        String sql = "SELECT r.ReviewId, c.FullName, r.Rating, r.Comment, r.ReviewCreatedAt, r.ReplyContent, r.ReplyBy, r.ReplyCreatedAt, " +
+                     "COALESCE(s.StaffName, rc.FullName) AS ReplyStaffName " +
                      "FROM Reviews r " +
                      "JOIN Customer c ON c.CustomerId = r.CustomerId " +
-                 "LEFT JOIN Staff s ON s.StaffId = r.ReplyBy " +
+                     "LEFT JOIN Staff s ON s.StaffId = r.ReplyBy AND r.ReplyBy > 0 " +
+                     "LEFT JOIN Customer rc ON rc.CustomerId = -r.ReplyBy AND r.ReplyBy < 0 " +
                      "WHERE r.MedicineId = ? " +
                      "ORDER BY r.ReviewCreatedAt DESC";
         

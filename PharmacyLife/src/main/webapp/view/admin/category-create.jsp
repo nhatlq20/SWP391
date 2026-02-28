@@ -71,7 +71,7 @@
         <jsp:include page="/view/common/sidebar.jsp" />
 
         <div class="main-content">
-            <h2 class="page-title"><i class="fas fa-plus me-2"></i>Thêm danh mục</h2>
+            <h2 class="page-title"> <i class="fas fa-plus text-primary"></i>Thêm danh mục</h2>
 
             <div class="form-card">
                 <form action="${pageContext.request.contextPath}/category" method="post">
@@ -80,7 +80,7 @@
                     <div class="mb-4">
                         <label class="form-label" for="categoryCode">Mã mục</label>
                         <input type="text" id="categoryCode" name="categoryCode" class="form-control"
-                            placeholder="Nhập mã mục" required />
+                            value="${nextCategoryCode}" readonly />
                     </div>
 
                     <div class="mb-4">
