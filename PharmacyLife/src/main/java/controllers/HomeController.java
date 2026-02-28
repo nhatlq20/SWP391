@@ -20,17 +20,21 @@ public class HomeController extends HttpServlet {
         CategoryDAO categoryDAO = new CategoryDAO();
         MedicineDAO medicineDAO = new MedicineDAO();
 
-        // Load all categories
+        // Load all categories with item count
         List<Category> listCategory = categoryDAO.getAllCategories();
-        System.out.println("Total categories loaded: " + listCategory.size());
-        
+        java.util.Map<Integer, Integer> counts = categoryDAO.countAllMedicinesByCategory();
+        for (Category c : listCategory) {
+            c.setMedicineCount(counts.getOrDefault(c.getCategoryId(), 0));
+        }
         request.setAttribute("listCategory", listCategory);
+
+        // Load best sellers
+        List<Medicine> bestSellers = medicineDAO.getBestSellers(5);
+        request.setAttribute("bestSellers", bestSellers);
 
         // Load all medicines
         List<Medicine> allMedicines = medicineDAO.getAllMedicines();
         final List<Medicine> medicines = (allMedicines == null) ? new ArrayList<>() : allMedicines;
-        System.out.println("Total medicines loaded: " + medicines.size());
-        
         request.setAttribute("allMedicines", medicines);
 
         request.getRequestDispatcher("/view/client/home.jsp").forward(request, response);
