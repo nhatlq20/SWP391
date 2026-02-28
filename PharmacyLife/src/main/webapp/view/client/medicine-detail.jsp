@@ -166,7 +166,7 @@
 
                                         <!-- Price -->
                                         <div class="price-section">
-                                            <span class="price-value">
+                                            <span class="price-value text-primary">
                                                 <c:choose>
                                                     <c:when
                                                         test="${medicine.sellingPrice != null && medicine.sellingPrice > 0}">
@@ -182,22 +182,19 @@
                                         </div>
 
 
-                                        <!-- Quantity Selection (chỉ hiển thị cho customer) -->
-                                        <c:if
-                                            test="${sessionScope.userType ne 'staff' and sessionScope.userType ne 'admin'}">
-                                            <div class="mb-3 d-flex align-items-center gap-3">
-                                                <label class="form-label text-muted mb-0">Chọn số lượng</label>
-                                                <div class="input-group rounded-pill border"
-                                                    style="max-width: 130px; overflow: hidden;">
-                                                    <button type="button" class="btn btn-light px-3"
-                                                        onclick="decreaseQty()">−</button>
-                                                    <input type="number" id="quantity" value="1" min="1"
-                                                        class="form-control text-center border-0 shadow-none qty-input">
-                                                    <button type="button" class="btn btn-light px-3"
-                                                        onclick="increaseQty()">+</button>
-                                                </div>
+                                        <!-- Quantity Selection -->
+                                        <div class="mb-3 d-flex align-items-center gap-3">
+                                            <label class="form-label text-muted mb-0">Chọn số lượng</label>
+                                            <div class="input-group rounded-pill border"
+                                                style="max-width: 130px; overflow: hidden;">
+                                                <button type="button" class="btn btn-light px-3"
+                                                    onclick="decreaseQty()">−</button>
+                                                <input type="number" id="quantity" value="1" min="1"
+                                                    class="form-control text-center border-0 shadow-none qty-input">
+                                                <button type="button" class="btn btn-light px-3"
+                                                    onclick="increaseQty()">+</button>
                                             </div>
-                                        </c:if>
+                                        </div>
 
                                         <!-- Category -->
                                         <div class="category-section">
@@ -219,19 +216,15 @@
                                         <!-- Action Buttons -->
 
                                         <div class="action-buttons">
-                                            <c:if
-                                                test="${sessionScope.userType ne 'staff' and sessionScope.userType ne 'admin'}">
-                                                <form id="addToCartForm"
-                                                    action="${pageContext.request.contextPath}/cart" method="POST"
-                                                    style="display: none;">
-                                                    <input type="hidden" name="action" value="add">
-                                                    <input type="hidden" name="id" value="${medicine.medicineId}">
-                                                    <input type="hidden" name="quantity" id="formQuantity" value="1">
-                                                </form>
+                                            <form id="addToCartForm" action="${pageContext.request.contextPath}/cart"
+                                                method="POST" style="display: none;">
+                                                <input type="hidden" name="action" value="add">
+                                                <input type="hidden" name="id" value="${medicine.medicineId}">
+                                                <input type="hidden" name="quantity" id="formQuantity" value="1">
+                                            </form>
 
-                                                <button class="btn-buy btn btn-primary"
-                                                    onclick="submitAddToCart()">Mua</button>
-                                            </c:if>
+                                            <button class="btn-buy btn btn-primary"
+                                                onclick="submitAddToCart()">Mua</button>
                                             <c:choose>
                                                 <c:when test="${sessionScope.userType eq 'customer'}">
                                                     <a class="btn-rate btn btn-outline-warning"
@@ -259,6 +252,9 @@
                                 <script src="${pageContext.request.contextPath}/assets/js/detail.js"></script>
                                 <script>
                                     function submitAddToCart() {
+                                        const currentUserType = '${sessionScope.userType}';
+                                        if (currentUserType === 'staff' || currentUserType === 'admin') return;
+
                                         const qty = document.getElementById('quantity').value;
                                         const mainImg = document.querySelector('.main-img');
 
