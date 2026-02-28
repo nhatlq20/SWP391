@@ -51,8 +51,8 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Số lượng</label>
-                                    <input name="remainingQuantity" type="number" min="0" class="form-control"
-                                        placeholder="Nhập số lượng" value="0">
+                                    <input name="remainingQuantity" type="number" min="0" max="1000"
+                                        class="form-control" placeholder="Nhập số lượng (tối đa 1000)" value="0">
                                 </div>
                                 <div class="col-md-12">
                                     <label class="form-label">Tên thuốc</label>

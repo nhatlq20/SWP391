@@ -168,9 +168,29 @@ public class MedicineControllerForDashboard extends HttpServlet {
             medicine.setUnit(request.getParameter("unit"));
 
             String quantityStr = request.getParameter("remainingQuantity");
-            medicine.setRemainingQuantity(quantityStr != null && !quantityStr.isEmpty()
-                    ? Integer.parseInt(quantityStr)
-                    : 0);
+            int quantity = 0;
+            if (quantityStr != null && !quantityStr.isEmpty()) {
+                try {
+                    long qLong = Long.parseLong(quantityStr);
+                    if (qLong < 0 || qLong > 1000) {
+                        request.setAttribute("errorMessage", "Số lượng không hợp lệ. Vui lòng nhập từ 0 đến 1.000.");
+                        request.setAttribute("categories", categoryDAO.getAllCategories());
+                        request.setAttribute("nextMedicineCode", medicineDAO.getNextMedicineCode());
+                        request.getRequestDispatcher("/view/admin/medicine-add-for-dashboard.jsp").forward(request,
+                                response);
+                        return;
+                    }
+                    quantity = (int) qLong;
+                } catch (NumberFormatException ex) {
+                    request.setAttribute("errorMessage", "Số lượng không hợp lệ. Vui lòng nhập từ 0 đến 1.000.");
+                    request.setAttribute("categories", categoryDAO.getAllCategories());
+                    request.setAttribute("nextMedicineCode", medicineDAO.getNextMedicineCode());
+                    request.getRequestDispatcher("/view/admin/medicine-add-for-dashboard.jsp").forward(request,
+                            response);
+                    return;
+                }
+            }
+            medicine.setRemainingQuantity(quantity);
 
             medicine.setBrandOrigin(request.getParameter("brandOrigin"));
             medicine.setShortDescription(request.getParameter("shortDescription"));
