@@ -182,19 +182,22 @@
                                         </div>
 
 
-                                        <!-- Quantity Selection -->
-                                        <div class="mb-3 d-flex align-items-center gap-3">
-                                            <label class="form-label text-muted mb-0">Chọn số lượng</label>
-                                            <div class="input-group rounded-pill border"
-                                                style="max-width: 130px; overflow: hidden;">
-                                                <button type="button" class="btn btn-light px-3"
-                                                    onclick="decreaseQty()">−</button>
-                                                <input type="number" id="quantity" value="1" min="1"
-                                                    class="form-control text-center border-0 shadow-none qty-input">
-                                                <button type="button" class="btn btn-light px-3"
-                                                    onclick="increaseQty()">+</button>
+                                        <!-- Quantity Selection (chỉ hiển thị cho customer) -->
+                                        <c:if
+                                            test="${sessionScope.userType ne 'staff' and sessionScope.userType ne 'admin'}">
+                                            <div class="mb-3 d-flex align-items-center gap-3">
+                                                <label class="form-label text-muted mb-0">Chọn số lượng</label>
+                                                <div class="input-group rounded-pill border"
+                                                    style="max-width: 130px; overflow: hidden;">
+                                                    <button type="button" class="btn btn-light px-3"
+                                                        onclick="decreaseQty()">−</button>
+                                                    <input type="number" id="quantity" value="1" min="1"
+                                                        class="form-control text-center border-0 shadow-none qty-input">
+                                                    <button type="button" class="btn btn-light px-3"
+                                                        onclick="increaseQty()">+</button>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </c:if>
 
                                         <!-- Category -->
                                         <div class="category-section">
@@ -216,15 +219,19 @@
                                         <!-- Action Buttons -->
 
                                         <div class="action-buttons">
-                                            <form id="addToCartForm" action="${pageContext.request.contextPath}/cart"
-                                                method="POST" style="display: none;">
-                                                <input type="hidden" name="action" value="add">
-                                                <input type="hidden" name="id" value="${medicine.medicineId}">
-                                                <input type="hidden" name="quantity" id="formQuantity" value="1">
-                                            </form>
+                                            <c:if
+                                                test="${sessionScope.userType ne 'staff' and sessionScope.userType ne 'admin'}">
+                                                <form id="addToCartForm"
+                                                    action="${pageContext.request.contextPath}/cart" method="POST"
+                                                    style="display: none;">
+                                                    <input type="hidden" name="action" value="add">
+                                                    <input type="hidden" name="id" value="${medicine.medicineId}">
+                                                    <input type="hidden" name="quantity" id="formQuantity" value="1">
+                                                </form>
 
-                                            <button class="btn-buy btn btn-primary"
-                                                onclick="submitAddToCart()">Mua</button>
+                                                <button class="btn-buy btn btn-primary"
+                                                    onclick="submitAddToCart()">Mua</button>
+                                            </c:if>
                                             <c:choose>
                                                 <c:when test="${sessionScope.userType eq 'customer'}">
                                                     <a class="btn-rate btn btn-outline-warning"
@@ -232,7 +239,9 @@
                                                         <i class="fas fa-star"></i> Đánh giá sản phẩm
                                                     </a>
                                                 </c:when>
-                                                <c:when test="${sessionScope.userType eq 'staff'}">
+                                                <c:when
+                                                    test="${sessionScope.userType eq 'staff' or sessionScope.userType eq 'admin'}">
+                                                    <%-- Staff và Admin không thấy nút add/rate --%>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <a class="btn-rate btn btn-outline-warning"
