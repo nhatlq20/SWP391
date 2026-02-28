@@ -86,16 +86,15 @@
                                                                 <c:out value='${medicine.medicineName}' />
                                                             </h5>
                                                             <div class="mt-auto">
-                                                                <div
-                                                                    class="d-flex justify-content-between align-items-center mb-2">
-                                                                    <div class="fw-bold text-danger medicine-price">
+                                                                <div class="mb-2">
+                                                                    <span class="fw-bold text-primary medicine-price">
                                                                         <fmt:formatNumber
                                                                             value="${medicine.sellingPrice}"
                                                                             type="number" groupingUsed="true" />₫
-                                                                    </div>
-                                                                    <div class="text-muted small medicine-unit">
+                                                                    </span><span class="text-muted small medicine-unit">
+                                                                        /
                                                                         <c:out value='${medicine.unit}' />
-                                                                    </div>
+                                                                    </span>
                                                                 </div>
                                                                 <a class="btn btn-primary w-100"
                                                                     href="${pageContext.request.contextPath}/medicine/detail?id=${medicine.medicineId}">Mua</a>
