@@ -51,13 +51,17 @@
                                     <% } %>
 
                                         <!-- Login Form -->
-                                        <form action="${pageContext.request.contextPath}/login" method="post">
+                                        <form id="loginForm" action="${pageContext.request.contextPath}/login" method="post" novalidate>
+                                            <div id="clientLoginError"
+                                                style="display: none; background-color: #ffe6e6; border-left: 4px solid #ff4444; padding: 12px; margin-bottom: 20px; border-radius: 4px; color: #cc0000; font-size: 14px;">
+                                            </div>
                                             <!-- Email Field -->
                                             <div class="form-group">
                                                 <label for="email">Địa chỉ email</label>
                                                 <div class="input-wrapper">
                                                     <input type="email" id="email" name="email"
-                                                        placeholder="Nhập email của bạn" value="${email}" required>
+                                                        placeholder="Nhập email của bạn" value="${email}" required
+                                                        maxlength="254" autocomplete="username" inputmode="email">
                                                     <img src="${pageContext.request.contextPath}/assets/img/email.png"
                                                         alt="Email Icon" class="input-icon">
                                                 </div>
@@ -66,11 +70,31 @@
                                             <!-- Password Field -->
                                             <div class="form-group">
                                                 <label for="password">Mật Khẩu</label>
-                                                <div class="input-wrapper">
-                                                    <input type="password" id="password" name="password"
-                                                        placeholder="Nhập mật khẩu của bạn" required>
+                                                <div class="input-wrapper password-wrapper">
+                                                    <input type="password" id="password" name="password" class="password-input"
+                                                        placeholder="Nhập mật khẩu của bạn" required minlength="8" maxlength="16"
+                                                        autocomplete="current-password">
                                                     <img src="${pageContext.request.contextPath}/assets/img/Lock.png"
                                                         alt="Password Icon" class="input-icon">
+                                                    <button type="button" id="togglePassword" class="password-toggle"
+                                                        aria-label="Hiển thị mật khẩu" aria-pressed="false">
+                                                        <span class="eye-icon eye-closed" aria-hidden="true">
+                                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round">
+                                                                <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20C7 20 2.73 16.89 1 12c.68-1.94 1.79-3.65 3.2-5" />
+                                                                <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c5 0 9.27 3.11 11 8a11.83 11.83 0 0 1-4.29 5.94" />
+                                                                <path d="M14.12 14.12A3 3 0 1 1 9.88 9.88" />
+                                                                <path d="M1 1l22 22" />
+                                                            </svg>
+                                                        </span>
+                                                        <span class="eye-icon eye-open" aria-hidden="true">
+                                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round">
+                                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+                                                                <circle cx="12" cy="12" r="3" />
+                                                            </svg>
+                                                        </span>
+                                                    </button>
                                                 </div>
                                             </div>
 
@@ -116,6 +140,84 @@
                         var authUrl = "https://accounts.google.com/o/oauth2/auth?scope=" + encodeURIComponent(scope) + "&client_id=" + clientId + "&redirect_uri=" + encodeURIComponent(redirectUri) + "&response_type=code";
                         
                         window.location.href = authUrl;
+                    }
+
+                    const passwordInput = document.getElementById("password");
+                    const togglePasswordButton = document.getElementById("togglePassword");
+                    const loginForm = document.getElementById("loginForm");
+                    const emailInput = document.getElementById("email");
+                    const clientLoginError = document.getElementById("clientLoginError");
+
+                    function showClientError(message) {
+                        clientLoginError.textContent = message;
+                        clientLoginError.style.display = "block";
+                    }
+
+                    function hideClientError() {
+                        clientLoginError.textContent = "";
+                        clientLoginError.style.display = "none";
+                    }
+
+                    function hidePasswordToggle() {
+                        togglePasswordButton.classList.remove("visible");
+                        passwordInput.type = "password";
+                        togglePasswordButton.setAttribute("aria-pressed", "false");
+                    }
+
+                    if (passwordInput && togglePasswordButton) {
+                        passwordInput.addEventListener("focus", function () {
+                            togglePasswordButton.classList.add("visible");
+                        });
+
+                        passwordInput.addEventListener("blur", function () {
+                            setTimeout(function () {
+                                if (document.activeElement !== togglePasswordButton) {
+                                    hidePasswordToggle();
+                                }
+                            }, 0);
+                        });
+
+                        togglePasswordButton.addEventListener("mousedown", function (event) {
+                            event.preventDefault();
+                        });
+
+                        togglePasswordButton.addEventListener("click", function () {
+                            const showPassword = passwordInput.type === "password";
+                            passwordInput.type = showPassword ? "text" : "password";
+                            togglePasswordButton.setAttribute("aria-pressed", String(showPassword));
+                        });
+                    }
+
+                    if (loginForm) {
+                        loginForm.addEventListener("submit", function (event) {
+                            hideClientError();
+
+                            const normalizedEmail = emailInput.value.trim().toLowerCase();
+                            const normalizedPassword = passwordInput.value.trim();
+                            const emailRegex = /^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*@(gmail\.com|yahoo\.com|fucantho|fucantho\.edu\.vn)$/;
+
+                            emailInput.value = normalizedEmail;
+
+                            if (!normalizedEmail || !normalizedPassword) {
+                                event.preventDefault();
+                                showClientError("Vui lòng nhập đầy đủ email và mật khẩu!");
+                                return;
+                            }
+
+                            if (normalizedEmail.length > 254 || !emailRegex.test(normalizedEmail)) {
+                                event.preventDefault();
+                                showClientError("Email chỉ được dùng đuôi: @gmail.com, @yahoo.com, @fucantho hoặc @fucantho.edu.vn");
+                                return;
+                            }
+
+                            if (passwordInput.value.length < 8 || passwordInput.value.length > 16) {
+                                event.preventDefault();
+                                showClientError("Mật khẩu phải từ 8 đến 16 ký tự!");
+                            }
+                        });
+
+                        emailInput.addEventListener("input", hideClientError);
+                        passwordInput.addEventListener("input", hideClientError);
                     }
                 </script>
             </body>
