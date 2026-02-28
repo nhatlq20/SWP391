@@ -65,16 +65,15 @@
                                                                 <c:out value='${medicine.medicineName}' />
                                                             </h5>
                                                             <div class="mt-auto">
-                                                                <div
-                                                                    class="d-flex justify-content-between align-items-center mb-2">
-                                                                    <div class="fw-bold text-danger medicine-price">
+                                                                <div class="mb-2">
+                                                                    <span class="fw-bold text-primary medicine-price">
                                                                         <fmt:formatNumber
                                                                             value="${medicine.sellingPrice}"
                                                                             type="number" groupingUsed="true" />₫
-                                                                    </div>
-                                                                    <div class="text-muted small medicine-unit">
+                                                                    </span><span class="text-muted small medicine-unit">
+                                                                        /
                                                                         <c:out value='${medicine.unit}' />
-                                                                    </div>
+                                                                    </span>
                                                                 </div>
                                                                 <button type="button" class="btn btn-primary w-100"
                                                                     onclick="event.stopPropagation(); addToCartAjax(this, ${medicine.medicineId})">Mua</button>
@@ -99,6 +98,9 @@
                             <script src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
                             <script>
                                 function addToCartAjax(btn, id) {
+                                    const currentUserType = '${sessionScope.userType}';
+                                    if (currentUserType === 'staff' || currentUserType === 'admin') return;
+
                                     const card = btn.closest('.medicine-card');
                                     const img = card.querySelector('img');
 

@@ -91,7 +91,7 @@ body {
 .price-value {
     font-size: 28px;
     font-weight: 700;
-    color: #EE5A52;
+    color: #3B6FD9 !important;
     display: inline-block;
 }
 

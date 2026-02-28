@@ -1,0 +1,72 @@
+/* revenue-dashboard.css - Custom styles for Admin Revenue Dashboard */
+
+body { background: #f4f7fb; }
+.admin-layout { display: flex; }
+.sidebar-fixed {
+    position: fixed;
+    top: 115px;
+    left: 0;
+    width: 280px;
+    height: calc(100vh - 115px);
+    z-index: 100;
+    background: #fff;
+    border-right: 1px solid #ebebeb;
+    overflow-y: auto;
+    box-shadow: 2px 0 8px rgba(79,129,225,0.04);
+}
+.main-content {
+    margin-left: 280px;
+    padding: 24px;
+    width: 100%;
+    min-height: calc(100vh - 115px);
+    margin-top: 115px;
+    padding-top: 32px;
+}
+.kpi-card {
+    border-radius: 12px;
+    box-shadow: 0 2px 12px 0 rgba(79,129,225,0.08);
+    color: #fff;
+    padding: 20px 0 14px 0;
+    margin-bottom: 0;
+    min-height: 110px;
+}
+.kpi-orders { background: #5a48e6; }
+.kpi-value { background: #2a60e8; }
+.kpi-revenue { background: #2acfcf; }
+.kpi-debt { background: #ff7e5f; }
+.kpi-label { font-size: 1.05em; opacity: 0.93; }
+.kpi-value-main { font-size: 2em; font-weight: bold; }
+.kpi-growth { font-size: 0.95em; margin-left: 6px; }
+.section-title { font-size: 1.2em; font-weight: 600; margin: 24px 0 18px 0; color: #2a60e8; }
+.kpi-section-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2a60e8;
+    margin-bottom: 8px;
+}
+.order-status-card {
+    border-radius: 12px;
+    box-shadow: 0 2px 12px 0 rgba(79,129,225,0.07);
+    background: #fff;
+    padding: 20px 16px 16px 16px;
+    min-height: 140px;
+}
+.order-status-title { font-size: 1.08em; font-weight: 600; margin-bottom: 14px; }
+.status-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 7px; }
+.dot-yellow { background: #ffd600; }
+.dot-blue { background: #2a60e8; }
+.dot-green { background: #2acfcf; }
+.dot-red { background: #ff7e5f; }
+@media (max-width: 1199.98px) {
+    .main-content { margin-left: 0; }
+    .sidebar-fixed { position: static; width: 100%; height: auto; border-right: none; box-shadow: none; }
+}
+@media (max-width: 991.98px) {
+    .kpi-value-main { font-size: 1.3em; }
+    .order-status-card { min-height: 100px; }
+}
+@media (max-width: 767.98px) {
+    .main-content { padding: 12px; }
+    .kpi-card { min-height: 90px; }
+}
+.row.gap-24 { row-gap: 24px; }

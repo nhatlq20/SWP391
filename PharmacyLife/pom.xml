@@ -22,6 +22,13 @@
 
     <dependencies>
 
+            <!-- Jakarta Servlet API for Tomcat 10+ compatibility -->
+            <dependency>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>5.0.0</version>
+                <scope>provided</scope>
+            </dependency>
         <!-- Jakarta EE API -->
         <dependency>
             <groupId>jakarta.platform</groupId>

@@ -166,7 +166,7 @@
 
                                         <!-- Price -->
                                         <div class="price-section">
-                                            <span class="price-value">
+                                            <span class="price-value text-primary">
                                                 <c:choose>
                                                     <c:when
                                                         test="${medicine.sellingPrice != null && medicine.sellingPrice > 0}">
@@ -232,7 +232,9 @@
                                                         <i class="fas fa-star"></i> Đánh giá sản phẩm
                                                     </a>
                                                 </c:when>
-                                                <c:when test="${sessionScope.userType eq 'staff'}">
+                                                <c:when
+                                                    test="${sessionScope.userType eq 'staff' or sessionScope.userType eq 'admin'}">
+                                                    <%-- Staff và Admin không thấy nút add/rate --%>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <a class="btn-rate btn btn-outline-warning"
@@ -250,6 +252,9 @@
                                 <script src="${pageContext.request.contextPath}/assets/js/detail.js"></script>
                                 <script>
                                     function submitAddToCart() {
+                                        const currentUserType = '${sessionScope.userType}';
+                                        if (currentUserType === 'staff' || currentUserType === 'admin') return;
+
                                         const qty = document.getElementById('quantity').value;
                                         const mainImg = document.querySelector('.main-img');
 
