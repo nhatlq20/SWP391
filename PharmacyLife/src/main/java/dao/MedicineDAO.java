@@ -224,6 +224,32 @@ public class MedicineDAO {
         }
     }
 
+    public String getNextMedicineCode() {
+        String sql = "SELECT TOP 1 MedicineCode FROM Medicine ORDER BY MedicineId DESC";
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                String lastCode = rs.getString(1);
+                if (lastCode != null && !lastCode.isEmpty()) {
+                    // Split prefix (letters) and numeric suffix
+                    String prefix = lastCode.replaceAll("\\d+$", "");
+                    String numPart = lastCode.replaceAll("^\\D+", "");
+                    try {
+                        int num = Integer.parseInt(numPart);
+                        int digits = numPart.length();
+                        return prefix + String.format("%0" + digits + "d", num + 1);
+                    } catch (NumberFormatException e) {
+                        return lastCode + "1";
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "TH001";
+    }
+
     public boolean deleteMedicine(int medicineId) {
         String sql = "DELETE FROM Medicine WHERE MedicineId = ?";
 
