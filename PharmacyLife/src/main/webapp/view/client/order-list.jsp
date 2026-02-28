@@ -21,7 +21,6 @@
                     <link href="assets/css/cart.css" rel="stylesheet">
                     <link href="assets/css/sidebar.css" rel="stylesheet">
                     <link href="assets/css/order-list.css" rel="stylesheet">
-                    <link href="assets/css/medicine-dashboard.css" rel="stylesheet">
                 </head>
 
                 <body>
@@ -151,7 +150,7 @@
                                                             </td>
                                                             <td class="text-center">
                                                                 <a href="order-detail?id=${o.orderId}"
-                                                                    class="btn-action btn-view" title="Xem chi tiết">
+                                                                    class="btn btn-detail" title="Xem chi tiết">
                                                                     <i class="fas fa-eye"></i>
                                                                 </a>
                                                             </td>
