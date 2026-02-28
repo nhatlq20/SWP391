@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CategoryDAO {
     private DBContext dbContext = new DBContext();
@@ -220,5 +222,47 @@ public class CategoryDAO {
     public List<Category> searchCategoryByName(String keyword) {
         return searchCategoriesByName(keyword);
     }
+
+    public String generateNextCategoryCode() {
+        String sql = "SELECT CategoryCode FROM Category";
+        Pattern pattern = Pattern.compile("^([A-Za-z]+)(\\d+)$");
+
+        int maxNumber = 0;
+        String prefix = "CAT";
+
+        try (Connection conn = dbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                String code = rs.getString("CategoryCode");
+                if (code == null) {
+                    continue;
+                }
+
+                Matcher matcher = pattern.matcher(code.trim());
+                if (!matcher.matches()) {
+                    continue;
+                }
+
+                int number;
+                try {
+                    number = Integer.parseInt(matcher.group(2));
+                } catch (NumberFormatException ex) {
+                    continue;
+                }
+
+                if (number > maxNumber) {
+                    maxNumber = number;
+                    prefix = matcher.group(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return String.format("%s%03d", prefix, maxNumber + 1);
+    }
+
 
 }

@@ -127,6 +127,7 @@ public class CategoryController extends HttpServlet {
 			response.sendRedirect("category?action=list");
 			return;
 		}
+		request.setAttribute("nextCategoryCode", dao.generateNextCategoryCode());
 		request.getRequestDispatcher("/view/admin/category-create.jsp").forward(request, response);
 	}
 
@@ -136,14 +137,22 @@ public class CategoryController extends HttpServlet {
 			response.sendRedirect("category?action=list");
 			return;
 		}
-		String code = request.getParameter("categoryCode");
 		String name = request.getParameter("categoryName");
+
+		if (name == null || name.trim().isEmpty()) {
+			request.setAttribute("errorMessage", "Tên danh mục không được để trống");
+			request.setAttribute("nextCategoryCode", dao.generateNextCategoryCode());
+			request.getRequestDispatcher("/view/admin/category-create.jsp").forward(request, response);
+			return;
+		}
+
+		String code = dao.generateNextCategoryCode();
 
 		Category c = new Category();
 		c.setCategoryCode(code);
-		c.setCategoryName(name);
+		c.setCategoryName(name.trim());
 
-		dao.insertCaterogy(c);
+		dao.createCategory(c);
 
 		response.sendRedirect("category?action=list");
 

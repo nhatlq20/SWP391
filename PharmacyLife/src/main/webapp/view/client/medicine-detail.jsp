@@ -106,7 +106,7 @@
                                                     </c:when>
                                                     <c:otherwise>
                                                         <c:forEach var="review" items="${reviews}">
-                                                            <div class="review-item">
+                                                            <div class="review-item" id="review-${review.reviewId}">
                                                                 <div class="review-thread">
                                                                     <div class="thread-main">
                                                                         <div class="thread-avatar customer-avatar">
@@ -132,8 +132,8 @@
                                                                                 </div>
                                                                                 <div class="thread-reply-content">
                                                                                     <div class="thread-reply-header">
-                                                                                        <span class="reply-staff-name"><c:out value="${not empty review.replyStaffName ? review.replyStaffName : 'Nhân viên nhà thuốc'}" /></span>
-                                                                                        <span class="reply-role-tag">Dược sĩ</span>
+                                                                                        <span class="reply-staff-name"><c:out value="${not empty review.replyStaffName ? review.replyStaffName : (review.replyBy lt 0 ? 'Khách hàng' : 'Nhân viên nhà thuốc')}" /></span>
+                                                                                        <span class="reply-role-tag"><c:out value="${review.replyBy lt 0 ? 'Khách hàng' : 'Dược sĩ'}" /></span>
                                                                                     </div>
                                                                                     <div class="thread-reply-text"><c:out value="${review.replyContent}" /></div>
                                                                                 </div>
@@ -141,10 +141,22 @@
                                                                         </div>
                                                                     </c:if>
 
+                                                                    <c:if test="${sessionScope.userType eq 'customer'}">
+                                                                        <form class="mt-2" action="${pageContext.request.contextPath}/reply-review" method="post">
+                                                                            <input type="hidden" name="reviewId" value="${review.reviewId}" />
+                                                                            <input type="hidden" name="medicineId" value="${medicine.medicineId}" />
+                                                                            <input type="hidden" name="returnTo" value="detail" />
+                                                                            <textarea class="form-control form-control-sm mb-2" name="replyContent" rows="2" placeholder="Nhập trả lời..." required><c:out value="${review.replyContent}" /></textarea>
+                                                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                                                ${not empty review.replyContent ? 'Cập nhật trả lời' : 'Gửi trả lời'}
+                                                                            </button>
+                                                                        </form>
+                                                                    </c:if>
+
                                                                     <c:if test="${sessionScope.userType eq 'staff'}">
                                                                         <a class="btn btn-sm btn-primary mt-2"
                                                                            href="${pageContext.request.contextPath}/view-reviews?medicineId=${medicine.medicineId}&selectedReviewId=${review.reviewId}">
-                                                                            ${not empty review.replyContent ? 'Chỉnh sửa phản hồi' : 'Trả lời'}
+                                                                            ${not empty review.replyContent ? 'Chỉnh sửa trả lời' : 'Trả lời'}
                                                                         </a>
                                                                     </c:if>
                                                                 </div>
