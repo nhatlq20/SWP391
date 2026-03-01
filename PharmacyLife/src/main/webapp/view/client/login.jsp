@@ -53,16 +53,13 @@
 
                                         <!-- Login Form -->
                                         <form id="loginForm" action="${pageContext.request.contextPath}/login" method="post" novalidate>
-                                            <div id="clientLoginError"
-                                                style="display: none; background-color: #ffe6e6; border-left: 4px solid #ff4444; padding: 12px; margin-bottom: 20px; border-radius: 4px; color: #cc0000; font-size: 14px;">
-                                            </div>
                                             <!-- Email Field -->
                                             <div class="form-group">
                                                 <label for="email">Địa chỉ email</label>
                                                 <div class="input-wrapper">
                                                     <input type="email" id="email" name="email"
-                                                        placeholder="Nhập email của bạn" value="${email}" required
-                                                        maxlength="254" autocomplete="username" inputmode="email">
+                                                        placeholder="Nhập email của bạn" value="${email}"
+                                                        autocomplete="username" inputmode="email">
                                                     <img src="${pageContext.request.contextPath}/assets/img/email.png"
                                                         alt="Email Icon" class="input-icon">
                                                 </div>
@@ -73,7 +70,7 @@
                                                 <label for="password">Mật Khẩu</label>
                                                 <div class="input-wrapper password-wrapper">
                                                     <input type="password" id="password" name="password" class="password-input"
-                                                        placeholder="Nhập mật khẩu của bạn" required minlength="8" maxlength="16"
+                                                        placeholder="Nhập mật khẩu của bạn"
                                                         autocomplete="current-password">
                                                     <img src="${pageContext.request.contextPath}/assets/img/Lock.png"
                                                         alt="Password Icon" class="input-icon">
@@ -135,7 +132,7 @@
 
                 <script>
                     function loginWithGoogle() {
-                        var clientId = "<%= Constants.GOOGLE_CLIENT_ID != null ? Constants.GOOGLE_CLIENT_ID : "" %>";
+                        var clientId = '<%= Constants.GOOGLE_CLIENT_ID != null ? Constants.GOOGLE_CLIENT_ID : "" %>';
                         var redirectUri = "<%= Constants.GOOGLE_REDIRECT_URI %>";
                         var scope = "email profile";
                         var authUrl = "https://accounts.google.com/o/oauth2/auth?scope=" + encodeURIComponent(scope) + "&client_id=" + clientId + "&redirect_uri=" + encodeURIComponent(redirectUri) + "&response_type=code";
@@ -145,19 +142,6 @@
 
                     const passwordInput = document.getElementById("password");
                     const togglePasswordButton = document.getElementById("togglePassword");
-                    const loginForm = document.getElementById("loginForm");
-                    const emailInput = document.getElementById("email");
-                    const clientLoginError = document.getElementById("clientLoginError");
-
-                    function showClientError(message) {
-                        clientLoginError.textContent = message;
-                        clientLoginError.style.display = "block";
-                    }
-
-                    function hideClientError() {
-                        clientLoginError.textContent = "";
-                        clientLoginError.style.display = "none";
-                    }
 
                     function hidePasswordToggle() {
                         togglePasswordButton.classList.remove("visible");
@@ -187,38 +171,6 @@
                             passwordInput.type = showPassword ? "text" : "password";
                             togglePasswordButton.setAttribute("aria-pressed", String(showPassword));
                         });
-                    }
-
-                    if (loginForm) {
-                        loginForm.addEventListener("submit", function (event) {
-                            hideClientError();
-
-                            const normalizedEmail = emailInput.value.trim().toLowerCase();
-                            const normalizedPassword = passwordInput.value.trim();
-                            const emailRegex = /^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*@(gmail\.com|yahoo\.com|fucantho|fucantho\.edu\.vn)$/;
-
-                            emailInput.value = normalizedEmail;
-
-                            if (!normalizedEmail || !normalizedPassword) {
-                                event.preventDefault();
-                                showClientError("Vui lòng nhập đầy đủ email và mật khẩu!");
-                                return;
-                            }
-
-                            if (normalizedEmail.length > 254 || !emailRegex.test(normalizedEmail)) {
-                                event.preventDefault();
-                                showClientError("Email chỉ được dùng đuôi: @gmail.com, @yahoo.com, @fucantho hoặc @fucantho.edu.vn");
-                                return;
-                            }
-
-                            if (passwordInput.value.length < 8 || passwordInput.value.length > 16) {
-                                event.preventDefault();
-                                showClientError("Mật khẩu phải từ 8 đến 16 ký tự!");
-                            }
-                        });
-
-                        emailInput.addEventListener("input", hideClientError);
-                        passwordInput.addEventListener("input", hideClientError);
                     }
                 </script>
             </body>

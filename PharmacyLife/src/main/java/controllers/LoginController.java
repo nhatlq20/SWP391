@@ -16,7 +16,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.regex.Pattern;
 import models.GoogleAccount;
 import utils.GoogleUtils;
 
@@ -25,12 +24,6 @@ import utils.GoogleUtils;
  * @author anltc
  */
 public class LoginController extends HttpServlet {
-
-        private static final Pattern EMAIL_PATTERN = Pattern.compile(
-            "^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*@(gmail\\.com|yahoo\\.com|fucantho|fucantho\\.edu\\.vn)$");
-    private static final int MAX_EMAIL_LENGTH = 254;
-    private static final int MIN_PASSWORD_LENGTH = 8;
-    private static final int MAX_PASSWORD_LENGTH = 16;
 
     private void forwardLoginWithError(HttpServletRequest request, HttpServletResponse response, String email,
             String message) throws ServletException, IOException {
@@ -121,29 +114,8 @@ public class LoginController extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        // Validate input
-        if (email == null || password == null) {
-            forwardLoginWithError(request, response, null, "Vui lòng nhập đầy đủ email và mật khẩu!");
-            return;
-        }
-
-        email = email.trim().toLowerCase();
-        password = password.trim();
-
-        if (email.isEmpty() || password.isEmpty()) {
-            forwardLoginWithError(request, response, email, "Vui lòng nhập đầy đủ email và mật khẩu!");
-            return;
-        }
-
-        if (email.length() > MAX_EMAIL_LENGTH || !EMAIL_PATTERN.matcher(email).matches()) {
-            forwardLoginWithError(request, response, email, "Email không đúng định dạng!");
-            return;
-        }
-
-        if (password.length() < MIN_PASSWORD_LENGTH || password.length() > MAX_PASSWORD_LENGTH) {
-            forwardLoginWithError(request, response, email, "Mật khẩu phải từ 8 đến 16 ký tự!");
-            return;
-        }
+        email = email == null ? "" : email.trim().toLowerCase();
+        password = password == null ? "" : password.trim();
 
         // Try to authenticate as Staff first
         StaffDAO staffDAO = new StaffDAO();
