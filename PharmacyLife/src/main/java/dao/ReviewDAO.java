@@ -6,6 +6,7 @@ import utils.DBContext;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
 ///Kiên
 public class ReviewDAO {
 
@@ -39,21 +40,22 @@ public class ReviewDAO {
     }
 
     public List<ReviewCustomer> getReviewsWithCustomerByMedicine(int medicineId) {
-        //lấy danh sách review của 1 loại thuốc
+        // lấy danh sách review của 1 loại thuốc
         List<ReviewCustomer> list = new ArrayList<>();
-        String sql = "SELECT r.ReviewId, c.FullName, r.Rating, r.Comment, r.ReviewCreatedAt, r.ReplyContent, r.ReplyBy, r.ReplyCreatedAt, " +
-                     "COALESCE(s.StaffName, rc.FullName) AS ReplyStaffName " +
-                     "FROM Reviews r " +
-                     "JOIN Customer c ON c.CustomerId = r.CustomerId " +
-                     "LEFT JOIN Staff s ON s.StaffId = r.ReplyBy AND r.ReplyBy > 0 " +
-                     "LEFT JOIN Customer rc ON rc.CustomerId = -r.ReplyBy AND r.ReplyBy < 0 " +
-                     "WHERE r.MedicineId = ? " +
-                     "ORDER BY r.ReviewCreatedAt DESC";
-        
-        try (Connection conn = dbContext.getConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "SELECT r.ReviewId, c.FullName, r.Rating, r.Comment, r.ReviewCreatedAt, r.ReplyContent, r.ReplyBy, r.ReplyCreatedAt, "
+                +
+                "COALESCE(s.StaffName, rc.FullName) AS ReplyStaffName " +
+                "FROM Reviews r " +
+                "JOIN Customer c ON c.CustomerId = r.CustomerId " +
+                "LEFT JOIN Staff s ON s.StaffId = r.ReplyBy AND r.ReplyBy > 0 " +
+                "LEFT JOIN Customer rc ON rc.CustomerId = -r.ReplyBy AND r.ReplyBy < 0 " +
+                "WHERE r.MedicineId = ? " +
+                "ORDER BY r.ReviewCreatedAt DESC";
+
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, medicineId);
-            
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     ReviewCustomer review = new ReviewCustomer();
@@ -77,16 +79,16 @@ public class ReviewDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         return list;
     }
 
-      public double getAverageRating(int medicineId) {
-        //tính trung bình sao
+    public double getAverageRating(int medicineId) {
+        // tính trung bình sao
         String sql = "SELECT AVG(CAST(Rating AS FLOAT)) as avgRating FROM Reviews WHERE MedicineId = ?";
-            
-        try (Connection conn = dbContext.getConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, medicineId);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -101,12 +103,12 @@ public class ReviewDAO {
         return 0.0;
     }
 
-        public int getTotalReviews(int medicineId) {
-            //đếm xem có bao nhiêu sản phẩm
+    public int getTotalReviews(int medicineId) {
+        // đếm xem có bao nhiêu sản phẩm
         String sql = "SELECT COUNT(*) as count FROM Reviews WHERE MedicineId = ?";
 
-        try (Connection conn = dbContext.getConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, medicineId);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -124,8 +126,8 @@ public class ReviewDAO {
     public boolean addReview(Review review) {
         String sql = "INSERT INTO Reviews (MedicineId, CustomerId, Rating, Comment, ReviewCreatedAt) VALUES (?, ?, ?, ?, GETDATE())";
 
-        try (Connection conn = dbContext.getConnection(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, review.getMedicineId());
             ps.setInt(2, review.getCustomerId());
             ps.setInt(3, review.getRating());
@@ -139,10 +141,6 @@ public class ReviewDAO {
 
         return false;
     }
-
-  
-
-
 
     public boolean insertReview(Review review) {
         return addReview(review);
@@ -202,7 +200,8 @@ public class ReviewDAO {
 
         return false;
     }
-// kien
+
+    // kien
     public List<Review> getAllReviews() {
         List<Review> reviews = new ArrayList<>();
         String sql = "SELECT * FROM Reviews ORDER BY ReviewCreatedAt DESC";

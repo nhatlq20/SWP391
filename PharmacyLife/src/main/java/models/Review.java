@@ -3,8 +3,10 @@ package models;
 import java.sql.Timestamp;
 
 import java.sql.Date;
+
 /**
- *kien
+ * kien
+ * 
  * @author PC
  */
 public class Review {
@@ -16,13 +18,11 @@ public class Review {
     private String comment;
     private Timestamp reviewCreatedAt;
 
-
     private String replyContent;
     private int replyBy;
     private Date replyCreatedAt;
 
-
-     public String getReplyContent() {
+    public String getReplyContent() {
         return replyContent;
     }
 
