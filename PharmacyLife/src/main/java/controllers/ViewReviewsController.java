@@ -23,8 +23,9 @@ public class ViewReviewsController extends HttpServlet {
         }
         Object userType = session.getAttribute("userType");
         Object loggedInUser = session.getAttribute("loggedInUser");
+        String normalizedType = userType == null ? "" : String.valueOf(userType).toLowerCase();
         return userType != null
-                && "staff".equalsIgnoreCase(String.valueOf(userType))
+                && ("staff".equals(normalizedType) || "admin".equals(normalizedType))
                 && loggedInUser instanceof Staff;
     }
 

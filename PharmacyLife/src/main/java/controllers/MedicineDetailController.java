@@ -77,6 +77,7 @@ public class MedicineDetailController extends HttpServlet {
             Integer customerId = getLoggedInCustomerId(request);
             boolean canReview = customerId != null && orderDAO.hasCustomerPurchasedMedicine(customerId, medicineId);
             request.setAttribute("canReview", canReview);
+            request.setAttribute("loggedCustomerId", customerId);
             
             request.getRequestDispatcher("/view/client/medicine-detail.jsp").forward(request, response);
         } catch (NumberFormatException e) {

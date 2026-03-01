@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -63,6 +64,21 @@
             padding: 10px 12px;
             color: #475569;
             font-size: 13px;
+            white-space: pre-line;
+        }
+
+        .reply-lines {
+            margin-top: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .reply-line {
+            background: #ffffff;
+            border: 1px solid #dbe2ea;
+            border-radius: 8px;
+            padding: 8px 10px;
         }
 
         .reply-dashboard-form {
@@ -156,32 +172,35 @@
                                     </div>
                                     <span class="review-date">${review.createdAt}</span>
                                 </div>
-                                <p class="review-comment">${review.comment}</p>
+                                <div class="customer-comment-box">
+                                    <p class="review-comment">${review.comment}</p>
+                                </div>
                          <!-- của kiên form phản hồi -->
                                 <c:if test="${not empty review.replyContent}">
-                                    <div class="reply-preview">
-                                        Đã phản hồi bởi
-                                        <strong>
-                                            <c:out value="${not empty review.replyStaffName ? review.replyStaffName : (review.replyBy lt 0 ? 'Khách hàng' : 'Nhân viên nhà thuốc')}" />
-                                        </strong>
-                                        (<c:out value="${review.replyBy lt 0 ? 'Khách hàng' : 'Dược sĩ'}" />):
-                                        ${review.replyContent}
-                                    </div>
+                                    <c:forEach var="replyItem" items="${fn:split(review.replyContent, '@@BR@@')}">
+                                        <c:if test="${not empty fn:trim(replyItem)}">
+                                            <div class="reply-preview">
+                                                <div class="reply-lines">
+                                                    <div class="reply-line"><c:out value="${replyItem}" /></div>
+                                                </div>
+                                            </div>
+                                        </c:if>
+                                    </c:forEach>
                                 </c:if>
 
-                                <c:if test="${sessionScope.userType eq 'staff'}">
-                                    <form class="reply-dashboard-form" action="${pageContext.request.contextPath}/reply-review" method="post">
+                                <c:if test="${sessionScope.userType eq 'staff' or sessionScope.userType eq 'admin'}">
+                                    <form class="reply-dashboard-form" action="${pageContext.request.contextPath}/reply-review" method="post" onsubmit="return validateReplyForm(this)">
                                         <input type="hidden" name="reviewId" value="${review.reviewId}" />
                                         <input type="hidden" name="medicineId" value="${medicineId}" />
                                         <input type="hidden" name="returnTo" value="viewReviews" />
                                         <label class="form-label mb-1"><strong>Trả lời đánh giá</strong></label>
-                                        <textarea class="form-control mb-2" name="replyContent" rows="3" placeholder="Nhập nội dung phản hồi..." required><c:out value="${review.replyContent}" /></textarea>
-                                        <button type="submit" class="btn btn-primary btn-sm">${not empty review.replyContent ? 'Cập nhật phản hồi' : 'Gửi phản hồi'}</button>
+                                        <textarea class="form-control mb-2" name="replyContent" rows="3" placeholder="Nhập nội dung phản hồi mới..." required></textarea>
+                                        <button type="submit" class="btn btn-primary btn-sm">${not empty review.replyContent ? 'Gửi thêm phản hồi' : 'Gửi phản hồi'}</button>
                                     </form>
 
                                 </c:if>
 
-                                <c:if test="${sessionScope.userType eq 'staff'}">
+                                                                <c:if test="${sessionScope.userType eq 'staff' or sessionScope.userType eq 'admin'}">
                                     <form class="delete-review-form" action="${pageContext.request.contextPath}/view-reviews" method="post"
                                           onsubmit="return confirm('Bạn chắc chắn muốn xóa review này?');">
                                         <input type="hidden" name="action" value="delete" />
@@ -203,5 +222,16 @@
     <%@ include file="../common/footer.jsp" %>
 
     <script src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function validateReplyForm(form) {
+            const textarea = form.querySelector('textarea[name="replyContent"]');
+            if (!textarea || textarea.value.trim().length > 0) {
+                return true;
+            }
+            alert('Nội dung phản hồi không được để trống.');
+            textarea.focus();
+            return false;
+        }
+    </script>
 </body>
 </html>

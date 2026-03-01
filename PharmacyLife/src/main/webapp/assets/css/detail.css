@@ -358,6 +358,12 @@ body {
     margin-bottom: 16px;
 }
 
+.comment-divider {
+    border: 0;
+    border-top: 1px solid #e5e7eb;
+    margin: 12px 0 16px;
+}
+
 .review-thread {
     display: flex;
     flex-direction: column;
@@ -433,10 +439,22 @@ body {
     color: #3f465d;
 }
 
+.customer-comment-box {
+    margin-top: 6px;
+    background: #ffffff;
+    border: 1px solid #dbe2ea;
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
 .thread-reply-wrap {
     position: relative;
     margin-left: 20px;
     padding-left: 28px;
+}
+
+.thread-reply-wrap+.thread-reply-wrap {
+    margin-top: 12px;
 }
 
 .thread-reply-line {
@@ -490,6 +508,20 @@ body {
     font-size: 14px;
     line-height: 1.6;
     color: #4a5168;
+    white-space: pre-line;
+}
+
+.thread-reply-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.thread-reply-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 10px;
 }
 
 .review-header {
