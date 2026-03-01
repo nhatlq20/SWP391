@@ -24,9 +24,18 @@ public class SearchController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
 
         String keyword = request.getParameter("keyword");
+        String categoryIdStr = request.getParameter("categoryId");
         List<Medicine> medicines = new ArrayList<>();
 
-        if (keyword != null && !keyword.trim().isEmpty()) {
+        if (categoryIdStr != null && !categoryIdStr.isEmpty()) {
+            try {
+                int cid = Integer.parseInt(categoryIdStr);
+                medicines = medicineDAO.getMedicinesByCategory(cid);
+                request.setAttribute("selectedCategoryId", cid);
+            } catch (NumberFormatException e) {
+                // Ignore invalid ID
+            }
+        } else if (keyword != null && !keyword.trim().isEmpty()) {
             keyword = keyword.trim();
             medicines = medicineDAO.searchMedicines(keyword);
         }
