@@ -11,44 +11,7 @@
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
             <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/medicine-dashboard.css">
-            <style>
-                body {
-                    background: #f3f4f8;
-                }
-
-                .page-title {
-                    font-size: 1.6rem;
-                    font-weight: 700;
-                    margin: 0;
-                    color: #1e293b;
-                }
-
-                .category-actions {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                }
-
-                .category-search {
-                    width: 280px;
-                }
-
-                .category-code {
-                    font-weight: 700;
-                    color: #1e293b;
-                    letter-spacing: .2px;
-                }
-
-                .category-name-badge {
-                    display: inline-block;
-                    background: #eef2ff;
-                    color: #3b82f6;
-                    border-radius: 6px;
-                    padding: 4px 10px;
-                    font-size: .85rem;
-                    font-weight: 500;
-                }
-            </style>
+        
         </head>
 
         <body class="bg-light">

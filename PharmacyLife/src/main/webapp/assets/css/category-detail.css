@@ -1,0 +1,135 @@
+body {
+  background: #f6f8fb;
+}
+
+.category-info-label {
+  font-weight: 600;
+  color: #0a2885;
+  font-size: 1.08rem;
+}
+.category-info-value {
+  font-size: 1.18rem;
+  font-weight: 600;
+  color: #0d6efd;
+  letter-spacing: 0.5px;
+}
+
+.medicine-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border-radius: 18px;
+  overflow: hidden;
+}
+.medicine-table th {
+  background: #eaf1ff;
+  color: #e8e8e8;
+  font-weight: 400;
+  font-size: 1rem;
+  border: none;
+  border-bottom: 2px solid #d6e6ff;
+  text-align: left;
+  padding: 14px 16px;
+  box-shadow: none;
+}
+.medicine-table th:first-child {
+  border-top-left-radius: 16px;
+}
+.medicine-table th:last-child {
+  border-top-right-radius: 16px;
+}
+.medicine-table th, .medicine-table td {
+  vertical-align: middle !important;
+  text-align: center;
+}
+.medicine-table td {
+  background: #fff;
+  border: none;
+  font-size: 1.05rem;
+  color: #222;
+  padding: 13px 10px;
+}
+.medicine-table tr:last-child td:first-child {
+  border-bottom-left-radius: 16px;
+}
+.medicine-table tr:last-child td:last-child {
+  border-bottom-right-radius: 16px;
+}
+.medicine-table td img {
+  border-radius: 0.5rem;
+  border: 1px solid #e3e6ef;
+  background: #f6f8fa;
+  max-width: 80px;
+  max-height: 60px;
+  object-fit: contain;
+}
+.price {
+  color: #0a9d2a;
+  font-weight: 700;
+  font-size: 1.08rem;
+}
+
+.medicine-table thead th {
+  background: #f1f6ff;
+  color: #0a2885;
+  font-weight: 600;
+  font-size: 0.98rem;
+  border: none;
+  border-bottom: 2.5px solid #d6e6ff;
+  text-align: left;
+  padding: 10px 10px;
+}
+.medicine-table thead tr th:first-child {
+  border-top-left-radius: 18px;
+}
+.medicine-table thead tr th:last-child {
+  border-top-right-radius: 18px;
+}
+
+.medicine-table th.medicine-code-col,
+.medicine-table td.medicine-code-col {
+  width: 180px;
+  min-width: 140px;
+  max-width: 220px;
+}
+
+.category-detail-card {
+  background: #fff;
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  margin: 2.5rem auto 0 320px;
+  max-width: 1150px;
+  border: 1px solid #e3e6ef;
+}
+
+.category-detail-card .row.mb-4 {
+  background: none !important;
+  border-radius: 18px 18px 0 0;
+  padding: 18px 32px 10px 32px;
+  margin-bottom: 0 !important;
+  box-shadow: 0 2px 8px 0 rgba(10,40,133,0.04);
+}
+
+.main-content {
+  padding-top: 2.5rem;
+  min-height: 100vh;
+}
+
+@media (max-width: 992px) {
+  .category-detail-card {
+    padding: 1.2rem 0.5rem;
+    max-width: 98vw;
+  }
+  .page-title {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .category-detail-card .row.mb-4 {
+    padding: 14px 10px 8px 10px;
+  }
+}
