@@ -254,7 +254,7 @@
                         const confirmPasswordValue = confirmPasswordInput.value;
 
                         const fullNameRegex = /^[\p{L}][\p{L}\s'.-]{1,99}$/u;
-                        const emailRegex = /^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*@(gmail\.com|yahoo\.com|fucantho|fucantho\.edu\.vn)$/;
+                        const emailRegex = /^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*@(gmail\.com|yahoo\.com|fucantho|fucantho\.edu\.vn|pharmacy\.com|pharmacylife\.com)$/;
                         const phoneRegex = /^0(3|5|7|8|9)\d{8}$/;
 
                         fullNameInput.value = normalizedFullName;
@@ -275,7 +275,7 @@
 
                         if (normalizedEmail.length > 254 || !emailRegex.test(normalizedEmail)) {
                             event.preventDefault();
-                            showRegisterError("Email chỉ được dùng đuôi: @gmail.com, @yahoo.com, @fucantho hoặc @fucantho.edu.vn");
+                            showRegisterError("Email không chính xác!");
                             return;
                         }
 
@@ -287,7 +287,7 @@
 
                         if (passwordValue.length < 8 || passwordValue.length > 16) {
                             event.preventDefault();
-                            showRegisterError("Mật khẩu phải từ 8 đến 16 ký tự!");
+                            showRegisterError("mật khẩu không phải có độ dài 8 đến 16 kí tự");
                             return;
                         }
 
