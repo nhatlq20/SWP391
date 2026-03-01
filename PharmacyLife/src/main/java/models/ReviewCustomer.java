@@ -8,6 +8,7 @@ import java.sql.Timestamp;
  */
 public class ReviewCustomer {
     private int reviewId;
+    private int customerId;
     private String customerName;
     private int rating;
     private String comment;
@@ -33,6 +34,14 @@ public class ReviewCustomer {
 
     public void setReviewId(int reviewId) {
         this.reviewId = reviewId;
+    }
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
     }
 
     public String getCustomerName() {
