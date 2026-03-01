@@ -58,9 +58,9 @@
 }
 
 .sidebar-item.active {
-    background-color: #eef2ff;
-    color: var(--primary-color);
-    border-right: 3px solid var(--primary-color);
+    background-color: #eef2ff !important;
+    color: var(--primary-color) !important;
+    border-right: 3px solid var(--primary-color) !important;
     box-shadow: none;
 }
 
