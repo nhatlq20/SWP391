@@ -1,5 +1,6 @@
 <%-- Document : login Created on : Feb 14, 2026, 7:52:37 AM Author : anltc --%>
     <%@page contentType="text/html" pageEncoding="UTF-8" %>
+    <%@page import="utils.Constants" %>
         <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
             <!DOCTYPE html>
             <html lang="vi">
@@ -51,13 +52,14 @@
                                     <% } %>
 
                                         <!-- Login Form -->
-                                        <form action="${pageContext.request.contextPath}/login" method="post">
+                                        <form id="loginForm" action="${pageContext.request.contextPath}/login" method="post" novalidate>
                                             <!-- Email Field -->
                                             <div class="form-group">
                                                 <label for="email">Địa chỉ email</label>
                                                 <div class="input-wrapper">
                                                     <input type="email" id="email" name="email"
-                                                        placeholder="Nhập email của bạn" value="${email}" required>
+                                                        placeholder="Nhập email của bạn" value="${email}"
+                                                        autocomplete="username" inputmode="email">
                                                     <img src="${pageContext.request.contextPath}/assets/img/email.png"
                                                         alt="Email Icon" class="input-icon">
                                                 </div>
@@ -66,11 +68,31 @@
                                             <!-- Password Field -->
                                             <div class="form-group">
                                                 <label for="password">Mật Khẩu</label>
-                                                <div class="input-wrapper">
-                                                    <input type="password" id="password" name="password"
-                                                        placeholder="Nhập mật khẩu của bạn" required>
+                                                <div class="input-wrapper password-wrapper">
+                                                    <input type="password" id="password" name="password" class="password-input"
+                                                        placeholder="Nhập mật khẩu của bạn"
+                                                        autocomplete="current-password">
                                                     <img src="${pageContext.request.contextPath}/assets/img/Lock.png"
                                                         alt="Password Icon" class="input-icon">
+                                                    <button type="button" id="togglePassword" class="password-toggle"
+                                                        aria-label="Hiển thị mật khẩu" aria-pressed="false">
+                                                        <span class="eye-icon eye-closed" aria-hidden="true">
+                                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round">
+                                                                <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20C7 20 2.73 16.89 1 12c.68-1.94 1.79-3.65 3.2-5" />
+                                                                <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c5 0 9.27 3.11 11 8a11.83 11.83 0 0 1-4.29 5.94" />
+                                                                <path d="M14.12 14.12A3 3 0 1 1 9.88 9.88" />
+                                                                <path d="M1 1l22 22" />
+                                                            </svg>
+                                                        </span>
+                                                        <span class="eye-icon eye-open" aria-hidden="true">
+                                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round">
+                                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+                                                                <circle cx="12" cy="12" r="3" />
+                                                            </svg>
+                                                        </span>
+                                                    </button>
                                                 </div>
                                             </div>
 
@@ -110,12 +132,45 @@
 
                 <script>
                     function loginWithGoogle() {
-                        var clientId = "314105560833-79r5neb6b7fciaqfql64ib168vifbm2t.apps.googleusercontent.com";
-                        var redirectUri = "http://localhost:8080/pharmacy/login";
+                        var clientId = '<%= Constants.GOOGLE_CLIENT_ID != null ? Constants.GOOGLE_CLIENT_ID : "" %>';
+                        var redirectUri = "<%= Constants.GOOGLE_REDIRECT_URI %>";
                         var scope = "email profile";
                         var authUrl = "https://accounts.google.com/o/oauth2/auth?scope=" + encodeURIComponent(scope) + "&client_id=" + clientId + "&redirect_uri=" + encodeURIComponent(redirectUri) + "&response_type=code";
                         
                         window.location.href = authUrl;
+                    }
+
+                    const passwordInput = document.getElementById("password");
+                    const togglePasswordButton = document.getElementById("togglePassword");
+
+                    function hidePasswordToggle() {
+                        togglePasswordButton.classList.remove("visible");
+                        passwordInput.type = "password";
+                        togglePasswordButton.setAttribute("aria-pressed", "false");
+                    }
+
+                    if (passwordInput && togglePasswordButton) {
+                        passwordInput.addEventListener("focus", function () {
+                            togglePasswordButton.classList.add("visible");
+                        });
+
+                        passwordInput.addEventListener("blur", function () {
+                            setTimeout(function () {
+                                if (document.activeElement !== togglePasswordButton) {
+                                    hidePasswordToggle();
+                                }
+                            }, 0);
+                        });
+
+                        togglePasswordButton.addEventListener("mousedown", function (event) {
+                            event.preventDefault();
+                        });
+
+                        togglePasswordButton.addEventListener("click", function () {
+                            const showPassword = passwordInput.type === "password";
+                            passwordInput.type = showPassword ? "text" : "password";
+                            togglePasswordButton.setAttribute("aria-pressed", String(showPassword));
+                        });
                     }
                 </script>
             </body>

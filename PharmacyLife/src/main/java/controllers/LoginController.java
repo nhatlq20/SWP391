@@ -25,6 +25,15 @@ import utils.GoogleUtils;
  */
 public class LoginController extends HttpServlet {
 
+    private void forwardLoginWithError(HttpServletRequest request, HttpServletResponse response, String email,
+            String message) throws ServletException, IOException {
+        request.setAttribute("errorMessage", message);
+        if (email != null) {
+            request.setAttribute("email", email);
+        }
+        request.getRequestDispatcher("view/client/login.jsp").forward(request, response);
+    }
+
     /**
      * Handles the HTTP <code>GET</code> method - Display login page
      *
@@ -105,14 +114,8 @@ public class LoginController extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        // Validate input
-        if (email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Vui lòng nhập đầy đủ email và mật khẩu!");
-            request.getRequestDispatcher("view/client/login.jsp").forward(request, response);
-            return;
-        }
-
-        email = email.trim();
+        email = email == null ? "" : email.trim().toLowerCase();
+        password = password == null ? "" : password.trim();
 
         // Try to authenticate as Staff first
         StaffDAO staffDAO = new StaffDAO();
@@ -165,9 +168,7 @@ public class LoginController extends HttpServlet {
         }
 
         // Login failed
-        request.setAttribute("errorMessage", "Email hoặc mật khẩu không đúng!");
-        request.setAttribute("email", email);
-        request.getRequestDispatcher("view/client/login.jsp").forward(request, response);
+        forwardLoginWithError(request, response, email, "Email hoặc mật khẩu không đúng!");
     }
 
     /**

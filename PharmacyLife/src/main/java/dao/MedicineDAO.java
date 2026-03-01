@@ -146,6 +146,29 @@ public class MedicineDAO {
         return medicines;
     }
 
+    public List<Medicine> getBestSellers(int limit) {
+        List<Medicine> medicines = new ArrayList<>();
+        String sql = "SELECT TOP " + limit + " m.*, c.CategoryName, COALESCE(SUM(oi.OrderQuantity), 0) as TotalSold " +
+                "FROM Medicine m " +
+                "LEFT JOIN Category c ON m.CategoryId = c.CategoryId " +
+                "LEFT JOIN OrderItems oi ON m.MedicineId = oi.MedicineId " +
+                "GROUP BY m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, m.Unit, " +
+                "m.OriginalPrice, m.SellingPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, c.CategoryName "
+                +
+                "ORDER BY TotalSold DESC, m.MedicineName ASC";
+
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                medicines.add(mapResultSetToMedicine(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return medicines;
+    }
+
     public List<Medicine> getMedicinesInStock() {
         List<Medicine> medicines = new ArrayList<>();
         String sql = "SELECT m.*, c.CategoryName FROM Medicine m "

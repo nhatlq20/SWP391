@@ -99,6 +99,11 @@ body {
     pointer-events: none;
 }
 
+.password-wrapper .input-icon {
+    left: auto;
+    right: 15px;
+}
+
 .form-group input {
     width: 100%;
     padding: 12px 45px 12px 15px;
@@ -117,6 +122,63 @@ body {
 
 .form-group input::placeholder {
     color: #aaa;
+}
+
+.password-wrapper .password-input {
+    padding-left: 15px;
+    padding-right: 75px;
+}
+
+.password-wrapper .password-input::-ms-reveal,
+.password-wrapper .password-input::-ms-clear {
+    display: none;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 45px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: #777;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.password-toggle.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.eye-icon {
+    display: inline-flex;
+    width: 20px;
+    height: 20px;
+}
+
+.eye-open {
+    display: none;
+}
+
+.password-toggle[aria-pressed="true"] .eye-open {
+    display: inline-flex;
+}
+
+.password-toggle[aria-pressed="true"] .eye-closed {
+    display: none;
+}
+
+.eye-icon svg {
+    width: 20px;
+    height: 20px;
 }
 
 .forgot-password {

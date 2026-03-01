@@ -125,7 +125,7 @@
 
 /* ---------- Buttons ---------- */
 .btn-add-medicine {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    background-color: #4F81E1;
     color: #fff;
     border: none;
     border-radius: 10px;
@@ -140,10 +140,10 @@
 }
 
 .btn-add-medicine:hover {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    background-color: #3b6dc2;
     color: #fff;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 12px rgba(79, 129, 225, 0.3);
 }
 
 .btn-back {

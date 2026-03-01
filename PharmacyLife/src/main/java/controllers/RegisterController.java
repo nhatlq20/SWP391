@@ -1,11 +1,14 @@
 package controllers;
 
 import dao.CustomerDAO;
+import dao.UserDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.regex.Pattern;
+import models.User;
 
 /**
  * RegisterController - Handles customer registration
@@ -13,6 +16,51 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author anltc
  */
 public class RegisterController extends HttpServlet {
+
+        private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*@(gmail\\.com|yahoo\\.com|fucantho|fucantho\\.edu\\.vn)$");
+    private static final Pattern FULL_NAME_PATTERN = Pattern.compile("^[\\p{L}][\\p{L}\\s'.-]{1,99}$");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^0(3|5|7|8|9)\\d{8}$");
+    private static final int MAX_EMAIL_LENGTH = 254;
+    private static final int MIN_PASSWORD_LENGTH = 8;
+    private static final int MAX_PASSWORD_LENGTH = 16;
+
+    private void forwardRegisterError(HttpServletRequest request, HttpServletResponse response,
+            String message, String fullName, String phone, String email) throws ServletException, IOException {
+        request.setAttribute("errorMessage", message);
+        request.setAttribute("fullName", fullName);
+        request.setAttribute("phone", phone);
+        request.setAttribute("email", email);
+        request.getRequestDispatcher("view/client/register.jsp").forward(request, response);
+    }
+
+    private String normalizeName(String name) {
+        if (name == null) {
+            return "";
+        }
+        return name.trim().replaceAll("\\s+", " ");
+    }
+
+    private String normalizeEmail(String email) {
+        if (email == null) {
+            return "";
+        }
+        return email.trim().toLowerCase();
+    }
+
+    private String normalizePhone(String phone) {
+        if (phone == null) {
+            return "";
+        }
+        String normalized = phone.trim().replaceAll("[\\s.-]", "");
+        if (normalized.startsWith("+84") && normalized.length() == 12) {
+            return "0" + normalized.substring(3);
+        }
+        if (normalized.startsWith("84") && normalized.length() == 11) {
+            return "0" + normalized.substring(2);
+        }
+        return normalized;
+    }
 
     /**
      * Handles the HTTP <code>GET</code> method - Display register page
@@ -44,8 +92,6 @@ public class RegisterController extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         
-       
-        
         // Get form parameters
         String fullName = request.getParameter("fullName");
         String phone = request.getParameter("phone");
@@ -53,131 +99,74 @@ public class RegisterController extends HttpServlet {
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
 
-        System.out.println("Received parameters:");
-        System.out.println("  FullName: " + fullName);
-        System.out.println("  Phone: " + phone);
-        System.out.println("  Email: " + email);
-        System.out.println("  Password: " + (password != null ? "***" : "null"));
-        System.out.println("  ConfirmPassword: " + (confirmPassword != null ? "***" : "null"));
+        fullName = normalizeName(fullName);
+        phone = normalizePhone(phone);
+        email = normalizeEmail(email);
+        password = password != null ? password : "";
+        confirmPassword = confirmPassword != null ? confirmPassword : "";
 
         // Validate input
-        if (fullName == null || fullName.trim().isEmpty() ||
-            phone == null || phone.trim().isEmpty() ||
-            email == null || email.trim().isEmpty() ||
-            password == null || password.isEmpty() ||
-            confirmPassword == null || confirmPassword.isEmpty()) {
-            
-            System.out.println("Validation failed: Missing fields");
-            request.setAttribute("errorMessage", "Vui lòng nhập đầy đủ thông tin!");
-            request.setAttribute("fullName", fullName);
-            request.setAttribute("phone", phone);
-            request.setAttribute("email", email);
-            request.getRequestDispatcher("view/client/register.jsp").forward(request, response);
+        if (fullName.isEmpty() || phone.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            forwardRegisterError(request, response, "Vui lòng nhập đầy đủ thông tin!", fullName, phone, email);
             return;
         }
 
-        // Trim inputs
-        fullName = fullName.trim();
-        phone = phone.trim();
-        email = email.trim();
+        if (fullName.length() < 2 || fullName.length() > 100 || !FULL_NAME_PATTERN.matcher(fullName).matches()) {
+            forwardRegisterError(request, response, "Họ tên không hợp lệ!", fullName, phone, email);
+            return;
+        }
+
+        if (email.length() > MAX_EMAIL_LENGTH || !EMAIL_PATTERN.matcher(email).matches()) {
+            forwardRegisterError(request, response, "Email không hợp lệ!", fullName, phone, email);
+            return;
+        }
+
+        if (!PHONE_PATTERN.matcher(phone).matches()) {
+            forwardRegisterError(request, response, "Số điện thoại không hợp lệ!", fullName, phone, email);
+            return;
+        }
+
+        if (password.length() < MIN_PASSWORD_LENGTH || password.length() > MAX_PASSWORD_LENGTH) {
+            forwardRegisterError(request, response, "Mật khẩu phải từ 8 đến 16 ký tự!", fullName, phone, email);
+            return;
+        }
 
         // Validate password match
         if (!password.equals(confirmPassword)) {
-            System.out.println("Validation failed: Password mismatch");
-            request.setAttribute("errorMessage", "Mật khẩu xác nhận không khớp!");
-            request.setAttribute("fullName", fullName);
-            request.setAttribute("phone", phone);
-            request.setAttribute("email", email);
-            request.getRequestDispatcher("view/client/register.jsp").forward(request, response);
+            forwardRegisterError(request, response, "Mật khẩu xác nhận không khớp!", fullName, phone, email);
             return;
         }
 
-        // Validate password length
-        if (password.length() < 6) {
-            System.out.println("Validation failed: Password too short");
-            request.setAttribute("errorMessage", "Mật khẩu phải có ít nhất 6 ký tự!");
-            request.setAttribute("fullName", fullName);
-            request.setAttribute("phone", phone);
-            request.setAttribute("email", email);
-            request.getRequestDispatcher("view/client/register.jsp").forward(request, response);
-            return;
-        }
-
-        // Validate email format
-        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-            System.out.println("Validation failed: Invalid email format");
-            request.setAttribute("errorMessage", "Email không hợp lệ!");
-            request.setAttribute("fullName", fullName);
-            request.setAttribute("phone", phone);
-            request.setAttribute("email", email);
-            request.getRequestDispatcher("view/client/register.jsp").forward(request, response);
-            return;
-        }
-
-        // Validate phone format (Vietnamese phone)
-        if (!phone.matches("^[0-9]{10,11}$")) {
-            System.out.println("Validation failed: Invalid phone format");
-            request.setAttribute("errorMessage", "Số điện thoại không hợp lệ! (10-11 số)");
-            request.setAttribute("fullName", fullName);
-            request.setAttribute("phone", phone);
-            request.setAttribute("email", email);
-            request.getRequestDispatcher("view/client/register.jsp").forward(request, response);
-            return;
-        }
-
-        System.out.println("All validations passed");
-        
         // Check if email already exists
-        System.out.println("Checking if email exists...");
         CustomerDAO customerDAO = new CustomerDAO();
-        
+        UserDAO userDAO = new UserDAO();
+
         try {
-            if (customerDAO.isEmailExists(email)) {
-                System.out.println("Email already exists");
-                request.setAttribute("errorMessage", "Email này đã được đăng ký!");
-                request.setAttribute("fullName", fullName);
-                request.setAttribute("phone", phone);
-                request.setAttribute("email", email);
-                request.getRequestDispatcher("view/client/register.jsp").forward(request, response);
+            User existingUser = userDAO.findByUsernameOrEmail(email);
+            if (existingUser != null || customerDAO.isEmailExists(email)) {
+                forwardRegisterError(request, response, "Email này đã được đăng ký!", fullName, phone, email);
                 return;
             }
-            System.out.println("Email is available");
         } catch (Exception e) {
-            System.out.println("Error checking email: " + e.getMessage());
-            e.printStackTrace();
-            request.setAttribute("errorMessage", "Lỗi hệ thống! Vui lòng thử lại sau.");
-            request.setAttribute("fullName", fullName);
-            request.setAttribute("phone", phone);
-            request.setAttribute("email", email);
-            request.getRequestDispatcher("view/client/register.jsp").forward(request, response);
+            forwardRegisterError(request, response, "Lỗi hệ thống! Vui lòng thử lại sau.", fullName, phone, email);
             return;
         }
 
         // Register customer
-        System.out.println("Attempting to register customer...");
         boolean success = false;
         try {
             success = customerDAO.registerCustomer(fullName, email, password, phone);
-        } catch (Exception e) {
-            System.out.println("Exception during registration: " + e.getMessage());
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
 
         if (success) {
             // Registration successful - Set success message and redirect to login
-            System.out.println("Registration successful!");
-            
             request.setAttribute("successMessage", "Đăng ký thành công! Vui lòng đăng nhập.");
+            request.setAttribute("email", email);
             request.getRequestDispatcher("view/client/login.jsp").forward(request, response);
         } else {
             // Registration failed
-            System.out.println("Registration failed!");
-           
-            request.setAttribute("errorMessage", "Đăng ký thất bại! Vui lòng thử lại.");
-            request.setAttribute("fullName", fullName);
-            request.setAttribute("phone", phone);
-            request.setAttribute("email", email);
-            request.getRequestDispatcher("view/client/register.jsp").forward(request, response);
+            forwardRegisterError(request, response, "Đăng ký thất bại! Vui lòng thử lại.", fullName, phone, email);
         }
     }
 
