@@ -254,7 +254,6 @@
                                             <button class="btn-buy btn btn-primary"
                                                 onclick="submitAddToCart()">Mua</button>
 
-                                            <!-- đây là xử lí khi chưa mua hàng -->
                                             <c:choose>
                                                 <c:when test="${sessionScope.userType eq 'customer'}">
                                                     <c:choose>
