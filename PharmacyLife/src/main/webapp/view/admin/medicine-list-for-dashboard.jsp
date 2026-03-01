@@ -77,10 +77,13 @@
 
                         <!-- Add Button -->
                         <div class="d-flex justify-content-end mb-3">
-                            <a href="${pageContext.request.contextPath}/admin/medicine-add-dashboard"
-                                class="btn-add-medicine">
-                                <i class="fas fa-plus"></i> Thêm thuốc mới
-                            </a>
+                            <c:if
+                                test="${sessionScope.userType eq 'staff' and fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
+                                <a href="${pageContext.request.contextPath}/admin/medicine-add-dashboard"
+                                    class="btn-add-medicine">
+                                    <i class="fas fa-plus"></i> Thêm thuốc mới
+                                </a>
+                            </c:if>
                         </div>
 
                         <!-- Medicine Table -->
@@ -92,10 +95,13 @@
                                         <i class="fas fa-inbox"></i>
                                         <h4>Chưa có thuốc nào</h4>
                                         <p>Hãy thêm thuốc đầu tiên của bạn</p>
-                                        <a href="${pageContext.request.contextPath}/admin/medicine-add-dashboard"
-                                            class="btn-add-medicine mt-3">
-                                            <i class="fas fa-plus"></i> Thêm thuốc mới
-                                        </a>
+                                        <c:if
+                                            test="${sessionScope.userType eq 'staff' and fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
+                                            <a href="${pageContext.request.contextPath}/admin/medicine-add-dashboard"
+                                                class="btn-add-medicine mt-3">
+                                                <i class="fas fa-plus"></i> Thêm thuốc mới
+                                            </a>
+                                        </c:if>
                                     </div>
                                 </c:when>
                                 <c:otherwise>
