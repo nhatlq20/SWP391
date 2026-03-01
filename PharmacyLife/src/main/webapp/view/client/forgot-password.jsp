@@ -26,6 +26,18 @@
                                 <h2>Quên mật khẩu</h2>
                                 <p class="subtitle">Nhập email để nhận mã OTP</p>
 
+                                <c:if test="${not empty successMessage}">
+                                    <div class="alert alert-success" style="margin-bottom: 16px;">
+                                        <span>${successMessage}</span>
+                                    </div>
+                                </c:if>
+
+                                <c:if test="${not empty errorMessage}">
+                                    <div class="alert alert-error" style="margin-bottom: 16px;">
+                                        <span>${errorMessage}</span>
+                                    </div>
+                                </c:if>
+
                                 <form action="${pageContext.request.contextPath}/forgot-password" method="post">
                                     <div class="form-group-forgot">
                                         <label>
@@ -34,7 +46,7 @@
                                         </label>
                                         <div class="input-wrapper">
                                             <span class="input-icon">@</span>
-                                            <input type="email" name="email" placeholder="Nhập email của bạn" required>
+                                            <input type="email" name="email" value="${email}" placeholder="Nhập email của bạn" required>
                                         </div>
                                         <div class="info-text">
                                             <i class="fas fa-info-circle"></i>

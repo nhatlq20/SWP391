@@ -60,11 +60,12 @@ public class ReviewDAO {
                 while (rs.next()) {
                     ReviewCustomer review = new ReviewCustomer();
                     review.setReviewId(rs.getInt("ReviewId"));
+                    review.setCustomerId(rs.getInt("CustomerId"));
                     review.setCustomerName(rs.getString("FullName"));
                     review.setRating(rs.getInt("Rating"));
                     review.setComment(rs.getString("Comment"));
                     review.setCreatedAt(rs.getTimestamp("ReviewCreatedAt"));
-                    review.setReplyContent(rs.getString("ReplyContent"));
+                    review.setReplyContent(toPlainReplyContent(rs.getString("ReplyContent")));
                     int replyBy = rs.getInt("ReplyBy");
                     if (rs.wasNull()) {
                         review.setReplyBy(null);
@@ -83,8 +84,151 @@ public class ReviewDAO {
         return list;
     }
 
-    public double getAverageRating(int medicineId) {
-        // tính trung bình sao
+    private void appendBlock(StringBuilder builder, String value) {
+        if (value == null) {
+            return;
+        }
+        String trimmed = value.trim();
+        if (trimmed.isEmpty()) {
+            return;
+        }
+        if (builder.length() > 0) {
+            builder.append("@@BR@@");
+        }
+        builder.append(trimmed);
+    }
+
+    private String normalizeReplyMarkers(String content) {
+        return content
+                .replaceAll("(?i)\\|\\s*meta\\s*\\|", "@@META@@")
+                .replaceAll("(?i)\\|\\s*br\\s*\\|", "@@BR@@")
+                .replaceAll("(?i)@\\s*meta\\s*@", "@@META@@")
+                .replaceAll("(?i)@\\s*br\\s*@", "@@BR@@");
+    }
+
+    private String addPharmacistTagIfNeeded(String author, String role) {
+        if (author == null) {
+            return "";
+        }
+        String cleanedAuthor = author.trim();
+        if (cleanedAuthor.isEmpty() || role == null) {
+            return cleanedAuthor;
+        }
+
+        String normalizedRole = role.toLowerCase();
+        boolean isStaffRole = normalizedRole.contains("dược")
+                || normalizedRole.contains("staff")
+                || normalizedRole.contains("admin");
+
+        if (isStaffRole && !cleanedAuthor.contains("(Dược sĩ)")) {
+            return cleanedAuthor + " (Dược sĩ)";
+        }
+        return cleanedAuthor;
+    }
+
+    private String toPlainReplyContent(String rawReplyContent) {
+        if (rawReplyContent == null) {
+            return null;
+        }
+
+        String content = rawReplyContent.trim();
+        if (content.isEmpty()) {
+            return content;
+        }
+
+        if (!content.contains("@@META@@") && !content.contains("|META|")) {
+            if (content.contains("@@BR@@")) {
+                StringBuilder plain = new StringBuilder();
+                for (String block : content.split("\\Q@@BR@@\\E")) {
+                    appendBlock(plain, block);
+                }
+                return plain.toString();
+            }
+
+            if (content.contains("\n")) {
+                StringBuilder plain = new StringBuilder();
+                for (String block : content.split("\\r?\\n")) {
+                    appendBlock(plain, block);
+                }
+                return plain.toString();
+            }
+
+            return content;
+        }
+
+        String normalized = normalizeReplyMarkers(content);
+        StringBuilder plain = new StringBuilder();
+
+        for (String blockRaw : normalized.split("\\Q@@BR@@\\E")) {
+            String block = blockRaw == null ? "" : blockRaw.trim();
+            if (block.isEmpty()) {
+                continue;
+            }
+
+            String[] parts = block.split("\\Q@@META@@\\E");
+            if (parts.length >= 3) {
+                String author = addPharmacistTagIfNeeded(parts[0], parts[1]);
+                String text = parts[2] == null ? "" : parts[2].trim();
+                if (!text.isEmpty()) {
+                    appendBlock(plain, author.isEmpty() ? text : author + ": " + text);
+                    continue;
+                }
+            }
+
+            appendBlock(plain, block);
+        }
+
+        return plain.toString();
+    }
+
+    private String getReplyAuthorName(Connection conn, int replyBy) throws SQLException {
+        if (replyBy > 0) {
+            String staffSql = "SELECT StaffName FROM Staff WHERE StaffId = ?";
+            try (PreparedStatement ps = conn.prepareStatement(staffSql)) {
+                ps.setInt(1, replyBy);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        String name = rs.getString("StaffName");
+                        if (name != null && !name.trim().isEmpty()) {
+                            return name.trim();
+                        }
+                    }
+                }
+            }
+            return "Nhân viên";
+        }
+
+        String customerSql = "SELECT FullName FROM Customer WHERE CustomerId = ?";
+        try (PreparedStatement ps = conn.prepareStatement(customerSql)) {
+            ps.setInt(1, -replyBy);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String name = rs.getString("FullName");
+                    if (name != null && !name.trim().isEmpty()) {
+                        return name.trim();
+                    }
+                }
+            }
+        }
+        return "Khách hàng";
+    }
+
+    private String buildAuthorLabel(String authorName, int replyBy) {
+        if (authorName == null) {
+            authorName = "";
+        }
+        String cleaned = authorName.trim();
+        // if (cleaned.isEmpty()) {
+        //     cleaned = replyBy > 0 ? "Nhân viên" : "Khách hàng";
+        // }
+        if (replyBy > 0 && !cleaned.contains("(Dược sĩ)")) {
+            return cleaned + " (Dược sĩ)";
+        }
+        return cleaned;
+    }
+
+      public double getAverageRating(int medicineId) {
+        //tính trung bình sao
         String sql = "SELECT AVG(CAST(Rating AS FLOAT)) as avgRating FROM Reviews WHERE MedicineId = ?";
 
         try (Connection conn = dbContext.getConnection();
@@ -183,16 +327,84 @@ public class ReviewDAO {
         deleteReviewByAdminOrStaff(reviewId);
     }
 
-    public boolean replyReview(int reviewId, String replyContent, int staffId) {
-        String sql = "UPDATE Reviews SET ReplyContent = ?, ReplyBy = ?, ReplyCreatedAt = GETDATE() WHERE ReviewId = ?";
+    // =====================================
+
+    private boolean hasAuthorPrefix(String replyLine) {
+        if (replyLine == null) {
+            return false;
+        }
+        int separatorIndex = replyLine.indexOf(": ");
+        return separatorIndex > 0 && separatorIndex <= 80;
+    }
+
+    private String normalizeExistingReplyBlocks(String existingContent, String fallbackAuthor) {
+        if (existingContent == null) {
+            return "";
+        }
+
+        String[] blocks = existingContent.split("\\Q@@BR@@\\E");
+        StringBuilder normalized = new StringBuilder();
+
+        for (String blockRaw : blocks) {
+            String block = blockRaw == null ? "" : blockRaw.trim();
+            if (block.isEmpty()) {
+                continue;
+            }
+
+            String withAuthor = hasAuthorPrefix(block) ? block : (fallbackAuthor + ": " + block);
+            if (normalized.length() > 0) {
+                normalized.append("@@BR@@");
+            }
+            normalized.append(withAuthor);
+        }
+
+        return normalized.toString();
+    }
+
+    public boolean replyReview(int reviewId, int medicineId, String replyContent, int staffId) {
+        String selectSql = "SELECT ReplyContent, ReplyBy FROM Reviews WHERE ReviewId = ? AND MedicineId = ?";
+        String updateSql = "UPDATE Reviews "
+                + "SET ReplyContent = ?, ReplyBy = ?, ReplyCreatedAt = GETDATE() "
+                + "WHERE ReviewId = ? AND MedicineId = ?";
 
         try (Connection conn = dbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, replyContent);
-            ps.setInt(2, staffId);
-            ps.setInt(3, reviewId);
+                PreparedStatement selectPs = conn.prepareStatement(selectSql);
+                PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
 
-            int row = ps.executeUpdate();
+            String authorName = getReplyAuthorName(conn, staffId);
+            String finalReply = buildAuthorLabel(authorName, staffId) + ": " + replyContent;
+
+            selectPs.setInt(1, reviewId);
+            selectPs.setInt(2, medicineId);
+
+            String fullReplyContent = finalReply;
+            try (ResultSet rs = selectPs.executeQuery()) {
+                if (!rs.next()) {
+                    return false;
+                }
+
+                String existingContent = rs.getString("ReplyContent");
+                int existingReplyByRaw = rs.getInt("ReplyBy");
+                Integer existingReplyBy = rs.wasNull() ? null : existingReplyByRaw;
+
+                if (existingContent != null && !existingContent.trim().isEmpty()) {
+                    String normalizedExisting = toPlainReplyContent(existingContent);
+                    String fallbackAuthor = existingReplyBy != null
+                            ? buildAuthorLabel(getReplyAuthorName(conn, existingReplyBy), existingReplyBy)
+                            : "Khách hàng";
+                    normalizedExisting = normalizeExistingReplyBlocks(normalizedExisting, fallbackAuthor);
+                    if (!normalizedExisting.isEmpty()) {
+                        fullReplyContent = normalizedExisting + "@@BR@@" + finalReply;
+                    }
+                }
+            }
+
+            updatePs.setString(1, fullReplyContent);
+            updatePs.setInt(2, staffId);
+            updatePs.setInt(3, reviewId);
+            updatePs.setInt(4, medicineId);
+
+            int row = updatePs.executeUpdate();
             return row > 0;
         } catch (SQLException e) {
             e.printStackTrace();

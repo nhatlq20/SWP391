@@ -105,7 +105,10 @@
                                                         <p class="no-reviews">Chưa có đánh giá nào cho sản phẩm này</p>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <c:forEach var="review" items="${reviews}">
+                                                        <c:forEach var="review" items="${reviews}" varStatus="reviewStatus">
+                                                            <c:if test="${not reviewStatus.first}">
+                                                                <hr class="comment-divider" />
+                                                            </c:if>
                                                             <div class="review-item" id="review-${review.reviewId}">
                                                                 <div class="review-thread">
                                                                     <div class="thread-main">
@@ -119,38 +122,41 @@
                                                                                 <i class="fas fa-star"></i>
                                                                                 <span class="review-date">${review.createdAt}</span>
                                                                             </div>
-                                                                            <p class="review-comment"><c:out value="${review.comment}" /></p>
+                                                                            <div class="customer-comment-box">
+                                                                                <p class="review-comment"><c:out value="${review.comment}" /></p>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
 
                                                                     <c:if test="${not empty review.replyContent}">
-                                                                        <div class="thread-reply-wrap">
-                                                                            <div class="thread-reply-line"></div>
-                                                                            <div class="thread-reply">
-                                                                                <div class="thread-avatar staff-avatar">
-                                                                                    <c:out value="${fn:toUpperCase(fn:substring(fn:trim(not empty review.replyStaffName ? review.replyStaffName : 'N'), 0, 1))}" />
-                                                                                </div>
-                                                                                <div class="thread-reply-content">
-                                                                                    <div class="thread-reply-header">
-                                                                                        <span class="reply-staff-name"><c:out value="${not empty review.replyStaffName ? review.replyStaffName : (review.replyBy lt 0 ? 'Khách hàng' : 'Nhân viên nhà thuốc')}" /></span>
-                                                                                        <span class="reply-role-tag"><c:out value="${review.replyBy lt 0 ? 'Khách hàng' : 'Dược sĩ'}" /></span>
+                                                                        <div id="reply-list-${review.reviewId}">
+                                                                            <c:forEach var="replyItem" items="${fn:split(review.replyContent, '@@BR@@')}">
+                                                                                <c:if test="${not empty fn:trim(replyItem)}">
+                                                                                    <c:set var="replyLine" value="${fn:trim(replyItem)}" />
+                                                                                    <c:set var="separatorIndex" value="${fn:indexOf(replyLine, ': ')}" />
+                                                                                    <c:choose>
+                                                                                        <c:when test="${separatorIndex gt 0}">
+                                                                                            <c:set var="replyAuthorName" value="${fn:substring(replyLine, 0, separatorIndex)}" />
+                                                                                            <c:set var="replyBodyText" value="${fn:substring(replyLine, separatorIndex + 2, fn:length(replyLine))}" />
+                                                                                        </c:when>
+                                                                                        <c:otherwise>
+                                                                                            <c:set var="replyAuthorName" value="${not empty review.replyStaffName ? review.replyStaffName : (review.replyBy lt 0 ? 'Khách hàng' : 'Nhân viên')}" />
+                                                                                            <c:set var="replyBodyText" value="${replyLine}" />
+                                                                                        </c:otherwise>
+                                                                                    </c:choose>
+                                                                                    <div class="thread-reply-wrap">
+                                                                                        <div class="thread-reply-line"></div>
+                                                                                        <div class="thread-reply">
+                                                                                            <div class="thread-avatar staff-avatar"><c:out value="${fn:toUpperCase(fn:substring(fn:trim(replyAuthorName), 0, 1))}" /></div>
+                                                                                            <div class="thread-reply-content">
+                                                                                                <div class="reply-staff-name"><c:out value="${replyAuthorName}" /></div>
+                                                                                                <div class="thread-reply-text"><c:out value="${replyBodyText}" /></div>
+                                                                                            </div>
+                                                                                        </div>
                                                                                     </div>
-                                                                                    <div class="thread-reply-text"><c:out value="${review.replyContent}" /></div>
-                                                                                </div>
-                                                                            </div>
+                                                                                </c:if>
+                                                                            </c:forEach>
                                                                         </div>
-                                                                    </c:if>
-
-                                                                    <c:if test="${sessionScope.userType eq 'customer'}">
-                                                                        <form class="mt-2" action="${pageContext.request.contextPath}/reply-review" method="post">
-                                                                            <input type="hidden" name="reviewId" value="${review.reviewId}" />
-                                                                            <input type="hidden" name="medicineId" value="${medicine.medicineId}" />
-                                                                            <input type="hidden" name="returnTo" value="detail" />
-                                                                            <textarea class="form-control form-control-sm mb-2" name="replyContent" rows="2" placeholder="Nhập trả lời..." required><c:out value="${review.replyContent}" /></textarea>
-                                                                            <button type="submit" class="btn btn-sm btn-primary">
-                                                                                ${not empty review.replyContent ? 'Cập nhật trả lời' : 'Gửi trả lời'}
-                                                                            </button>
-                                                                        </form>
                                                                     </c:if>
 
                                                                     <c:if test="${sessionScope.userType eq 'staff'}">
@@ -158,6 +164,16 @@
                                                                             href="${pageContext.request.contextPath}/view-reviews?medicineId=${medicine.medicineId}&selectedReviewId=${review.reviewId}">
                                                                             ${not empty review.replyContent ? 'Chỉnh sửa trả lời' : 'Trả lời'}
                                                                         </a>
+                                                                    </c:if>
+
+                                                                    <c:if test="${sessionScope.userType eq 'customer' and loggedCustomerId ne review.customerId}">
+                                                                        <form class="mt-2 js-inline-reply-form" action="${pageContext.request.contextPath}/reply-review" method="post" data-review-id="${review.reviewId}" data-replier-name="${sessionScope.loggedInUser.fullName}">
+                                                                            <input type="hidden" name="reviewId" value="${review.reviewId}" />
+                                                                            <input type="hidden" name="medicineId" value="${medicine.medicineId}" />
+                                                                            <input type="hidden" name="returnTo" value="detail" />
+                                                                            <textarea class="form-control form-control-sm mb-2" name="replyContent" rows="2" placeholder="Trả lời @${review.customerName}..." required></textarea>
+                                                                            <button type="submit" class="btn btn-sm btn-outline-primary">Gửi trả lời</button>
+                                                                        </form>
                                                                     </c:if>
                                                                 </div>
                                                             </div>
@@ -280,6 +296,103 @@
                                     src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
                                 <script src="${pageContext.request.contextPath}/assets/js/detail.js"></script>
                                 <script>
+                                    function validateReplyForm(form) {
+                                        const textarea = form.querySelector('textarea[name="replyContent"]');
+                                        if (!textarea || textarea.value.trim().length > 0) {
+                                            return true;
+                                        }
+                                        alert('Nội dung trả lời không được để trống.');
+                                        textarea.focus();
+                                        return false;
+                                    }
+
+                                    function bindInlineReplyForms() {
+                                        function createReplyElement(text, authorName) {
+                                            const replyWrap = document.createElement('div');
+                                            replyWrap.className = 'thread-reply-wrap';
+                                            const displayName = authorName && authorName.trim().length > 0 ? authorName.trim() : 'Khách hàng';
+                                            const avatarText = displayName.charAt(0).toUpperCase();
+                                            replyWrap.innerHTML = '<div class="thread-reply-line"></div>'
+                                                + '<div class="thread-reply">'
+                                                + '<div class="thread-avatar staff-avatar">' + avatarText + '</div>'
+                                                + '<div class="thread-reply-content">'
+                                                + '<div class="reply-staff-name"></div>'
+                                                + '<div class="thread-reply-text"></div>'
+                                                + '</div>'
+                                                + '</div>';
+                                            replyWrap.querySelector('.reply-staff-name').textContent = displayName;
+                                            replyWrap.querySelector('.thread-reply-text').textContent = text;
+                                            return replyWrap;
+                                        }
+
+                                        document.querySelectorAll('.js-inline-reply-form').forEach(form => {
+                                            if (form.dataset.bound === 'true') {
+                                                return;
+                                            }
+                                            form.dataset.bound = 'true';
+
+                                            form.addEventListener('submit', async function (event) {
+                                                event.preventDefault();
+
+                                                const textarea = form.querySelector('textarea[name="replyContent"]');
+                                                if (!textarea || textarea.value.trim().length === 0) {
+                                                    alert('Nội dung trả lời không được để trống.');
+                                                    if (textarea) textarea.focus();
+                                                    return;
+                                                }
+
+                                                const submitBtn = form.querySelector('button[type="submit"]');
+                                                const originalText = submitBtn ? submitBtn.textContent : '';
+                                                if (submitBtn) {
+                                                    submitBtn.disabled = true;
+                                                    submitBtn.textContent = 'Đang gửi...';
+                                                }
+
+                                                try {
+                                                    const formData = new URLSearchParams(new FormData(form));
+                                                    const response = await fetch(form.action, {
+                                                        method: 'POST',
+                                                        headers: {
+                                                            'X-Requested-With': 'XMLHttpRequest',
+                                                            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                                                        },
+                                                        body: formData.toString()
+                                                    });
+
+                                                    const data = await response.json();
+                                                    if (!response.ok || !data.success) {
+                                                        throw new Error(data.message || 'Gửi trả lời thất bại');
+                                                    }
+
+                                                    const reviewId = form.dataset.reviewId;
+                                                    const replierName = form.dataset.replierName || 'Khách hàng';
+                                                    const replyDisplayText = replierName + ': ' + data.replyContent;
+                                                    let replyList = document.getElementById('reply-list-' + reviewId);
+                                                    if (replyList) {
+                                                        replyList.appendChild(createReplyElement(replyDisplayText, replierName));
+                                                    } else {
+                                                        const reviewThread = form.closest('.review-thread');
+                                                        if (reviewThread) {
+                                                            replyList = document.createElement('div');
+                                                            replyList.id = 'reply-list-' + reviewId;
+                                                            replyList.appendChild(createReplyElement(replyDisplayText, replierName));
+                                                            reviewThread.insertBefore(replyList, form);
+                                                        }
+                                                    }
+
+                                                    textarea.value = '';
+                                                } catch (error) {
+                                                    alert(error.message || 'Có lỗi xảy ra khi gửi trả lời.');
+                                                } finally {
+                                                    if (submitBtn) {
+                                                        submitBtn.disabled = false;
+                                                        submitBtn.textContent = originalText;
+                                                    }
+                                                }
+                                            });
+                                        });
+                                    }
+
                                     function submitAddToCart() {
                                         const currentUserType = '${sessionScope.userType}';
                                         if (currentUserType === 'staff' || currentUserType === 'admin') return;
@@ -322,6 +435,8 @@
                                                     console.error(error);
                                             });
                                     }
+
+                                    document.addEventListener('DOMContentLoaded', bindInlineReplyForms);
                                 </script>
                 </body>
 

@@ -6,6 +6,7 @@ import models.Staff;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Pattern;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +19,72 @@ import jakarta.servlet.http.HttpSession;
  * @author anltc
  */
 public class ProfileController extends HttpServlet {
+
+    private static final Pattern FULL_NAME_PATTERN = Pattern.compile("^[\\p{L}][\\p{L}\\s'.-]{1,99}$");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^0\\d{9}$");
+    private static final Pattern ADDRESS_PATTERN = Pattern.compile("^[\\p{L}\\p{N}\\s.,-]+$");
+
+    private String normalizeName(String name) {
+        if (name == null) {
+            return "";
+        }
+        return name.trim().replaceAll("\\s+", " ");
+    }
+
+    private String normalizePhone(String phone) {
+        if (phone == null) {
+            return "";
+        }
+        return phone.trim().replaceAll("[\\s.-]", "");
+    }
+
+    private String normalizeAddress(String address) {
+        if (address == null) {
+            return "";
+        }
+        return address.trim().replaceAll("\\s+", " ");
+    }
+
+    private Date parseDob(String dobStr) throws Exception {
+        if (dobStr == null || dobStr.trim().isEmpty()) {
+            return null;
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        sdf.setLenient(false);
+        return sdf.parse(dobStr.trim());
+    }
+
+    private Date todayWithoutTime() {
+        Date now = new Date();
+        return new Date(now.getYear(), now.getMonth(), now.getDate());
+    }
+
+    private void forwardProfileError(HttpServletRequest request, HttpServletResponse response,
+            Object loggedInUser, String userType,
+            String fullName, String phone, String address, String dobStr, String gender, String message)
+            throws ServletException, IOException {
+        ProfileUser user = new ProfileUser();
+        user.setFullName(fullName);
+        user.setPhone(phone);
+        user.setAddress(address);
+        user.setGender(gender);
+
+        try {
+            user.setDob(parseDob(dobStr));
+        } catch (Exception ignored) {
+            user.setDob(null);
+        }
+
+        if ("customer".equals(userType) && loggedInUser instanceof Customer) {
+            user.setEmail(((Customer) loggedInUser).getEmail());
+        } else if ("staff".equals(userType) && loggedInUser instanceof Staff) {
+            user.setEmail(((Staff) loggedInUser).getStaffEmail());
+        }
+
+        request.setAttribute("errorMessage", message);
+        request.setAttribute("user", user);
+        request.getRequestDispatcher("view/client/profile.jsp").forward(request, response);
+    }
 
     /**
      * Handles the HTTP <code>GET</code> method - Display profile page
@@ -92,11 +159,11 @@ public class ProfileController extends HttpServlet {
         }
 
         // Get form parameters
-        String fullName = request.getParameter("fullName");
-        String phone = request.getParameter("phone");
+        String fullName = normalizeName(request.getParameter("fullName"));
+        String phone = normalizePhone(request.getParameter("phone"));
         String gender = request.getParameter("gender");
         String dobStr = request.getParameter("dob");
-        String address = request.getParameter("address");
+        String address = normalizeAddress(request.getParameter("address"));
 
         Object loggedInUser = session.getAttribute("loggedInUser");
         String userType = (String) session.getAttribute("userType");
@@ -105,17 +172,51 @@ public class ProfileController extends HttpServlet {
         boolean success = false;
 
         try {
+            if (fullName.isEmpty() || !FULL_NAME_PATTERN.matcher(fullName).matches()) {
+                forwardProfileError(request, response, loggedInUser, userType,
+                        fullName, phone, address, dobStr, gender,
+                        "Họ tên không hợp lệ!");
+                return;
+            }
+
+            if (!phone.isEmpty() && !PHONE_PATTERN.matcher(phone).matches()) {
+                forwardProfileError(request, response, loggedInUser, userType,
+                        fullName, phone, address, dobStr, gender,
+                        "Số điện thoại phải bắt đầu bằng 0 và có đúng 10 số!");
+                return;
+            }
+
+            Date parsedDob = null;
+            if (dobStr != null && !dobStr.trim().isEmpty()) {
+                try {
+                    parsedDob = parseDob(dobStr);
+                } catch (Exception e) {
+                    forwardProfileError(request, response, loggedInUser, userType,
+                            fullName, phone, address, dobStr, gender,
+                            "Ngày sinh không hợp lệ!");
+                    return;
+                }
+
+                if (parsedDob.after(todayWithoutTime())) {
+                    forwardProfileError(request, response, loggedInUser, userType,
+                            fullName, phone, address, dobStr, gender,
+                            "Ngày sinh không được vượt quá thời điểm hiện tại!");
+                    return;
+                }
+            }
+
+            if (!address.isEmpty() && !ADDRESS_PATTERN.matcher(address).matches()) {
+                forwardProfileError(request, response, loggedInUser, userType,
+                        fullName, phone, address, dobStr, gender,
+                        "Địa chỉ không hợp lệ! Chỉ được dùng chữ, số, khoảng trắng và các ký tự . , -");
+                return;
+            }
+
             ProfileDAO profileDAO = new ProfileDAO();
 
             if ("customer".equals(userType) && loggedInUser instanceof Customer) {
                 // Update Customer
-                Date dob = null;
-                if (dobStr != null && !dobStr.isEmpty()) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    dob = sdf.parse(dobStr);
-                }
-
-                success = profileDAO.updateCustomerProfile(userId, fullName, phone, address, dob, gender);
+                success = profileDAO.updateCustomerProfile(userId, fullName, phone, address, parsedDob, gender);
 
                 if (success) {
                     // Reload customer data
@@ -126,13 +227,7 @@ public class ProfileController extends HttpServlet {
 
             } else if ("staff".equals(userType) && loggedInUser instanceof Staff) {
                 // Update Staff
-                Date staffDob = null;
-                if (dobStr != null && !dobStr.isEmpty()) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    staffDob = sdf.parse(dobStr);
-                }
-
-                success = profileDAO.updateStaffProfile(userId, fullName, phone, address, staffDob, gender);
+                success = profileDAO.updateStaffProfile(userId, fullName, phone, address, parsedDob, gender);
 
                 if (success) {
                     // Reload staff data

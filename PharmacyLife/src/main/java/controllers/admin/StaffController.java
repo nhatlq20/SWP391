@@ -2,15 +2,59 @@ package controllers.admin;
 
 import dao.StaffDAO;
 import dao.RoleDAO;
+import dao.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 import models.Staff;
 import models.Role;
+import models.User;
 
 public class StaffController extends HttpServlet {
+
+    private static final Pattern FULL_NAME_PATTERN = Pattern.compile("^[\\p{L}][\\p{L}\\s'.-]{1,99}$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*@(gmail\\.com|yahoo\\.com|fucantho|fucantho\\.edu\\.vn|pharmacy\\.com|pharmacylife\\.com)$");
+    private static final int MAX_EMAIL_LENGTH = 254;
+    private static final int MIN_PASSWORD_LENGTH = 8;
+    private static final int MAX_PASSWORD_LENGTH = 16;
+
+    private String normalizeName(String name) {
+        if (name == null) {
+            return "";
+        }
+        return name.trim().replaceAll("\\s+", " ");
+    }
+
+    private String normalizeEmail(String email) {
+        if (email == null) {
+            return "";
+        }
+        return email.trim().toLowerCase();
+    }
+
+    private void forwardAddWithError(HttpServletRequest request, HttpServletResponse response,
+            String message, String staffName, String staffEmail)
+            throws ServletException, IOException {
+        try {
+            RoleDAO roleDao = new RoleDAO();
+            List<Role> roleList = roleDao.getAllRoles();
+            if (roleList == null) {
+                roleList = new ArrayList<>();
+            }
+            request.setAttribute("roleList", roleList);
+        } catch (Exception e) {
+            request.setAttribute("roleList", new ArrayList<Role>());
+        }
+
+        request.setAttribute("errorMessage", message);
+        request.setAttribute("staffName", staffName);
+        request.setAttribute("staffEmail", staffEmail);
+        request.getRequestDispatcher("/view/admin/staff-add.jsp").forward(request, response);
+    }
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -96,29 +140,49 @@ public class StaffController extends HttpServlet {
 
             case "insert":
                 try {
-                    String staffName = request.getParameter("staffName");
-                    String staffEmail = request.getParameter("staffEmail");
+                    String staffName = normalizeName(request.getParameter("staffName"));
+                    String staffEmail = normalizeEmail(request.getParameter("staffEmail"));
                     String staffPassword = request.getParameter("staffPassword");
+                    if (staffPassword == null) {
+                        staffPassword = "";
+                    }
 
                     System.out.println("\n=== ADD STAFF REQUEST ===");
                     System.out.println("Name: " + staffName);
                     System.out.println("Email: " + staffEmail);
                     System.out.println("Password provided: " + (staffPassword != null && !staffPassword.isEmpty()));
 
-                    if (staffName == null || staffName.trim().isEmpty()) {
-                        System.out.println("ERROR: Staff name is required");
-                        response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
-                        return;
-                    }
-                    if (staffEmail == null || staffEmail.trim().isEmpty()) {
-                        System.out.println("ERROR: Staff email is required");
-                        response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
+                    if (staffName.isEmpty()) {
+                        forwardAddWithError(request, response, "Vui lòng nhập họ tên nhân viên!", staffName, staffEmail);
                         return;
                     }
 
-                    if (staffPassword == null || staffPassword.trim().isEmpty()) {
-                        System.out.println("ERROR: Staff password is required");
-                        response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
+                    if (staffName.length() < 2 || staffName.length() > 100 || !FULL_NAME_PATTERN.matcher(staffName).matches()) {
+                        forwardAddWithError(request, response, "Họ tên không hợp lệ!", staffName, staffEmail);
+                        return;
+                    }
+
+                    if (staffEmail.isEmpty()) {
+                        forwardAddWithError(request, response, "Vui lòng nhập email nhân viên!", staffName, staffEmail);
+                        return;
+                    }
+
+                    if (staffEmail.length() > MAX_EMAIL_LENGTH || !EMAIL_PATTERN.matcher(staffEmail).matches()) {
+                        forwardAddWithError(request, response,
+                                "Email không chính xác!",
+                                staffName, staffEmail);
+                        return;
+                    }
+
+                    UserDAO userDAO = new UserDAO();
+                    User existedUser = userDAO.findByEmail(staffEmail);
+                    if (existedUser != null) {
+                        forwardAddWithError(request, response, "Email này đã được đăng ký!", staffName, staffEmail);
+                        return;
+                    }
+
+                    if (staffPassword.length() < MIN_PASSWORD_LENGTH || staffPassword.length() > MAX_PASSWORD_LENGTH) {
+                        forwardAddWithError(request, response, "mật khẩu phải có độ dài từ 8 đến 16 kí tự", staffName, staffEmail);
                         return;
                     }
 
@@ -127,32 +191,34 @@ public class StaffController extends HttpServlet {
 
                     if (roleId == null) {
                         System.out.println("ERROR: Role 'nhân viên' not found in database");
-                        response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
+                        forwardAddWithError(request, response, "Không tìm thấy vai trò nhân viên!", staffName, staffEmail);
                         return;
                     }
                     System.out.println("Role ID: " + roleId);
 
                     Staff newStaff = new Staff();
                     // StaffCode will be generated automatically in DAO.insertStaff()
-                    newStaff.setStaffName(staffName.trim());
-                    newStaff.setStaffEmail(staffEmail.trim());
-                    newStaff.setStaffPassword(staffPassword.trim());
+                    newStaff.setStaffName(staffName);
+                    newStaff.setStaffEmail(staffEmail);
+                    newStaff.setStaffPassword(staffPassword);
                     newStaff.setRoleId(roleId);
 
                     boolean success = dao.insertStaff(newStaff);
 
                     if (success) {
                         System.out.println("Staff added successfully!");
+                        response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
                     } else {
                         System.out.println("ERROR: Failed to insert staff");
+                        forwardAddWithError(request, response, "Thêm nhân viên thất bại! Vui lòng thử lại.", staffName, staffEmail);
                     }
                     System.out.println("===  END ===\n");
-
-                    response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
                 } catch (Exception e) {
                     System.out.println("ERROR: " + e.getMessage());
                     e.printStackTrace();
-                    response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
+                    forwardAddWithError(request, response, "Có lỗi xảy ra! Vui lòng thử lại.",
+                            normalizeName(request.getParameter("staffName")),
+                            normalizeEmail(request.getParameter("staffEmail")));
                 }
                 break;
 
