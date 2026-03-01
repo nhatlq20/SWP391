@@ -105,7 +105,8 @@
                                                         <p class="no-reviews">Chưa có đánh giá nào cho sản phẩm này</p>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <c:forEach var="review" items="${reviews}" varStatus="reviewStatus">
+                                                        <c:forEach var="review" items="${reviews}"
+                                                            varStatus="reviewStatus">
                                                             <c:if test="${not reviewStatus.first}">
                                                                 <hr class="comment-divider" />
                                                             </c:if>
@@ -113,44 +114,74 @@
                                                                 <div class="review-thread">
                                                                     <div class="thread-main">
                                                                         <div class="thread-avatar customer-avatar">
-                                                                            <c:out value="${fn:toUpperCase(fn:substring(fn:trim(review.customerName), 0, 1))}" />
+                                                                            <c:out
+                                                                                value="${fn:toUpperCase(fn:substring(fn:trim(review.customerName), 0, 1))}" />
                                                                         </div>
                                                                         <div class="thread-main-content">
-                                                                            <div class="reviewer-name"><c:out value="${review.customerName}" /></div>
+                                                                            <div class="reviewer-name">
+                                                                                <c:out value="${review.customerName}" />
+                                                                            </div>
                                                                             <div class="review-score-line">
-                                                                                <span class="score-number">${review.rating}</span>
+                                                                                <span
+                                                                                    class="score-number">${review.rating}</span>
                                                                                 <i class="fas fa-star"></i>
-                                                                                <span class="review-date">${review.createdAt}</span>
+                                                                                <span
+                                                                                    class="review-date">${review.createdAt}</span>
                                                                             </div>
                                                                             <div class="customer-comment-box">
-                                                                                <p class="review-comment"><c:out value="${review.comment}" /></p>
+                                                                                <p class="review-comment">
+                                                                                    <c:out value="${review.comment}" />
+                                                                                </p>
                                                                             </div>
                                                                         </div>
                                                                     </div>
 
                                                                     <c:if test="${not empty review.replyContent}">
                                                                         <div id="reply-list-${review.reviewId}">
-                                                                            <c:forEach var="replyItem" items="${fn:split(review.replyContent, '@@BR@@')}">
-                                                                                <c:if test="${not empty fn:trim(replyItem)}">
-                                                                                    <c:set var="replyLine" value="${fn:trim(replyItem)}" />
-                                                                                    <c:set var="separatorIndex" value="${fn:indexOf(replyLine, ': ')}" />
+                                                                            <c:forEach var="replyItem"
+                                                                                items="${fn:split(review.replyContent, '@@BR@@')}">
+                                                                                <c:if
+                                                                                    test="${not empty fn:trim(replyItem)}">
+                                                                                    <c:set var="replyLine"
+                                                                                        value="${fn:trim(replyItem)}" />
+                                                                                    <c:set var="separatorIndex"
+                                                                                        value="${fn:indexOf(replyLine, ': ')}" />
                                                                                     <c:choose>
-                                                                                        <c:when test="${separatorIndex gt 0}">
-                                                                                            <c:set var="replyAuthorName" value="${fn:substring(replyLine, 0, separatorIndex)}" />
-                                                                                            <c:set var="replyBodyText" value="${fn:substring(replyLine, separatorIndex + 2, fn:length(replyLine))}" />
+                                                                                        <c:when
+                                                                                            test="${separatorIndex gt 0}">
+                                                                                            <c:set var="replyAuthorName"
+                                                                                                value="${fn:substring(replyLine, 0, separatorIndex)}" />
+                                                                                            <c:set var="replyBodyText"
+                                                                                                value="${fn:substring(replyLine, separatorIndex + 2, fn:length(replyLine))}" />
                                                                                         </c:when>
                                                                                         <c:otherwise>
-                                                                                            <c:set var="replyAuthorName" value="${not empty review.replyStaffName ? review.replyStaffName : (review.replyBy lt 0 ? 'Khách hàng' : 'Nhân viên')}" />
-                                                                                            <c:set var="replyBodyText" value="${replyLine}" />
+                                                                                            <c:set var="replyAuthorName"
+                                                                                                value="${not empty review.replyStaffName ? review.replyStaffName : (review.replyBy lt 0 ? 'Khách hàng' : 'Nhân viên')}" />
+                                                                                            <c:set var="replyBodyText"
+                                                                                                value="${replyLine}" />
                                                                                         </c:otherwise>
                                                                                     </c:choose>
                                                                                     <div class="thread-reply-wrap">
-                                                                                        <div class="thread-reply-line"></div>
+                                                                                        <div class="thread-reply-line">
+                                                                                        </div>
                                                                                         <div class="thread-reply">
-                                                                                            <div class="thread-avatar staff-avatar"><c:out value="${fn:toUpperCase(fn:substring(fn:trim(replyAuthorName), 0, 1))}" /></div>
-                                                                                            <div class="thread-reply-content">
-                                                                                                <div class="reply-staff-name"><c:out value="${replyAuthorName}" /></div>
-                                                                                                <div class="thread-reply-text"><c:out value="${replyBodyText}" /></div>
+                                                                                            <div
+                                                                                                class="thread-avatar staff-avatar">
+                                                                                                <c:out
+                                                                                                    value="${fn:toUpperCase(fn:substring(fn:trim(replyAuthorName), 0, 1))}" />
+                                                                                            </div>
+                                                                                            <div
+                                                                                                class="thread-reply-content">
+                                                                                                <div
+                                                                                                    class="reply-staff-name">
+                                                                                                    <c:out
+                                                                                                        value="${replyAuthorName}" />
+                                                                                                </div>
+                                                                                                <div
+                                                                                                    class="thread-reply-text">
+                                                                                                    <c:out
+                                                                                                        value="${replyBodyText}" />
+                                                                                                </div>
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
@@ -162,17 +193,32 @@
                                                                     <c:if test="${sessionScope.userType eq 'staff'}">
                                                                         <a class="btn btn-sm btn-primary mt-2"
                                                                             href="${pageContext.request.contextPath}/view-reviews?medicineId=${medicine.medicineId}&selectedReviewId=${review.reviewId}">
-                                                                            ${not empty review.replyContent ? 'Chỉnh sửa trả lời' : 'Trả lời'}
+                                                                            ${not empty review.replyContent ? 'Trả lời'
+                                                                            : 'Trả lời'}
                                                                         </a>
                                                                     </c:if>
 
-                                                                    <c:if test="${sessionScope.userType eq 'customer' and loggedCustomerId ne review.customerId}">
-                                                                        <form class="mt-2 js-inline-reply-form" action="${pageContext.request.contextPath}/reply-review" method="post" data-review-id="${review.reviewId}" data-replier-name="${sessionScope.loggedInUser.fullName}">
-                                                                            <input type="hidden" name="reviewId" value="${review.reviewId}" />
-                                                                            <input type="hidden" name="medicineId" value="${medicine.medicineId}" />
-                                                                            <input type="hidden" name="returnTo" value="detail" />
-                                                                            <textarea class="form-control form-control-sm mb-2" name="replyContent" rows="2" placeholder="Trả lời @${review.customerName}..." required></textarea>
-                                                                            <button type="submit" class="btn btn-sm btn-outline-primary">Gửi trả lời</button>
+                                                                    <c:if
+                                                                        test="${sessionScope.userType eq 'customer' and loggedCustomerId ne review.customerId}">
+                                                                        <form class="mt-2 js-inline-reply-form"
+                                                                            action="${pageContext.request.contextPath}/reply-review"
+                                                                            method="post"
+                                                                            data-review-id="${review.reviewId}"
+                                                                            data-replier-name="${sessionScope.loggedInUser.fullName}">
+                                                                            <input type="hidden" name="reviewId"
+                                                                                value="${review.reviewId}" />
+                                                                            <input type="hidden" name="medicineId"
+                                                                                value="${medicine.medicineId}" />
+                                                                            <input type="hidden" name="returnTo"
+                                                                                value="detail" />
+                                                                            <textarea
+                                                                                class="form-control form-control-sm mb-2"
+                                                                                name="replyContent" rows="2"
+                                                                                placeholder="Trả lời @${review.customerName}..."
+                                                                                required></textarea>
+                                                                            <button type="submit"
+                                                                                class="btn btn-sm btn-outline-primary">Gửi
+                                                                                trả lời</button>
                                                                         </form>
                                                                     </c:if>
                                                                 </div>
@@ -264,7 +310,8 @@
                                                             </a>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <button class="btn-rate btn btn-outline-secondary" type="button" disabled>
+                                                            <button class="btn-rate btn btn-outline-secondary"
+                                                                type="button" disabled>
                                                                 <i class="fas fa-star"></i> Chỉ đánh giá sau khi đã mua
                                                             </button>
                                                         </c:otherwise>
@@ -285,7 +332,8 @@
 
                                         <c:if test="${param.reviewError eq 'notPurchased'}">
                                             <div class="alert alert-warning mt-3 mb-0" role="alert">
-                                                Bạn chỉ có thể đánh giá sản phẩm sau khi đã mua và đơn hàng đã được giao.
+                                                Bạn chỉ có thể đánh giá sản phẩm sau khi đã mua và đơn hàng đã được
+                                                giao.
                                             </div>
                                         </c:if>
                                     </div>
