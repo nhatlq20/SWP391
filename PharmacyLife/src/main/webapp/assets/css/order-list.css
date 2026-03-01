@@ -108,9 +108,10 @@ body {
 }
 
 .btn-detail {
-    color: var(--primary-blue);
-    border: 1.5px solid var(--primary-blue);
-    border-radius: 12px;
+    background-color: #4F81E1;
+    color: white;
+    border: none;
+    border-radius: 10px;
     width: 36px;
     height: 36px;
     display: flex;
@@ -118,14 +119,13 @@ body {
     justify-content: center;
     font-size: 1rem;
     transition: all 0.2s;
-    background: transparent;
     margin: 0 auto;
 }
 
 .btn-detail:hover {
-    background-color: var(--primary-blue);
+    background-color: #3b6dc2;
     color: white;
-    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 4px 10px rgba(79, 129, 225, 0.3);
     text-decoration: none;
 }
 
