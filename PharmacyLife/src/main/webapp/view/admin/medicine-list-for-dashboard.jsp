@@ -225,15 +225,18 @@
                                                                     style="text-decoration:none">
                                                                     <i class="fas fa-eye"></i>
                                                                 </a>
-                                                                <a href="${pageContext.request.contextPath}/admin/medicine-edit-dashboard?id=${medicine.medicineId}"
-                                                                    class="btn-action btn-edit" title="Sửa"
-                                                                    style="text-decoration:none">
-                                                                    <i class="fas fa-pen"></i>
-                                                                </a>
-                                                                <button class="btn-action btn-delete" title="Xóa"
-                                                                    onclick="openDeleteModal('${medicine.medicineId}', '${medicine.medicineName}')">
-                                                                    <i class="fas fa-trash"></i>
-                                                                </button>
+                                                                <c:if
+                                                                    test="${sessionScope.userType eq 'staff' and fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
+                                                                    <a href="${pageContext.request.contextPath}/admin/medicine-edit-dashboard?id=${medicine.medicineId}"
+                                                                        class="btn-action btn-edit" title="Sửa"
+                                                                        style="text-decoration:none">
+                                                                        <i class="fas fa-pen"></i>
+                                                                    </a>
+                                                                    <button class="btn-action btn-delete" title="Xóa"
+                                                                        onclick="openDeleteModal('${medicine.medicineId}', '${medicine.medicineName}')">
+                                                                        <i class="fas fa-trash"></i>
+                                                                    </button>
+                                                                </c:if>
                                                             </div>
                                                         </td>
                                                     </tr>
