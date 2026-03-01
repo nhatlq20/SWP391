@@ -19,7 +19,10 @@
             </style>
             <div class="sidebar-wrapper">
                 <div class="sidebar-menu">
-                    <c:set var="uri" value="${pageContext.request.requestURI}" />
+                    <c:set var="uri" value="${requestScope['javax.servlet.forward.request_uri']}" />
+                    <c:if test="${empty uri}">
+                        <c:set var="uri" value="${pageContext.request.requestURI}" />
+                    </c:if>
 
                     <c:set var="userRole" value="${fn:toLowerCase(fn:trim(sessionScope.roleName))}" />
 
@@ -76,8 +79,9 @@
 
                         <c:if test="${userRole eq 'admin'}">
                             <a href="${pageContext.request.contextPath}/admin/imports"
-                                class="sidebar-item ${fn:contains(uri, 'imports') ? 'active' : ''}">
-                                  <i class="fas fa-file-import"></i> <span style="font-size: 1em;">Quản lý nhập thuốc</span>
+                                class="sidebar-item ${fn:contains(uri, 'import') ? 'active' : ''}">
+                                <i class="fas fa-file-import"></i> <span style="font-size: 1em;">Quản lý nhập
+                                    thuốc</span>
                             </a>
 
                             <a href="${pageContext.request.contextPath}/admin/revenue"

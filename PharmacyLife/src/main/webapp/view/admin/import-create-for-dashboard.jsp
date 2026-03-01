@@ -3,20 +3,23 @@
         <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
             <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
                 <!DOCTYPE html>
-                <html>
+                <html lang="vi">
 
                 <head>
                     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <title>Tạo phiếu nhập - Admin</title>
                     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
                         rel="stylesheet">
                     <link rel="stylesheet"
                         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
                     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/medicine-dashboard.css">
+                    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/sidebar.css">
+                    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/header.css">
                     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
                 </head>
 
-                <body>
+                <body class="bg-light">
                     <jsp:include page="/view/common/header.jsp" />
                     <jsp:include page="/view/common/sidebar.jsp" />
 
@@ -98,7 +101,7 @@
                                             <h5 class="fw-bold mb-0" style="color: #1e293b; font-size: 1.1rem;">
                                                 <i class="fas fa-list me-2 text-primary"></i>Danh sách thuốc nhập
                                             </h5>
-                                            <button type="button" class="btn btn-add-medicine"
+                                            <button type="button" class="btn btn-add-medicine btn-primary"
                                                 onclick="openAddMedicineModal()">
                                                 <i class="fas fa-plus me-2"></i>Thêm thuốc
                                             </button>
@@ -198,7 +201,7 @@
                                 <button type="button" class="btn btn-light px-4 py-2 fw-semibold"
                                     style="border-radius: 8px;" onclick="closeAddMedicineModal()">Hủy bỏ</button>
                                 <button type="button" class="btn btn-primary px-4 py-2 fw-semibold"
-                                    style="border-radius: 8px; background: linear-gradient(135deg, #3b82f6, #2563eb);"
+                                    style="border-radius: 8px; background-color: #4F81E1; border: none;"
                                     onclick="addMedicineFromModal()">Thêm vào danh sách</button>
                             </div>
                         </div>
