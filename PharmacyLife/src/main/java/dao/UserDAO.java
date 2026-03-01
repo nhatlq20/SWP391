@@ -108,6 +108,40 @@ public class UserDAO {
         return null;
     }
 
+    public User findByEmail(String email) {
+        final String sqlCustomer = "SELECT CustomerId as UserID, CustomerCode as Username, Email, Password, FullName, PhoneNumber, IsActive, CreatedAt, NULL as UpdatedAt, 'Customer' as RoleName "
+                + "FROM Customer "
+                + "WHERE IsActive = 1 AND Email = ?";
+
+        final String sqlStaff = "SELECT s.StaffId as UserID, s.StaffCode as Username, s.StaffEmail as Email, s.StaffPassword as Password, s.StaffName as FullName, s.StaffPhone as PhoneNumber, s.StaffIsActive as IsActive, s.StaffCreatedAt as CreatedAt, s.StaffUpdateAt as UpdatedAt, r.RoleName "
+                + "FROM Staff s JOIN Role r ON s.RoleId = r.RoleId "
+                + "WHERE s.StaffIsActive = 1 AND s.StaffEmail = ?";
+
+        try (Connection conn = dbContext.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(sqlCustomer)) {
+                ps.setString(1, email);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return mapRowToUser(rs);
+                    }
+                }
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement(sqlStaff)) {
+                ps.setString(1, email);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return mapRowToUser(rs);
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException("Failed to find user by email", ex);
+        }
+
+        return null;
+    }
+
     public boolean createUser(User user) {
         // We assume new users are Customers for now.
         final String sqlCustomer = "INSERT INTO Customer (CustomerCode, FullName, Email, Password, PhoneNumber, IsActive, CreatedAt) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -188,6 +222,32 @@ public class UserDAO {
             return false;
         } catch (SQLException ex) {
             throw new RuntimeException("Failed to update user password", ex);
+        }
+    }
+
+    public boolean updatePasswordByEmail(String email, String newPassword) {
+        final String sqlCustomer = "UPDATE Customer SET Password = ? WHERE LOWER(Email) = LOWER(?) AND IsActive = 1";
+        final String sqlStaff = "UPDATE Staff SET StaffPassword = ? WHERE LOWER(StaffEmail) = LOWER(?) AND StaffIsActive = 1";
+        try (Connection conn = dbContext.getConnection()) {
+            int totalUpdatedRows = 0;
+
+            try (PreparedStatement ps = conn.prepareStatement(sqlCustomer)) {
+                ps.setString(1, newPassword);
+                ps.setString(2, email);
+                int rows = ps.executeUpdate();
+                totalUpdatedRows += rows;
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement(sqlStaff)) {
+                ps.setString(1, newPassword);
+                ps.setString(2, email);
+                int rows = ps.executeUpdate();
+                totalUpdatedRows += rows;
+            }
+
+            return totalUpdatedRows > 0;
+        } catch (SQLException ex) {
+            throw new RuntimeException("Failed to update user password by email", ex);
         }
     }
 

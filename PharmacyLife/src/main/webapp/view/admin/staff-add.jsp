@@ -28,8 +28,16 @@
                                 <h3><i class="fas fa-plus-circle me-2 text-primary"></i>Thêm nhân viên mới</h3>
                             </div>
                             <div class="form-card-body">
+                                <c:if test="${not empty errorMessage}">
+                                    <div class="alert alert-danger" style="margin-bottom: 16px;">
+                                        ${errorMessage}
+                                    </div>
+                                </c:if>
+
+                                <div id="clientStaffError" class="alert alert-danger" style="display: none; margin-bottom: 16px;"></div>
+
                                 <form method="POST" action="${pageContext.request.contextPath}/admin/manage-staff?action=insert"
-                                    class="staff-form">
+                                    class="staff-form" id="staffAddForm">
 
                                     <div class="row g-4">
                                         <div class="col-md-6">
@@ -38,7 +46,7 @@
                                                     <i class="fas fa-user-tag me-1"></i> Họ và tên nhân viên
                                                 </label>
                                                 <input type="text" id="staffName" name="staffName"
-                                                    placeholder="Họ và tên nhân viên" required class="form-control">
+                                                    placeholder="Họ và tên nhân viên" required class="form-control" value="${staffName}">
                                             </div>
                                         </div>
 
@@ -57,7 +65,7 @@
                                                     <i class="fas fa-envelope me-1"></i> Email
                                                 </label>
                                                 <input type="email" id="staffEmail" name="staffEmail"
-                                                    placeholder="Email nhân viên" required class="form-control">
+                                                    placeholder="Email nhân viên" required class="form-control" value="${staffEmail}" maxlength="254">
                                             </div>
                                         </div>
 
@@ -67,7 +75,7 @@
                                                     <i class="fas fa-lock me-1"></i> Mật khẩu
                                                 </label>
                                                 <input type="password" id="staffPassword" name="staffPassword"
-                                                    placeholder="Mật khẩu" required class="form-control">
+                                                    placeholder="Mật khẩu" required class="form-control" minlength="8" maxlength="16">
                                             </div>
                                         </div>
                                     </div>
@@ -88,5 +96,78 @@
                 </div>
 
             </body>
+
+            <script>
+                const staffAddForm = document.getElementById("staffAddForm");
+                const staffNameInput = document.getElementById("staffName");
+                const staffEmailInput = document.getElementById("staffEmail");
+                const staffPasswordInput = document.getElementById("staffPassword");
+                const clientStaffError = document.getElementById("clientStaffError");
+
+                function showClientStaffError(message) {
+                    if (!clientStaffError) {
+                        return;
+                    }
+                    clientStaffError.textContent = message;
+                    clientStaffError.style.display = "block";
+                }
+
+                function hideClientStaffError() {
+                    if (!clientStaffError) {
+                        return;
+                    }
+                    clientStaffError.textContent = "";
+                    clientStaffError.style.display = "none";
+                }
+
+                function normalizeName(value) {
+                    return value ? value.trim().replace(/\s+/g, " ") : "";
+                }
+
+                if (staffAddForm) {
+                    staffAddForm.addEventListener("submit", function (event) {
+                        hideClientStaffError();
+
+                        const normalizedName = normalizeName(staffNameInput.value);
+                        const normalizedEmail = staffEmailInput.value.trim().toLowerCase();
+                        const passwordValue = staffPasswordInput.value;
+
+                        const fullNameRegex = /^[\p{L}][\p{L}\s'.-]{1,99}$/u;
+                        const emailRegex = /^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*@(gmail\.com|yahoo\.com|fucantho|fucantho\.edu\.vn|pharmacy\.com|pharmacylife\.com)$/;
+
+                        staffNameInput.value = normalizedName;
+                        staffEmailInput.value = normalizedEmail;
+
+                        if (!normalizedName || !normalizedEmail || !passwordValue) {
+                            event.preventDefault();
+                            showClientStaffError("Vui lòng nhập đầy đủ thông tin!");
+                            return;
+                        }
+
+                        if (!fullNameRegex.test(normalizedName)) {
+                            event.preventDefault();
+                            showClientStaffError("Họ tên không hợp lệ!");
+                            return;
+                        }
+
+                        if (normalizedEmail.length > 254 || !emailRegex.test(normalizedEmail)) {
+                            event.preventDefault();
+                            showClientStaffError("Email không chính xác!");
+                            return;
+                        }
+
+                        if (passwordValue.length < 8 || passwordValue.length > 16) {
+                            event.preventDefault();
+                            showClientStaffError("mật khẩu phải có độ dài từ 8 đến 16 kí tự");
+                        }
+                    });
+
+                    [staffNameInput, staffEmailInput, staffPasswordInput].forEach(function (input) {
+                        if (input) {
+                            input.addEventListener("input", hideClientStaffError);
+                        }
+                    });
+                }
+            </script>
 
             </html>

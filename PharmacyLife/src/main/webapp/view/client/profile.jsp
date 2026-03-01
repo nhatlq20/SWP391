@@ -39,6 +39,11 @@
                 </div>
                 </c:if>
 
+                <div id="clientProfileError" class="alert alert-error" style="display: none !important;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="clientProfileErrorText"></span>
+                </div>
+
                 <form action="${pageContext.request.contextPath}/profile" method="post" class="profile-form">
                     <!-- Row 1: Full Name & Phone -->
                     <div class="form-row">
@@ -122,5 +127,106 @@
             </div>
         </div>
     </div>
+
+    <script>
+        const profileForm = document.querySelector(".profile-form");
+        const fullNameInput = profileForm ? profileForm.querySelector('input[name="fullName"]') : null;
+        const phoneInput = profileForm ? profileForm.querySelector('input[name="phone"]') : null;
+        const dobInput = profileForm ? profileForm.querySelector('input[name="dob"]') : null;
+        const addressInput = profileForm ? profileForm.querySelector('input[name="address"]') : null;
+        const clientProfileError = document.getElementById("clientProfileError");
+        const clientProfileErrorText = document.getElementById("clientProfileErrorText");
+
+        function showProfileError(message) {
+            if (!clientProfileError || !clientProfileErrorText) {
+                return;
+            }
+            clientProfileErrorText.textContent = message;
+            clientProfileError.style.setProperty("display", "flex", "important");
+        }
+
+        function hideProfileError() {
+            if (!clientProfileError || !clientProfileErrorText) {
+                return;
+            }
+            clientProfileErrorText.textContent = "";
+            clientProfileError.style.setProperty("display", "none", "important");
+        }
+
+        function normalizeSpaces(value) {
+            return value ? value.trim().replace(/\s+/g, " ") : "";
+        }
+
+        function normalizePhone(value) {
+            return value ? value.trim().replace(/[\s.-]/g, "") : "";
+        }
+
+        if (dobInput) {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, "0");
+            const dd = String(today.getDate()).padStart(2, "0");
+            dobInput.max = `${yyyy}-${mm}-${dd}`;
+        }
+
+        if (profileForm) {
+            profileForm.addEventListener("submit", function (event) {
+                hideProfileError();
+
+                const normalizedFullName = normalizeSpaces(fullNameInput ? fullNameInput.value : "");
+                const normalizedPhone = normalizePhone(phoneInput ? phoneInput.value : "");
+                const normalizedAddress = normalizeSpaces(addressInput ? addressInput.value : "");
+
+                const fullNameRegex = /^[\p{L}][\p{L}\s'.-]{1,99}$/u;
+                const phoneRegex = /^0\d{9}$/;
+                const addressRegex = /^[\p{L}\p{N}\s.,-]+$/u;
+
+                if (fullNameInput) {
+                    fullNameInput.value = normalizedFullName;
+                }
+                if (phoneInput) {
+                    phoneInput.value = normalizedPhone;
+                }
+                if (addressInput) {
+                    addressInput.value = normalizedAddress;
+                }
+
+                if (!normalizedFullName || !fullNameRegex.test(normalizedFullName)) {
+                    event.preventDefault();
+                    showProfileError("Họ tên không hợp lệ!");
+                    return;
+                }
+
+                if (normalizedPhone && !phoneRegex.test(normalizedPhone)) {
+                    event.preventDefault();
+                    showProfileError("Số điện thoại phải bắt đầu bằng 0 và có đúng 10 số!");
+                    return;
+                }
+
+                if (dobInput && dobInput.value) {
+                    const selectedDate = new Date(dobInput.value + "T00:00:00");
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    if (selectedDate > today) {
+                        event.preventDefault();
+                        showProfileError("Ngày sinh không được vượt quá thời điểm hiện tại!");
+                        return;
+                    }
+                }
+
+                if (normalizedAddress && !addressRegex.test(normalizedAddress)) {
+                    event.preventDefault();
+                    showProfileError("Địa chỉ không hợp lệ! Chỉ được dùng chữ, số, khoảng trắng và các ký tự . , -");
+                }
+            });
+
+            [fullNameInput, phoneInput, dobInput, addressInput].forEach(function (input) {
+                if (input) {
+                    input.addEventListener("input", hideProfileError);
+                    input.addEventListener("change", hideProfileError);
+                }
+            });
+        }
+    </script>
 </body>
 </html>

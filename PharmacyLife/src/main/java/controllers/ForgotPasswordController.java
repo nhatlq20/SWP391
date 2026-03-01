@@ -29,8 +29,28 @@ public class ForgotPasswordController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String input = request.getParameter("email");
+        String emailInput = input == null ? "" : input.trim().toLowerCase();
+        request.setAttribute("email", emailInput);
+
+        if (emailInput.isEmpty()) {
+            request.setAttribute("errorMessage", "Email không đúng");
+            request.getRequestDispatcher("view/client/forgot-password.jsp").forward(request, response);
+            return;
+        }
+
+        HttpSession session = request.getSession(false);
+        String sessionUserEmail = session != null && session.getAttribute("userEmail") != null
+                ? session.getAttribute("userEmail").toString().trim().toLowerCase()
+                : null;
+
+        if (sessionUserEmail != null && !sessionUserEmail.isEmpty() && !sessionUserEmail.equals(emailInput)) {
+            request.setAttribute("errorMessage", "Email không đúng");
+            request.getRequestDispatcher("view/client/forgot-password.jsp").forward(request, response);
+            return;
+        }
+
         UserDAO userDAO = new UserDAO();
-        User user = userDAO.findByUsernameOrEmail(input);
+        User user = userDAO.findByEmail(emailInput);
 
         if (user != null && user.getEmail() != null && !user.getEmail().isEmpty()) {
             String email = user.getEmail();
@@ -38,7 +58,7 @@ public class ForgotPasswordController extends HttpServlet {
             boolean isSent = EmailUtils.sendOTPEmail(email, otp);
 
             if (isSent) {
-                HttpSession session = request.getSession();
+                session = request.getSession();
                 session.setAttribute("otp", otp);
                 session.setAttribute("email", email);
                 session.setMaxInactiveInterval(300); // 5 minutes
@@ -50,7 +70,7 @@ public class ForgotPasswordController extends HttpServlet {
                 request.getRequestDispatcher("view/client/forgot-password.jsp").forward(request, response);
             }
         } else {
-            request.setAttribute("errorMessage", "Thông tin tài khoản hoặc email không tồn tại trong hệ thống.");
+            request.setAttribute("errorMessage", "Email không đúng");
             request.getRequestDispatcher("view/client/forgot-password.jsp").forward(request, response);
         }
     }

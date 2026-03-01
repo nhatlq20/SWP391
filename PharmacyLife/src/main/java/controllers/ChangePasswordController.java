@@ -17,6 +17,9 @@ import jakarta.servlet.http.HttpSession;
  */
 public class ChangePasswordController extends HttpServlet {
 
+    private static final int MIN_PASSWORD_LENGTH = 8;
+    private static final int MAX_PASSWORD_LENGTH = 16;
+
     /**
      * Handles the HTTP <code>GET</code> method - Display change password page
      *
@@ -75,8 +78,14 @@ public class ChangePasswordController extends HttpServlet {
             return;
         }
 
-        if (newPassword == null || newPassword.length() < 6) {
-            request.setAttribute("errorMessage", "Mật khẩu mới phải có ít nhất 6 ký tự!");
+        if (newPassword == null || newPassword.length() < MIN_PASSWORD_LENGTH || newPassword.length() > MAX_PASSWORD_LENGTH) {
+            request.setAttribute("errorMessage", "mật khẩu không phải có độ dài 8 đến 16 kí tự");
+            request.getRequestDispatcher("view/client/change-password.jsp").forward(request, response);
+            return;
+        }
+
+        if (confirmPassword == null || confirmPassword.length() < MIN_PASSWORD_LENGTH || confirmPassword.length() > MAX_PASSWORD_LENGTH) {
+            request.setAttribute("errorMessage", "mật khẩu không phải có độ dài 8 đến 16 kí tự");
             request.getRequestDispatcher("view/client/change-password.jsp").forward(request, response);
             return;
         }

@@ -46,12 +46,12 @@
 
                     <div class="form-group">
                         <label>Mật khẩu mới</label>
-                        <input type="password" name="newPassword" placeholder="Nhập mật khẩu mới của bạn" required minlength="6">
+                        <input type="password" name="newPassword" placeholder="Nhập mật khẩu mới của bạn" required minlength="8" maxlength="16">
                     </div>
 
                     <div class="form-group">
                         <label>Nhập lại mật khẩu mới</label>
-                        <input type="password" name="confirmPassword" placeholder="Nhập lại mật khẩu mới của bạn" required minlength="6">
+                        <input type="password" name="confirmPassword" placeholder="Nhập lại mật khẩu mới của bạn" required minlength="8" maxlength="16">
                     </div>
 
                     <button type="submit" class="submit-btn">Lưu thay đổi</button>
