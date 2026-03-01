@@ -161,7 +161,7 @@
 
                                                                     <c:if test="${sessionScope.userType eq 'staff'}">
                                                                         <a class="btn btn-sm btn-primary mt-2"
-                                                                           href="${pageContext.request.contextPath}/view-reviews?medicineId=${medicine.medicineId}&selectedReviewId=${review.reviewId}">
+                                                                            href="${pageContext.request.contextPath}/view-reviews?medicineId=${medicine.medicineId}&selectedReviewId=${review.reviewId}">
                                                                             ${not empty review.replyContent ? 'Chỉnh sửa trả lời' : 'Trả lời'}
                                                                         </a>
                                                                     </c:if>
@@ -254,7 +254,7 @@
                                             <button class="btn-buy btn btn-primary"
                                                 onclick="submitAddToCart()">Mua</button>
 
-                                                   <!-- đây là xử lí khi chưa mua hàng -->
+                                            <!-- đây là xử lí khi chưa mua hàng -->
                                             <c:choose>
                                                 <c:when test="${sessionScope.userType eq 'customer'}">
                                                     <c:choose>

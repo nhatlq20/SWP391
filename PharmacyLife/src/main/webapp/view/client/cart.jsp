@@ -124,8 +124,7 @@
                                                                                 maxFractionDigits="0" />
                                                                         </td>
                                                                         <td class="text-center">
-                                                                            <form action="cart" method="POST"
-                                                                                onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">
+                                                                            <form action="cart" method="POST">
                                                                                 <input type="hidden" name="action"
                                                                                     value="remove">
                                                                                 <input type="hidden" name="id"

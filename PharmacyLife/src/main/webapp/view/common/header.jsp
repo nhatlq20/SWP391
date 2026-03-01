@@ -310,10 +310,7 @@
                                                                 <small class="text-muted">x${it.quantity}</small>
                                                             </div>
                                                         </div>
-                                                        <a href="${pageContext.request.contextPath}/cart?action=remove&id=${it.medicine.medicineId}"
-                                                            class="text-danger small ms-2">
-                                                            <i class="fas fa-trash"></i>
-                                                        </a>
+
                                                     </div>
                                                 </c:forEach>
                                             </c:otherwise>
@@ -402,5 +399,18 @@
                         if (badge) {
                             badge.textContent = newCount;
                         }
+                        // Refresh mini-cart items without page flash by fetching current page's HTML in background
+                        fetch(window.location.href)
+                            .then(response => response.text())
+                            .then(html => {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(html, 'text/html');
+                                const newItems = doc.getElementById('miniCartItems');
+                                const currentItems = document.getElementById('miniCartItems');
+                                if (newItems && currentItems) {
+                                    currentItems.innerHTML = newItems.innerHTML;
+                                }
+                            })
+                            .catch(err => console.warn('Could not update mini-cart smoothly:', err));
                     }
                 </script>
