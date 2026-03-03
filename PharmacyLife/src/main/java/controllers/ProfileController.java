@@ -77,8 +77,10 @@ public class ProfileController extends HttpServlet {
 
         if ("customer".equals(userType) && loggedInUser instanceof Customer) {
             user.setEmail(((Customer) loggedInUser).getEmail());
+            user.setRoleID(0);
         } else if ("staff".equals(userType) && loggedInUser instanceof Staff) {
             user.setEmail(((Staff) loggedInUser).getStaffEmail());
+            user.setRoleID(((Staff) loggedInUser).getRoleId());
         }
 
         request.setAttribute("errorMessage", message);
@@ -118,6 +120,7 @@ public class ProfileController extends HttpServlet {
             user.setAddress(customer.getAddress());
             user.setDob(customer.getDob());
             user.setGender(customer.getGender());
+            user.setRoleID(0); // Use 0 to represent customer since they don't have roleId
 
         } else if ("staff".equals(userType) && loggedInUser instanceof Staff) {
             Staff staff = (Staff) loggedInUser;
@@ -131,6 +134,8 @@ public class ProfileController extends HttpServlet {
                 staffGender = "Khác";
             }
             user.setGender(staffGender);
+            // Staff has getRoleId() (lowercase 'd')
+            user.setRoleID(staff.getRoleId());
         }
 
         request.setAttribute("user", user);
@@ -168,6 +173,18 @@ public class ProfileController extends HttpServlet {
         Object loggedInUser = session.getAttribute("loggedInUser");
         String userType = (String) session.getAttribute("userType");
         Integer userId = (Integer) session.getAttribute("userId");
+
+        // Repopulate disabled fields from session if user is Admin/Staff
+        if ("staff".equals(userType) && loggedInUser instanceof Staff) {
+            Staff staff = (Staff) loggedInUser;
+            fullName = staff.getStaffName();
+            address = staff.getStaffAddress();
+            gender = staff.getStaffGender();
+            if (staff.getStaffDob() != null) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                dobStr = sdf.format(staff.getStaffDob());
+            }
+        }
 
         boolean success = false;
 
@@ -263,6 +280,7 @@ public class ProfileController extends HttpServlet {
         private String address;
         private Date dob;
         private String gender;
+        private int roleID;
 
         public String getFullName() {
             return fullName;
@@ -310,6 +328,14 @@ public class ProfileController extends HttpServlet {
 
         public void setGender(String gender) {
             this.gender = gender;
+        }
+
+        public int getRoleID() {
+            return roleID;
+        }
+
+        public void setRoleID(int roleID) {
+            this.roleID = roleID;
         }
     }
 

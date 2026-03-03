@@ -7,8 +7,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.regex.Pattern;
 import models.User;
+import utils.EmailUtils;
 
 /**
  * RegisterController - Handles customer registration
@@ -152,21 +154,24 @@ public class RegisterController extends HttpServlet {
             return;
         }
 
-        // Register customer
-        boolean success = false;
-        try {
-            success = customerDAO.registerCustomer(fullName, email, password, phone);
-        } catch (Exception ignored) {
-        }
+        // Generate OTP and send email
+        String otp = EmailUtils.generateOTP();
+        boolean isEmailSent = EmailUtils.sendOTPEmail(email, otp, "register");
 
-        if (success) {
-            // Registration successful - Set success message and redirect to login
-            request.setAttribute("successMessage", "Đăng ký thành công! Vui lòng đăng nhập.");
-            request.setAttribute("email", email);
-            request.getRequestDispatcher("view/client/login.jsp").forward(request, response);
+        if (isEmailSent) {
+            // Save info to session for verification
+            HttpSession session = request.getSession();
+            session.setAttribute("otp", otp);
+            session.setAttribute("regFullName", fullName);
+            session.setAttribute("regEmail", email);
+            session.setAttribute("regPhone", phone);
+            session.setAttribute("regPassword", password);
+            session.setAttribute("otpAction", "register");
+            
+            // Redirect to verify-email page
+            response.sendRedirect(request.getContextPath() + "/verify-email");
         } else {
-            // Registration failed
-            forwardRegisterError(request, response, "Đăng ký thất bại! Vui lòng thử lại.", fullName, phone, email);
+            forwardRegisterError(request, response, "Email không tồn tại hoặc không thể gửi mã xác nhận. Vui lòng kiểm tra lại!", fullName, phone, email);
         }
     }
 

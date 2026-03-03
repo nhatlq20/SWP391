@@ -19,7 +19,7 @@ public class EmailUtils {
         return String.valueOf(otp);
     }
 
-    public static boolean sendOTPEmail(String toEmail, String otp) {
+    public static boolean sendOTPEmail(String toEmail, String otp, String action) {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -39,13 +39,15 @@ public class EmailUtils {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
             message.setSubject("Mã xác thực OTP - PharmacyLife");
 
+            String actionText = action.equals("register") ? "hoàn tất đăng ký tài khoản" : "hoàn tất thủ tục thay đổi mật khẩu";
+
             String htmlContent = "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">"
                     + "  <div style=\"margin:50px auto;width:70%;padding:20px 0\">"
                     + "    <div style=\"border-bottom:1px solid #eee\">"
                     + "      <a href=\"\" style=\"font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600\">PharmacyLife</a>"
                     + "    </div>"
                     + "    <p style=\"font-size:1.1em\">Xin chào,</p>"
-                    + "    <p>Cảm ơn bạn đã lựa chọn PharmacyLife. Sử dụng mã OTP sau đây để hoàn tất thủ tục thay đổi mật khẩu. Mã OTP có hiệu lực trong vòng 5 phút.</p>"
+                    + "    <p>Cảm ơn bạn đã lựa chọn PharmacyLife. Sử dụng mã OTP sau đây để " + actionText + ". Mã OTP có hiệu lực trong vòng 5 phút.</p>"
                     + "    <h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;\">" + otp + "</h2>"
                     + "    <p style=\"font-size:0.9em;\">Trân trọng,<br />Đội ngũ PharmacyLife</p>"
                     + "    <hr style=\"border:none;border-top:1px solid #eee\" />"
@@ -65,5 +67,9 @@ public class EmailUtils {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static boolean sendOTPEmail(String toEmail, String otp) {
+        return sendOTPEmail(toEmail, otp, "reset");
     }
 }

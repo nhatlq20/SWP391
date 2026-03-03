@@ -61,6 +61,7 @@ public class ForgotPasswordController extends HttpServlet {
                 session = request.getSession();
                 session.setAttribute("otp", otp);
                 session.setAttribute("email", email);
+                session.setAttribute("otpAction", "reset");
                 session.setMaxInactiveInterval(300); // 5 minutes
 
                 request.setAttribute("successMessage", "Mã OTP đã được gửi đến email: " + email);

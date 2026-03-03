@@ -52,7 +52,8 @@
                                 <img src="${pageContext.request.contextPath}/assets/img/fname.png" alt="Name">
                                 Họ và tên của bạn
                             </label>
-                            <input type="text" name="fullName" value="${user.fullName}" placeholder="Họ và tên của bạn" required>
+                            <input type="text" name="fullName" value="${user.fullName}" placeholder="Họ và tên của bạn" required
+                                   ${user.roleID == 1 || user.roleID == 2 ? 'disabled style="background-color: #e9ecef; cursor: not-allowed;"' : ''}>
                         </div>
                         
                         <div class="form-field">
@@ -71,12 +72,20 @@
                                 <img src="${pageContext.request.contextPath}/assets/img/gender.png" alt="Gender">
                                 Giới tính
                             </label>
-                            <select name="gender">
-                                <option value="" disabled ${empty user.gender ? 'selected' : ''}>Giới tính của bạn</option>
-                                <option value="Nam" ${user.gender == 'Nam' ? 'selected' : ''}>Nam</option>
-                                <option value="Nữ" ${user.gender == 'Nữ' ? 'selected' : ''}>Nữ</option>
-                                <option value="Khác" ${user.gender == 'Khác' ? 'selected' : ''}>Khác</option>
-                            </select>
+                            <c:choose>
+                                <c:when test="${user.roleID == 1 || user.roleID == 2}">
+                                    <input type="text" value="${user.gender}" disabled style="background-color: #e9ecef; cursor: not-allowed;">
+                                    <input type="hidden" name="gender" value="${user.gender}">
+                                </c:when>
+                                <c:otherwise>
+                                    <select name="gender">
+                                        <option value="" disabled ${empty user.gender ? 'selected' : ''}>Giới tính của bạn</option>
+                                        <option value="Nam" ${user.gender == 'Nam' ? 'selected' : ''}>Nam</option>
+                                        <option value="Nữ" ${user.gender == 'Nữ' ? 'selected' : ''}>Nữ</option>
+                                        <option value="Khác" ${user.gender == 'Khác' ? 'selected' : ''}>Khác</option>
+                                    </select>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                         
                         <div class="form-field">
@@ -84,7 +93,8 @@
                                 <img src="${pageContext.request.contextPath}/assets/img/dob.png" alt="DOB">
                                 Ngày sinh
                             </label>
-                            <input type="date" name="dob" value="<fmt:formatDate value='${user.dob}' pattern='yyyy-MM-dd' />" placeholder="Ngày sinh của bạn">
+                            <input type="date" name="dob" value="<fmt:formatDate value='${user.dob}' pattern='yyyy-MM-dd' />" 
+                                   placeholder="Ngày sinh của bạn" ${user.roleID == 1 || user.roleID == 2 ? 'disabled style="background-color: #e9ecef; cursor: not-allowed;"' : ''}>
                         </div>
                     </div>
 
@@ -103,7 +113,8 @@
                             <img src="${pageContext.request.contextPath}/assets/img/address.png" alt="Address">
                             Địa chỉ
                         </label>
-                        <input type="text" name="address" value="${user.address}" placeholder="Địa chỉ của bạn">
+                        <input type="text" name="address" value="${user.address}" placeholder="Địa chỉ của bạn"
+                               ${user.roleID == 1 || user.roleID == 2 ? 'disabled style="background-color: #e9ecef; cursor: not-allowed;"' : ''}>
                     </div>
 
                     <!-- Buttons -->
@@ -113,10 +124,12 @@
                             Lưu
                         </button>
                         
-                        <button type="button" class="btn btn-warning" onclick="window.location.href='${pageContext.request.contextPath}/forgot-password'">
-                            <img src="${pageContext.request.contextPath}/assets/img/forgot.png" alt="Forgot Password">
-                            Quên mật khẩu
-                        </button>
+                        <c:if test="${user.roleID == 0}">
+                            <button type="button" class="btn btn-warning" onclick="window.location.href='${pageContext.request.contextPath}/change-email'">
+                                <img src="${pageContext.request.contextPath}/assets/img/email.png" alt="Change Email">
+                                Thay đổi Email
+                            </button>
+                        </c:if>
                         
                         <button type="button" class="btn btn-secondary" onclick="window.location.href='${pageContext.request.contextPath}/change-password'">
                             <img src="${pageContext.request.contextPath}/assets/img/pass.png" alt="Change Password">
