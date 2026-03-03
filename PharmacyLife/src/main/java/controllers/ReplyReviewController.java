@@ -27,18 +27,12 @@ public class ReplyReviewController extends HttpServlet {
 
         String normalizedUserType = String.valueOf(userType).toLowerCase();
 
-        if ("staff".equals(normalizedUserType) && loggedInUser instanceof Staff) {
+        // Chỉ cho phép staff hoặc admin trả lời review
+        if (("staff".equals(normalizedUserType) || "admin".equals(normalizedUserType)) && loggedInUser instanceof Staff) {
             return ((Staff) loggedInUser).getStaffId();
         }
 
-        if ("admin".equals(normalizedUserType) && loggedInUser instanceof Staff) {
-            return ((Staff) loggedInUser).getStaffId();
-        }
-
-        if ("customer".equals(normalizedUserType) && loggedInUser instanceof Customer) {
-            return -((Customer) loggedInUser).getCustomerId();
-        }
-
+        // Customer không được trả lời review
         return null;
     }
 
@@ -125,13 +119,9 @@ public class ReplyReviewController extends HttpServlet {
             }
 
             if (medicineIdParam != null && !medicineIdParam.trim().isEmpty()) {
-                if (returnToDetail) {
-                    response.sendRedirect(request.getContextPath() + "/medicine/detail?id=" + medicineIdParam + "#review-" + reviewId);
-                } else {
-                    response.sendRedirect(request.getContextPath() + "/view-reviews?medicineId=" + medicineIdParam);
-                }
+                response.sendRedirect(request.getContextPath() + "/medicine/detail?id=" + medicineIdParam + "#review-" + reviewId);
             } else {
-                response.sendRedirect(request.getContextPath() + "/view-reviews");
+                response.sendRedirect(request.getContextPath() + "/medicine/detail");
             }
         } catch (NumberFormatException e) {
             if (ajaxRequest) {

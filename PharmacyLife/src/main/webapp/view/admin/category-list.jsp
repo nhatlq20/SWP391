@@ -21,8 +21,8 @@
             <div class="main-content">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="page-title"><i class="fas fa-list me-2 text-primary"></i>Quản lí danh mục</h2>
-                    <div class="category-actions">
-                        <form class="search-form" action="${pageContext.request.contextPath}/category" method="get">
+                    <div class="category-actions d-flex align-items-center justify-content-end gap-3" style="gap: 18px;">
+                        <form class="search-form mb-0" action="${pageContext.request.contextPath}/category" method="get">
                             <input type="hidden" name="action" value="search" />
                             <div class="search-box category-search">
                                 <i class="fas fa-search"></i>
@@ -31,12 +31,11 @@
                                     oninput="filterCategoryTable()"
                                     onkeydown="if(event.key==='Enter'){event.preventDefault(); filterCategoryTable();}">
                             </div>
-                     
                         </form>
                         <c:if
                             test="${sessionScope.userType eq 'staff' and fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
                             <a href="${pageContext.request.contextPath}/category?action=show"
-                                class="btn-add-medicine">
+                                class="btn-add-medicine ms-2">
                                 <i class="fas fa-plus"></i> Thêm danh mục mới
                             </a>
                         </c:if>
