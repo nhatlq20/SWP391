@@ -8,10 +8,13 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
 import models.Staff;
 import models.Role;
 import models.User;
+import utils.EmailUtils;
 
 public class StaffController extends HttpServlet {
 
@@ -82,6 +85,10 @@ public class StaffController extends HttpServlet {
 
             case "list":
                 String sort = request.getParameter("sort");
+                String successMsg = request.getParameter("success");
+                if ("1".equals(successMsg)) {
+                    request.setAttribute("successMessage", "Thêm nhân viên mới thành công!");
+                }
                 List<Staff> staffList = dao.getAllStaff(sort);
                 if (staffList == null) {
                     staffList = new ArrayList<>();
@@ -115,7 +122,12 @@ public class StaffController extends HttpServlet {
             case "delete":
                 try {
                     int deleteId = Integer.parseInt(request.getParameter("id"));
-                    dao.deleteStaff(deleteId);
+                    Staff staffToDelete = dao.getStaffById(deleteId);
+                    if (staffToDelete != null) {
+                        // Gửi email thông báo dừng hợp tác trước khi xóa
+                        EmailUtils.sendStaffTerminationEmail(staffToDelete.getStaffEmail(), staffToDelete.getStaffName());
+                        dao.deleteStaff(deleteId);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -143,6 +155,11 @@ public class StaffController extends HttpServlet {
                     String staffName = normalizeName(request.getParameter("staffName"));
                     String staffEmail = normalizeEmail(request.getParameter("staffEmail"));
                     String staffPassword = request.getParameter("staffPassword");
+                    String staffPhone = request.getParameter("staffPhone");
+                    String staffAddress = request.getParameter("staffAddress");
+                    String staffGender = request.getParameter("staffGender");
+                    String staffDobStr = request.getParameter("staffDob");
+                    
                     if (staffPassword == null) {
                         staffPassword = "";
                     }
@@ -150,7 +167,6 @@ public class StaffController extends HttpServlet {
                     System.out.println("\n=== ADD STAFF REQUEST ===");
                     System.out.println("Name: " + staffName);
                     System.out.println("Email: " + staffEmail);
-                    System.out.println("Password provided: " + (staffPassword != null && !staffPassword.isEmpty()));
 
                     if (staffName.isEmpty()) {
                         forwardAddWithError(request, response, "Vui lòng nhập họ tên nhân viên!", staffName, staffEmail);
@@ -197,17 +213,30 @@ public class StaffController extends HttpServlet {
                     System.out.println("Role ID: " + roleId);
 
                     Staff newStaff = new Staff();
-                    // StaffCode will be generated automatically in DAO.insertStaff()
                     newStaff.setStaffName(staffName);
                     newStaff.setStaffEmail(staffEmail);
                     newStaff.setStaffPassword(staffPassword);
+                    newStaff.setStaffPhone(staffPhone);
+                    newStaff.setStaffAddress(staffAddress);
+                    newStaff.setStaffGender(staffGender);
                     newStaff.setRoleId(roleId);
+
+                    if (staffDobStr != null && !staffDobStr.isEmpty()) {
+                        try {
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            newStaff.setStaffDob(sdf.parse(staffDobStr));
+                        } catch (Exception e) {
+                            System.out.println("Error parsing date: " + staffDobStr);
+                        }
+                    }
 
                     boolean success = dao.insertStaff(newStaff);
 
                     if (success) {
                         System.out.println("Staff added successfully!");
-                        response.sendRedirect(request.getContextPath() + "/admin/manage-staff");
+                        // Gửi email thông báo tài khoản
+                        EmailUtils.sendStaffAccountEmail(staffEmail, staffName, staffPassword);
+                        response.sendRedirect(request.getContextPath() + "/admin/manage-staff?success=1");
                     } else {
                         System.out.println("ERROR: Failed to insert staff");
                         forwardAddWithError(request, response, "Thêm nhân viên thất bại! Vui lòng thử lại.", staffName, staffEmail);

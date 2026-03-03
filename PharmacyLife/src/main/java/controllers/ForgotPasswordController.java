@@ -71,7 +71,7 @@ public class ForgotPasswordController extends HttpServlet {
                 request.getRequestDispatcher("view/client/forgot-password.jsp").forward(request, response);
             }
         } else {
-            request.setAttribute("errorMessage", "Email không đúng");
+            request.setAttribute("errorMessage", "Tài khoản này không tồn tại");
             request.getRequestDispatcher("view/client/forgot-password.jsp").forward(request, response);
         }
     }

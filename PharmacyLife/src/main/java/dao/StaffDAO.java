@@ -173,10 +173,14 @@ public class StaffDAO {
             ps.setString(2, s.getStaffName());
             ps.setString(3, s.getStaffEmail());
             ps.setString(4, s.getStaffPassword() != null ? s.getStaffPassword() : ""); // StaffPassword
-            ps.setString(5, "");  // StaffPhone
-            ps.setString(6, "");  // StaffAddress
-            ps.setNull(7, java.sql.Types.DATE);  // StaffDob
-            ps.setString(8, "Khác");  // StaffGender
+            ps.setString(5, s.getStaffPhone() != null ? s.getStaffPhone() : "");  // StaffPhone
+            ps.setString(6, s.getStaffAddress() != null ? s.getStaffAddress() : "");  // StaffAddress
+            if (s.getStaffDob() != null) {
+                ps.setDate(7, new java.sql.Date(s.getStaffDob().getTime()));
+            } else {
+                ps.setNull(7, java.sql.Types.DATE);
+            }
+            ps.setString(8, s.getStaffGender() != null ? s.getStaffGender() : "Khác");  // StaffGender
             ps.setInt(9, s.getRoleId());
             ps.setBoolean(10, true);  // StaffIsActive
             
