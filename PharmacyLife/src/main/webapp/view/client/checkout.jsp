@@ -100,8 +100,9 @@
                                                     </div>
 
                                                     <div class="col-12 mt-4">
-                                                        <button class="btn btn-primary-custom w-100 py-3 fw-bold"
-                                                            type="submit">
+                                                        <input type="hidden" name="appliedVoucherId"
+                                                            id="appliedVoucherId" value="0">
+                                                        <button class="btn-checkout w-100" type="submit">
                                                             HOÀN TẤT ĐẶT HÀNG
                                                         </button>
                                                         <div class="text-center mt-3">
@@ -141,27 +142,29 @@
                                             </ul>
 
                                             <div class="d-flex justify-content-between mb-2">
-                                                <span>Tạm tính</span>
-                                                <strong>
+                                                <span>Tạm tính:</span>
+                                                <span class="fw-bold">
                                                     <fmt:formatNumber value="${totalMoney}" type="currency"
                                                         currencySymbol="₫" maxFractionDigits="0" />
-                                                </strong>
+                                                </span>
                                             </div>
 
                                             <div class="voucher-section mb-3">
-                                                <div class="input-group">
+                                                <div class="d-flex">
                                                     <input type="text" id="voucherCode" name="voucherCode"
-                                                        class="form-control" placeholder="Nhập mã giảm giá">
-                                                    <button type="button" class="btn btn-outline-primary"
-                                                        onclick="applyVoucher()">Áp dụng</button>
+                                                        class="form-control" placeholder="Mã giảm giá"
+                                                        style="border-radius: 8px 0 0 8px;">
+                                                    <button type="button" class="btn btn-primary"
+                                                        onclick="applyVoucher()"
+                                                        style="border-radius: 0 8px 8px 0; background-color: #2563eb; border: none; padding: 0 20px; font-weight: 600; white-space: nowrap; flex-shrink: 0;">
+                                                        Áp dụng
+                                                    </button>
                                                 </div>
                                                 <div id="voucherMessage" class="small mt-1"></div>
-                                                <input type="hidden" id="appliedVoucherId" name="appliedVoucherId"
-                                                    value="0">
                                             </div>
 
                                             <div class="d-flex justify-content-between mb-2 text-success">
-                                                <span>Giảm giá</span>
+                                                <span>Giảm giá:</span>
                                                 <span id="discountValueDisplay">-0 ₫</span>
                                             </div>
                                             <hr>

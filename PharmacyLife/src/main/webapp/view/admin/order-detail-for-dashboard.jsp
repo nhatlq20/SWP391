@@ -140,9 +140,31 @@
                                             </tbody>
                                             <tfoot style="background-color: #f9fafb;">
                                                 <tr>
-                                                    <td colspan="3" class="text-end fw-bold py-3">Tổng cộng:</td>
-                                                    <td class="text-end fs-5 fw-bold py-3 pe-4"
-                                                        style="color: #22c55e; white-space: nowrap;">
+                                                    <td colspan="3" class="text-end fw-bold py-2">Giá gốc:</td>
+                                                    <td class="text-end fw-bold py-2 pe-4" style="white-space: nowrap;">
+                                                        <fmt:formatNumber
+                                                            value="${order.totalAmount + order.discountAmount}"
+                                                            type="number" groupingUsed="true" />&nbsp;đ
+                                                    </td>
+                                                </tr>
+                                                <c:if test="${order.discountAmount > 0}">
+                                                    <tr>
+                                                        <td colspan="3" class="text-end fw-bold py-2 text-danger">
+                                                            Mã Voucher <c:if test="${not empty order.voucher}">
+                                                                (${order.voucher.voucherCode})</c:if>:
+                                                        </td>
+                                                        <td class="text-end fw-bold py-2 pe-4 text-danger"
+                                                            style="white-space: nowrap;">
+                                                            -
+                                                            <fmt:formatNumber value="${order.discountAmount}"
+                                                                type="number" groupingUsed="true" />&nbsp;đ
+                                                        </td>
+                                                    </tr>
+                                                </c:if>
+                                                <tr style="border-top: 2px solid #e5e7eb;">
+                                                    <td colspan="3" class="text-end fw-bold py-3 fs-5">Tổng cộng:</td>
+                                                    <td class="text-end fs-5 fw-bold py-3 pe-4 text-primary"
+                                                        style="white-space: nowrap;">
                                                         <fmt:formatNumber value="${order.totalAmount}" type="number"
                                                             groupingUsed="true" />&nbsp;đ
                                                     </td>
@@ -192,7 +214,8 @@
 
                                     <c:if test="${not empty order.staff}">
                                         <div class="mb-3 text-center">
-                                            <div class="small text-muted text-uppercase fw-bold mb-1">Được xác nhận bởi</div>
+                                            <div class="small text-muted text-uppercase fw-bold mb-1">Được xác nhận bởi
+                                            </div>
                                             <div class="fw-bold text-primary">
                                                 <i class="fas fa-user-check me-1"></i> ${order.staff.staffName}
                                             </div>
