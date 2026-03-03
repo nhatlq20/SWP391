@@ -31,25 +31,19 @@
                                             <div class="medicine-image-box rounded-3 overflow-hidden">
                                                 <c:choose>
                                                     <c:when test="${not empty medicine.imageUrl}">
-                                                        <c:set var="imageUrlTrimmed"
-                                                            value="${fn:trim(medicine.imageUrl)}" />
+                                                        <c:set var="imageUrlTrimmed" value="${fn:trim(medicine.imageUrl)}" />
                                                         <c:choose>
-                                                            <c:when
-                                                                test="${fn:startsWith(imageUrlTrimmed, 'http://') or fn:startsWith(imageUrlTrimmed, 'https://')}">
+                                                            <c:when test="${fn:startsWith(imageUrlTrimmed, 'http://') or fn:startsWith(imageUrlTrimmed, 'https://')}">
                                                                 <c:set var="imgSrc" value="${imageUrlTrimmed}" />
                                                             </c:when>
-                                                            <c:when test="${fn:startsWith(imageUrlTrimmed, '/')}">
-                                                                <c:set var="imgSrc"
-                                                                    value="${pageContext.request.contextPath}${imageUrlTrimmed}" />
+                                                            <c:when test="${fn:startsWith(imageUrlTrimmed, '/')}" >
+                                                                <c:set var="imgSrc" value="${pageContext.request.contextPath}${imageUrlTrimmed}" />
                                                             </c:when>
-                                                            <c:when
-                                                                test="${fn:contains(imageUrlTrimmed, 'assets/img')}">
-                                                                <c:set var="imgSrc"
-                                                                    value="${pageContext.request.contextPath}/${imageUrlTrimmed}" />
+                                                            <c:when test="${fn:contains(imageUrlTrimmed, 'assets/img')}">
+                                                                <c:set var="imgSrc" value="${pageContext.request.contextPath}/${imageUrlTrimmed}" />
                                                             </c:when>
                                                             <c:otherwise>
-                                                                <c:set var="imgSrc"
-                                                                    value="${pageContext.request.contextPath}/assets/img/${imageUrlTrimmed}" />
+                                                                <c:set var="imgSrc" value="${pageContext.request.contextPath}/assets/img/${imageUrlTrimmed}" />
                                                             </c:otherwise>
                                                         </c:choose>
                                                         <img src="<c:out value='${imgSrc}'/>"
@@ -62,7 +56,6 @@
                                                             class="main-img zoom-img" />
                                                     </c:otherwise>
                                                 </c:choose>
-
                                             </div>
                                         </div>
 
@@ -198,29 +191,7 @@
                                                                         </a>
                                                                     </c:if>
 
-                                                                    <c:if
-                                                                        test="${sessionScope.userType eq 'customer' and loggedCustomerId ne review.customerId}">
-                                                                        <form class="mt-2 js-inline-reply-form"
-                                                                            action="${pageContext.request.contextPath}/reply-review"
-                                                                            method="post"
-                                                                            data-review-id="${review.reviewId}"
-                                                                            data-replier-name="${sessionScope.loggedInUser.fullName}">
-                                                                            <input type="hidden" name="reviewId"
-                                                                                value="${review.reviewId}" />
-                                                                            <input type="hidden" name="medicineId"
-                                                                                value="${medicine.medicineId}" />
-                                                                            <input type="hidden" name="returnTo"
-                                                                                value="detail" />
-                                                                            <textarea
-                                                                                class="form-control form-control-sm mb-2"
-                                                                                name="replyContent" rows="2"
-                                                                                placeholder="Trả lời @${review.customerName}..."
-                                                                                required></textarea>
-                                                                            <button type="submit"
-                                                                                class="btn btn-sm btn-outline-primary">Gửi
-                                                                                trả lời</button>
-                                                                        </form>
-                                                                    </c:if>
+                                                                 
                                                                 </div>
                                                             </div>
                                                         </c:forEach>
