@@ -57,6 +57,12 @@
                                     </div>
                                 </div>
 
+                                <c:if test="${not empty successMessage}">
+                                    <div class="alert alert-success mt-3" style="margin-bottom: 0;">
+                                        <i class="fas fa-check-circle me-1"></i> ${successMessage}
+                                    </div>
+                                </c:if>
+
                                 <div class="d-flex justify-content-end mb-3">
                                     <a href="${pageContext.request.contextPath}/admin/manage-staff?action=add"
                                         class="btn-add-staff">

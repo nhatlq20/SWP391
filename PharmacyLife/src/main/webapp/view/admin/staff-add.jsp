@@ -78,6 +78,48 @@
                                                     placeholder="Mật khẩu" required class="form-control" minlength="8" maxlength="16">
                                             </div>
                                         </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="staffPhone" class="form-label">
+                                                    <i class="fas fa-phone me-1"></i> Số điện thoại
+                                                </label>
+                                                <input type="text" id="staffPhone" name="staffPhone"
+                                                    placeholder="Số điện thoại" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="staffDob" class="form-label">
+                                                    <i class="fas fa-calendar-alt me-1"></i> Ngày sinh
+                                                </label>
+                                                <input type="date" id="staffDob" name="staffDob" class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="staffGender" class="form-label">
+                                                    <i class="fas fa-venus-mars me-1"></i> Giới tính
+                                                </label>
+                                                <select id="staffGender" name="staffGender" class="form-select">
+                                                    <option value="Nam">Nam</option>
+                                                    <option value="Nữ">Nữ</option>
+                                                    <option value="Khác">Khác</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="staffAddress" class="form-label">
+                                                    <i class="fas fa-map-marker-alt me-1"></i> Địa chỉ
+                                                </label>
+                                                <input type="text" id="staffAddress" name="staffAddress"
+                                                    placeholder="Địa chỉ" class="form-control">
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="form-actions d-flex justify-content-between mt-4">
