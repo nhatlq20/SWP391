@@ -7,6 +7,7 @@ import models.Order;
 import models.OrderItem;
 import models.Medicine;
 import models.Staff;
+import models.Voucher;
 import utils.DBContext;
 
 public class OrderDAO {
@@ -49,8 +50,9 @@ public class OrderDAO {
     }
 
     public Order getOrderById(int orderId) {
-        String sql = "SELECT o.*, s.StaffName FROM Orders o " +
+        String sql = "SELECT o.*, s.StaffName, v.VoucherCode FROM Orders o " +
                 "LEFT JOIN Staff s ON o.StaffId = s.StaffId " +
+                "LEFT JOIN Vouchers v ON o.VoucherId = v.VoucherId " +
                 "WHERE o.OrderId = ?";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -239,6 +241,16 @@ public class OrderDAO {
         // Map Voucher info
         order.setVoucherId(rs.getInt("VoucherId"));
         order.setDiscountAmount(rs.getDouble("DiscountAmount"));
+        try {
+            String vCode = rs.getString("VoucherCode");
+            if (vCode != null) {
+                Voucher v = new Voucher();
+                v.setVoucherCode(vCode);
+                order.setVoucher(v);
+            }
+        } catch (SQLException e) {
+            // VoucherCode might not be in all queries
+        }
 
         // Map Staff info if available
         int staffId = rs.getInt("StaffId");

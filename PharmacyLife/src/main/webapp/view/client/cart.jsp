@@ -147,28 +147,8 @@
                                                     <div class="total-section shadow-sm">
                                                         <h5 class="summary-title">Thông tin đơn hàng</h5>
 
-                                                        <div class="coupon-container">
-                                                            <input type="text" class="coupon-input"
-                                                                placeholder="Mã giảm giá">
-                                                            <button class="btn-apply-coupon" type="button">
-                                                                Áp dụng
-                                                            </button>
-                                                        </div>
-
                                                         <div class="price-calculations">
-                                                            <div class="price-row">
-                                                                <span>Tạm tính:</span>
-                                                                <span class="fw-bold text-dark">
-                                                                    <fmt:formatNumber value="${totalMoney}"
-                                                                        type="currency" currencySymbol="₫"
-                                                                        maxFractionDigits="0" />
-                                                                </span>
-                                                            </div>
-                                                            <div class="price-row">
-                                                                <span>Giảm giá:</span>
-                                                                <span class="text-success">-0 ₫</span>
-                                                            </div>
-                                                            <div class="price-row total">
+                                                            <div class="price-row total mt-0">
                                                                 <span class="total-label">Tổng cộng:</span>
                                                                 <span class="total-value" id="cart-total">
                                                                     <fmt:formatNumber value="${totalMoney}"
@@ -177,25 +157,26 @@
                                                                 </span>
                                                             </div>
                                                         </div>
-
-                                                        <a href="checkout" class="btn-checkout">
-                                                            Thanh toán
-                                                            <i class="fas fa-arrow-right"></i>
-                                                        </a>
-
-                                                        <a href="home"
-                                                            class="btn btn-outline-secondary w-100 mt-3 d-flex align-items-center justify-content-center"
-                                                            style="border-radius: 10px; height: 44px; font-weight: 600; font-size: 0.9rem;">
-                                                            <i class="fas fa-arrow-left me-2"></i> Mua thêm
-                                                        </a>
                                                     </div>
+
+                                                    <a href="checkout" class="btn-checkout">
+                                                        Thanh toán
+                                                        <i class="fas fa-arrow-right"></i>
+                                                    </a>
+
+                                                    <a href="home"
+                                                        class="btn btn-outline-secondary w-100 mt-3 d-flex align-items-center justify-content-center"
+                                                        style="border-radius: 10px; height: 44px; font-weight: 600; font-size: 0.9rem;">
+                                                        <i class="fas fa-arrow-left me-2"></i> Mua thêm
+                                                    </a>
                                                 </div>
                                             </div>
-                                        </c:if>
                                     </div>
+                                    </c:if>
                                 </div>
                             </div>
                         </div>
+                    </div>
                     </div>
 
 

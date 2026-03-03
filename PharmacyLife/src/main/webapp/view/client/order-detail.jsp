@@ -180,10 +180,44 @@
                                         <tfoot>
                                             <tr>
                                                 <td colspan="3" class="text-end pt-4 border-0">
-                                                    <span class="total-label">Tổng cộng:</span>
+                                                    <span class="total-label"
+                                                        style="font-size: 0.95rem; color: #6b7280;">Giá gốc:</span>
                                                 </td>
                                                 <td class="text-end pt-4 border-0">
-                                                    <span class="total-amount">
+                                                    <span class="fw-bold" style="font-size: 1rem;">
+                                                        <fmt:formatNumber
+                                                            value="${order.totalAmount + order.discountAmount}"
+                                                            type="currency" currencySymbol="₫" maxFractionDigits="0" />
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <c:if test="${order.discountAmount > 0}">
+                                                <tr>
+                                                    <td colspan="3" class="text-end pt-2 border-0">
+                                                        <span class="total-label text-danger"
+                                                            style="font-size: 0.95rem;">
+                                                            Mã Voucher <c:if test="${not empty order.voucher}">
+                                                                (${order.voucher.voucherCode})</c:if>:
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-end pt-2 border-0">
+                                                        <span class="fw-bold text-danger" style="font-size: 1rem;">
+                                                            -
+                                                            <fmt:formatNumber value="${order.discountAmount}"
+                                                                type="currency" currencySymbol="₫"
+                                                                maxFractionDigits="0" />
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </c:if>
+                                            <tr>
+                                                <td colspan="3" class="text-end pt-2 border-0">
+                                                    <span class="total-label"
+                                                        style="font-size: 1.1rem; color: var(--text-slate); font-weight: 700;">Tổng
+                                                        cộng:</span>
+                                                </td>
+                                                <td class="text-end pt-2 border-0">
+                                                    <span class="total-amount" style="color: #22c55e;">
                                                         <fmt:formatNumber value="${order.totalAmount}" type="currency"
                                                             currencySymbol="₫" maxFractionDigits="0" />
                                                     </span>
