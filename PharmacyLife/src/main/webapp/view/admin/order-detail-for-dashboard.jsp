@@ -190,6 +190,15 @@
                                         </span>
                                     </div>
 
+                                    <c:if test="${not empty order.staff}">
+                                        <div class="mb-3 text-center">
+                                            <div class="small text-muted text-uppercase fw-bold mb-1">Được xác nhận bởi</div>
+                                            <div class="fw-bold text-primary">
+                                                <i class="fas fa-user-check me-1"></i> ${order.staff.staffName}
+                                            </div>
+                                        </div>
+                                    </c:if>
+
                                     <form action="order-update-dashboard" method="POST">
                                         <input type="hidden" name="id" value="${order.orderId}">
                                         <div class="mb-3">
