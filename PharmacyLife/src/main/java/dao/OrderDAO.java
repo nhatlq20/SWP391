@@ -143,16 +143,17 @@ public class OrderDAO {
 
     public boolean saveOrder(Order order) {
         String sqlOrder = "INSERT INTO Orders (CustomerId, StaffId, OrderDate, ShippingName, ShippingPhone, ShippingAddress, Status, TotalAmount, VoucherId, DiscountAmount) "
-                +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlItem = "INSERT INTO OrderItems (OrderId, MedicineId, OrderQuantity, UnitPrice) VALUES (?, ?, ?, ?)";
+        String sqlUpdateStock = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity - ? WHERE MedicineId = ? AND RemainingQuantity >= ?";
+        String sqlUpdateVoucher = "UPDATE Vouchers SET UsedQuantity = UsedQuantity + 1 WHERE VoucherId = ? AND UsedQuantity < Quantity";
 
         Connection conn = null;
         try {
             conn = dbContext.getConnection();
             conn.setAutoCommit(false);
 
-            // Insert Order
+            // 1. Insert Order
             try (PreparedStatement ps = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setInt(1, order.getCustomerId());
                 if (order.getStaffId() > 0)
@@ -187,16 +188,42 @@ public class OrderDAO {
                 }
             }
 
-            // Insert Items
-            try (PreparedStatement ps = conn.prepareStatement(sqlItem)) {
+            // 2. Insert Items and Update Stock
+            try (PreparedStatement psItem = conn.prepareStatement(sqlItem);
+                    PreparedStatement psStock = conn.prepareStatement(sqlUpdateStock)) {
                 for (OrderItem item : order.getItems()) {
-                    ps.setInt(1, order.getOrderId());
-                    ps.setInt(2, item.getMedicineId());
-                    ps.setInt(3, item.getQuantity());
-                    ps.setDouble(4, item.getUnitPrice());
-                    ps.addBatch();
+                    // Insert OrderItem
+                    psItem.setInt(1, order.getOrderId());
+                    psItem.setInt(2, item.getMedicineId());
+                    psItem.setInt(3, item.getQuantity());
+                    psItem.setDouble(4, item.getUnitPrice());
+                    psItem.addBatch();
+
+                    // Subtract Stock
+                    psStock.setInt(1, item.getQuantity());
+                    psStock.setInt(2, item.getMedicineId());
+                    psStock.setInt(3, item.getQuantity()); // Condition RemainingQuantity >= quantity
+                    int stockUpdate = psStock.executeUpdate();
+                    if (stockUpdate == 0) {
+                        System.err.println("OrderDAO: Not enough stock for MedicineID: " + item.getMedicineId());
+                        conn.rollback();
+                        return false;
+                    }
                 }
-                ps.executeBatch();
+                psItem.executeBatch();
+            }
+
+            // 3. Update Voucher usage if applicable
+            if (order.getVoucherId() > 0) {
+                try (PreparedStatement psVoucher = conn.prepareStatement(sqlUpdateVoucher)) {
+                    psVoucher.setInt(1, order.getVoucherId());
+                    int voucherUpdate = psVoucher.executeUpdate();
+                    if (voucherUpdate == 0) {
+                        System.err.println("OrderDAO: Voucher reached limit or not found: " + order.getVoucherId());
+                        conn.rollback();
+                        return false;
+                    }
+                }
             }
 
             conn.commit();
