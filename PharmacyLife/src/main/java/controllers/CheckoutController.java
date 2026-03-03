@@ -9,7 +9,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import models.Cart;
 import models.Order;
+import models.Voucher;
 import dao.CartDAO;
+import dao.VoucherDAO;
 
 @WebServlet(name = "CheckoutController", urlPatterns = { "/checkout", "/checkout-success" })
 public class CheckoutController extends HttpServlet {
@@ -69,8 +71,36 @@ public class CheckoutController extends HttpServlet {
             order.setShippingPhone(phone);
             order.setShippingAddress(address);
 
+            // Handle Voucher
+            int appliedVoucherId = 0;
+            double discountAmount = 0;
+            try {
+                String vIdParam = request.getParameter("appliedVoucherId");
+                if (vIdParam != null && !vIdParam.equals("0")) {
+                    appliedVoucherId = Integer.parseInt(vIdParam);
+                    VoucherDAO vDAO = new VoucherDAO();
+                    Voucher v = vDAO.getVoucherById(appliedVoucherId);
+                    if (v != null && v.isActive()) {
+                        // Re-calculate discount for security
+                        double tempTotal = cart.getTotalMoney();
+                        if ("Percent".equalsIgnoreCase(v.getDiscountType())) {
+                            discountAmount = tempTotal * (v.getDiscountValue() / 100);
+                            if (v.getMaxDiscountAmount() != null && discountAmount > v.getMaxDiscountAmount()) {
+                                discountAmount = v.getMaxDiscountAmount();
+                            }
+                        } else {
+                            discountAmount = v.getDiscountValue();
+                        }
+                        order.setVoucherId(appliedVoucherId);
+                        order.setDiscountAmount(discountAmount);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             order.setStatus("Pending");
-            order.setTotalAmount(cart.getTotalMoney());
+            order.setTotalAmount(cart.getTotalMoney() - discountAmount);
 
             // Convert Cart Items to Order Items
             java.util.List<models.OrderItem> orderItems = new java.util.ArrayList<>();
@@ -95,6 +125,11 @@ public class CheckoutController extends HttpServlet {
                 if (customerId != null) {
                     CartDAO cartDAO_checkout = new CartDAO();
                     cartDAO_checkout.clearCart(customerId);
+                }
+                // Increment voucher usage
+                if (order.getVoucherId() > 0) {
+                    VoucherDAO vDAO = new VoucherDAO();
+                    vDAO.incrementUsedQuantity(order.getVoucherId());
                 }
                 // Redirect to success page to prevent double submission
                 response.sendRedirect(request.getContextPath() + "/checkout-success");

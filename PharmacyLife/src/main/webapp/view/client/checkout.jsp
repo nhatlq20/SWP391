@@ -147,14 +147,27 @@
                                                         currencySymbol="₫" maxFractionDigits="0" />
                                                 </strong>
                                             </div>
+
+                                            <div class="voucher-section mb-3">
+                                                <div class="input-group">
+                                                    <input type="text" id="voucherCode" name="voucherCode"
+                                                        class="form-control" placeholder="Nhập mã giảm giá">
+                                                    <button type="button" class="btn btn-outline-primary"
+                                                        onclick="applyVoucher()">Áp dụng</button>
+                                                </div>
+                                                <div id="voucherMessage" class="small mt-1"></div>
+                                                <input type="hidden" id="appliedVoucherId" name="appliedVoucherId"
+                                                    value="0">
+                                            </div>
+
                                             <div class="d-flex justify-content-between mb-2 text-success">
                                                 <span>Giảm giá</span>
-                                                <span>-0 ₫</span>
+                                                <span id="discountValueDisplay">-0 ₫</span>
                                             </div>
                                             <hr>
                                             <div class="d-flex justify-content-between">
                                                 <span class="h5 mb-0">Tổng cộng</span>
-                                                <span class="h5 mb-0 text-danger fw-bold">
+                                                <span class="h5 mb-0 text-danger fw-bold" id="finalTotalDisplay">
                                                     <fmt:formatNumber value="${totalMoney}" type="currency"
                                                         currencySymbol="₫" maxFractionDigits="0" />
                                                 </span>
@@ -165,6 +178,41 @@
                             </div>
                         </div>
                     </div>
+
+                    <script>
+                        let _totalMoney = parseFloat("${totalMoney}") || 0;
+                        let _discount = 0;
+
+                        function applyVoucher() {
+                            const code = document.getElementById('voucherCode').value;
+                            if (!code) return;
+
+                            fetch('${pageContext.request.contextPath}/check-voucher?code=' + encodeURIComponent(code) + '&total=' + _totalMoney)
+                                .then(response => response.json())
+                                .then(data => {
+                                    const msgEl = document.getElementById('voucherMessage');
+                                    if (data.success) {
+                                        _discount = data.discount;
+                                        document.getElementById('appliedVoucherId').value = data.voucherId;
+                                        document.getElementById('discountValueDisplay').innerText = '-' + formatCurrency(_discount);
+                                        document.getElementById('finalTotalDisplay').innerText = formatCurrency(_totalMoney - _discount);
+                                        msgEl.innerText = data.message;
+                                        msgEl.className = 'small mt-1 text-success';
+                                    } else {
+                                        _discount = 0;
+                                        document.getElementById('appliedVoucherId').value = 0;
+                                        document.getElementById('discountValueDisplay').innerText = '-0 ₫';
+                                        document.getElementById('finalTotalDisplay').innerText = formatCurrency(_totalMoney);
+                                        msgEl.innerText = data.message;
+                                        msgEl.className = 'small mt-1 text-danger';
+                                    }
+                                });
+                        }
+
+                        function formatCurrency(n) {
+                            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n).replace('₫', '₫');
+                        }
+                    </script>
 
                     <!-- Bootstrap Bundle with Popper -->
                     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

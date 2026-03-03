@@ -78,6 +78,11 @@
                         </a>
 
                         <c:if test="${userRole eq 'admin'}">
+                            <a href="${pageContext.request.contextPath}/admin/vouchers"
+                                class="sidebar-item ${fn:contains(uri, 'voucher') ? 'active' : ''}">
+                                <i class="fas fa-ticket-alt"></i> <span>Quản lý mã giảm giá</span>
+                            </a>
+
                             <a href="${pageContext.request.contextPath}/admin/imports"
                                 class="sidebar-item ${fn:contains(uri, 'import') ? 'active' : ''}">
                                 <i class="fas fa-file-import"></i> <span style="font-size: 1em;">Quản lý nhập

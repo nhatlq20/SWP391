@@ -140,9 +140,9 @@ public class OrderDAO {
     }
 
     public boolean saveOrder(Order order) {
-        String sqlOrder = "INSERT INTO Orders (CustomerId, StaffId, OrderDate, ShippingName, ShippingPhone, ShippingAddress, Status, TotalAmount) "
+        String sqlOrder = "INSERT INTO Orders (CustomerId, StaffId, OrderDate, ShippingName, ShippingPhone, ShippingAddress, Status, TotalAmount, VoucherId, DiscountAmount) "
                 +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlItem = "INSERT INTO OrderItems (OrderId, MedicineId, OrderQuantity, UnitPrice) VALUES (?, ?, ?, ?)";
 
         Connection conn = null;
@@ -163,6 +163,11 @@ public class OrderDAO {
                 ps.setString(6, order.getShippingAddress());
                 ps.setString(7, order.getStatus());
                 ps.setDouble(8, order.getTotalAmount());
+                if (order.getVoucherId() > 0)
+                    ps.setInt(9, order.getVoucherId());
+                else
+                    ps.setNull(9, Types.INTEGER);
+                ps.setDouble(10, order.getDiscountAmount());
 
                 int affectedRows = ps.executeUpdate();
                 if (affectedRows == 0) {
@@ -230,6 +235,10 @@ public class OrderDAO {
         order.setShippingAddress(rs.getString("ShippingAddress"));
         order.setStatus(rs.getString("Status"));
         order.setTotalAmount(rs.getDouble("TotalAmount"));
+
+        // Map Voucher info
+        order.setVoucherId(rs.getInt("VoucherId"));
+        order.setDiscountAmount(rs.getDouble("DiscountAmount"));
 
         // Map Staff info if available
         int staffId = rs.getInt("StaffId");
