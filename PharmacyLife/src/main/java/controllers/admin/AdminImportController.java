@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import dao.ImportDAO;
+import dao.MedicineDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import models.Medicine;
 public class AdminImportController extends HttpServlet {
 
     private ImportDAO importDAO;
+    private MedicineDAO medicineDAO;
 
     private boolean isAdmin(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -50,6 +52,7 @@ public class AdminImportController extends HttpServlet {
     @Override
     public void init() throws ServletException {
         importDAO = new ImportDAO();
+        medicineDAO = new MedicineDAO();
     }
 
     // Kiểm tra quyền admin
@@ -112,6 +115,8 @@ public class AdminImportController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        request.setCharacterEncoding("UTF-8");
 
         if (!checkAdminPermission(request, response)) {
             return;
@@ -360,6 +365,16 @@ public class AdminImportController extends HttpServlet {
                     importDAO.updateImport(imp);
                 }
 
+                if ("Đã duyệt".equals(status)) {
+                    List<ImportDetail> detailsToSync = importDAO.getImportDetails(newImportId);
+                    if (detailsToSync != null) {
+                        for (ImportDetail detail : detailsToSync) {
+                            medicineDAO.addQuantityAndSetOriginalPrice(detail.getMedicineId(), detail.getQuantity(),
+                                    detail.getUnitPrice());
+                        }
+                    }
+                }
+
                 response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
             } else {
                 request.setAttribute("error", "Không thể tạo phiếu nhập");
@@ -383,6 +398,7 @@ public class AdminImportController extends HttpServlet {
             }
 
             Import imp = importDAO.getImportById(importId);
+            String oldStatus = imp != null ? imp.getStatus() : null;
             if (imp == null) {
                 request.setAttribute("error", "Không tìm thấy phiếu nhập");
                 listImports(request, response);
@@ -479,6 +495,15 @@ public class AdminImportController extends HttpServlet {
             }
 
             if (importDAO.updateImport(imp)) {
+                if (!"Đã duyệt".equals(oldStatus) && "Đã duyệt".equals(imp.getStatus())) {
+                    List<ImportDetail> detailsToSync = importDAO.getImportDetails(importId);
+                    if (detailsToSync != null) {
+                        for (ImportDetail detail : detailsToSync) {
+                            medicineDAO.addQuantityAndSetOriginalPrice(detail.getMedicineId(), detail.getQuantity(),
+                                    detail.getUnitPrice());
+                        }
+                    }
+                }
                 response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
             } else {
                 request.setAttribute("error", "Không thể cập nhật phiếu nhập");
@@ -561,7 +586,8 @@ public class AdminImportController extends HttpServlet {
                 List<ImportDetail> details = importDAO.getImportDetails(importId);
                 if (details != null && details.size() <= 1) {
                     // Cannot delete if it's the last item
-                    request.setAttribute("error", "Phiếu nhập phải có ít nhất 1 loại thuốc. Không thể xóa chi tiết cuối cùng.");
+                    request.setAttribute("error",
+                            "Phiếu nhập phải có ít nhất 1 loại thuốc. Không thể xóa chi tiết cuối cùng.");
                     showEditForm(request, response);
                     return;
                 } else if (details == null) {
