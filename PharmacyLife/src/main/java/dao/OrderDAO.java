@@ -6,6 +6,7 @@ import java.util.List;
 import models.Order;
 import models.OrderItem;
 import models.Medicine;
+import models.Staff;
 import utils.DBContext;
 
 public class OrderDAO {
@@ -13,7 +14,9 @@ public class OrderDAO {
 
     public List<Order> getAllOrders() {
         List<Order> orders = new ArrayList<>();
-        String sql = "SELECT * FROM Orders ORDER BY OrderId ASC";
+        String sql = "SELECT o.*, s.StaffName FROM Orders o " +
+                "LEFT JOIN Staff s ON o.StaffId = s.StaffId " +
+                "ORDER BY o.OrderId ASC";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
@@ -46,7 +49,9 @@ public class OrderDAO {
     }
 
     public Order getOrderById(int orderId) {
-        String sql = "SELECT * FROM Orders WHERE OrderId = ?";
+        String sql = "SELECT o.*, s.StaffName FROM Orders o " +
+                "LEFT JOIN Staff s ON o.StaffId = s.StaffId " +
+                "WHERE o.OrderId = ?";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, orderId);
@@ -96,19 +101,21 @@ public class OrderDAO {
         return items;
     }
 
-    public boolean updateStatus(int orderId, String status) {
-        String sql = "UPDATE Orders SET Status = ? WHERE OrderId = ?";
+    public boolean updateStatus(int orderId, String status, int staffId) {
+        String sql = "UPDATE Orders SET Status = ?, StaffId = ? WHERE OrderId = ?";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status);
-            ps.setInt(2, orderId);
+            ps.setInt(2, staffId);
+            ps.setInt(3, orderId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
     }
-// xử lí dao để coi trạng thái
+
+    // xử lí dao để coi trạng thái
     public boolean hasCustomerPurchasedMedicine(int customerId, int medicineId) {
         String sql = "SELECT TOP 1 1 "
                 + "FROM Orders o "
@@ -223,6 +230,22 @@ public class OrderDAO {
         order.setShippingAddress(rs.getString("ShippingAddress"));
         order.setStatus(rs.getString("Status"));
         order.setTotalAmount(rs.getDouble("TotalAmount"));
+
+        // Map Staff info if available
+        int staffId = rs.getInt("StaffId");
+        if (!rs.wasNull()) {
+            Staff staff = new Staff();
+            staff.setStaffId(staffId);
+            try {
+                // We check if StaffName was included in the result set
+                String staffName = rs.getString("StaffName");
+                staff.setStaffName(staffName);
+            } catch (SQLException e) {
+                // StaffName might not be in all queries
+            }
+            order.setStaff(staff);
+        }
+
         return order;
     }
 }

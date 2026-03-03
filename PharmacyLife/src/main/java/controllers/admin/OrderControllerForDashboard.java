@@ -76,11 +76,16 @@ public class OrderControllerForDashboard extends HttpServlet {
         if (idParam != null && status != null) {
             try {
                 int orderId = Integer.parseInt(idParam);
-                boolean success = orderDAO.updateStatus(orderId, status);
+                HttpSession session = request.getSession();
+                Integer staffId = (Integer) session.getAttribute("userId");
+
+                if (staffId == null)
+                    staffId = 0; // Fallback or handle error
+
+                boolean success = orderDAO.updateStatus(orderId, status, staffId);
 
                 if (success) {
                     // Add success message
-                    HttpSession session = request.getSession();
                     session.setAttribute("message", "Cập nhật trạng thái đơn hàng #" + orderId + " thành công!");
                     session.setAttribute("messageType", "success");
 

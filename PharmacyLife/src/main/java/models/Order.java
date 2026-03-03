@@ -15,6 +15,7 @@ public class Order {
     private double totalAmount;
 
     private List<OrderItem> items;
+    private Staff staff;
 
     public Order() {
     }
@@ -110,5 +111,13 @@ public class Order {
 
     public void setItems(List<OrderItem> items) {
         this.items = items;
+    }
+
+    public Staff getStaff() {
+        return staff;
+    }
+
+    public void setStaff(Staff staff) {
+        this.staff = staff;
     }
 }
