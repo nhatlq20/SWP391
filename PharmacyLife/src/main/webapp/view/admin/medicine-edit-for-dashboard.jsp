@@ -53,20 +53,11 @@
                                         <label class="form-label">Ảnh</label>
                                         <input name="imageUrl" class="form-control" value="${medicine.imageUrl}">
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Số lượng</label>
-                                        <input name="remainingQuantity" type="number" min="0" class="form-control"
-                                            value="${medicine.remainingQuantity}">
-                                    </div>
+
                                     <div class="col-md-12">
                                         <label class="form-label">Tên thuốc</label>
                                         <input name="medicineName" class="form-control" value="${medicine.medicineName}"
                                             required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Giá bán (đ)</label>
-                                        <input name="sellingPrice" type="number" step="0.01" min="0"
-                                            class="form-control" value="${medicine.sellingPrice}">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Thương hiệu / xuất xứ</label>
@@ -90,7 +81,8 @@
                                     <div class="col-md-6">
                                         <label class="form-label">Giá gốc (đ)</label>
                                         <input name="originalPrice" type="number" step="0.01" min="0"
-                                            class="form-control" value="${medicine.originalPrice}">
+                                            class="form-control" value="${medicine.originalPrice}" readonly
+                                            style="background-color:#e9ecef; cursor:not-allowed;">
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label">Mô tả</label>
