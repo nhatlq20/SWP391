@@ -49,12 +49,8 @@
                                     <label class="form-label">Ảnh</label>
                                     <input name="imageUrl" class="form-control" placeholder="Nhập đường dẫn ảnh">
                                 </div>
+
                                 <div class="col-md-6">
-                                    <label class="form-label">Số lượng</label>
-                                    <input name="remainingQuantity" type="number" min="0" max="1000"
-                                        class="form-control" placeholder="Nhập số lượng (tối đa 1000)" value="0">
-                                </div>
-                                <div class="col-md-12">
                                     <label class="form-label">Tên thuốc</label>
                                     <input name="medicineName" class="form-control" placeholder="Nhập tên thuốc"
                                         required>
@@ -80,11 +76,6 @@
                                         <option value="Lọ">Lọ</option>
                                         <option value="Viên">Viên</option>
                                     </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Giá gốc (đ)</label>
-                                    <input name="originalPrice" type="number" step="0.01" min="0" class="form-control"
-                                        placeholder="Nhập giá gốc">
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label">Mô tả</label>

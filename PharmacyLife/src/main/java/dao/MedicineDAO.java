@@ -306,6 +306,24 @@ public class MedicineDAO {
         }
     }
 
+    public boolean addQuantityAndSetOriginalPrice(int medicineId, int quantityToAdd, double newOriginalPrice) {
+        String sql = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity + ?, OriginalPrice = ? WHERE MedicineId = ?";
+
+        try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, quantityToAdd);
+            ps.setDouble(2, newOriginalPrice);
+            ps.setInt(3, medicineId);
+
+            int result = ps.executeUpdate();
+            return result > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean medicineExists(int medicineId) {
         String sql = "SELECT COUNT(*) FROM Medicine WHERE MedicineId = ?";
 
@@ -414,5 +432,19 @@ public class MedicineDAO {
         }
 
         return sb.toString();
-    }
-}
+    }}
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
