@@ -112,34 +112,21 @@ public class StaffDAO {
 
     // Helper: Generate next staff code based on actual database identity value (ST001, ST002, etc)
     public String generateNextStaffCode() {
-        long nextId = 0;
+        int nextId = 1;
 
-        // Try querying the system catalogs for the actual next identity value (SQL Server specific)
-        String sysSql = "SELECT CASE WHEN last_value IS NULL THEN seed_value ELSE (CAST(last_value AS BIGINT) + CAST(increment_value AS BIGINT)) END AS next_id "
-                      + "FROM sys.identity_columns WHERE object_id = OBJECT_ID('Staff')";
-
+        // Query the maximum StaffId to determine the next numeric part
+        String sqlMax = "SELECT MAX(StaffId) FROM Staff";
         try (Connection conn = new DBContext().getConnection();
-                PreparedStatement ps = conn.prepareStatement(sysSql);
-                ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = conn.prepareStatement(sqlMax);
+             ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                nextId = rs.getLong("next_id");
+                int maxId = rs.getInt(1);
+                if (maxId > 0) {
+                    nextId = maxId + 1;
+                }
             }
         } catch (Exception e) {
-            System.out.println("Error querying sys.identity_columns for staff: " + e.getMessage());
-        }
-
-        // Fallback: use MAX(StaffId) if sys query fails or returns nothing
-        if (nextId <= 0) {
-            String sqlMax = "SELECT MAX(StaffId) FROM Staff";
-            try (Connection conn = new DBContext().getConnection();
-                    PreparedStatement ps = conn.prepareStatement(sqlMax);
-                    ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    nextId = rs.getLong(1) + 1;
-                }
-            } catch (Exception e) {
-                nextId = 1;
-            }
+            System.out.println("Error querying MAX(StaffId) for staff: " + e.getMessage());
         }
 
         // Format as ST001, ST002... if less than 1000, else just ST + number
@@ -157,8 +144,8 @@ public class StaffDAO {
         s.setStaffCode(staffCode);
         
         // Insert including StaffPassword (keep column order aligned with database)
-        String sql = "INSERT INTO Staff (StaffCode, StaffName, StaffEmail, StaffPassword, StaffPhone, StaffAddress, StaffDob, StaffGender, RoleId, StaffIsActive) " +
-             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Staff (StaffCode, StaffName, StaffEmail, StaffPassword, StaffPhone, StaffAddress, StaffDob, StaffGender, RoleId, StaffIsActive, StaffCreatedAt) " +
+             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = new DBContext().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -183,6 +170,7 @@ public class StaffDAO {
             ps.setString(8, s.getStaffGender() != null ? s.getStaffGender() : "Khác");  // StaffGender
             ps.setInt(9, s.getRoleId());
             ps.setBoolean(10, true);  // StaffIsActive
+            ps.setTimestamp(11, new java.sql.Timestamp(System.currentTimeMillis())); // StaffCreatedAt
             
             int result = ps.executeUpdate();
             System.out.println("Result: " + result + " row inserted");

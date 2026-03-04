@@ -21,7 +21,7 @@ public class UserDAO {
                 + "FROM Customer "
                 + "WHERE (CustomerCode = ? OR Email = ?) AND Password = ? AND IsActive = 1";
         
-        final String sqlStaff = "SELECT s.StaffId as UserID, s.StaffCode as Username, s.StaffEmail as Email, s.StaffPassword as Password, s.StaffName as FullName, s.StaffPhone as PhoneNumber, s.StaffIsActive as IsActive, s.StaffCreatedAt as CreatedAt, s.StaffUpdateAt as UpdatedAt, r.RoleName "
+        final String sqlStaff = "SELECT s.StaffId as UserID, s.StaffCode as Username, s.StaffEmail as Email, s.StaffPassword as Password, s.StaffName as FullName, s.StaffPhone as PhoneNumber, s.StaffIsActive as IsActive, s.StaffCreatedAt as CreatedAt, NULL as UpdatedAt, r.RoleName "
                 + "FROM Staff s JOIN Role r ON s.RoleId = r.RoleId "
                 + "WHERE (s.StaffCode = ? OR s.StaffEmail = ?) AND s.StaffPassword = ? AND s.StaffIsActive = 1";
 
@@ -55,7 +55,7 @@ public class UserDAO {
                 + "SELECT CustomerId as UserID, CustomerCode as Username, Email, Password, FullName, PhoneNumber, IsActive, CreatedAt, NULL as UpdatedAt, 'Customer' as RoleName "
                 + "FROM Customer WHERE IsActive = 1 "
                 + "UNION ALL "
-                + "SELECT s.StaffId as UserID, s.StaffCode as Username, s.StaffEmail as Email, s.StaffPassword as Password, s.StaffName as FullName, s.StaffPhone as PhoneNumber, s.StaffIsActive as IsActive, s.StaffCreatedAt as CreatedAt, s.StaffUpdateAt as UpdatedAt, r.RoleName "
+                + "SELECT s.StaffId as UserID, s.StaffCode as Username, s.StaffEmail as Email, s.StaffPassword as Password, s.StaffName as FullName, s.StaffPhone as PhoneNumber, s.StaffIsActive as IsActive, s.StaffCreatedAt as CreatedAt, NULL as UpdatedAt, r.RoleName "
                 + "FROM Staff s JOIN Role r ON s.RoleId = r.RoleId WHERE s.StaffIsActive = 1"
                 + ") as CombinedUsers";
         List<User> users = new ArrayList<>();
@@ -76,7 +76,7 @@ public class UserDAO {
                 + "WHERE IsActive = 1 AND (Email = ? OR CustomerCode = ?)";
         
         // Query Staff table
-        final String sqlStaff = "SELECT s.StaffId as UserID, s.StaffCode as Username, s.StaffEmail as Email, s.StaffPassword as Password, s.StaffName as FullName, s.StaffPhone as PhoneNumber, s.StaffIsActive as IsActive, s.StaffCreatedAt as CreatedAt, s.StaffUpdateAt as UpdatedAt, r.RoleName "
+        final String sqlStaff = "SELECT s.StaffId as UserID, s.StaffCode as Username, s.StaffEmail as Email, s.StaffPassword as Password, s.StaffName as FullName, s.StaffPhone as PhoneNumber, s.StaffIsActive as IsActive, s.StaffCreatedAt as CreatedAt, NULL as UpdatedAt, r.RoleName "
                 + "FROM Staff s JOIN Role r ON s.RoleId = r.RoleId "
                 + "WHERE s.StaffIsActive = 1 AND (s.StaffEmail = ? OR s.StaffCode = ?)";
 
@@ -111,13 +111,16 @@ public class UserDAO {
     public User findByEmail(String email) {
         final String sqlCustomer = "SELECT CustomerId as UserID, CustomerCode as Username, Email, Password, FullName, PhoneNumber, IsActive, CreatedAt, NULL as UpdatedAt, 'Customer' as RoleName "
                 + "FROM Customer "
-                + "WHERE IsActive = 1 AND Email = ?";
+                + "WHERE Email = ?";
 
-        final String sqlStaff = "SELECT s.StaffId as UserID, s.StaffCode as Username, s.StaffEmail as Email, s.StaffPassword as Password, s.StaffName as FullName, s.StaffPhone as PhoneNumber, s.StaffIsActive as IsActive, s.StaffCreatedAt as CreatedAt, s.StaffUpdateAt as UpdatedAt, r.RoleName "
+        final String sqlStaff = "SELECT s.StaffId as UserID, s.StaffCode as Username, s.StaffEmail as Email, s.StaffPassword as Password, s.StaffName as FullName, s.StaffPhone as PhoneNumber, s.StaffIsActive as IsActive, s.StaffCreatedAt as CreatedAt, NULL as UpdatedAt, r.RoleName "
                 + "FROM Staff s JOIN Role r ON s.RoleId = r.RoleId "
-                + "WHERE s.StaffIsActive = 1 AND s.StaffEmail = ?";
+                + "WHERE s.StaffEmail = ?";
 
         try (Connection conn = dbContext.getConnection()) {
+            if (conn == null) {
+                throw new RuntimeException("Could not establish connection to database (Connection is NULL)");
+            }
             try (PreparedStatement ps = conn.prepareStatement(sqlCustomer)) {
                 ps.setString(1, email);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -136,7 +139,13 @@ public class UserDAO {
                 }
             }
         } catch (SQLException ex) {
-            throw new RuntimeException("Failed to find user by email", ex);
+            System.out.println("SQL ERROR in findByEmail: " + ex.getMessage());
+            ex.printStackTrace();
+            throw new RuntimeException("SQL Error: " + ex.getMessage(), ex);
+        } catch (Exception ex) {
+            System.out.println("GENERAL ERROR in findByEmail: " + ex.getMessage());
+            ex.printStackTrace();
+            throw new RuntimeException("General Error: " + ex.getMessage(), ex);
         }
 
         return null;
@@ -163,38 +172,48 @@ public class UserDAO {
     }
 
     private User mapRowToUser(ResultSet rs) throws SQLException {
-        int userId = rs.getInt("UserID");
-        String username = rs.getString("Username");
-        String email = rs.getString("Email");
-        String password = rs.getString("Password");
-        String fullName = rs.getString("FullName");
-        String phoneNumber = rs.getString("PhoneNumber");
-        boolean isActiveBool = rs.getBoolean("IsActive");
-        Timestamp createdAtTs = rs.getTimestamp("CreatedAt");
-        Timestamp updatedAtTs = rs.getTimestamp("UpdatedAt");
+        try {
+            int userId = rs.getInt("UserID");
+            String username = rs.getString("Username");
+            String email = rs.getString("Email");
+            String password = rs.getString("Password");
+            String fullName = rs.getString("FullName");
+            String phoneNumber = rs.getString("PhoneNumber");
+            boolean isActiveBool = rs.getBoolean("IsActive");
+            Timestamp createdAtTs = rs.getTimestamp("CreatedAt");
+            
+            // Check if UpdatedAt exists in current resultset
+            Timestamp updatedAtTs = null;
+            try {
+                updatedAtTs = rs.getTimestamp("UpdatedAt");
+            } catch (SQLException ignored) {}
 
-        String roleName = rs.getString("RoleName");
+            String roleName = rs.getString("RoleName");
 
-        LocalDate createdAt = createdAtTs != null ? createdAtTs.toLocalDateTime().toLocalDate() : null;
-        LocalDate updatedAt = updatedAtTs != null ? updatedAtTs.toLocalDateTime().toLocalDate() : null;
+            LocalDate createdAt = createdAtTs != null ? createdAtTs.toLocalDateTime().toLocalDate() : null;
+            LocalDate updatedAt = updatedAtTs != null ? updatedAtTs.toLocalDateTime().toLocalDate() : null;
 
-        User u = new User();
-        u.setUserID(userId);
-        u.setUsername(username);
-        u.setEmail(email);
-        u.setPassword(password);
-        u.setFullName(fullName);
-        u.setPhoneNumber(phoneNumber);
-        u.setIsActive(isActiveBool);
-        u.setCreatedAt(createdAt);
-        u.setUpdatedAt(updatedAt);
+            User u = new User();
+            u.setUserID(userId);
+            u.setUsername(username);
+            u.setEmail(email);
+            u.setPassword(password);
+            u.setFullName(fullName);
+            u.setPhoneNumber(phoneNumber);
+            u.setIsActive(isActiveBool);
+            u.setCreatedAt(createdAt);
+            u.setUpdatedAt(updatedAt);
 
-        if (roleName != null) {
-            List<String> roles = new ArrayList<>();
-            roles.add(roleName);
-            u.setRoles(roles);
+            if (roleName != null) {
+                List<String> roles = new ArrayList<>();
+                roles.add(roleName);
+                u.setRoles(roles);
+            }
+            return u;
+        } catch (SQLException e) {
+            System.out.println("ERROR mapping result set to User: " + e.getMessage());
+            throw e;
         }
-        return u;
     }
 
     public boolean updatePassword(int userId, String newPassword) {
