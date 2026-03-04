@@ -1,3 +1,4 @@
+
 package dao;
 
 import models.Review;
@@ -434,6 +435,23 @@ public class ReviewDAO {
 
     public List<Review> getAllReview() {
         return getAllReviews();
+    }
+        // Kiểm tra khách hàng đã đánh giá sản phẩm này chưa
+    public boolean hasCustomerReviewedMedicine(int customerId, int medicineId) {
+        String sql = "SELECT COUNT(*) FROM Reviews WHERE CustomerId = ? AND MedicineId = ?";
+        try (Connection conn = dbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.setInt(2, medicineId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private Review mapResultSetToReview(ResultSet rs) throws SQLException {
