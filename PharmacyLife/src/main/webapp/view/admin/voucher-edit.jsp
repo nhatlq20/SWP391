@@ -133,6 +133,22 @@
                 </span>
 
                 <script>
+                    function validateDates() {
+                        var startDateValue = document.getElementById('startDate').value;
+                        var endDateValue = document.getElementById('endDate').value;
+                        var endDateInput = document.getElementById('endDate');
+
+                        if (startDateValue && endDateValue) {
+                            var startDate = new Date(startDateValue);
+                            var endDate = new Date(endDateValue);
+                            if (endDate <= startDate) {
+                                endDateInput.setCustomValidity('Ngày kết thúc phải muộn hơn ngày bắt đầu');
+                            } else {
+                                endDateInput.setCustomValidity('');
+                            }
+                        }
+                    }
+
                     function toggleMaxAmt() {
                         var type = document.getElementById('discountType').value;
                         var container = document.getElementById('maxDiscountContainer');
@@ -148,9 +164,14 @@
                     }
 
                     window.onload = function () {
-                        document.getElementById('startDate').value = document.getElementById('startDateServer').innerText;
-                        document.getElementById('endDate').value = document.getElementById('endDateServer').innerText;
+                        document.getElementById('startDate').value = document.getElementById('startDateServer').innerText.trim();
+                        document.getElementById('endDate').value = document.getElementById('endDateServer').innerText.trim();
+
+                        document.getElementById('startDate').addEventListener('change', validateDates);
+                        document.getElementById('endDate').addEventListener('change', validateDates);
+
                         toggleMaxAmt();
+                        validateDates(); // Initial load check
                     };
                 </script>
             </body>
