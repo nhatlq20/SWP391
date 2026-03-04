@@ -22,13 +22,27 @@
                 <i class="fas fa-user-circle"></i>
                 Thông tin cá nhân
             </h1>
-            <div class="profile-card">
+                <div class="profile-card">
                 <!-- Success Message -->
+                <c:set var="displayedSuccess" value="false" />
                 <c:if test="${not empty successMessage}">
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i>
-                    <span>${successMessage}</span>
-                </div>
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        <span>${successMessage}</span>
+                    </div>
+                    <c:set var="displayedSuccess" value="true" />
+                </c:if>
+
+                <!-- Session Success Message (only if not already displayed) -->
+                <c:if test="${not empty sessionScope.successMessage && !displayedSuccess}">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        <span>${sessionScope.successMessage}</span>
+                    </div>
+                    <c:remove var="successMessage" scope="session" />
+                </c:if>
+                <c:if test="${not empty sessionScope.successMessage && displayedSuccess}">
+                    <c:remove var="successMessage" scope="session" />
                 </c:if>
 
                 <!-- Error Message -->
@@ -125,7 +139,7 @@
                         </button>
                         
                         <c:if test="${user.roleID == 0}">
-                            <button type="button" class="btn btn-warning" onclick="window.location.href='${pageContext.request.contextPath}/change-email'">
+                            <button type="button" class="btn btn-warning" onclick="window.location.href='${pageContext.request.contextPath}/change-email'" style="background-color: #4F81E1; border-color: #4F81E1;">
                                 <img src="${pageContext.request.contextPath}/assets/img/email.png" alt="Change Email">
                                 Thay đổi Email
                             </button>

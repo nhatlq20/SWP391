@@ -251,6 +251,23 @@ public class UserDAO {
         }
     }
 
+    public boolean updateEmail(int userId, String role, String newEmail) {
+        String sql;
+        if ("Customer".equalsIgnoreCase(role)) {
+            sql = "UPDATE Customer SET Email = ? WHERE CustomerId = ?";
+        } else {
+            sql = "UPDATE Staff SET StaffEmail = ? WHERE StaffId = ?";
+        }
+
+        try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newEmail);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            throw new RuntimeException("Failed to update email", ex);
+        }
+    }
+
     // Lấy danh sách khách hàng (role = customer)
     public List<User> getAllCustomers() {
         final String sql = "SELECT CustomerId as UserID, CustomerCode as Username, Email, Password, FullName, PhoneNumber, IsActive, CreatedAt, NULL as UpdatedAt, 'Customer' as RoleName "
