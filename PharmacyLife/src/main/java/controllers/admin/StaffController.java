@@ -243,9 +243,9 @@ public class StaffController extends HttpServlet {
                     }
                     System.out.println("===  END ===\n");
                 } catch (Exception e) {
-                    System.out.println("ERROR: " + e.getMessage());
+                    System.out.println("ERROR adding staff: " + e.getMessage());
                     e.printStackTrace();
-                    forwardAddWithError(request, response, "Có lỗi xảy ra! Vui lòng thử lại.",
+                    forwardAddWithError(request, response, "Có lỗi xảy ra: " + e.getMessage(),
                             normalizeName(request.getParameter("staffName")),
                             normalizeEmail(request.getParameter("staffEmail")));
                 }
