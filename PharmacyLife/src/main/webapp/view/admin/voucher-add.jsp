@@ -55,12 +55,9 @@
                                         maxlength="20">
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="discountType" class="form-label">Loại giảm giá</label>
-                                    <select class="form-select" id="discountType" name="discountType" required
-                                        onchange="toggleMaxAmt()">
-                                        <option value="Percent">Phần trăm (%)</option>
-                                        <option value="Fixed">Số tiền cố định (VND)</option>
-                                    </select>
+                                    <label for="quantity" class="form-label">Tổng số lượng phát hành</label>
+                                    <input type="number" class="form-control" id="quantity" name="quantity" required
+                                        min="1">
                                 </div>
 
                                 <div class="col-12">
@@ -69,17 +66,25 @@
                                         maxlength="255"></textarea>
                                 </div>
 
-                                <div class="col-md-4">
+                                <div class="col-md-3">
+                                    <label for="discountType" class="form-label">Loại giảm giá</label>
+                                    <select class="form-select" id="discountType" name="discountType" required
+                                        onchange="toggleMaxAmt()">
+                                        <option value="Percent">Phần trăm (%)</option>
+                                        <option value="Fixed">Số tiền cố định (VND)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
                                     <label for="discountValue" class="form-label">Giá trị giảm</label>
                                     <input type="number" step="0.01" class="form-control" id="discountValue"
                                         name="discountValue" required>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label for="minOrderValue" class="form-label">Đơn tối thiểu (VND)</label>
                                     <input type="number" step="0.01" class="form-control" id="minOrderValue"
                                         name="minOrderValue" value="0">
                                 </div>
-                                <div class="col-md-4" id="maxDiscountContainer">
+                                <div class="col-md-3" id="maxDiscountContainer">
                                     <label for="maxDiscountAmount" class="form-label">Giảm tối đa (VND)</label>
                                     <input type="number" step="0.01" class="form-control" id="maxDiscountAmount"
                                         name="maxDiscountAmount">
@@ -96,11 +101,6 @@
                                         required>
                                 </div>
 
-                                <div class="col-md-6">
-                                    <label for="quantity" class="form-label">Tổng số lượng phát hành</label>
-                                    <input type="number" class="form-control" id="quantity" name="quantity" required
-                                        min="1">
-                                </div>
                                 <div class="col-md-6 d-flex align-items-center mt-auto">
                                     <div class="form-check form-switch ms-3">
                                         <input class="form-check-input" type="checkbox" id="isActive" name="isActive"
@@ -110,7 +110,7 @@
                                 </div>
 
                                 <div class="col-12 mt-4">
-                                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold">TẠO
+                                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold" id="submitBtn">TẠO
                                         VOUCHER</button>
                                 </div>
                             </div>
@@ -119,6 +119,18 @@
                 </div>
 
                 <script>
+                    function validateDates() {
+                        var startDate = new Date(document.getElementById('startDate').value);
+                        var endDate = new Date(document.getElementById('endDate').value);
+                        var endDateInput = document.getElementById('endDate');
+
+                        if (endDate <= startDate) {
+                            endDateInput.setCustomValidity('Ngày kết thúc phải muộn hơn ngày bắt đầu');
+                        } else {
+                            endDateInput.setCustomValidity('');
+                        }
+                    }
+
                     function toggleMaxAmt() {
                         var type = document.getElementById('discountType').value;
                         var container = document.getElementById('maxDiscountContainer');
@@ -136,13 +148,21 @@
                     // Cài đặt ngày mặc định
                     window.onload = function () {
                         var now = new Date();
-                        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                        document.getElementById('startDate').value = now.toISOString().slice(0, 16);
+                        // Format current time to local ISO string
+                        var tzoffset = (new Date()).getTimezoneOffset() * 60000;
+                        var localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, 16);
 
-                        var nextMonth = new Date();
-                        nextMonth.setMonth(nextMonth.getMonth() + 1);
-                        nextMonth.setMinutes(nextMonth.getMinutes() - nextMonth.getTimezoneOffset());
-                        document.getElementById('endDate').value = nextMonth.toISOString().slice(0, 16);
+                        document.getElementById('startDate').value = localISOTime;
+                        document.getElementById('startDate').min = localISOTime;
+
+                        var nextMonth = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+                        var nextMonthISOTime = (new Date(nextMonth.getTime() - tzoffset)).toISOString().slice(0, 16);
+                        document.getElementById('endDate').value = nextMonthISOTime;
+
+                        document.getElementById('startDate').addEventListener('change', validateDates);
+                        document.getElementById('endDate').addEventListener('change', validateDates);
+
+                        validateDates(); // Initial check
                     };
                 </script>
             </body>
