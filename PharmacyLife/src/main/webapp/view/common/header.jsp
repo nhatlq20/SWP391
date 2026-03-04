@@ -317,7 +317,7 @@
                                         </c:choose>
                                     </div>
                                     <div class="cart-footer text-center p-2">
-                                        <a href="cart" class="btn btn-primary btn-sm px-3">Xem giỏ hàng</a>
+                                        <a href="${pageContext.request.contextPath}/cart" class="btn btn-primary btn-sm px-3">Xem giỏ hàng</a>
                                     </div>
                                 </div>
                             </div>

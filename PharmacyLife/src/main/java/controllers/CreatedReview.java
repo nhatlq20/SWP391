@@ -84,13 +84,19 @@ public class CreatedReview extends HttpServlet {
                 return;
             }
 
+            ReviewDAO dao = new ReviewDAO();
+            // Kiểm tra nếu đã đánh giá rồi thì không cho đánh giá nữa
+            if (dao.hasCustomerReviewedMedicine(customerId, medicineId)) {
+                response.sendRedirect(request.getContextPath() + "/medicine/detail?id=" + medicineId + "&reviewError=alreadyReviewed");
+                return;
+            }
+
             Review r = new Review();
             r.setCustomerId(customerId);
             r.setMedicineId(medicineId);
             r.setRating(rating);
             r.setComment(comment);
 
-            ReviewDAO dao = new ReviewDAO();
             dao.insertReview(r);
 
             // Quay về trang chi tiết sản phẩm để xem đánh giá vừa thêm

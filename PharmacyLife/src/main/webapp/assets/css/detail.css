@@ -141,7 +141,7 @@ body {
 }
 
 /* Quantity pill selector */
-.qty-pill {
+ qty-pill {
     display: inline-flex;
     align-items: stretch;
     border: 1.5px solid #d0d0d0;
@@ -152,7 +152,7 @@ body {
     width: fit-content;
 }
 
-.qty-btn {
+ qty-btn {
     flex: 0 0 auto;
     background: none;
     border: none;
@@ -166,11 +166,11 @@ body {
     transition: background 0.15s;
 }
 
-.qty-btn:hover {
+ qty-btn:hover {
     background: #f0f0f0;
 }
 
-.qty-input {
+ qty-input {
     flex: 0 0 42px;
     width: 42px;
     min-width: 0;
@@ -188,8 +188,8 @@ body {
     appearance: textfield;
 }
 
-.qty-input::-webkit-outer-spin-button,
-.qty-input::-webkit-inner-spin-button {
+ qty-input::-webkit-outer-spin-button,
+ qty-input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
@@ -835,15 +835,32 @@ body {
 
 .stats-left {
     display: flex;
-    gap: 20px;
+    gap: 32px;
+    justify-content: center;
 }
+.btn-danh-gia{
+    margin-left: 50px;
+    width: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
 
+}
+.btn-danh-gia a.btn,
+.btn-danh-gia button.btn {
+    width: 100%;
+ padding: 16px 18px;
+    font-size: 1.2rem;
+    font-weight: 600;
+        border-radius: 20px;
+        text-align: center;
+}
 .average-rating {
     text-align: center;
 }
 
 .rating-number {
-    font-size: 32px;
+    font-size: 38px;
     font-weight: 600;
     color: #FFD700;
 }
@@ -856,13 +873,17 @@ body {
 }
 
 .average-rating .rating-stars i {
-    font-size: 16px;
+    font-size: 26px;
 }
 
 .total-reviews {
     margin: 8px 0 0 0;
     color: #666;
-    font-size: 14px;
+    font-size: 19px;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Reviews List */

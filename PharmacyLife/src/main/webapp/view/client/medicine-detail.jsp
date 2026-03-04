@@ -61,11 +61,11 @@
 
                                         <!-- Review Section -->
                                         <div class="review-section">
-                                            <h3 class="review-title">Đánh giá sản phẩm</h3>
+                                        
 
-                                            <!-- Review Stats -->
+                                            <!-- Review Stats và nút đánh giá sản phẩm nằm cùng khung, căn trái -->
                                             <c:if test="${totalReviews > 0}">
-                                                <div class="review-stats">
+                                                <div class="review-stats position-relative" style="padding-bottom: 16px;">
                                                     <div class="stats-left">
                                                         <div class="average-rating">
                                                             <span class="rating-number">${averageRating}</span>
@@ -86,6 +86,24 @@
                                                             <p class="total-reviews">dựa trên
                                                                 <strong>${totalReviews}</strong> đánh giá
                                                             </p>
+                                                        </div>
+                                                        <!-- Nút đánh giá sản phẩm nằm dưới dòng chữ, căn trái -->
+                                                            <!-- Không hiện gì nếu không đủ điều kiện, KHÔNG để comment trong c:choose -->
+                                                        <div class="mt-3 text-end me-5 btn-danh-gia">
+                                                            <c:if test="${sessionScope.userType eq 'customer'}">
+                                                                <c:choose>
+                                                                    <c:when test="${canReview}" >
+                                                                        <a class="btn btn-primary py-3"  href="${pageContext.request.contextPath}/create-review?medicineId=${medicine.medicineId}">
+                                                                            <i class="fas fa-star py-3"></i> Gửi đánh giá
+                                                                        </a>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <button class="btn btn-primary " type="button" disabled>
+                                                                            <i class="fas fa-star"></i> Gửi đánh giá
+                                                                        </button>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </c:if>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -154,26 +172,18 @@
                                                                                                 value="${replyLine}" />
                                                                                         </c:otherwise>
                                                                                     </c:choose>
-                                                                                    <div class="thread-reply-wrap">
-                                                                                        <div class="thread-reply-line">
-                                                                                        </div>
+                                                                                    <div class="thread-reply-wrap custom-reply-style">
+                                                                                        <div class="thread-reply-line"></div>
                                                                                         <div class="thread-reply">
-                                                                                            <div
-                                                                                                class="thread-avatar staff-avatar">
-                                                                                                <c:out
-                                                                                                    value="${fn:toUpperCase(fn:substring(fn:trim(replyAuthorName), 0, 1))}" />
+                                                                                            <div class="thread-avatar staff-avatar reply-avatar">
+                                                                                                <c:out value="${fn:toUpperCase(fn:substring(fn:trim(replyAuthorName), 0, 1))}" />
                                                                                             </div>
-                                                                                            <div
-                                                                                                class="thread-reply-content">
-                                                                                                <div
-                                                                                                    class="reply-staff-name">
-                                                                                                    <c:out
-                                                                                                        value="${replyAuthorName}" />
+                                                                                            <div class="thread-reply-content">
+                                                                                                <div class="reply-staff-name reply-author">
+                                                                                                    <c:out value="${replyAuthorName}" />
                                                                                                 </div>
-                                                                                                <div
-                                                                                                    class="thread-reply-text">
-                                                                                                    <c:out
-                                                                                                        value="${replyBodyText}" />
+                                                                                                <div class="thread-reply-text reply-body">
+                                                                                                    <c:out value="${replyBodyText}" />
                                                                                                 </div>
                                                                                             </div>
                                                                                         </div>
@@ -271,34 +281,8 @@
                                             <button class="btn-buy btn btn-primary"
                                                 onclick="submitAddToCart()">Mua</button>
 
-                                            <c:choose>
-                                                <c:when test="${sessionScope.userType eq 'customer'}">
-                                                    <c:choose>
-                                                        <c:when test="${canReview}">
-                                                            <a class="btn-rate btn btn-outline-warning"
-                                                                href="${pageContext.request.contextPath}/create-review?medicineId=${medicine.medicineId}">
-                                                                <i class="fas fa-star"></i> Đánh giá sản phẩm
-                                                            </a>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <button class="btn-rate btn btn-outline-secondary"
-                                                                type="button" disabled>
-                                                                <i class="fas fa-star"></i> Chỉ đánh giá sau khi đã mua
-                                                            </button>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </c:when>
-                                                <c:when
-                                                    test="${sessionScope.userType eq 'staff' or sessionScope.userType eq 'admin'}">
-                                                    <%-- Staff và Admin không thấy nút add/rate --%>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <a class="btn-rate btn btn-outline-warning"
-                                                        href="${pageContext.request.contextPath}/login">
-                                                        <i class="fas fa-star"></i> Đánh giá sản phẩm
-                                                    </a>
-                                                </c:otherwise>
-                                            </c:choose>
+                                            <!-- Xóa nút đánh giá ở action-buttons cũ (nếu còn) -->
+
                                         </div>
 
                                         <c:if test="${param.reviewError eq 'notPurchased'}">
