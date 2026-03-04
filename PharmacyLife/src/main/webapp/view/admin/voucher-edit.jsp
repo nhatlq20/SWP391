@@ -56,6 +56,18 @@
                                         readonly>
                                 </div>
                                 <div class="col-md-6">
+                                    <label for="quantity" class="form-label">Tổng số lượng phát hành</label>
+                                    <input type="number" class="form-control" id="quantity" name="quantity"
+                                        value="${voucher.quantity}" required min="1">
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="description" class="form-label">Mô tả chi tiết</label>
+                                    <textarea class="form-control" id="description" name="description" rows="2"
+                                        maxlength="255">${voucher.description}</textarea>
+                                </div>
+
+                                <div class="col-md-3">
                                     <label for="discountType" class="form-label">Loại giảm giá</label>
                                     <select class="form-select" id="discountType" name="discountType" required
                                         onchange="toggleMaxAmt()">
@@ -65,24 +77,17 @@
                                             tiền cố định (VND)</option>
                                     </select>
                                 </div>
-
-                                <div class="col-12">
-                                    <label for="description" class="form-label">Mô tả chi tiết</label>
-                                    <textarea class="form-control" id="description" name="description" rows="2"
-                                        maxlength="255">${voucher.description}</textarea>
-                                </div>
-
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label for="discountValue" class="form-label">Giá trị giảm</label>
                                     <input type="number" step="0.01" class="form-control" id="discountValue"
                                         name="discountValue" value="${voucher.discountValue}" required>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label for="minOrderValue" class="form-label">Đơn tối thiểu (VND)</label>
                                     <input type="number" step="0.01" class="form-control" id="minOrderValue"
                                         name="minOrderValue" value="${voucher.minOrderValue}">
                                 </div>
-                                <div class="col-md-4" id="maxDiscountContainer">
+                                <div class="col-md-3" id="maxDiscountContainer">
                                     <label for="maxDiscountAmount" class="form-label">Giảm tối đa (VND)</label>
                                     <input type="number" step="0.01" class="form-control" id="maxDiscountAmount"
                                         name="maxDiscountAmount" value="${voucher.maxDiscountAmount}">
@@ -99,11 +104,6 @@
                                         required>
                                 </div>
 
-                                <div class="col-md-6">
-                                    <label for="quantity" class="form-label">Tổng số lượng phát hành</label>
-                                    <input type="number" class="form-control" id="quantity" name="quantity"
-                                        value="${voucher.quantity}" required min="1">
-                                </div>
                                 <div class="col-md-6 d-flex align-items-center mt-auto">
                                     <div class="form-check form-switch ms-3">
                                         <input class="form-check-input" type="checkbox" id="isActive" name="isActive"
@@ -114,7 +114,8 @@
 
                                 <div class="col-12 mt-4 text-center">
                                     <div class="text-muted small mb-3">Đã sử dụng:
-                                        <strong>${voucher.usedQuantity}</strong> mã.</div>
+                                        <strong>${voucher.usedQuantity}</strong> mã.
+                                    </div>
                                     <button type="submit" class="btn btn-primary w-100 py-3 fw-bold">CẬP NHẬT
                                         VOUCHER</button>
                                 </div>
