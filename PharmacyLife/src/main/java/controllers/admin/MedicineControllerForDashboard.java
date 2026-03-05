@@ -179,8 +179,11 @@ public class MedicineControllerForDashboard extends HttpServlet {
         try {
             Medicine medicine = new Medicine();
             int categoryId = Integer.parseInt(request.getParameter("categoryId"));
-            // Auto-generate medicine code based on category
-            medicine.setMedicineCode(medicineDAO.getNextMedicineCode(categoryId));
+            // Use the code already shown to user via AJAX; fallback to server-gen if empty
+            String submittedCode = request.getParameter("medicineCode");
+            medicine.setMedicineCode(submittedCode != null && !submittedCode.isEmpty()
+                    ? submittedCode
+                    : medicineDAO.getNextMedicineCode(categoryId));
             medicine.setMedicineName(request.getParameter("medicineName"));
             medicine.setCategoryId(categoryId);
             medicine.setImageUrl(request.getParameter("imageUrl"));
@@ -274,9 +277,10 @@ public class MedicineControllerForDashboard extends HttpServlet {
                     : 0);
 
             String quantityStr = request.getParameter("remainingQuantity");
-            medicine.setRemainingQuantity(quantityStr != null && !quantityStr.isEmpty()
-                    ? Integer.parseInt(quantityStr)
-                    : 0);
+            if (quantityStr != null && !quantityStr.isEmpty()) {
+                medicine.setRemainingQuantity(Integer.parseInt(quantityStr));
+            }
+            // else: keep the existing remainingQuantity loaded from DB above
 
             medicine.setBrandOrigin(request.getParameter("brandOrigin"));
             medicine.setShortDescription(request.getParameter("shortDescription"));

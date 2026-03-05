@@ -29,7 +29,7 @@ public class MedicineDAO {
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
                 + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY UnitId ASC) "
-                + "ORDER BY m.MedicineId ASC";
+                + "ORDER BY c.CategoryId ASC";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);

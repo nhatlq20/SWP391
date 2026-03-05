@@ -37,7 +37,7 @@
                                     <div class="col-md-6">
                                         <label class="form-label">Mã thuốc</label>
                                         <input name="medicineCode" class="form-control" value="${medicine.medicineCode}"
-                                            readonly>
+                                            required>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Danh mục</label>
@@ -80,8 +80,8 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Giá bán (đ)</label>
-                                        <input name="sellingPrice" type="number" step="0.01" min="0"
-                                            class="form-control" value="${medicine.sellingPrice}" required>
+                                        <input name="sellingPrice" type="number" step="1" min="1" class="form-control"
+                                            value="${medicine.sellingPrice}" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Giá gốc (đ)</label>

@@ -36,7 +36,6 @@
                                     <input id="medicineCodeInput" name="medicineCode" class="form-control"
                                         value="${nextMedicineCode}" readonly
                                         style="background-color:#e9ecef; cursor:not-allowed;">
-                                    <small class="text-muted">Tự động tạo theo danh mục</small>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Danh mục</label>
@@ -49,8 +48,9 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Ảnh</label>
-                                    <input name="imageUrl" class="form-control" placeholder="Nhập đường dẫn ảnh">
+                                    <label class="form-label">Ảnh <span class="text-danger">*</span></label>
+                                    <input name="imageUrl" class="form-control" placeholder="Nhập đường dẫn ảnh"
+                                        required>
                                 </div>
 
                                 <div class="col-md-6">
@@ -59,14 +59,15 @@
                                         required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Giá bán (đ)</label>
-                                    <input name="sellingPrice" type="number" step="0.01" min="0" class="form-control"
-                                        placeholder="Nhập giá thuốc">
+                                    <label class="form-label">Giá bán (đ) <span class="text-danger">*</span></label>
+                                    <input name="sellingPrice" type="number" step="1" min="1" class="form-control"
+                                        placeholder="Nhập giá thuốc" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Thương hiệu / xuất xứ</label>
+                                    <label class="form-label">Thương hiệu / xuất xứ <span
+                                            class="text-danger">*</span></label>
                                     <input name="brandOrigin" class="form-control"
-                                        placeholder="Nhập thương hiệu / xuất xứ">
+                                        placeholder="Nhập thương hiệu / xuất xứ" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Đơn vị</label>
