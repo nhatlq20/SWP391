@@ -479,20 +479,23 @@ body {
     background: #f6f8fc;
     border: 1px solid #e3e8f2;
     border-radius: 12px;
-    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
 }
 
 .thread-reply-header {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 6px;
+ flex-direction: column;
 }
 
 .reply-staff-name {
     font-size: 14px;
     font-weight: 700;
     color: #0f39c1;
+ 
 }
 
 .reply-role-tag {
@@ -501,14 +504,15 @@ body {
     color: #1d4ed8;
     background: #dbeafe;
     border-radius: 6px;
-    padding: 2px 6px;
+    /* padding: 2px 6px; */
 }
 
 .thread-reply-text {
     font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.4;
     color: #4a5168;
     white-space: pre-line;
+  
 }
 
 .thread-reply-list {
@@ -612,8 +616,17 @@ body {
 
 .review-text {
     color: #666;
-    font-size: 13px;
+    font-size: 50px;
     line-height: 1.6;
+}
+/* Hover effect for review button (btn-primary) */
+
+.btn.btn-primary:hover,
+.btn-primary:hover {
+    background: #2F5BB8;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(63, 111, 217, 0.18);
+    transform: translateY(-2px);
 }
 
 /* Responsive Design */
@@ -689,7 +702,7 @@ body {
 
     .review-comment,
     .thread-reply-text {
-        font-size: 13px;
+        font-size: 14px;
     }
 }
 
