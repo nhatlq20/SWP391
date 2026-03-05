@@ -33,12 +33,15 @@
                             <div class="row g-4">
                                 <div class="col-md-6">
                                     <label class="form-label">Mã thuốc</label>
-                                    <input name="medicineCode" class="form-control" value="${nextMedicineCode}" readonly
+                                    <input id="medicineCodeInput" name="medicineCode" class="form-control"
+                                        value="${nextMedicineCode}" readonly
                                         style="background-color:#e9ecef; cursor:not-allowed;">
+                                    <small class="text-muted">Tự động tạo theo danh mục</small>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Danh mục</label>
-                                    <select name="categoryId" class="form-select" required>
+                                    <select name="categoryId" id="categorySelect" class="form-select" required
+                                        onchange="fetchNextCode(this.value)">
                                         <option value="">Chọn danh mục của thuốc</option>
                                         <c:forEach var="cat" items="${categories}">
                                             <option value="${cat.categoryId}">${cat.categoryName}</option>
@@ -98,6 +101,19 @@
             </div>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script>
+                function fetchNextCode(categoryId) {
+                    var codeInput = document.getElementById('medicineCodeInput');
+                    if (!categoryId) {
+                        codeInput.value = 'MED001';
+                        return;
+                    }
+                    fetch('${pageContext.request.contextPath}/admin/medicine-next-code?categoryId=' + categoryId)
+                        .then(function (resp) { return resp.text(); })
+                        .then(function (code) { codeInput.value = code; })
+                        .catch(function () { codeInput.value = 'MED001'; });
+                }
+            </script>
         </body>
 
         </html>

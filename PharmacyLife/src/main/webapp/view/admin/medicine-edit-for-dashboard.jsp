@@ -79,6 +79,11 @@
                                         </select>
                                     </div>
                                     <div class="col-md-6">
+                                        <label class="form-label">Giá bán (đ)</label>
+                                        <input name="sellingPrice" type="number" step="0.01" min="0"
+                                            class="form-control" value="${medicine.sellingPrice}" required>
+                                    </div>
+                                    <div class="col-md-6">
                                         <label class="form-label">Giá gốc (đ)</label>
                                         <input name="originalPrice" type="number" step="0.01" min="0"
                                             class="form-control" value="${medicine.originalPrice}" readonly
