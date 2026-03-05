@@ -76,11 +76,13 @@ public class MedicineDetailController extends HttpServlet {
 
             Integer customerId = getLoggedInCustomerId(request);
             boolean canReview = false;
+            boolean hasReviewed = false;
             if (customerId != null && orderDAO.hasCustomerPurchasedMedicine(customerId, medicineId)) {
-                // Chỉ cho đánh giá nếu chưa từng đánh giá sản phẩm này
-                canReview = !reviewDAO.hasCustomerReviewedMedicine(customerId, medicineId);
+                hasReviewed = reviewDAO.hasCustomerReviewedMedicine(customerId, medicineId);
+                canReview = !hasReviewed;
             }
             request.setAttribute("canReview", canReview);
+            request.setAttribute("hasReviewed", hasReviewed);
             request.setAttribute("loggedCustomerId", customerId);
             
             request.getRequestDispatcher("/view/client/medicine-detail.jsp").forward(request, response);
