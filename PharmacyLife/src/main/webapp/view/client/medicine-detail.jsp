@@ -89,21 +89,33 @@
                                                         </div>
                                                         <!-- Nút đánh giá sản phẩm nằm dưới dòng chữ, căn trái -->
                                                             <!-- Không hiện gì nếu không đủ điều kiện, KHÔNG để comment trong c:choose -->
-                                                        <div class="mt-3 text-end me-5 btn-danh-gia">
-                                                            <c:if test="${sessionScope.userType eq 'customer'}">
-                                                                <c:choose>
-                                                                    <c:when test="${canReview}" >
-                                                                        <a class="btn btn-primary py-3"  href="${pageContext.request.contextPath}/create-review?medicineId=${medicine.medicineId}">
-                                                                            <i class="fas fa-star py-3"></i> Gửi đánh giá
-                                                                        </a>
-                                                                    </c:when>
-                                                                    <c:otherwise>
-                                                                        <button class="btn btn-primary " type="button" disabled>
-                                                                            <i class="fas fa-star"></i> Gửi đánh giá
-                                                                        </button>
-                                                                    </c:otherwise>
-                                                                </c:choose>
-                                                            </c:if>
+                                                        <div class="mt-3 text-end btn-danh-gia">
+                                                            <c:choose>
+                                                                <c:when test="${sessionScope.userType eq 'customer'}">
+                                                                    <c:choose>
+                                                                        <c:when test="${hasReviewed}">
+                                                                            <a class="btn btn-primary" href="#" onclick="showReviewedToast(); return false;">
+                                                                                <i class="fas fa-star"></i> Gửi đánh giá
+                                                                            </a>
+                                                                        </c:when>
+                                                                        <c:when test="${canReview}">
+                                                                            <a class="btn btn-primary" href="${pageContext.request.contextPath}/create-review?medicineId=${medicine.medicineId}">
+                                                                                <i class="fas fa-star"></i> Gửi đánh giá
+                                                                            </a>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <a class="btn btn-primary" href="#" onclick="showReviewToast(); return false;">
+                                                                                <i class="fas fa-star"></i> Gửi đánh giá
+                                                                            </a>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <a class="btn btn-primary" href="${pageContext.request.contextPath}/login">
+                                                                        <i class="fas fa-star"></i> Gửi đánh giá
+                                                                    </a>
+                                                                </c:otherwise>
+                                                            </c:choose>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -113,6 +125,47 @@
                                             <div class="reviews-list">
                                                 <c:choose>
                                                     <c:when test="${empty reviews}">
+                                                        <div class="review-stats position-relative" style="padding-bottom: 16px;">
+                                                            <div class="stats-left">
+                                                                <div class="average-rating">
+                                                                    <span class="rating-number">0</span>
+                                                                    <div class="rating-stars">
+                                                                        <c:forEach var="i" begin="1" end="5">
+                                                                            <i class="fas fa-star" style="color: #ddd;"></i>
+                                                                        </c:forEach>
+                                                                    </div>
+                                                                    <p class="total-reviews">dựa trên <strong>0</strong> đánh giá</p>
+                                                                </div>
+                                                                <div class="mt-3 text-end btn-danh-gia">
+                                                                    <c:choose>
+                                                                        <c:when test="${sessionScope.userType eq 'customer'}">
+                                                                            <c:choose>
+                                                                                <c:when test="${hasReviewed}">
+                                                                                    <a class="btn btn-primary" href="#" onclick="showReviewedToast(); return false;">
+                                                                                        <i class="fas fa-star"></i> Gửi đánh giá
+                                                                                    </a>
+                                                                                </c:when>
+                                                                                <c:when test="${canReview}">
+                                                                                    <a class="btn btn-primary" href="${pageContext.request.contextPath}/create-review?medicineId=${medicine.medicineId}">
+                                                                                        <i class="fas fa-star"></i> Gửi đánh giá
+                                                                                    </a>
+                                                                                </c:when>
+                                                                                <c:otherwise>
+                                                                                    <a class="btn btn-primary" href="#" onclick="showReviewToast(); return false;">
+                                                                                        <i class="fas fa-star"></i> Gửi đánh giá
+                                                                                    </a>
+                                                                                </c:otherwise>
+                                                                            </c:choose>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <a class="btn btn-primary" href="${pageContext.request.contextPath}/login">
+                                                                                <i class="fas fa-star"></i> Gửi đánh giá
+                                                                            </a>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                         <p class="no-reviews">Chưa có đánh giá nào cho sản phẩm này</p>
                                                     </c:when>
                                                     <c:otherwise>
@@ -244,7 +297,7 @@
                                                 style="max-width: 130px; overflow: hidden;">
                                                 <button type="button" class="btn btn-light px-3"
                                                     onclick="decreaseQty()">−</button>
-                                                <input type="number" id="quantity" value="1" min="1"
+                                                <input type="text" id="quantity" value="1" min="1"
                                                     class="form-control text-center border-0 shadow-none qty-input">
                                                 <button type="button" class="btn btn-light px-3"
                                                     onclick="increaseQty()">+</button>
@@ -296,7 +349,38 @@
 
                                 <script
                                     src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
+                                <!-- Toast đã đánh giá -->
+                                <div id="reviewed-toast" style="display:none;position:fixed;z-index:9999;top:80px;right:30px;min-width:320px;max-width:90vw;background:#fff;color:#333;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);padding:18px 28px;font-size:1rem;align-items:center;gap:12px;border-left:5px solid #3b82f6;">
+                                    <i class="fas fa-info-circle" style="color:#3b82f6;font-size:1.5rem;margin-right:10px;"></i>
+                                    <span>Bạn đã đánh giá sản phẩm này rồi.</span>
+                                </div>
+                                <script>
+                                    function showReviewedToast() {
+                                        var toast = document.getElementById('reviewed-toast');
+                                        if (!toast) return;
+                                        toast.style.display = 'flex';
+                                        setTimeout(function() {
+                                            toast.style.display = 'none';
+                                        }, 2500);
+                                    }
+                                </script>
                                 <script src="${pageContext.request.contextPath}/assets/js/detail.js"></script>
+
+                                <!-- Toast thông báo khi chưa mua mà bấm đánh giá -->
+                                <div id="review-toast" style="display:none;position:fixed;z-index:9999;top:30px;right:30px;min-width:320px;max-width:90vw;background:#fff;color:#333;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);padding:18px 28px;font-size:1rem;align-items:center;gap:12px;border-left:5px solid #f39c12;">
+                                    <i class="fas fa-exclamation-triangle" style="color:#f39c12;font-size:1.5rem;margin-right:10px;"></i>
+                                    <span>Bạn chỉ có thể đánh giá sản phẩm sau khi đã mua và đơn hàng đã được giao.</span>
+                                </div>
+                                <script>
+                                    function showReviewToast() {
+                                        var toast = document.getElementById('review-toast');
+                                        if (!toast) return;
+                                        toast.style.display = 'flex';
+                                        setTimeout(function() {
+                                            toast.style.display = 'none';
+                                        }, 2500);
+                                    }
+                                </script>
                                 <script>
                                     function validateReplyForm(form) {
                                         const textarea = form.querySelector('textarea[name="replyContent"]');
