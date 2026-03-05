@@ -110,11 +110,16 @@
                                                                         </c:otherwise>
                                                                     </c:choose>
                                                                 </c:when>
-                                                                <c:otherwise>
+                                                                <c:when test="${sessionScope.userType eq 'admin' || sessionScope.userType eq 'staff'}">
+                                                                    <button type="button" class="btn btn-primary">
+                                                                        <i class="fas fa-star"></i> Gửi đánh giá
+                                                                    </button>
+                                                                </c:when>
+                                                                <c:when test="${empty sessionScope.userType}">
                                                                     <a class="btn btn-primary" href="${pageContext.request.contextPath}/login">
                                                                         <i class="fas fa-star"></i> Gửi đánh giá
                                                                     </a>
-                                                                </c:otherwise>
+                                                                </c:when>
                                                             </c:choose>
                                                         </div>
                                                     </div>
@@ -157,11 +162,16 @@
                                                                                 </c:otherwise>
                                                                             </c:choose>
                                                                         </c:when>
-                                                                        <c:otherwise>
+                                                                        <c:when test="${sessionScope.userType eq 'admin' || sessionScope.userType eq 'staff'}">
+                                                                            <button type="button" class="btn btn-primary" >
+                                                                                <i class="fas fa-star"></i> Gửi đánh giá
+                                                                            </button>
+                                                                        </c:when>
+                                                                        <c:when test="${empty sessionScope.userType}">
                                                                             <a class="btn btn-primary" href="${pageContext.request.contextPath}/login">
                                                                                 <i class="fas fa-star"></i> Gửi đánh giá
                                                                             </a>
-                                                                        </c:otherwise>
+                                                                        </c:when>
                                                                     </c:choose>
                                                                 </div>
                                                             </div>
@@ -232,12 +242,8 @@
                                                                                                 <c:out value="${fn:toUpperCase(fn:substring(fn:trim(replyAuthorName), 0, 1))}" />
                                                                                             </div>
                                                                                             <div class="thread-reply-content">
-                                                                                                <div class="reply-staff-name reply-author">
-                                                                                                    <c:out value="${replyAuthorName}" />
-                                                                                                </div>
-                                                                                                <div class="thread-reply-text reply-body">
-                                                                                                    <c:out value="${replyBodyText}" />
-                                                                                                </div>
+                                                                                                <span class="reply-staff-name reply-author"><c:out value="${replyAuthorName}" /></span>
+                                                                                                <span class="thread-reply-text reply-body"><c:out value="${replyBodyText}" /></span>
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
