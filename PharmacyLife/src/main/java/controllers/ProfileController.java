@@ -196,14 +196,14 @@ public class ProfileController extends HttpServlet {
             boolean isStaffOrAdmin = (("staff".equals(userType) || (roleId != null && (roleId == 1 || roleId == 2))) && loggedInUser instanceof Staff);
 
             if (!isStaffOrAdmin) {
-                if (fullName.isEmpty() || !FULL_NAME_PATTERN.matcher(fullName).matches()) {
+                if (fullName == null || fullName.trim().isEmpty() || !FULL_NAME_PATTERN.matcher(fullName).matches()) {
                     forwardProfileError(request, response, loggedInUser, userType,
                             fullName, phone, address, dobStr, gender,
                             "Họ tên không hợp lệ!");
                     return;
                 }
 
-                if (!address.isEmpty() && !ADDRESS_PATTERN.matcher(address).matches()) {
+                if (address != null && !address.isEmpty() && !ADDRESS_PATTERN.matcher(address).matches()) {
                     forwardProfileError(request, response, loggedInUser, userType,
                             fullName, phone, address, dobStr, gender,
                             "Địa chỉ không hợp lệ! Chỉ được dùng chữ, số, khoảng trắng và các ký tự . , -");
@@ -211,7 +211,14 @@ public class ProfileController extends HttpServlet {
                 }
             }
 
-            if (!phone.isEmpty() && !PHONE_PATTERN.matcher(phone).matches()) {
+            if (phone == null || phone.trim().isEmpty()) {
+                forwardProfileError(request, response, loggedInUser, userType,
+                        fullName, phone, address, dobStr, gender,
+                        "Số điện thoại không được để trống!");
+                return;
+            }
+
+            if (!PHONE_PATTERN.matcher(phone).matches()) {
                 forwardProfileError(request, response, loggedInUser, userType,
                         fullName, phone, address, dobStr, gender,
                         "Số điện thoại phải bắt đầu bằng 0 và có đúng 10 số!");
@@ -242,6 +249,14 @@ public class ProfileController extends HttpServlet {
             ProfileDAO profileDAO = new ProfileDAO();
 
             if ("customer".equals(userType) && loggedInUser instanceof Customer) {
+                // Check duplicate phone for customer
+                if (profileDAO.isCustomerPhoneExists(phone, userId)) {
+                    forwardProfileError(request, response, loggedInUser, userType,
+                            fullName, phone, address, dobStr, gender,
+                            "Số điện thoại này đã được sử dụng bởi một tài khoản khách hàng khác!");
+                    return;
+                }
+
                 // Update Customer
                 success = profileDAO.updateCustomerProfile(userId, fullName, phone, address, parsedDob, gender);
 
@@ -253,6 +268,14 @@ public class ProfileController extends HttpServlet {
                 }
 
             } else if (loggedInUser instanceof Staff) {
+                // Check duplicate phone for staff
+                if (profileDAO.isStaffPhoneExists(phone, userId)) {
+                    forwardProfileError(request, response, loggedInUser, userType,
+                            fullName, phone, address, dobStr, gender,
+                            "Số điện thoại này đã được sử dụng bởi một nhân viên khác!");
+                    return;
+                }
+
                 // Update Staff or Admin
                 success = profileDAO.updateStaffProfile(userId, fullName, phone, address, parsedDob, gender);
 
