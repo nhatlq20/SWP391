@@ -173,10 +173,13 @@ public class ProfileController extends HttpServlet {
         Object loggedInUser = session.getAttribute("loggedInUser");
         String userType = (String) session.getAttribute("userType");
         Integer userId = (Integer) session.getAttribute("userId");
+        Integer roleId = (Integer) session.getAttribute("roleId");
 
         // Repopulate disabled fields from session if user is Admin/Staff
-        if ("staff".equals(userType) && loggedInUser instanceof Staff) {
+        // In this system, Staff and Admin often share the "staff" userType but check roleId
+        if (("staff".equals(userType) || (roleId != null && (roleId == 1 || roleId == 2))) && loggedInUser instanceof Staff) {
             Staff staff = (Staff) loggedInUser;
+            // Only update phone from request, keep other fields from current staff session if they are disabled in JSP
             fullName = staff.getStaffName();
             address = staff.getStaffAddress();
             gender = staff.getStaffGender();
@@ -189,11 +192,23 @@ public class ProfileController extends HttpServlet {
         boolean success = false;
 
         try {
-            if (fullName.isEmpty() || !FULL_NAME_PATTERN.matcher(fullName).matches()) {
-                forwardProfileError(request, response, loggedInUser, userType,
-                        fullName, phone, address, dobStr, gender,
-                        "Họ tên không hợp lệ!");
-                return;
+            // Only validate fullName if it's NOT a staff/admin (because for staff/admin it's disabled and we use session data)
+            boolean isStaffOrAdmin = (("staff".equals(userType) || (roleId != null && (roleId == 1 || roleId == 2))) && loggedInUser instanceof Staff);
+
+            if (!isStaffOrAdmin) {
+                if (fullName.isEmpty() || !FULL_NAME_PATTERN.matcher(fullName).matches()) {
+                    forwardProfileError(request, response, loggedInUser, userType,
+                            fullName, phone, address, dobStr, gender,
+                            "Họ tên không hợp lệ!");
+                    return;
+                }
+
+                if (!address.isEmpty() && !ADDRESS_PATTERN.matcher(address).matches()) {
+                    forwardProfileError(request, response, loggedInUser, userType,
+                            fullName, phone, address, dobStr, gender,
+                            "Địa chỉ không hợp lệ! Chỉ được dùng chữ, số, khoảng trắng và các ký tự . , -");
+                    return;
+                }
             }
 
             if (!phone.isEmpty() && !PHONE_PATTERN.matcher(phone).matches()) {
@@ -208,25 +223,20 @@ public class ProfileController extends HttpServlet {
                 try {
                     parsedDob = parseDob(dobStr);
                 } catch (Exception e) {
-                    forwardProfileError(request, response, loggedInUser, userType,
-                            fullName, phone, address, dobStr, gender,
-                            "Ngày sinh không hợp lệ!");
-                    return;
+                    if (!isStaffOrAdmin) {
+                        forwardProfileError(request, response, loggedInUser, userType,
+                                fullName, phone, address, dobStr, gender,
+                                "Ngày sinh không hợp lệ!");
+                        return;
+                    }
                 }
 
-                if (parsedDob.after(todayWithoutTime())) {
+                if (parsedDob != null && parsedDob.after(todayWithoutTime())) {
                     forwardProfileError(request, response, loggedInUser, userType,
                             fullName, phone, address, dobStr, gender,
                             "Ngày sinh không được vượt quá thời điểm hiện tại!");
                     return;
                 }
-            }
-
-            if (!address.isEmpty() && !ADDRESS_PATTERN.matcher(address).matches()) {
-                forwardProfileError(request, response, loggedInUser, userType,
-                        fullName, phone, address, dobStr, gender,
-                        "Địa chỉ không hợp lệ! Chỉ được dùng chữ, số, khoảng trắng và các ký tự . , -");
-                return;
             }
 
             ProfileDAO profileDAO = new ProfileDAO();
@@ -242,12 +252,12 @@ public class ProfileController extends HttpServlet {
                     session.setAttribute("userName", updatedCustomer.getFullName());
                 }
 
-            } else if ("staff".equals(userType) && loggedInUser instanceof Staff) {
-                // Update Staff
+            } else if (loggedInUser instanceof Staff) {
+                // Update Staff or Admin
                 success = profileDAO.updateStaffProfile(userId, fullName, phone, address, parsedDob, gender);
 
                 if (success) {
-                    // Reload staff data
+                    // Reload data
                     Staff updatedStaff = profileDAO.getStaffById(userId);
                     session.setAttribute("loggedInUser", updatedStaff);
                     session.setAttribute("userName", updatedStaff.getStaffName());
