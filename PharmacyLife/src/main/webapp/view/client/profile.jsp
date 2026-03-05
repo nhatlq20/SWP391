@@ -208,29 +208,29 @@
                 const phoneRegex = /^0\d{9}$/;
                 const addressRegex = /^[\p{L}\p{N}\s.,-]+$/u;
 
-                if (fullNameInput) {
+                if (fullNameInput && !fullNameInput.disabled) {
                     fullNameInput.value = normalizedFullName;
                 }
-                if (phoneInput) {
+                if (phoneInput && !phoneInput.disabled) {
                     phoneInput.value = normalizedPhone;
                 }
-                if (addressInput) {
+                if (addressInput && !addressInput.disabled) {
                     addressInput.value = normalizedAddress;
                 }
 
-                if (!normalizedFullName || !fullNameRegex.test(normalizedFullName)) {
+                if (fullNameInput && !fullNameInput.disabled && (!normalizedFullName || !fullNameRegex.test(normalizedFullName))) {
                     event.preventDefault();
                     showProfileError("Họ tên không hợp lệ!");
                     return;
                 }
 
-                if (normalizedPhone && !phoneRegex.test(normalizedPhone)) {
+                if (phoneInput && !phoneInput.disabled && normalizedPhone && !phoneRegex.test(normalizedPhone)) {
                     event.preventDefault();
                     showProfileError("Số điện thoại phải bắt đầu bằng 0 và có đúng 10 số!");
                     return;
                 }
 
-                if (dobInput && dobInput.value) {
+                if (dobInput && !dobInput.disabled && dobInput.value) {
                     const selectedDate = new Date(dobInput.value + "T00:00:00");
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
@@ -241,7 +241,7 @@
                     }
                 }
 
-                if (normalizedAddress && !addressRegex.test(normalizedAddress)) {
+                if (addressInput && !addressInput.disabled && normalizedAddress && !addressRegex.test(normalizedAddress)) {
                     event.preventDefault();
                     showProfileError("Địa chỉ không hợp lệ! Chỉ được dùng chữ, số, khoảng trắng và các ký tự . , -");
                 }
