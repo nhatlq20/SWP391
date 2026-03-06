@@ -89,6 +89,11 @@
                                             class="form-control" value="${medicine.originalPrice}" readonly
                                             style="background-color:#e9ecef; cursor:not-allowed;">
                                     </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Thành phần</label>
+                                        <input name="ingredients" class="form-control" value="${medicine.ingredients}"
+                                            placeholder="Nhập thành phần thuốc">
+                                    </div>
                                     <div class="col-12">
                                         <label class="form-label">Mô tả</label>
                                         <textarea name="shortDescription" rows="4"
