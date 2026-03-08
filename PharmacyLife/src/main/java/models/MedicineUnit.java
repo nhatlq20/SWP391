@@ -1,6 +1,7 @@
 package models;
 
 public class MedicineUnit {
+
     private int unitId;
     private int medicineId;
     private String unitName;
@@ -65,19 +66,7 @@ public class MedicineUnit {
         return isBaseUnit;
     }
 
-    public void setBaseUnit(boolean baseUnit) {
-        isBaseUnit = baseUnit;
-    }
-
-    @Override
-    public String toString() {
-        return "MedicineUnit{" +
-                "unitId=" + unitId +
-                ", medicineId=" + medicineId +
-                ", unitName='" + unitName + '\'' +
-                ", conversionRate=" + conversionRate +
-                ", sellingPrice=" + sellingPrice +
-                ", isBaseUnit=" + isBaseUnit +
-                '}';
+    public void setBaseUnit(boolean isBaseUnit) {
+        this.isBaseUnit = isBaseUnit;
     }
 }

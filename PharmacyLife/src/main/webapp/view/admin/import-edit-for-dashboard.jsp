@@ -44,26 +44,16 @@
                                             <div class="info-item">
                                                 <label class="info-label" for="supplierId">Nhà cung cấp</label>
                                                 <div class="info-value">
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <select name="supplierId" id="supplierId" required
-                                                            class="form-select border-0 bg-transparent p-0"
-                                                            style="box-shadow: none; flex-grow: 1;">
-                                                            <option value="">-- Chọn nhà cung cấp --</option>
-                                                            <c:forEach var="supplier" items="${suppliers}">
-                                                                <option value="${supplier.supplierId}"
-                                                                    ${supplier.supplierId==importRecord.supplierId
-                                                                    ? 'selected' : '' }>${supplier.supplierName}
-                                                                </option>
-                                                            </c:forEach>
-                                                        </select>
-                                                        <button type="button"
-                                                            class="btn btn-sm btn-outline-primary rounded-circle"
-                                                            style="width: 24px; height: 24px; padding: 0; line-height: 22px;"
-                                                            onclick="openQuickSupplierModal()"
-                                                            title="Thêm nhà cung cấp mới">
-                                                            <i class="fas fa-plus" style="font-size: 0.75rem;"></i>
-                                                        </button>
-                                                    </div>
+                                                    <select name="supplierId" id="supplierId" required
+                                                        class="form-select border-0 bg-transparent p-0"
+                                                        style="box-shadow: none;">
+                                                        <option value="">-- Chọn nhà cung cấp --</option>
+                                                        <c:forEach var="supplier" items="${suppliers}">
+                                                            <option value="${supplier[0]}"
+                                                                ${supplier[0]==importRecord.supplierId ? 'selected' : ''
+                                                                }>${supplier[1]}</option>
+                                                        </c:forEach>
+                                                    </select>
                                                 </div>
                                             </div>
                                             <div class="info-item">
@@ -123,7 +113,6 @@
                                                         <tr>
                                                             <th>Mã thuốc</th>
                                                             <th>Tên thuốc</th>
-                                                            <th>Đơn vị</th>
                                                             <th>Số lượng</th>
                                                             <th>Đơn giá</th>
                                                             <th>Thành tiền</th>
@@ -138,7 +127,6 @@
                                                                         <td><strong>${detail.medicineCode}</strong></td>
                                                                         <td>${detail.medicineName != null ?
                                                                             detail.medicineName : '-'}</td>
-                                                                        <td>-</td>
                                                                         <td>${detail.quantity}</td>
                                                                         <td><span class="price">
                                                                                 <fmt:formatNumber
@@ -153,12 +141,21 @@
                                                                                     maxFractionDigits='0' />₫
                                                                             </span></td>
                                                                         <td style="text-align: center;">
-                                                                            <button type="submit"
-                                                                                form="deleteForm_${detail.detailId}"
-                                                                                class="btn-action btn-delete"
-                                                                                onclick="return confirm('Xóa thuốc này? (Phiếu phải có ít nhất 1 loại thuốc)')">
-                                                                                <i class="fas fa-trash"></i>
-                                                                            </button>
+                                                                            <form
+                                                                                action="${pageContext.request.contextPath}/admin/imports"
+                                                                                method="POST" style="display: inline;">
+                                                                                <input type="hidden" name="action"
+                                                                                    value="deleteDetail">
+                                                                                <input type="hidden" name="detailId"
+                                                                                    value="${detail.detailId}">
+                                                                                <input type="hidden" name="importId"
+                                                                                    value="${importRecord.importId}">
+                                                                                <button type="submit"
+                                                                                    class="btn-action btn-delete"
+                                                                                    onclick="return confirm('Xóa thuốc này? (Phiếu phải có ít nhất 1 loại thuốc)')">
+                                                                                    <i class="fas fa-trash"></i>
+                                                                                </button>
+                                                                            </form>
                                                                         </td>
                                                                     </tr>
                                                                 </c:forEach>
@@ -196,199 +193,103 @@
                         </div>
                     </div>
 
-                    <c:if test="${not empty importRecord and not empty details}">
-                        <c:forEach var="detail" items="${details}">
-                            <form id="deleteForm_${detail.detailId}"
-                                action="${pageContext.request.contextPath}/admin/imports" method="POST"
-                                style="display: none;">
-                                <input type="hidden" name="action" value="deleteDetail">
-                                <input type="hidden" name="detailId" value="${detail.detailId}">
-                                <input type="hidden" name="importId" value="${importRecord.importId}">
-                            </form>
-                        </c:forEach>
-                    </c:if>
+                    <!-- Modal Form (Overlaid) -->
+                    <div id="addMedicineModal" class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title"><i class="fas fa-plus-circle me-2 text-primary"></i>Thêm thuốc
+                                    vào phiếu nhập</h5>
+                                <button type="button" class="close-btn"
+                                    onclick="closeAddMedicineModal()">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group mb-4">
+                                    <label class="form-label fw-bold">Chọn thuốc nhập</label>
+                                    <select id="modalMedicineId" class="form-select shadow-sm">
+                                        <option value="">-- Tìm và chọn thuốc --</option>
+                                        <c:forEach var="med" items="${medicines}">
+                                            <option value="${med.medicineId}">${med.medicineCode} - ${med.medicineName}
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-4">
+                                            <label class="form-label fw-bold">Số lượng</label>
+                                            <input type="number" id="modalQuantity" class="form-control shadow-sm"
+                                                min="1" placeholder="Nhập SL"
+                                                oninput="validateQuantity(); calculateModalTotal();">
+                                            <div id="quantityError"
+                                                style="color: #dc3545; font-size: 0.8rem; margin-top: 4px; display: none;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-4">
+                                            <label class="form-label fw-bold">Giá nhập (VNĐ)</label>
+                                            <input type="number" id="modalPrice" class="form-control shadow-sm" min="0"
+                                                step="1000" placeholder="Nhập đơn giá" oninput="calculateModalTotal()">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-total-box">
+                                    <span class="modal-total-label">Tổng cộng dự kiến:</span>
+                                    <span id="modalTotalDisplay" class="modal-total-amount">0₫</span>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-light px-4 py-2 fw-semibold"
+                                    style="border-radius: 8px;" onclick="closeAddMedicineModal()">Hủy bỏ</button>
+                                <button type="button" class="btn btn-primary px-4 py-2 fw-semibold"
+                                    style="border-radius: 8px; background-color: #4F81E1; border: none;"
+                                    onclick="addMedicineFromModal()">Thêm vào danh sách</button>
+                            </div>
+                        </div>
+                    </div>
 
                     <script>
                         let medicineList = [];
-                        let totalAmount = 0;
-                        let allMedicineOptions = [
-                            <c:forEach var="med" items="${medicines}" varStatus="status">
-                                {
-                                    value: "${med.medicineId}",
-                                text: "${med.medicineCode} - ${fn:escapeXml(med.medicineName)}",
-                                categoryId: "${med.categoryId}"
-                                }${status.last ? '' : ','}
-                            </c:forEach>
-                        ];
-                        let allMedicineUnits = [
-                            <c:forEach var="unit" items="${medicineUnits}" varStatus="status">
-                                {
-                                    unitId: ${unit.unitId},
-                                medicineId: ${unit.medicineId},
-                                unitName: "${fn:escapeXml(unit.unitName)}",
-                                isBaseUnit: ${unit.isBaseUnit}
-                                }${status.last ? '' : ','}
-                            </c:forEach>
-                        ];
-
-                        document.addEventListener('DOMContentLoaded', function () {
-                            // Add change listener for price reset
-                            const modalMedSelect = document.getElementById('modalMedicineId');
-                            if (modalMedSelect) {
-                                modalMedSelect.addEventListener('change', function () {
-                                    document.getElementById('modalPrice').value = '';
-                                    calculateModalTotal();
-                                    updateUnitOptions();
-                                });
-                            }
-                        });
 
                         // Initialize medicineList from server-side details
                         <c:if test="${not empty details}">
                             <c:forEach var="detail" items="${details}">
                                 medicineList.push({
-                                    detailId: parseInt("${detail.detailId}"),
-                                medicineId: parseInt("${detail.medicineId}"),
-                                medicineCode: "${detail.medicineCode}",
-                                medicineName: "${fn:escapeXml(detail.medicineName)}",
-                                quantity: parseInt("${detail.quantity}"),
-                                price: parseFloat("${detail.unitPrice}"),
-                                total: parseFloat("${detail.quantity * detail.unitPrice}")
+                                    detailId: ${not empty detail.detailId ? detail.detailId : 0},
+                                medicineId: ${not empty detail.medicineId ? detail.medicineId : 0},
+                                medicineCode: "${not empty detail.medicineCode ? detail.medicineCode : ''}",
+                                medicineName: "${not empty detail.medicineName ? detail.medicineName : ''}",
+                                quantity: ${not empty detail.quantity ? detail.quantity : 0},
+                                price: ${not empty detail.unitPrice ? detail.unitPrice : 0},
+                                total: ${not empty detail.quantity && not empty detail.unitPrice ? (detail.quantity * detail.unitPrice) : 0}
                                 });
                             </c:forEach>
                         </c:if>
 
                         function openAddMedicineModal() {
-                            document.getElementById('addMedicineModal').style.display = 'flex';
-                            document.getElementById('modalCategoryId').value = '';
+                            document.getElementById('addMedicineModal').style.display = 'block';
                             document.getElementById('modalMedicineId').value = '';
-                            document.getElementById('modalUnitId').innerHTML = '<option value="">-- Chọn thuốc trước --</option>';
                             document.getElementById('modalQuantity').value = '';
                             document.getElementById('modalPrice').value = '';
                             document.getElementById('modalTotalDisplay').textContent = '0₫';
-                            filterMedicinesByCategory(); // Clear initially
-                        }
-
-                        function updateUnitOptions() {
-                            const medId = document.getElementById('modalMedicineId').value;
-                            const unitSelect = document.getElementById('modalUnitId');
-                            unitSelect.innerHTML = '<option value="">-- Chọn đơn vị --</option>';
-                            if (!medId) return;
-
-                            let possibleUnits = allMedicineUnits.filter(u => u.medicineId == medId);
-                            possibleUnits.forEach(u => {
-                                let opt = document.createElement('option');
-                                opt.value = u.unitId;
-                                opt.textContent = u.unitName;
-                                if (u.isBaseUnit) opt.selected = true;
-                                unitSelect.appendChild(opt);
-                            });
-                        }
-
-                        function filterMedicinesByCategory() {
-                            const categoryId = document.getElementById('modalCategoryId').value;
-                            const medicineSelect = document.getElementById('modalMedicineId');
-                            if (!medicineSelect) return;
-
-                            const currentValue = medicineSelect.value;
-
-                            // Rebuild options list
-                            medicineSelect.innerHTML = '<option value="">-- ' + (categoryId ? 'Chọn thuốc' : 'Chọn danh mục hoặc tìm tất cả') + ' --</option>';
-
-                            allMedicineOptions.forEach(opt => {
-                                // Show all if no category selected, or filter by categoryId
-                                if (!categoryId || String(opt.categoryId) === String(categoryId).trim()) {
-                                    const newOpt = document.createElement('option');
-                                    newOpt.value = opt.value;
-                                    newOpt.textContent = opt.text;
-                                    newOpt.setAttribute('data-category', opt.categoryId);
-                                    if (opt.value === currentValue) newOpt.selected = true;
-                                    medicineSelect.appendChild(newOpt);
-                                }
-                            });
-
-                            // If current selection is no longer valid in filtered list, reset it
-                            if (currentValue && medicineSelect.value === "") {
-                                calculateModalTotal();
-                            }
                         }
 
                         function closeAddMedicineModal() {
                             document.getElementById('addMedicineModal').style.display = 'none';
                         }
 
-                        // Quick Supplier Logic
-                        function openQuickSupplierModal() {
-                            document.getElementById('quickSupplierModal').style.display = 'flex';
-                            document.getElementById('qsName').value = '';
-                            document.getElementById('qsAddress').value = '';
-                            document.getElementById('qsContact').value = '';
-                            document.getElementById('qsError').style.display = 'none';
-                        }
-
-                        function closeQuickSupplierModal() {
-                            document.getElementById('quickSupplierModal').style.display = 'none';
-                        }
-
-                        function saveQuickSupplier() {
-                            const name = document.getElementById('qsName').value.trim();
-                            const address = document.getElementById('qsAddress').value.trim();
-                            const contact = document.getElementById('qsContact').value.trim();
-                            const errorDiv = document.getElementById('qsError');
-                            const btn = document.getElementById('btnSaveSupplier');
-                            const spinner = document.getElementById('qsSpinner');
-
-                            if (!name) {
-                                errorDiv.textContent = 'Vui lòng nhập tên nhà cung cấp';
-                                errorDiv.style.display = 'block';
-                                return;
+                        document.getElementById('modalMedicineId').addEventListener('change', function () {
+                            const medicineId = this.value;
+                            if (medicineId && medicineId.trim() !== '') {
+                                // Clear price field - user must enter manually
+                                document.getElementById('modalPrice').value = '';
+                                calculateModalTotal();
+                            } else {
+                                document.getElementById('modalPrice').value = '';
+                                calculateModalTotal();
                             }
-
-                            errorDiv.style.display = 'none';
-                            btn.disabled = true;
-                            spinner.style.display = 'inline-block';
-
-                            const params = new URLSearchParams();
-                            params.append('supplierName', name);
-                            params.append('supplierAddress', address);
-                            params.append('contactInfo', contact);
-
-                            fetch('${pageContext.request.contextPath}/admin/suppliers/quick-add', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded',
-                                },
-                                body: params
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        // Add to dropdown
-                                        const select = document.getElementById('supplierId');
-                                        const option = new Option(data.name, data.id);
-                                        select.add(option);
-                                        select.value = data.id;
-
-                                        // Close modal
-                                        closeQuickSupplierModal();
-
-                                        // Optional: notify user
-                                        alert('Đã thêm nhà cung cấp: ' + data.name);
-                                    } else {
-                                        errorDiv.textContent = data.message || 'Lỗi khi thêm nhà cung cấp';
-                                        errorDiv.style.display = 'block';
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    errorDiv.textContent = 'Lỗi hệ thống khi kết nối server';
-                                    errorDiv.style.display = 'block';
-                                })
-                                .finally(() => {
-                                    btn.disabled = false;
-                                    spinner.style.display = 'none';
-                                });
-                        }
+                        });
 
                         function calculateModalTotal() {
                             const quantity = parseFloat(document.getElementById('modalQuantity').value) || 0;
@@ -412,8 +313,8 @@
                                     errorDiv.textContent = "Số lượng phải lớn hơn 0.";
                                     errorDiv.style.display = 'block';
                                     isValid = false;
-                                } else if (intValue > 5000) {
-                                    errorDiv.textContent = "Số lượng quá lớn (tối đa 5000).";
+                                } else if (intValue > 1000) {
+                                    errorDiv.textContent = "Số lượng không được vượt quá 1000.";
                                     errorDiv.style.display = 'block';
                                     isValid = false;
                                 } else {
@@ -425,18 +326,22 @@
                             return isValid;
                         }
 
+                        function calculateModalTotal() {
+                            const quantity = parseFloat(document.getElementById('modalQuantity').value) || 0;
+                            const price = parseFloat(document.getElementById('modalPrice').value) || 0;
+                            const total = quantity * price;
+                            document.getElementById('modalTotalDisplay').textContent = formatCurrency(total);
+                        }
+
                         function addMedicineFromModal() {
                             const medicineId = document.getElementById('modalMedicineId').value;
-                            const unitSelect = document.getElementById('modalUnitId');
-                            const unitId = unitSelect.value;
-                            const unitName = unitSelect.options[unitSelect.selectedIndex]?.text || '';
                             const quantityInput = document.getElementById('modalQuantity');
                             const quantity = quantityInput.value;
                             const price = parseFloat(document.getElementById('modalPrice').value);
 
-                            if (!medicineId || !unitId || quantity === '' || quantity === null || isNaN(parseInt(quantity)) || !price) {
+                            if (!medicineId || quantity === '' || quantity === null || isNaN(parseInt(quantity)) || !price) {
                                 validateQuantity();
-                                alert("Vui lòng nhập đầy đủ thông tin thuốc (bao gồm cả đơn vị và số lượng).");
+                                alert("Vui lòng nhập đầy đủ thông tin thuốc.");
                                 return;
                             }
                             if (!validateQuantity()) {
@@ -453,8 +358,6 @@
                             const total = parseInt(quantity) * price;
                             medicineList.push({
                                 medicineId: medicineId,
-                                unitId: unitId,
-                                unitName: unitName,
                                 medicineCode: medicineCode,
                                 medicineName: medicineName,
                                 quantity: parseInt(quantity),
@@ -483,9 +386,14 @@
                                     let deleteBtn = '';
                                     if (item.detailId) {
                                         // Existing item from database - delete via server
-                                        deleteBtn = `<button type="submit" form="deleteForm_\${item.detailId}" class="btn-action btn-delete" onclick="return confirm('Xóa thuốc này?')">
+                                        deleteBtn = `<form action="${pageContext.request.contextPath}/admin/imports" method="POST" style="display: inline;">
+                                            <input type="hidden" name="action" value="deleteDetail">
+                                            <input type="hidden" name="detailId" value="\${item.detailId}">
+                                            <input type="hidden" name="importId" value="${importRecord.importId}">
+                                            <button type="submit" class="btn-action btn-delete" onclick="return confirm('Xóa thuốc này?')">
                                                 <i class="fas fa-trash"></i>
-                                            </button>`;
+                                            </button>
+                                        </form>`;
                                     } else {
                                         // New item - delete client-side
                                         deleteBtn = `<button type="button" class="btn-action btn-delete" onclick="removeMedicine(\${index})">
@@ -495,7 +403,6 @@
                                     tbody.innerHTML += `<tr>
                                         <td><strong>\${item.medicineCode}</strong></td>
                                         <td>\${item.medicineName || '-'}</td>
-                                        <td>\${item.unitName || '-'}</td>
                                         <td>\${item.quantity}</td>
                                         <td><span class="price">\${formatCurrency(item.price)}</span></td>
                                         <td><span class="price">\${formatCurrency(item.total)}</span></td>
@@ -503,7 +410,7 @@
                                     </tr>`;
                                     if (!item.detailId) {
                                         // Only add hidden inputs for new items
-                                        hiddenContainer.innerHTML += `<input type="hidden" name="newMedicines[\${index}].medicineId" value="\${item.medicineId}"><input type="hidden" name="newMedicines[\${index}].unitId" value="\${item.unitId}"><input type="hidden" name="newMedicines[\${index}].quantity" value="\${item.quantity}"><input type="hidden" name="newMedicines[\${index}].price" value="\${item.price}">`;
+                                        hiddenContainer.innerHTML += `<input type="hidden" name="newMedicines[\${index}].medicineId" value="\${item.medicineId}"><input type="hidden" name="newMedicines[\${index}].quantity" value="\${item.quantity}"><input type="hidden" name="newMedicines[\${index}].price" value="\${item.price}">`;
                                     }
                                 });
                             }
@@ -514,136 +421,10 @@
                         }
 
                         window.onclick = function (event) {
-                            const modalMed = document.getElementById('addMedicineModal');
-                            const modalSup = document.getElementById('quickSupplierModal');
-                            if (event.target === modalMed) closeAddMedicineModal();
-                            if (event.target === modalSup) closeQuickSupplierModal();
+                            const modal = document.getElementById('addMedicineModal');
+                            if (event.target === modal) closeAddMedicineModal();
                         }
                     </script>
-
-                    <!-- Modal Form (Overlaid) -->
-                    <div id="addMedicineModal" class="modal" style="z-index: 9999999 !important;">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">
-                                    <i class="fas fa-pills me-2 text-primary"></i>
-                                    Thêm thuốc nhập
-                                </h5>
-                                <button type="button" class="close-btn" onclick="closeAddMedicineModal()">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="row g-3">
-                                    <div class="col-12">
-                                        <label class="form-label fw-semibold">Danh mục</label>
-                                        <select id="modalCategoryId" class="form-select"
-                                            onchange="filterMedicinesByCategory()">
-                                            <option value="">-- Tất cả danh mục --</option>
-                                            <c:forEach var="cat" items="${categories}">
-                                                <option value="${cat.categoryId}">${cat.categoryName}</option>
-                                            </c:forEach>
-                                        </select>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label fw-semibold">Tên thuốc</label>
-                                        <select id="modalMedicineId" class="form-select">
-                                            <option value="">-- Chọn danh mục trước --</option>
-                                            <c:forEach var="med" items="${medicines}">
-                                                <option value="${med.medicineId}" data-category="${med.categoryId}">
-                                                    ${med.medicineCode} - ${med.medicineName}
-                                                </option>
-                                            </c:forEach>
-                                        </select>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label fw-semibold">Đơn vị</label>
-                                        <select id="modalUnitId" class="form-select">
-                                            <option value="">-- Chọn thuốc trước --</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-6">
-                                        <label class="form-label fw-semibold">Số lượng</label>
-                                        <input type="number" id="modalQuantity" class="form-control" min="1"
-                                            placeholder="0" oninput="validateQuantity(); calculateModalTotal();">
-                                        <div id="quantityError" class="text-danger small mt-1" style="display: none;">
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <label class="form-label fw-semibold">Đơn giá nhập</label>
-                                        <div class="input-group">
-                                            <input type="number" id="modalPrice" class="form-control" min="0"
-                                                step="1000" placeholder="0" oninput="calculateModalTotal()">
-                                            <span class="input-group-text small">đ</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="modal-total-box mt-4">
-                                    <span class="modal-total-label">Thành tiền dự kiến</span>
-                                    <span id="modalTotalDisplay" class="modal-total-amount text-primary">0₫</span>
-                                </div>
-                            </div>
-                            <div class="modal-footer border-0">
-                                <button type="button"
-                                    class="btn btn-link text-secondary text-decoration-none fw-semibold"
-                                    onclick="closeAddMedicineModal()">Hủy</button>
-                                <button type="button" class="btn btn-primary px-4 fw-bold" style="border-radius: 12px;"
-                                    onclick="addMedicineFromModal()">
-                                    Xác nhận thêm
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Add Supplier Modal -->
-                    <div id="quickSupplierModal" class="modal" style="z-index: 9999999 !important;">
-                        <div class="modal-content" style="max-width: 480px;">
-                            <div class="modal-header">
-                                <h5 class="modal-title">
-                                    <i class="fas fa-truck-field me-2 text-primary"></i>
-                                    Nhà cung cấp mới
-                                </h5>
-                                <button type="button" class="close-btn" onclick="closeQuickSupplierModal()">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="quickSupplierForm" class="row g-3">
-                                    <div class="col-12">
-                                        <label class="form-label fw-semibold">Tên nhà cung cấp <span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" id="qsName" class="form-control" required
-                                            placeholder="Nhập tên NCC">
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label fw-semibold">Địa chỉ</label>
-                                        <input type="text" id="qsAddress" class="form-control"
-                                            placeholder="Địa chỉ chi tiết">
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label fw-semibold">Thông tin liên hệ</label>
-                                        <input type="text" id="qsContact" class="form-control"
-                                            placeholder="SĐT hoặc Email">
-                                    </div>
-                                </form>
-                                <div id="qsError" class="alert alert-danger mt-3 py-2 small" style="display: none;">
-                                </div>
-                            </div>
-                            <div class="modal-footer border-0">
-                                <button type="button"
-                                    class="btn btn-link text-secondary text-decoration-none fw-semibold"
-                                    onclick="closeQuickSupplierModal()">Hủy</button>
-                                <button type="button" class="btn btn-primary px-4 fw-bold" style="border-radius: 12px;"
-                                    id="btnSaveSupplier" onclick="saveQuickSupplier()">
-                                    <span id="qsSpinner" class="spinner-border spinner-border-sm me-2"
-                                        style="display: none;"></span>
-                                    Lưu thông tin
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
                     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
                 </body>
 
