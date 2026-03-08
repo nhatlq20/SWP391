@@ -503,7 +503,7 @@ public class ImportDAO {
 
     public List<Medicine> getAllMedicines() {
         List<Medicine> list = new ArrayList<>();
-        String sql = "SELECT MedicineId, MedicineCode, MedicineName, OriginalPrice FROM Medicine";
+        String sql = "SELECT MedicineId, MedicineCode, MedicineName, OriginalPrice, CategoryId FROM Medicine";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
@@ -513,6 +513,7 @@ public class ImportDAO {
                 m.setMedicineCode(rs.getString("MedicineCode"));
                 m.setMedicineName(rs.getString("MedicineName"));
                 m.setOriginalPrice(rs.getDouble("OriginalPrice"));
+                m.setCategoryId(rs.getInt("CategoryId"));
                 list.add(m);
             }
         } catch (SQLException e) {

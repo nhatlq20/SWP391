@@ -166,12 +166,23 @@
                                     onclick="closeAddMedicineModal()">&times;</button>
                             </div>
                             <div class="modal-body">
+                                <div class="form-group mb-3">
+                                    <label class="form-label fw-bold">Danh mục thuốc</label>
+                                    <select id="modalCategoryId" class="form-select shadow-sm"
+                                        onchange="filterMedicinesByCategory()">
+                                        <option value="">-- Tất cả danh mục --</option>
+                                        <c:forEach var="cat" items="${categories}">
+                                            <option value="${cat.categoryId}">${cat.categoryName}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
                                 <div class="form-group mb-4">
                                     <label class="form-label fw-bold">Chọn thuốc nhập</label>
                                     <select id="modalMedicineId" class="form-select shadow-sm">
                                         <option value="">-- Tìm và chọn thuốc --</option>
                                         <c:forEach var="med" items="${medicines}">
-                                            <option value="${med.medicineId}">${med.medicineCode} - ${med.medicineName}
+                                            <option value="${med.medicineId}" data-category="${med.categoryId}">
+                                                ${med.medicineCode} - ${med.medicineName}
                                             </option>
                                         </c:forEach>
                                     </select>
@@ -259,6 +270,8 @@
 
                         function openAddMedicineModal() {
                             document.getElementById('addMedicineModal').style.display = 'block';
+                            document.getElementById('modalCategoryId').value = '';
+                            filterMedicinesByCategory(); // Reset filter
                             document.getElementById('modalMedicineId').value = '';
                             document.getElementById('modalQuantity').value = '';
                             document.getElementById('modalPrice').value = '';
@@ -267,6 +280,33 @@
 
                         function closeAddMedicineModal() {
                             document.getElementById('addMedicineModal').style.display = 'none';
+                        }
+
+                        function filterMedicinesByCategory() {
+                            const categoryId = document.getElementById('modalCategoryId').value;
+                            const medicineSelect = document.getElementById('modalMedicineId');
+                            const options = medicineSelect.querySelectorAll('option');
+
+                            let firstVisible = true;
+                            options.forEach(option => {
+                                if (option.value === "") { // Header option
+                                    option.style.display = "block";
+                                    return;
+                                }
+
+                                const medCategory = option.getAttribute('data-category');
+                                if (!categoryId || medCategory === categoryId) {
+                                    option.style.display = "block";
+                                    if (firstVisible && medicineSelect.value === "") {
+                                        // firstVisible = false;
+                                    }
+                                } else {
+                                    option.style.display = "none";
+                                    if (medicineSelect.value === option.value) {
+                                        medicineSelect.value = "";
+                                    }
+                                }
+                            });
                         }
 
                         function openAddSupplierModal() {
