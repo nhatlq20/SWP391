@@ -322,8 +322,10 @@
                                                 <c:choose>
                                                     <c:when
                                                         test="${medicine.sellingPrice != null && medicine.sellingPrice > 0}">
-                                                        <fmt:formatNumber value="${medicine.sellingPrice}" type="number"
-                                                            groupingUsed="true" />₫
+                                                        <c:set var="roundedPrice"
+                                                            value="${Math.ceil(medicine.sellingPrice)}" />
+                                                        <fmt:formatNumber value="${roundedPrice}" type="number"
+                                                            groupingUsed="true" maxFractionDigits="0" />₫
                                                     </c:when>
                                                     <c:otherwise>Giá tham khảo</c:otherwise>
                                                 </c:choose>
@@ -636,7 +638,7 @@
                                         btn.classList.add('active');
 
                                         // Update price display
-                                        var price = parseFloat(btn.dataset.price);
+                                        var price = Math.ceil(parseFloat(btn.dataset.price));
                                         var unitName = btn.dataset.unit;
                                         var unitId = btn.dataset.unitid;
 
