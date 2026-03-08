@@ -42,16 +42,22 @@
                                                 <div class="info-value text-muted">${importRecord.importCode}</div>
                                             </div>
                                             <div class="info-item">
-                                                <label class="info-label" for="supplierId">Nhà cung cấp</label>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <label class="info-label" for="supplierId">Nhà cung cấp</label>
+                                                    <button type="button" class="btn btn-sm text-primary p-0"
+                                                        onclick="openAddSupplierModal()" title="Thêm nhà cung cấp mới">
+                                                        <i class="fas fa-plus-circle"></i>
+                                                    </button>
+                                                </div>
                                                 <div class="info-value">
                                                     <select name="supplierId" id="supplierId" required
                                                         class="form-select border-0 bg-transparent p-0"
                                                         style="box-shadow: none;">
                                                         <option value="">-- Chọn nhà cung cấp --</option>
                                                         <c:forEach var="supplier" items="${suppliers}">
-                                                            <option value="${supplier[0]}"
-                                                                ${supplier[0]==importRecord.supplierId ? 'selected' : ''
-                                                                }>${supplier[1]}</option>
+                                                            <option value="${supplier.supplierId}"
+                                                                ${supplier.supplierId==importRecord.supplierId
+                                                                ? 'selected' : '' }>${supplier.supplierName}</option>
                                                         </c:forEach>
                                                     </select>
                                                 </div>
@@ -193,7 +199,7 @@
                         </div>
                     </div>
 
-                    <!-- Modal Form (Overlaid) -->
+                    <!-- Modal Thêm Thuốc -->
                     <div id="addMedicineModal" class="modal">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -249,6 +255,45 @@
                         </div>
                     </div>
 
+                    <!-- Modal Thêm Nhà Cung Cấp Mới -->
+                    <div id="addSupplierModal" class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title"><i class="fas fa-truck me-2 text-primary"></i>Thêm nhà cung cấp
+                                    mới</h5>
+                                <button type="button" class="close-btn"
+                                    onclick="closeAddSupplierModal()">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group mb-4">
+                                    <label class="form-label fw-bold">Tên nhà cung cấp <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" id="newSupplierName" class="form-control shadow-sm"
+                                        placeholder="Nhập tên nhà cung cấp">
+                                </div>
+                                <div class="form-group mb-4">
+                                    <label class="form-label fw-bold">Địa chỉ</label>
+                                    <input type="text" id="newSupplierAddress" class="form-control shadow-sm"
+                                        placeholder="Nhập địa chỉ">
+                                </div>
+                                <div class="form-group mb-4">
+                                    <label class="form-label fw-bold">Thông tin liên hệ</label>
+                                    <input type="text" id="newSupplierContact" class="form-control shadow-sm"
+                                        placeholder="Số điện thoại / Email">
+                                </div>
+                                <div id="supplierError"
+                                    style="color: #dc3545; font-size: 0.8rem; margin-top: 4px; display: none;"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-light px-4 py-2 fw-semibold"
+                                    style="border-radius: 8px;" onclick="closeAddSupplierModal()">Hủy bỏ</button>
+                                <button type="button" class="btn btn-primary px-4 py-2 fw-semibold"
+                                    style="border-radius: 8px; background-color: #4F81E1; border: none;"
+                                    onclick="saveNewSupplier()">Lưu thông tin</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <script>
                         let medicineList = [];
 
@@ -256,13 +301,13 @@
                         <c:if test="${not empty details}">
                             <c:forEach var="detail" items="${details}">
                                 medicineList.push({
-                                    detailId: ${not empty detail.detailId ? detail.detailId : 0},
-                                medicineId: ${not empty detail.medicineId ? detail.medicineId : 0},
-                                medicineCode: "${not empty detail.medicineCode ? detail.medicineCode : ''}",
-                                medicineName: "${not empty detail.medicineName ? detail.medicineName : ''}",
-                                quantity: ${not empty detail.quantity ? detail.quantity : 0},
-                                price: ${not empty detail.unitPrice ? detail.unitPrice : 0},
-                                total: ${not empty detail.quantity && not empty detail.unitPrice ? (detail.quantity * detail.unitPrice) : 0}
+                                    detailId: <c:out value="${not empty detail.detailId ? detail.detailId : 0}" />,
+                                medicineId: <c:out value="${not empty detail.medicineId ? detail.medicineId : 0}" />,
+                                medicineCode: "<c:out value="${not empty detail.medicineCode ? detail.medicineCode : ''}" />",
+                                medicineName: "<c:out value="${not empty detail.medicineName ? detail.medicineName : ''}" />",
+                                quantity: <c:out value="${not empty detail.quantity ? detail.quantity : 0}" />,
+                                price: <c:out value="${not empty detail.unitPrice ? detail.unitPrice : 0}" />,
+                                total: <c:out value="${not empty detail.quantity && not empty detail.unitPrice ? (detail.quantity * detail.unitPrice) : 0}" />
                                 });
                             </c:forEach>
                         </c:if>
@@ -277,6 +322,66 @@
 
                         function closeAddMedicineModal() {
                             document.getElementById('addMedicineModal').style.display = 'none';
+                        }
+
+                        function openAddSupplierModal() {
+                            document.getElementById('addSupplierModal').style.display = 'block';
+                            document.getElementById('newSupplierName').value = '';
+                            document.getElementById('newSupplierAddress').value = '';
+                            document.getElementById('newSupplierContact').value = '';
+                            document.getElementById('supplierError').style.display = 'none';
+                        }
+
+                        function closeAddSupplierModal() {
+                            document.getElementById('addSupplierModal').style.display = 'none';
+                        }
+
+                        async function saveNewSupplier() {
+                            const name = document.getElementById('newSupplierName').value.trim();
+                            const address = document.getElementById('newSupplierAddress').value.trim();
+                            const contact = document.getElementById('newSupplierContact').value.trim();
+                            const errorDiv = document.getElementById('supplierError');
+
+                            if (!name) {
+                                errorDiv.textContent = 'Vui lòng nhập tên nhà cung cấp';
+                                errorDiv.style.display = 'block';
+                                return;
+                            }
+
+                            try {
+                                const params = new URLSearchParams();
+                                params.append('action', 'createSupplier');
+                                params.append('supplierName', name);
+                                params.append('supplierAddress', address);
+                                params.append('contactInfo', contact);
+
+                                const response = await fetch(`${pageContext.request.contextPath}/admin/imports`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                    },
+                                    body: params
+                                });
+
+                                const result = await response.json();
+                                if (result.success) {
+                                    // Thêm vào select box
+                                    const select = document.getElementById('supplierId');
+                                    const option = new Option(result.supplierName, result.supplierId);
+                                    select.add(option);
+                                    select.value = result.supplierId;
+
+                                    closeAddSupplierModal();
+                                    alert('Đã thêm nhà cung cấp mới thành công!');
+                                } else {
+                                    errorDiv.textContent = result.message || 'Có lỗi xảy ra khi tạo nhà cung cấp';
+                                    errorDiv.style.display = 'block';
+                                }
+                            } catch (error) {
+                                console.error('Error:', error);
+                                errorDiv.textContent = 'Lỗi kết nối server';
+                                errorDiv.style.display = 'block';
+                            }
                         }
 
                         document.getElementById('modalMedicineId').addEventListener('change', function () {
@@ -421,8 +526,10 @@
                         }
 
                         window.onclick = function (event) {
-                            const modal = document.getElementById('addMedicineModal');
-                            if (event.target === modal) closeAddMedicineModal();
+                            const medicineModal = document.getElementById('addMedicineModal');
+                            const supplierModal = document.getElementById('addSupplierModal');
+                            if (event.target === medicineModal) closeAddMedicineModal();
+                            if (event.target === supplierModal) closeAddSupplierModal();
                         }
                     </script>
                     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

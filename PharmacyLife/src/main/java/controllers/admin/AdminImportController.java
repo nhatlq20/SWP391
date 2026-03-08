@@ -24,6 +24,7 @@ public class AdminImportController extends HttpServlet {
 
     private ImportDAO importDAO;
     private MedicineDAO medicineDAO;
+    private dao.SupplierDAO supplierDAO;
 
     private boolean isAdmin(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -53,6 +54,7 @@ public class AdminImportController extends HttpServlet {
     public void init() throws ServletException {
         importDAO = new ImportDAO();
         medicineDAO = new MedicineDAO();
+        supplierDAO = new dao.SupplierDAO();
     }
 
     // Kiểm tra quyền admin
@@ -144,6 +146,9 @@ public class AdminImportController extends HttpServlet {
                 case "search":
                     searchImports(request, response);
                     break;
+                case "createSupplier":
+                    createSupplierAjax(request, response);
+                    break;
                 default:
                     listImports(request, response);
                     break;
@@ -211,7 +216,7 @@ public class AdminImportController extends HttpServlet {
         List<Medicine> medicines = importDAO.getAllMedicines();
         request.setAttribute("medicines", medicines);
 
-        List<Object[]> suppliers = importDAO.getAllSuppliers();
+        List<models.Supplier> suppliers = importDAO.getAllSuppliers();
         request.setAttribute("suppliers", suppliers);
 
         request.getRequestDispatcher(getImportView("create", request)).forward(request, response);
@@ -237,7 +242,7 @@ public class AdminImportController extends HttpServlet {
             List<Medicine> medicines = importDAO.getAllMedicines();
             request.setAttribute("medicines", medicines);
 
-            List<Object[]> suppliers = importDAO.getAllSuppliers();
+            List<models.Supplier> suppliers = importDAO.getAllSuppliers();
             request.setAttribute("suppliers", suppliers);
 
             request.getRequestDispatcher(getImportView("edit", request)).forward(request, response);
@@ -488,7 +493,7 @@ public class AdminImportController extends HttpServlet {
                 request.setAttribute("details", updatedDetails);
                 List<Medicine> medicines = importDAO.getAllMedicines();
                 request.setAttribute("medicines", medicines);
-                List<Object[]> suppliers = importDAO.getAllSuppliers();
+                List<models.Supplier> suppliers = importDAO.getAllSuppliers();
                 request.setAttribute("suppliers", suppliers);
                 request.getRequestDispatcher(getImportView("edit", request)).forward(request, response);
                 return;
@@ -683,6 +688,39 @@ public class AdminImportController extends HttpServlet {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
             return importDAO.getStaffIdByCode(input);
+        }
+    }
+
+    private void createSupplierAjax(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            String name = request.getParameter("supplierName");
+            String address = request.getParameter("supplierAddress");
+            String contact = request.getParameter("contactInfo");
+
+            if (name == null || name.trim().isEmpty()) {
+                response.getWriter()
+                        .write("{\"success\": false, \"message\": \"Tên nhà cung cấp không được để trống\"}");
+                return;
+            }
+
+            models.Supplier supplier = new models.Supplier();
+            supplier.setSupplierName(name);
+            supplier.setSupplierAddress(address);
+            supplier.setContactInfo(contact);
+
+            if (supplierDAO.createSupplier(supplier)) {
+                response.getWriter().write("{\"success\": true, \"supplierId\": " + supplier.getSupplierId()
+                        + ", \"supplierName\": \"" + supplier.getSupplierName() + "\"}");
+            } else {
+                response.getWriter().write("{\"success\": false, \"message\": \"Không thể tạo nhà cung cấp\"}");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().write("{\"success\": false, \"message\": \"Lỗi server: " + e.getMessage() + "\"}");
         }
     }
 

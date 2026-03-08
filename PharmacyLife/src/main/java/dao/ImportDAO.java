@@ -12,6 +12,7 @@ import java.util.List;
 import models.Import;
 import models.ImportDetail;
 import models.Medicine;
+import models.Supplier;
 import utils.DBContext;
 
 public class ImportDAO {
@@ -26,11 +27,11 @@ public class ImportDAO {
         List<Import> imports = new ArrayList<>();
 
         String sql = "SELECT i.ImportId, i.SupplierId, s.SupplierName, " +
-            "       i.StaffId, st.StaffName, i.ImportCreateAt, i.TotalPrice, i.ImportStatus " +
-            "FROM   Import i " +
-            "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
-            "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
-            "ORDER BY i.ImportCreateAt DESC";
+                "       i.StaffId, st.StaffName, i.ImportCreateAt, i.TotalPrice, i.ImportStatus " +
+                "FROM   Import i " +
+                "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
+                "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
+                "ORDER BY i.ImportCreateAt DESC";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
@@ -51,18 +52,17 @@ public class ImportDAO {
         List<Import> imports = new ArrayList<>();
 
         String sql = "SELECT i.ImportId, i.SupplierId, s.SupplierName, " +
-            "       i.StaffId, st.StaffName, i.ImportCreateAt, i.TotalPrice, i.ImportStatus " +
-            "FROM   Import i " +
-            "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
-            "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
-            "WHERE  CAST(i.ImportId AS VARCHAR(10)) LIKE ? " +
-            "   OR  s.SupplierName LIKE ? " +
-            "   OR  ('IP' + RIGHT('000' + CAST(i.ImportId AS VARCHAR(10)), 3)) LIKE ? " +
-            "ORDER BY i.ImportCreateAt DESC";
+                "       i.StaffId, st.StaffName, i.ImportCreateAt, i.TotalPrice, i.ImportStatus " +
+                "FROM   Import i " +
+                "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
+                "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
+                "WHERE  CAST(i.ImportId AS VARCHAR(10)) LIKE ? " +
+                "   OR  s.SupplierName LIKE ? " +
+                "   OR  ('IP' + RIGHT('000' + CAST(i.ImportId AS VARCHAR(10)), 3)) LIKE ? " +
+                "ORDER BY i.ImportCreateAt DESC";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-
 
             String pattern = "%" + keyword + "%";
             ps.setString(1, pattern);
@@ -86,11 +86,11 @@ public class ImportDAO {
         Import imp = null;
 
         String sql = "SELECT i.ImportId, i.SupplierId, s.SupplierName, " +
-            "       i.StaffId, st.StaffName, i.ImportCreateAt, i.TotalPrice, i.ImportStatus " +
-            "FROM   Import i " +
-            "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
-            "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
-            "WHERE  i.ImportId = ?";
+                "       i.StaffId, st.StaffName, i.ImportCreateAt, i.TotalPrice, i.ImportStatus " +
+                "FROM   Import i " +
+                "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
+                "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
+                "WHERE  i.ImportId = ?";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -111,7 +111,7 @@ public class ImportDAO {
     // Tạo phiếu nhập mới
     public boolean createImport(Import imp) {
         String sql = "INSERT INTO Import (SupplierId, StaffId, ImportCreateAt, TotalPrice, ImportStatus) " +
-            "VALUES (?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -157,8 +157,8 @@ public class ImportDAO {
     // Cập nhật phiếu nhập
     public boolean updateImport(Import imp) {
         String sql = "UPDATE Import " +
-            "SET SupplierId = ?, StaffId = ?, ImportCreateAt = ?, TotalPrice = ?, ImportStatus = ? " +
-            "WHERE ImportId = ?";
+                "SET SupplierId = ?, StaffId = ?, ImportCreateAt = ?, TotalPrice = ?, ImportStatus = ? " +
+                "WHERE ImportId = ?";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -537,14 +537,19 @@ public class ImportDAO {
         return 0;
     }
 
-    public List<Object[]> getAllSuppliers() {
-        List<Object[]> list = new ArrayList<>();
-        String sql = "SELECT SupplierId, SupplierName FROM Supplier ORDER BY SupplierName";
+    public List<Supplier> getAllSuppliers() {
+        List<Supplier> list = new ArrayList<>();
+        String sql = "SELECT SupplierId, SupplierName, SupplierAddress, ContactInfo FROM Supplier ORDER BY SupplierName";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                list.add(new Object[] { rs.getInt("SupplierId"), rs.getString("SupplierName") });
+                Supplier s = new Supplier();
+                s.setSupplierId(rs.getInt("SupplierId"));
+                s.setSupplierName(rs.getString("SupplierName"));
+                s.setSupplierAddress(rs.getString("SupplierAddress"));
+                s.setContactInfo(rs.getString("ContactInfo"));
+                list.add(s);
             }
         } catch (SQLException e) {
             e.printStackTrace();
