@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import models.Staff;
@@ -110,91 +111,93 @@ public class StaffDAO {
         }
     }
 
-    // Helper: Generate next staff code based on actual database identity value (ST001, ST002, etc)
-    public String generateNextStaffCode() {
-        int nextId = 1;
-
-        // Query the maximum StaffId to determine the next numeric part
-        String sqlMax = "SELECT MAX(StaffId) FROM Staff";
-        try (Connection conn = new DBContext().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sqlMax);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                int maxId = rs.getInt(1);
-                if (maxId > 0) {
-                    nextId = maxId + 1;
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Error querying MAX(StaffId) for staff: " + e.getMessage());
-        }
-
-        // Format as ST001, ST002... if less than 1000, else just ST + number
-        if (nextId < 1000) {
-            return String.format("ST%03d", nextId);
-        } else {
-            return "ST" + nextId;
-        }
-    }
-
     // 4. Insert Staff
     public boolean insertStaff(models.Staff s) {
-        // Generate staff code
-        String staffCode = generateNextStaffCode();
-        s.setStaffCode(staffCode);
-        
-        // Insert including StaffPassword (keep column order aligned with database)
-        String sql = "INSERT INTO Staff (StaffCode, StaffName, StaffEmail, StaffPassword, StaffPhone, StaffAddress, StaffDob, StaffGender, RoleId, StaffIsActive, StaffCreatedAt) " +
-             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // First, get the next ID to be generated (to form the StaffCode)
+        String sqlNextId = "SELECT IDENT_CURRENT('Staff') + IDENT_INCR('Staff') as next_id";
+        int nextId = 1;
 
         try (Connection conn = new DBContext().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement psId = conn.prepareStatement(sqlNextId);
+             ResultSet rsId = psId.executeQuery()) {
+            if (rsId.next()) {
+                nextId = rsId.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println("Error getting next identity value: " + e.getMessage());
+            // Fallback: Use MAX(StaffId) + 1
+            String sqlMaxId = "SELECT MAX(StaffId) FROM Staff";
+            try (Connection conn = new DBContext().getConnection();
+                 PreparedStatement psMax = conn.prepareStatement(sqlMaxId);
+                 ResultSet rsMax = psMax.executeQuery()) {
+                if (rsMax.next()) {
+                    nextId = rsMax.getInt(1) + 1;
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        String staffCode = String.format("ST%03d", nextId);
+        s.setStaffCode(staffCode);
+
+        // Standard Insert including StaffCode to avoid NOT NULL constraints
+        String sql = "INSERT INTO Staff (StaffCode, StaffName, StaffEmail, StaffPassword, StaffPhone, StaffAddress, StaffDob, StaffGender, RoleId, StaffIsActive, StaffCreatedAt) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             System.out.println("\n=== INSERT STAFF ===");
-            System.out.println("Code: " + staffCode);
-            System.out.println("Name: " + s.getStaffName());
-            System.out.println("Email: " + s.getStaffEmail());
-            System.out.println("RoleId: " + s.getRoleId());
-            
+            System.out.println("Predicted Code: " + staffCode);
+
             ps.setString(1, staffCode);
             ps.setString(2, s.getStaffName());
             ps.setString(3, s.getStaffEmail());
-            ps.setString(4, s.getStaffPassword() != null ? s.getStaffPassword() : ""); // StaffPassword
-            ps.setString(5, s.getStaffPhone() != null ? s.getStaffPhone() : "");  // StaffPhone
-            ps.setString(6, s.getStaffAddress() != null ? s.getStaffAddress() : "");  // StaffAddress
+            ps.setString(4, s.getStaffPassword() != null ? s.getStaffPassword() : "");
+            ps.setString(5, s.getStaffPhone() != null ? s.getStaffPhone() : "");
+            ps.setString(6, s.getStaffAddress() != null ? s.getStaffAddress() : "");
             if (s.getStaffDob() != null) {
                 ps.setDate(7, new java.sql.Date(s.getStaffDob().getTime()));
             } else {
                 ps.setNull(7, java.sql.Types.DATE);
             }
-            ps.setString(8, s.getStaffGender() != null ? s.getStaffGender() : "Khác");  // StaffGender
+            ps.setString(8, s.getStaffGender() != null ? s.getStaffGender() : "Khác");
             ps.setInt(9, s.getRoleId());
-            ps.setBoolean(10, true);  // StaffIsActive
-            ps.setTimestamp(11, new java.sql.Timestamp(System.currentTimeMillis())); // StaffCreatedAt
-            
-            int result = ps.executeUpdate();
-            System.out.println("Result: " + result + " row inserted");
-            
-            if (result > 0) {
-                System.out.println("SUCCESS!\n");
-                return true;
-            } else {
-                System.out.println("FAILED: No rows\n");
-                return false;
-            }
+            ps.setBoolean(10, true);
+            ps.setTimestamp(11, new java.sql.Timestamp(System.currentTimeMillis()));
 
+            int result = ps.executeUpdate();
+            if (result > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        int actualId = rs.getInt(1);
+                        s.setStaffId(actualId);
+                        
+                        // Verification: If predicted ID was wrong, update it finally
+                        String actualCode = String.format("ST%03d", actualId);
+                        if (!actualCode.equals(staffCode)) {
+                            String updateSql = "UPDATE Staff SET StaffCode = ? WHERE StaffId = ?";
+                            try (PreparedStatement psUpdate = conn.prepareStatement(updateSql)) {
+                                psUpdate.setString(1, actualCode);
+                                psUpdate.setInt(2, actualId);
+                                psUpdate.executeUpdate();
+                                s.setStaffCode(actualCode);
+                            }
+                        }
+                    }
+                }
+                System.out.println("SUCCESS: Staff created with Code " + s.getStaffCode());
+                return true;
+            }
         } catch (SQLException e) {
             System.out.println("SQL ERROR: " + e.getMessage());
-            System.out.println("State: " + e.getSQLState());
             e.printStackTrace();
-            System.out.println("FAILED\n");
-            return false;
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
             e.printStackTrace();
-            System.out.println("FAILED\n");
-            return false;
         }
+        return false;
     }
 
     // 5. Login - Authenticate user by email and password
