@@ -15,7 +15,7 @@
 
     <div class="main-content" style="background: #f5f6fa; min-height: 80vh;">
         <h2 class="page-title"> <i class="fas fa-plus text-primary"></i>Thêm danh mục</h2>
-        <div class="form-card shadow-lg p-4 bg-white rounded-4" style="max-width: 1200px; width: 100%;">
+        <div class="form-card shadow-lg p-4 bg-white rounded-4">
             <form action="${pageContext.request.contextPath}/category" method="post">
                 <input type="hidden" name="action" value="insert" />
 

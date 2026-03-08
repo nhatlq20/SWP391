@@ -33,12 +33,14 @@
                             <div class="row g-4">
                                 <div class="col-md-6">
                                     <label class="form-label">Mã thuốc</label>
-                                    <input name="medicineCode" class="form-control" value="${nextMedicineCode}" readonly
+                                    <input id="medicineCodeInput" name="medicineCode" class="form-control"
+                                        value="${nextMedicineCode}" readonly
                                         style="background-color:#e9ecef; cursor:not-allowed;">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Danh mục</label>
-                                    <select name="categoryId" class="form-select" required>
+                                    <select name="categoryId" id="categorySelect" class="form-select" required
+                                        onchange="fetchNextCode(this.value)">
                                         <option value="">Chọn danh mục của thuốc</option>
                                         <c:forEach var="cat" items="${categories}">
                                             <option value="${cat.categoryId}">${cat.categoryName}</option>
@@ -46,8 +48,9 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Ảnh</label>
-                                    <input name="imageUrl" class="form-control" placeholder="Nhập đường dẫn ảnh">
+                                    <label class="form-label">Ảnh <span class="text-danger">*</span></label>
+                                    <input name="imageUrl" class="form-control" placeholder="Nhập đường dẫn ảnh"
+                                        required>
                                 </div>
 
                                 <div class="col-md-6">
@@ -56,14 +59,15 @@
                                         required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Giá bán (đ)</label>
-                                    <input name="sellingPrice" type="number" step="0.01" min="0" class="form-control"
-                                        placeholder="Nhập giá thuốc">
+                                    <label class="form-label">Giá bán (đ) <span class="text-danger">*</span></label>
+                                    <input name="sellingPrice" type="number" step="1" min="1" class="form-control"
+                                        placeholder="Nhập giá thuốc" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Thương hiệu / xuất xứ</label>
+                                    <label class="form-label">Thương hiệu / xuất xứ <span
+                                            class="text-danger">*</span></label>
                                     <input name="brandOrigin" class="form-control"
-                                        placeholder="Nhập thương hiệu / xuất xứ">
+                                        placeholder="Nhập thương hiệu / xuất xứ" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Đơn vị</label>
@@ -76,6 +80,10 @@
                                         <option value="Lọ">Lọ</option>
                                         <option value="Viên">Viên</option>
                                     </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Thành phần</label>
+                                    <input name="ingredients" class="form-control" placeholder="Nhập thành phần thuốc">
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label">Mô tả</label>
@@ -98,6 +106,19 @@
             </div>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script>
+                function fetchNextCode(categoryId) {
+                    var codeInput = document.getElementById('medicineCodeInput');
+                    if (!categoryId) {
+                        codeInput.value = 'MED001';
+                        return;
+                    }
+                    fetch('${pageContext.request.contextPath}/admin/medicine-next-code?categoryId=' + categoryId)
+                        .then(function (resp) { return resp.text(); })
+                        .then(function (code) { codeInput.value = code; })
+                        .catch(function () { codeInput.value = 'MED001'; });
+                }
+            </script>
         </body>
 
         </html>

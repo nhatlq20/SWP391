@@ -7,13 +7,18 @@ public class Medicine {
     private int categoryId;
     private String medicineName;
     private String brandOrigin;
-    private String unit;
     private double originalPrice;
-    private double sellingPrice;
     private String shortDescription;
     private String imageUrl;
     private int remainingQuantity;
     private Category category; // For join query results
+    private MedicineUnit baseUnit; // Base unit from MedicineUnit table (IsBaseUnit=1)
+    private String ingredients; // Thành phần
+
+    // Legacy fields kept for backward compatibility (used only when baseUnit is
+    // null)
+    private String unit;
+    private double sellingPrice;
 
     public Medicine() {
     }
@@ -108,7 +113,22 @@ public class Medicine {
         this.brandOrigin = brandOrigin;
     }
 
+    public String getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(String ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    /**
+     * Returns the unit name from the base unit if available, otherwise falls back
+     * to the legacy field.
+     */
     public String getUnit() {
+        if (baseUnit != null) {
+            return baseUnit.getUnitName();
+        }
         return unit;
     }
 
@@ -124,7 +144,14 @@ public class Medicine {
         this.originalPrice = originalPrice;
     }
 
+    /**
+     * Returns the selling price from the base unit if available, otherwise falls
+     * back to the legacy field.
+     */
     public double getSellingPrice() {
+        if (baseUnit != null) {
+            return baseUnit.getSellingPrice();
+        }
         return sellingPrice;
     }
 
@@ -182,6 +209,14 @@ public class Medicine {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public MedicineUnit getBaseUnit() {
+        return baseUnit;
+    }
+
+    public void setBaseUnit(MedicineUnit baseUnit) {
+        this.baseUnit = baseUnit;
     }
 
     @Override

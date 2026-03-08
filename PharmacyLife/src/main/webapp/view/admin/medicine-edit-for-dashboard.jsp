@@ -37,7 +37,7 @@
                                     <div class="col-md-6">
                                         <label class="form-label">Mã thuốc</label>
                                         <input name="medicineCode" class="form-control" value="${medicine.medicineCode}"
-                                            readonly>
+                                            required>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Danh mục</label>
@@ -79,10 +79,20 @@
                                         </select>
                                     </div>
                                     <div class="col-md-6">
+                                        <label class="form-label">Giá bán (đ)</label>
+                                        <input name="sellingPrice" type="number" step="1" min="1" class="form-control"
+                                            value="${medicine.sellingPrice}" required>
+                                    </div>
+                                    <div class="col-md-6">
                                         <label class="form-label">Giá gốc (đ)</label>
                                         <input name="originalPrice" type="number" step="0.01" min="0"
                                             class="form-control" value="${medicine.originalPrice}" readonly
                                             style="background-color:#e9ecef; cursor:not-allowed;">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Thành phần</label>
+                                        <input name="ingredients" class="form-control" value="${medicine.ingredients}"
+                                            placeholder="Nhập thành phần thuốc">
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label">Mô tả</label>

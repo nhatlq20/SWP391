@@ -66,8 +66,10 @@
                                 <img src="${pageContext.request.contextPath}/assets/img/fname.png" alt="Name">
                                 Họ và tên của bạn
                             </label>
-                            <input type="text" name="fullName" value="${user.fullName}" placeholder="Họ và tên của bạn" required
-                                   ${user.roleID == 1 || user.roleID == 2 ? 'disabled style="background-color: #e9ecef; cursor: not-allowed;"' : ''}>
+                            <input type="text" name="fullName" value="${user.fullName}" placeholder="Họ và tên của bạn"
+                                   oninvalid="this.setCustomValidity('Họ và tên không được để trống')"
+                                   oninput="this.setCustomValidity('')"
+                                   ${user.roleID == 1 || user.roleID == 2 ? 'disabled style="background-color: #e9ecef; cursor: not-allowed;"' : 'required'}>
                         </div>
                         
                         <div class="form-field">
@@ -75,7 +77,9 @@
                                 <img src="${pageContext.request.contextPath}/assets/img/phonea.png" alt="Phone">
                                 Số điện thoại
                             </label>
-                            <input type="tel" name="phone" value="${user.phone}" placeholder="Số điện thoại của bạn">
+                            <input type="tel" name="phone" value="${user.phone}" placeholder="Số điện thoại của bạn" required
+                                   oninvalid="this.setCustomValidity('Số điện thoại không được để trống')"
+                                   oninput="this.setCustomValidity('')">
                         </div>
                     </div>
 
@@ -208,29 +212,27 @@
                 const phoneRegex = /^0\d{9}$/;
                 const addressRegex = /^[\p{L}\p{N}\s.,-]+$/u;
 
-                if (fullNameInput) {
+                if (fullNameInput && !fullNameInput.disabled) {
                     fullNameInput.value = normalizedFullName;
                 }
-                if (phoneInput) {
+                if (phoneInput && !phoneInput.disabled) {
                     phoneInput.value = normalizedPhone;
                 }
-                if (addressInput) {
-                    addressInput.value = normalizedAddress;
+                if (addressInput && !addressInput.disabled) {
+                    if (!normalizedPhone) {
+                        event.preventDefault();
+                        showProfileError("Số điện thoại không được để trống!");
+                        return;
+                    }
+                    if (!phoneRegex.test(normalizedPhone)) {
+                        event.preventDefault();
+                        showProfileError("Số điện thoại phải bắt đầu bằng 0 và có đúng 10 số!");
+                        return;
+                    }
+                    phoneInput.value = normalizedPhone;
                 }
 
-                if (!normalizedFullName || !fullNameRegex.test(normalizedFullName)) {
-                    event.preventDefault();
-                    showProfileError("Họ tên không hợp lệ!");
-                    return;
-                }
-
-                if (normalizedPhone && !phoneRegex.test(normalizedPhone)) {
-                    event.preventDefault();
-                    showProfileError("Số điện thoại phải bắt đầu bằng 0 và có đúng 10 số!");
-                    return;
-                }
-
-                if (dobInput && dobInput.value) {
+                if (dobInput && !dobInput.disabled && dobInput.value) {
                     const selectedDate = new Date(dobInput.value + "T00:00:00");
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
@@ -241,7 +243,7 @@
                     }
                 }
 
-                if (normalizedAddress && !addressRegex.test(normalizedAddress)) {
+                if (addressInput && !addressInput.disabled && normalizedAddress && !addressRegex.test(normalizedAddress)) {
                     event.preventDefault();
                     showProfileError("Địa chỉ không hợp lệ! Chỉ được dùng chữ, số, khoảng trắng và các ký tự . , -");
                 }

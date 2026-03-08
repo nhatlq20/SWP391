@@ -186,4 +186,32 @@ public class ProfileDAO {
             return false;
         }
     }
-}
+    // Check if phone number exists in Customer table (excluding current user)
+    public boolean isCustomerPhoneExists(String phone, int customerId) {
+        String sql = "SELECT CustomerId FROM Customer WHERE PhoneNumber = ? AND CustomerId <> ?";
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, phone);
+            ps.setInt(2, customerId);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Check if phone number exists in Staff table (excluding current user)
+    public boolean isStaffPhoneExists(String phone, int staffId) {
+        String sql = "SELECT StaffId FROM Staff WHERE StaffPhone = ? AND StaffId <> ?";
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, phone);
+            ps.setInt(2, staffId);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }}

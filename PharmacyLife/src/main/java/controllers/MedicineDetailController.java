@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import dao.MedicineDAO;
+import dao.MedicineUnitDAO;
 import dao.OrderDAO;
 import dao.ReviewDAO;
 import jakarta.servlet.ServletException;
@@ -17,6 +18,7 @@ import models.ReviewCustomer;
 public class MedicineDetailController extends HttpServlet {
 
     private final MedicineDAO medicineDAO = new MedicineDAO();
+    private final MedicineUnitDAO medicineUnitDAO = new MedicineUnitDAO();
     private final ReviewDAO reviewDAO = new ReviewDAO();
     private final OrderDAO orderDAO = new OrderDAO();
 
@@ -54,35 +56,42 @@ public class MedicineDetailController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/home");
             return;
         }
-        
+
         try {
             int medicineId = Integer.parseInt(id);
             Medicine medicine = medicineDAO.getMedicineById(medicineId);
-            
+
             if (medicine == null) {
                 response.sendRedirect(request.getContextPath() + "/home");
                 return;
             }
-            
+
             // Lấy danh sách reviews của sản phẩm (với thông tin khách hàng)
             List<ReviewCustomer> reviews = reviewDAO.getReviewsWithCustomerByMedicine(medicineId);
             double averageRating = reviewDAO.getAverageRating(medicineId);
-           int totalReviews = reviewDAO.getTotalReviews(medicineId);
-            
+            int totalReviews = reviewDAO.getTotalReviews(medicineId);
+
+            // Lấy danh sách thành phần từ bảng MedicineIngredients + ActiveIngredients
+            List<String> ingredientNames = medicineDAO.getIngredientNamesByMedicineId(medicineId);
+
             request.setAttribute("medicine", medicine);
+            request.setAttribute("ingredientNames", ingredientNames);
+            request.setAttribute("units", medicineUnitDAO.getUnitsByMedicineId(medicineId));
             request.setAttribute("reviews", reviews);
             request.setAttribute("averageRating", Math.round(averageRating * 10) / 10.0);
-           request.setAttribute("totalReviews", totalReviews);
+            request.setAttribute("totalReviews", totalReviews);
 
             Integer customerId = getLoggedInCustomerId(request);
             boolean canReview = false;
+            boolean hasReviewed = false;
             if (customerId != null && orderDAO.hasCustomerPurchasedMedicine(customerId, medicineId)) {
-                // Chỉ cho đánh giá nếu chưa từng đánh giá sản phẩm này
-                canReview = !reviewDAO.hasCustomerReviewedMedicine(customerId, medicineId);
+                hasReviewed = reviewDAO.hasCustomerReviewedMedicine(customerId, medicineId);
+                canReview = !hasReviewed;
             }
             request.setAttribute("canReview", canReview);
+            request.setAttribute("hasReviewed", hasReviewed);
             request.setAttribute("loggedCustomerId", customerId);
-            
+
             request.getRequestDispatcher("/view/client/medicine-detail.jsp").forward(request, response);
         } catch (NumberFormatException e) {
             response.sendRedirect(request.getContextPath() + "/home");

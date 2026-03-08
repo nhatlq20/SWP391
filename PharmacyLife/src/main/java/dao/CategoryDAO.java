@@ -177,7 +177,8 @@ public class CategoryDAO {
     // kien
     public List<Medicine> getMedicineByCategory(int categoryId) {
         List<Medicine> list = new ArrayList<>();
-        String sql = "SELECT * FROM Medicine WHERE CategoryId = ?";
+        String sql = "SELECT MedicineId, MedicineCode, MedicineName, CategoryId, ImageUrl, RemainingQuantity "
+                + "FROM Medicine WHERE CategoryId = ?";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -190,10 +191,8 @@ public class CategoryDAO {
                     medicine.setMedicineId(rs.getInt("MedicineId"));
                     medicine.setMedicineCode(rs.getString("MedicineCode"));
                     medicine.setMedicineName(rs.getString("MedicineName"));
-                    medicine.setSellingPrice(rs.getDouble("SellingPrice"));
                     medicine.setCategoryId(rs.getInt("CategoryId"));
                     medicine.setImageUrl(rs.getString("ImageUrl"));
-                    medicine.setUnit(rs.getString("Unit"));
                     medicine.setRemainingQuantity(rs.getInt("RemainingQuantity"));
                     list.add(medicine);
                 }
@@ -231,8 +230,8 @@ public class CategoryDAO {
         String prefix = "CAT";
 
         try (Connection conn = dbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 String code = rs.getString("CategoryCode");
@@ -263,6 +262,5 @@ public class CategoryDAO {
 
         return String.format("%s%03d", prefix, maxNumber + 1);
     }
-
 
 }

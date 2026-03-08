@@ -3,6 +3,7 @@ package controllers.admin;
 import dao.StaffDAO;
 import dao.RoleDAO;
 import dao.UserDAO;
+import dao.ProfileDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import java.io.IOException;
@@ -195,6 +196,15 @@ public class StaffController extends HttpServlet {
                     if (existedUser != null) {
                         forwardAddWithError(request, response, "Email này đã được đăng ký!", staffName, staffEmail);
                         return;
+                    }
+
+                    ProfileDAO profileDAO = new ProfileDAO();
+                    if (staffPhone != null && !staffPhone.trim().isEmpty()) {
+                        String normalizedPhone = staffPhone.trim().replaceAll("[\\s.-]", "");
+                        if (profileDAO.isStaffPhoneExists(normalizedPhone, -1)) {
+                            forwardAddWithError(request, response, "Số điện thoại này đã được sử dụng bởi một nhân viên khác!", staffName, staffEmail);
+                            return;
+                        }
                     }
 
                     if (staffPassword.length() < MIN_PASSWORD_LENGTH || staffPassword.length() > MAX_PASSWORD_LENGTH) {

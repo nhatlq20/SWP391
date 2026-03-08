@@ -141,7 +141,7 @@ body {
 }
 
 /* Quantity pill selector */
- qty-pill {
+qty-pill {
     display: inline-flex;
     align-items: stretch;
     border: 1.5px solid #d0d0d0;
@@ -152,7 +152,7 @@ body {
     width: fit-content;
 }
 
- qty-btn {
+qty-btn {
     flex: 0 0 auto;
     background: none;
     border: none;
@@ -166,11 +166,11 @@ body {
     transition: background 0.15s;
 }
 
- qty-btn:hover {
+qty-btn:hover {
     background: #f0f0f0;
 }
 
- qty-input {
+qty-input {
     flex: 0 0 42px;
     width: 42px;
     min-width: 0;
@@ -188,8 +188,8 @@ body {
     appearance: textfield;
 }
 
- qty-input::-webkit-outer-spin-button,
- qty-input::-webkit-inner-spin-button {
+qty-input::-webkit-outer-spin-button,
+qty-input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
@@ -479,20 +479,23 @@ body {
     background: #f6f8fc;
     border: 1px solid #e3e8f2;
     border-radius: 12px;
-    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
 }
 
 .thread-reply-header {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 6px;
+ flex-direction: column;
 }
 
 .reply-staff-name {
     font-size: 14px;
     font-weight: 700;
     color: #0f39c1;
+ 
 }
 
 .reply-role-tag {
@@ -501,14 +504,15 @@ body {
     color: #1d4ed8;
     background: #dbeafe;
     border-radius: 6px;
-    padding: 2px 6px;
+    /* padding: 2px 6px; */
 }
 
 .thread-reply-text {
     font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.4;
     color: #4a5168;
     white-space: pre-line;
+  
 }
 
 .thread-reply-list {
@@ -612,8 +616,17 @@ body {
 
 .review-text {
     color: #666;
-    font-size: 13px;
+    font-size: 50px;
     line-height: 1.6;
+}
+/* Hover effect for review button (btn-primary) */
+
+.btn.btn-primary:hover,
+.btn-primary:hover {
+    background: #2F5BB8;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(63, 111, 217, 0.18);
+    transform: translateY(-2px);
 }
 
 /* Responsive Design */
@@ -689,7 +702,7 @@ body {
 
     .review-comment,
     .thread-reply-text {
-        font-size: 13px;
+        font-size: 14px;
     }
 }
 
@@ -838,7 +851,8 @@ body {
     gap: 32px;
     justify-content: center;
 }
-.btn-danh-gia{
+
+.btn-danh-gia {
     margin-left: 50px;
     width: 250px;
     display: flex;
@@ -846,15 +860,17 @@ body {
     justify-content: flex-start;
 
 }
+
 .btn-danh-gia a.btn,
 .btn-danh-gia button.btn {
     width: 100%;
- padding: 16px 18px;
+    padding: 10px 10px;
     font-size: 1.2rem;
     font-weight: 600;
-        border-radius: 20px;
-        text-align: center;
+    border-radius: 20px;
+    text-align: center;
 }
+
 .average-rating {
     text-align: center;
 }
@@ -954,3 +970,65 @@ body {
     margin: 0;
     font-size: 14px;
 }
+
+/* Unit selector pills */
+.unit-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 18px;
+    border-radius: 999px;
+    border: 1.5px solid #d1d5db;
+    background: #fff;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: border-color .15s, background .15s, color .15s;
+}
+
+.unit-pill:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
+.unit-pill.active {
+    border-color: #2563eb;
+    background: #eff6ff;
+    color: #2563eb;
+    font-weight: 700;
+}
+/* Medicine Info Rows (Table-like design) */
+.medicine-info-rows {
+    margin-top: 25px;
+    margin-bottom: 30px;
+    font-size: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.info-row {
+    display: flex;
+    align-items: flex-start;
+}
+
+.info-label {
+    flex: 0 0 160px;
+    color: #666666;
+    font-weight: 400;
+}
+
+.info-value {
+    flex: 1;
+    color: #1a1a1a;
+    font-weight: 400;
+}
+
+.info-value.info-value--link {
+    color: #3b82f6; /* Matching blue links in the image */
+    text-decoration: none;
+}
+.info-value.info-value--link:hover {
+    text-decoration: underline;
+}
+
