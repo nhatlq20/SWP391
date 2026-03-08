@@ -224,11 +224,17 @@
                                     <select id="modalMedicineId" class="form-select shadow-sm">
                                         <option value="">-- Tìm và chọn thuốc --</option>
                                         <c:forEach var="med" items="${medicines}">
-                                            <option value="${med.medicineId}" data-category="${med.categoryId}">
+                                            <option value="${med.medicineId}" data-category="${med.categoryId}"
+                                                data-unit="${med.unit}">
                                                 ${med.medicineCode} - ${med.medicineName}
                                             </option>
                                         </c:forEach>
                                     </select>
+                                </div>
+                                <div class="form-group mb-4">
+                                    <label class="form-label fw-bold">Đơn vị</label>
+                                    <input type="text" id="modalUnit" class="form-control shadow-sm bg-light" readonly
+                                        placeholder="Tự động hiện đơn vị">
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6">
@@ -328,6 +334,7 @@
                             document.getElementById('modalCategoryId').value = '';
                             filterMedicinesByCategory(); // Reset filter
                             document.getElementById('modalMedicineId').value = '';
+                            document.getElementById('modalUnit').value = '';
                             document.getElementById('modalQuantity').value = '';
                             document.getElementById('modalPrice').value = '';
                             document.getElementById('modalTotalDisplay').textContent = '0₫';
@@ -422,6 +429,10 @@
 
                         document.getElementById('modalMedicineId').addEventListener('change', function () {
                             const medicineId = this.value;
+                            const selectedOption = this.options[this.selectedIndex];
+                            const unit = selectedOption.getAttribute('data-unit') || '';
+                            document.getElementById('modalUnit').value = unit;
+
                             if (medicineId && medicineId.trim() !== '') {
                                 // Clear price field - user must enter manually
                                 document.getElementById('modalPrice').value = '';
