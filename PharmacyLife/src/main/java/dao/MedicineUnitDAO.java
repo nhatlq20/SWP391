@@ -106,7 +106,7 @@ public class MedicineUnitDAO {
      */
     public boolean updateBaseUnit(int medicineId, String unitName, double sellingPrice) {
         String sql = "UPDATE MedicineUnit SET UnitName = ?, SellingPrice = ? "
-                + "WHERE MedicineId = ? AND IsBaseUnit = 1";
+                + "WHERE UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = ? ORDER BY UnitId ASC)";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, unitName);

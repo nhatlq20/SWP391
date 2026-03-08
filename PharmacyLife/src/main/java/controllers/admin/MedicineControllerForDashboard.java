@@ -240,6 +240,38 @@ public class MedicineControllerForDashboard extends HttpServlet {
                 baseUnit.setBaseUnit(true);
                 medicineUnitDAO.addUnit(baseUnit);
 
+                // Add Sub-Unit 1 if provided
+                String subUnit1 = request.getParameter("subUnit1");
+                String subRate1Str = request.getParameter("subRate1");
+                String subPrice1Str = request.getParameter("subPrice1");
+                int rate1 = 0;
+                if (subUnit1 != null && !subUnit1.isEmpty() && subRate1Str != null && !subRate1Str.isEmpty()) {
+                    rate1 = Integer.parseInt(subRate1Str);
+                    MedicineUnit unit1 = new MedicineUnit();
+                    unit1.setMedicineId(newMedicineId);
+                    unit1.setUnitName(subUnit1);
+                    unit1.setConversionRate(rate1);
+                    unit1.setSellingPrice(Double.parseDouble(subPrice1Str));
+                    unit1.setBaseUnit(false);
+                    medicineUnitDAO.addUnit(unit1);
+                }
+
+                // Add Sub-Unit 2 if provided
+                String subUnit2 = request.getParameter("subUnit2");
+                String subRate2Str = request.getParameter("subRate2");
+                String subPrice2Str = request.getParameter("subPrice2");
+                if (subUnit2 != null && !subUnit2.isEmpty() && subRate2Str != null && !subRate2Str.isEmpty()) {
+                    // Cumulative rate: if 1 Hộp = 10 Vỉ and 1 Vỉ = 10 Viên, then 1 Hộp = 100 Viên
+                    int rate2 = rate1 * Integer.parseInt(subRate2Str);
+                    MedicineUnit unit2 = new MedicineUnit();
+                    unit2.setMedicineId(newMedicineId);
+                    unit2.setUnitName(subUnit2);
+                    unit2.setConversionRate(rate2);
+                    unit2.setSellingPrice(Double.parseDouble(subPrice2Str));
+                    unit2.setBaseUnit(false);
+                    medicineUnitDAO.addUnit(unit2);
+                }
+
                 response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
             } else {
                 request.setAttribute("errorMessage", "Không thể thêm thuốc. Vui lòng thử lại.");
