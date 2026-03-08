@@ -457,31 +457,6 @@ public class MedicineDAO {
         return medicine;
     }
 
-    /**
-     * Returns a comma-separated list of IngredientNames for the given medicineId,
-     * joining MedicineIngredients with ActiveIngredients.
-     */
-    public List<String> getIngredientNamesByMedicineId(int medicineId) {
-        List<String> names = new ArrayList<>();
-        String sql = "SELECT ai.IngredientName "
-                + "FROM MedicineIngredients mi "
-                + "JOIN ActiveIngredients ai ON mi.IngredientId = ai.IngredientId "
-                + "WHERE mi.MedicineId = ? "
-                + "ORDER BY ai.IngredientName";
-        try (Connection conn = dbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, medicineId);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    names.add(rs.getString("IngredientName"));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return names;
-    }
-
     public String searchMedicineByKeyword(String keyword) {
         StringBuilder sb = new StringBuilder();
 

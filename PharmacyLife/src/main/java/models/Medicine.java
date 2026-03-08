@@ -13,7 +13,6 @@ public class Medicine {
     private int remainingQuantity;
     private Category category; // For join query results
     private MedicineUnit baseUnit; // Base unit from MedicineUnit table (IsBaseUnit=1)
-    private String ingredients; // Thành phần
 
     // Legacy fields kept for backward compatibility (used only when baseUnit is
     // null)
@@ -111,14 +110,6 @@ public class Medicine {
 
     public void setBrandOrigin(String brandOrigin) {
         this.brandOrigin = brandOrigin;
-    }
-
-    public String getIngredients() {
-        return ingredients;
-    }
-
-    public void setIngredients(String ingredients) {
-        this.ingredients = ingredients;
     }
 
     /**

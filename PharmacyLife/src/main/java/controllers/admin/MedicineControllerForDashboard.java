@@ -220,7 +220,6 @@ public class MedicineControllerForDashboard extends HttpServlet {
 
             medicine.setBrandOrigin(request.getParameter("brandOrigin"));
             medicine.setShortDescription(request.getParameter("shortDescription"));
-            medicine.setIngredients(request.getParameter("ingredients"));
 
             // Insert Medicine and get the new ID
             int newMedicineId = medicineDAO.createMedicineAndReturnId(medicine);
@@ -285,7 +284,6 @@ public class MedicineControllerForDashboard extends HttpServlet {
 
             medicine.setBrandOrigin(request.getParameter("brandOrigin"));
             medicine.setShortDescription(request.getParameter("shortDescription"));
-            medicine.setIngredients(request.getParameter("ingredients"));
 
             boolean success = medicineDAO.updateMedicine(medicine);
             if (success) {

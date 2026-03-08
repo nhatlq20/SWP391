@@ -31,25 +31,19 @@
                                             <div class="medicine-image-box rounded-3 overflow-hidden">
                                                 <c:choose>
                                                     <c:when test="${not empty medicine.imageUrl}">
-                                                        <c:set var="imageUrlTrimmed"
-                                                            value="${fn:trim(medicine.imageUrl)}" />
+                                                        <c:set var="imageUrlTrimmed" value="${fn:trim(medicine.imageUrl)}" />
                                                         <c:choose>
-                                                            <c:when
-                                                                test="${fn:startsWith(imageUrlTrimmed, 'http://') or fn:startsWith(imageUrlTrimmed, 'https://')}">
+                                                            <c:when test="${fn:startsWith(imageUrlTrimmed, 'http://') or fn:startsWith(imageUrlTrimmed, 'https://')}">
                                                                 <c:set var="imgSrc" value="${imageUrlTrimmed}" />
                                                             </c:when>
-                                                            <c:when test="${fn:startsWith(imageUrlTrimmed, '/')}">
-                                                                <c:set var="imgSrc"
-                                                                    value="${pageContext.request.contextPath}${imageUrlTrimmed}" />
+                                                            <c:when test="${fn:startsWith(imageUrlTrimmed, '/')}" >
+                                                                <c:set var="imgSrc" value="${pageContext.request.contextPath}${imageUrlTrimmed}" />
                                                             </c:when>
-                                                            <c:when
-                                                                test="${fn:contains(imageUrlTrimmed, 'assets/img')}">
-                                                                <c:set var="imgSrc"
-                                                                    value="${pageContext.request.contextPath}/${imageUrlTrimmed}" />
+                                                            <c:when test="${fn:contains(imageUrlTrimmed, 'assets/img')}">
+                                                                <c:set var="imgSrc" value="${pageContext.request.contextPath}/${imageUrlTrimmed}" />
                                                             </c:when>
                                                             <c:otherwise>
-                                                                <c:set var="imgSrc"
-                                                                    value="${pageContext.request.contextPath}/assets/img/${imageUrlTrimmed}" />
+                                                                <c:set var="imgSrc" value="${pageContext.request.contextPath}/assets/img/${imageUrlTrimmed}" />
                                                             </c:otherwise>
                                                         </c:choose>
                                                         <img src="<c:out value='${imgSrc}'/>"
@@ -67,12 +61,11 @@
 
                                         <!-- Review Section -->
                                         <div class="review-section">
-
+                                        
 
                                             <!-- Review Stats và nút đánh giá sản phẩm nằm cùng khung, căn trái -->
                                             <c:if test="${totalReviews > 0}">
-                                                <div class="review-stats position-relative"
-                                                    style="padding-bottom: 16px;">
+                                                <div class="review-stats position-relative" style="padding-bottom: 16px;">
                                                     <div class="stats-left">
                                                         <div class="average-rating">
                                                             <span class="rating-number">${averageRating}</span>
@@ -95,26 +88,23 @@
                                                             </p>
                                                         </div>
                                                         <!-- Nút đánh giá sản phẩm nằm dưới dòng chữ, căn trái -->
-                                                        <!-- Không hiện gì nếu không đủ điều kiện, KHÔNG để comment trong c:choose -->
+                                                            <!-- Không hiện gì nếu không đủ điều kiện, KHÔNG để comment trong c:choose -->
                                                         <div class="mt-3 text-end btn-danh-gia">
                                                             <c:choose>
                                                                 <c:when test="${sessionScope.userType eq 'customer'}">
                                                                     <c:choose>
                                                                         <c:when test="${hasReviewed}">
-                                                                            <a class="btn btn-primary" href="#"
-                                                                                onclick="showReviewedToast(); return false;">
+                                                                            <a class="btn btn-primary" href="#" onclick="showReviewedToast(); return false;">
                                                                                 <i class="fas fa-star"></i> Gửi đánh giá
                                                                             </a>
                                                                         </c:when>
                                                                         <c:when test="${canReview}">
-                                                                            <a class="btn btn-primary"
-                                                                                href="${pageContext.request.contextPath}/create-review?medicineId=${medicine.medicineId}">
+                                                                            <a class="btn btn-primary" href="${pageContext.request.contextPath}/create-review?medicineId=${medicine.medicineId}">
                                                                                 <i class="fas fa-star"></i> Gửi đánh giá
                                                                             </a>
                                                                         </c:when>
                                                                         <c:otherwise>
-                                                                            <a class="btn btn-primary" href="#"
-                                                                                onclick="showReviewToast(); return false;">
+                                                                            <a class="btn btn-primary" href="#" onclick="showReviewToast(); return false;">
                                                                                 <i class="fas fa-star"></i> Gửi đánh giá
                                                                             </a>
                                                                         </c:otherwise>
@@ -140,44 +130,34 @@
                                             <div class="reviews-list">
                                                 <c:choose>
                                                     <c:when test="${empty reviews}">
-                                                        <div class="review-stats position-relative"
-                                                            style="padding-bottom: 16px;">
+                                                        <div class="review-stats position-relative" style="padding-bottom: 16px;">
                                                             <div class="stats-left">
                                                                 <div class="average-rating">
                                                                     <span class="rating-number">0</span>
                                                                     <div class="rating-stars">
                                                                         <c:forEach var="i" begin="1" end="5">
-                                                                            <i class="fas fa-star"
-                                                                                style="color: #ddd;"></i>
+                                                                            <i class="fas fa-star" style="color: #ddd;"></i>
                                                                         </c:forEach>
                                                                     </div>
-                                                                    <p class="total-reviews">dựa trên <strong>0</strong>
-                                                                        đánh giá</p>
+                                                                    <p class="total-reviews">dựa trên <strong>0</strong> đánh giá</p>
                                                                 </div>
                                                                 <div class="mt-3 text-end btn-danh-gia">
                                                                     <c:choose>
-                                                                        <c:when
-                                                                            test="${sessionScope.userType eq 'customer'}">
+                                                                        <c:when test="${sessionScope.userType eq 'customer'}">
                                                                             <c:choose>
                                                                                 <c:when test="${hasReviewed}">
-                                                                                    <a class="btn btn-primary" href="#"
-                                                                                        onclick="showReviewedToast(); return false;">
-                                                                                        <i class="fas fa-star"></i> Gửi
-                                                                                        đánh giá
+                                                                                    <a class="btn btn-primary" href="#" onclick="showReviewedToast(); return false;">
+                                                                                        <i class="fas fa-star"></i> Gửi đánh giá
                                                                                     </a>
                                                                                 </c:when>
                                                                                 <c:when test="${canReview}">
-                                                                                    <a class="btn btn-primary"
-                                                                                        href="${pageContext.request.contextPath}/create-review?medicineId=${medicine.medicineId}">
-                                                                                        <i class="fas fa-star"></i> Gửi
-                                                                                        đánh giá
+                                                                                    <a class="btn btn-primary" href="${pageContext.request.contextPath}/create-review?medicineId=${medicine.medicineId}">
+                                                                                        <i class="fas fa-star"></i> Gửi đánh giá
                                                                                     </a>
                                                                                 </c:when>
                                                                                 <c:otherwise>
-                                                                                    <a class="btn btn-primary" href="#"
-                                                                                        onclick="showReviewToast(); return false;">
-                                                                                        <i class="fas fa-star"></i> Gửi
-                                                                                        đánh giá
+                                                                                    <a class="btn btn-primary" href="#" onclick="showReviewToast(); return false;">
+                                                                                        <i class="fas fa-star"></i> Gửi đánh giá
                                                                                     </a>
                                                                                 </c:otherwise>
                                                                             </c:choose>
@@ -255,15 +235,11 @@
                                                                                                 value="${replyLine}" />
                                                                                         </c:otherwise>
                                                                                     </c:choose>
-                                                                                    <div
-                                                                                        class="thread-reply-wrap custom-reply-style">
-                                                                                        <div class="thread-reply-line">
-                                                                                        </div>
+                                                                                    <div class="thread-reply-wrap custom-reply-style">
+                                                                                        <div class="thread-reply-line"></div>
                                                                                         <div class="thread-reply">
-                                                                                            <div
-                                                                                                class="thread-avatar staff-avatar reply-avatar">
-                                                                                                <c:out
-                                                                                                    value="${fn:toUpperCase(fn:substring(fn:trim(replyAuthorName), 0, 1))}" />
+                                                                                            <div class="thread-avatar staff-avatar reply-avatar">
+                                                                                                <c:out value="${fn:toUpperCase(fn:substring(fn:trim(replyAuthorName), 0, 1))}" />
                                                                                             </div>
                                                                                             <div class="thread-reply-content">
                                                                                                 <span class="reply-staff-name reply-author"><c:out value="${replyAuthorName}" /></span>
@@ -284,7 +260,7 @@
                                                                         </a>
                                                                     </c:if>
 
-
+                                                                 
                                                                 </div>
                                                             </div>
                                                         </c:forEach>
@@ -304,7 +280,7 @@
 
                                         <!-- Price -->
                                         <div class="price-section">
-                                            <span class="price-value text-primary" id="priceDisplay">
+                                            <span class="price-value text-primary">
                                                 <c:choose>
                                                     <c:when
                                                         test="${medicine.sellingPrice != null && medicine.sellingPrice > 0}">
@@ -314,24 +290,10 @@
                                                     <c:otherwise>Giá tham khảo</c:otherwise>
                                                 </c:choose>
                                             </span>
-                                            <span class="price-unit" id="unitDisplay">/
+                                            <span class="price-unit">/
                                                 <c:out value='${medicine.unit}' />
                                             </span>
                                         </div>
-
-                                        <!-- Unit Selector -->
-                                        <c:if test="${not empty units}">
-                                            <div class="mb-3 d-flex align-items-center gap-2 flex-wrap">
-                                                <span class="form-label text-muted mb-0 me-1">Chọn đơn vị tính</span>
-                                                <c:forEach var="u" items="${units}" varStatus="st">
-                                                    <button type="button" class="unit-pill ${st.first ? 'active' : ''}"
-                                                        data-price="${u.sellingPrice}" data-unit="${u.unitName}"
-                                                        data-unitid="${u.unitId}" onclick="selectUnit(this)">
-                                                        ${u.unitName}
-                                                    </button>
-                                                </c:forEach>
-                                            </div>
-                                        </c:if>
 
 
                                         <!-- Quantity Selection -->
@@ -348,62 +310,31 @@
                                             </div>
                                         </div>
 
-                                        <!-- Info rows -->
-                                        <div class="medicine-info-rows">
-                                            <div class="info-row">
-                                                <span class="info-label">Danh mục</span>
-                                                <c:choose>
-                                                    <c:when
-                                                        test="${not empty medicine.category and not empty medicine.category.categoryId}">
-                                                        <a href="${pageContext.request.contextPath}/category?id=${medicine.category.categoryId}"
-                                                            class="info-value info-value--link text-decoration-none">
-                                                            <c:out value="${medicine.category.categoryName}" />
-                                                        </a>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="info-value text-muted">Chưa phân loại</span>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </div>
-                                            <c:if test="${not empty ingredientNames}">
-                                                <div class="info-row">
-                                                    <span class="info-label">Thành phần</span>
-                                                    <span class="info-value text-dark">
-                                                        <c:forEach var="ing" items="${ingredientNames}" varStatus="st">
-                                                            <c:out value="${ing}" />
-                                                            <c:if test="${!st.last}">, </c:if>
-                                                        </c:forEach>
-                                                    </span>
-                                                </div>
-                                            </c:if>
+                                        <!-- Category -->
+                                        <div class="category-section">
+                                            <span class="category-label">Danh mục:</span>
+                                            <span class="category-value">
+                                                <c:out value='${medicine.category.categoryName}'
+                                                    default='Chưa phân loại' />
+                                            </span>
+                                        </div>
 
-                                            <c:if test="${not empty medicine.brandOrigin}">
-                                                <div class="info-row">
-                                                    <span class="info-label">Nước sản xuất</span>
-                                                    <span class="info-value text-dark">
-                                                        <c:out value="${medicine.brandOrigin}" />
-                                                    </span>
-                                                </div>
-                                            </c:if>
-
-                                            <c:if test="${not empty medicine.shortDescription}">
-                                                <div class="info-row">
-                                                    <span class="info-label">Mô tả ngắn</span>
-                                                    <span class="info-value text-dark">
-                                                        <c:out value="${medicine.shortDescription}" />
-                                                    </span>
-                                                </div>
-                                            </c:if>
+                                        <!-- Description -->
+                                        <div class="description-section">
+                                            <span class="section-title">Mô tả ngắn:</span>
+                                            <p class="section-content">
+                                                <c:out value='${medicine.shortDescription}' />
+                                            </p>
                                         </div>
 
                                         <!-- Action Buttons -->
+
                                         <div class="action-buttons">
                                             <form id="addToCartForm" action="${pageContext.request.contextPath}/cart"
                                                 method="POST" style="display: none;">
                                                 <input type="hidden" name="action" value="add">
                                                 <input type="hidden" name="id" value="${medicine.medicineId}">
                                                 <input type="hidden" name="quantity" id="formQuantity" value="1">
-                                                <input type="hidden" name="unitId" id="formUnitId" value="">
                                             </form>
 
                                             <button class="btn-buy btn btn-primary"
@@ -425,10 +356,8 @@
                                 <script
                                     src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
                                 <!-- Toast đã đánh giá -->
-                                <div id="reviewed-toast"
-                                    style="display:none;position:fixed;z-index:9999;top:80px;right:30px;min-width:320px;max-width:90vw;background:#fff;color:#333;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);padding:18px 28px;font-size:1rem;align-items:center;gap:12px;border-left:5px solid #3b82f6;">
-                                    <i class="fas fa-info-circle"
-                                        style="color:#3b82f6;font-size:1.5rem;margin-right:10px;"></i>
+                                <div id="reviewed-toast" style="display:none;position:fixed;z-index:9999;top:80px;right:30px;min-width:320px;max-width:90vw;background:#fff;color:#333;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);padding:18px 28px;font-size:1rem;align-items:center;gap:12px;border-left:5px solid #3b82f6;">
+                                    <i class="fas fa-info-circle" style="color:#3b82f6;font-size:1.5rem;margin-right:10px;"></i>
                                     <span>Bạn đã đánh giá sản phẩm này rồi.</span>
                                 </div>
                                 <script>
@@ -436,7 +365,7 @@
                                         var toast = document.getElementById('reviewed-toast');
                                         if (!toast) return;
                                         toast.style.display = 'flex';
-                                        setTimeout(function () {
+                                        setTimeout(function() {
                                             toast.style.display = 'none';
                                         }, 2500);
                                     }
@@ -444,19 +373,16 @@
                                 <script src="${pageContext.request.contextPath}/assets/js/detail.js"></script>
 
                                 <!-- Toast thông báo khi chưa mua mà bấm đánh giá -->
-                                <div id="review-toast"
-                                    style="display:none;position:fixed;z-index:9999;top:30px;right:30px;min-width:320px;max-width:90vw;background:#fff;color:#333;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);padding:18px 28px;font-size:1rem;align-items:center;gap:12px;border-left:5px solid #f39c12;">
-                                    <i class="fas fa-exclamation-triangle"
-                                        style="color:#f39c12;font-size:1.5rem;margin-right:10px;"></i>
-                                    <span>Bạn chỉ có thể đánh giá sản phẩm sau khi đã mua và đơn hàng đã được
-                                        giao.</span>
+                                <div id="review-toast" style="display:none;position:fixed;z-index:9999;top:30px;right:30px;min-width:320px;max-width:90vw;background:#fff;color:#333;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);padding:18px 28px;font-size:1rem;align-items:center;gap:12px;border-left:5px solid #f39c12;">
+                                    <i class="fas fa-exclamation-triangle" style="color:#f39c12;font-size:1.5rem;margin-right:10px;"></i>
+                                    <span>Bạn chỉ có thể đánh giá sản phẩm sau khi đã mua và đơn hàng đã được giao.</span>
                                 </div>
                                 <script>
                                     function showReviewToast() {
                                         var toast = document.getElementById('review-toast');
                                         if (!toast) return;
                                         toast.style.display = 'flex';
-                                        setTimeout(function () {
+                                        setTimeout(function() {
                                             toast.style.display = 'none';
                                         }, 2500);
                                     }
@@ -565,13 +491,11 @@
 
                                         const qty = document.getElementById('quantity').value;
                                         const mainImg = document.querySelector('.main-img');
-                                        const unitId = document.getElementById('formUnitId').value;
 
                                         const formData = new URLSearchParams();
                                         formData.append('action', 'add');
                                         formData.append('id', '${medicine.medicineId}');
                                         formData.append('quantity', qty);
-                                        if (unitId) formData.append('unitId', unitId);
 
                                         fetch('${pageContext.request.contextPath}/cart', {
                                             method: 'POST',
@@ -588,9 +512,11 @@
                                             })
                                             .then(data => {
                                                 if (data.success) {
+                                                    // Start fly animation
                                                     if (typeof animateFlyToCart === 'function') {
                                                         animateFlyToCart(mainImg);
                                                     }
+                                                    // Update header count
                                                     if (typeof updateHeaderCartCount === 'function') {
                                                         setTimeout(() => updateHeaderCartCount(data.cartCount), 800);
                                                     }
@@ -602,39 +528,7 @@
                                             });
                                     }
 
-                                    function selectUnit(btn) {
-                                        // Deactivate all pills
-                                        document.querySelectorAll('.unit-pill').forEach(function (p) {
-                                            p.classList.remove('active');
-                                        });
-                                        btn.classList.add('active');
-
-                                        // Update price display
-                                        var price = parseFloat(btn.dataset.price);
-                                        var unitName = btn.dataset.unit;
-                                        var unitId = btn.dataset.unitid;
-
-                                        var priceEl = document.getElementById('priceDisplay');
-                                        if (priceEl) {
-                                            priceEl.textContent = price > 0
-                                                ? price.toLocaleString('vi-VN') + '₫'
-                                                : 'Giá tham khảo';
-                                        }
-
-                                        var unitEl = document.getElementById('unitDisplay');
-                                        if (unitEl) unitEl.textContent = '/ ' + unitName;
-
-                                        // Store unitId for cart
-                                        var formUnitId = document.getElementById('formUnitId');
-                                        if (formUnitId) formUnitId.value = unitId;
-                                    }
-
-                                    // Init: activate first pill on load
-                                    document.addEventListener('DOMContentLoaded', function () {
-                                        var firstPill = document.querySelector('.unit-pill');
-                                        if (firstPill) selectUnit(firstPill);
-                                        bindInlineReplyForms();
-                                    });
+                                    document.addEventListener('DOMContentLoaded', bindInlineReplyForms);
                                 </script>
                 </body>
 
