@@ -81,6 +81,10 @@
                                         <option value="Viên">Viên</option>
                                     </select>
                                 </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Thành phần</label>
+                                    <input name="ingredients" class="form-control" placeholder="Nhập thành phần thuốc">
+                                </div>
                                 <div class="col-12">
                                     <label class="form-label">Mô tả</label>
                                     <textarea name="shortDescription" rows="4" class="form-control"
