@@ -73,9 +73,12 @@ public class MedicineDetailController extends HttpServlet {
 
             // Lấy danh sách thành phần từ bảng MedicineIngredients + ActiveIngredients
             List<String> ingredientNames = medicineDAO.getIngredientNamesByMedicineId(medicineId);
+            // Lấy danh sách công dụng/tình trạng từ bảng MedicineConditions + Conditions
+            List<String> conditionNames = medicineDAO.getConditionNamesByMedicineId(medicineId);
 
             request.setAttribute("medicine", medicine);
             request.setAttribute("ingredientNames", ingredientNames);
+            request.setAttribute("conditionNames", conditionNames);
             request.setAttribute("units", medicineUnitDAO.getUnitsByMedicineId(medicineId));
             request.setAttribute("reviews", reviews);
             request.setAttribute("averageRating", Math.round(averageRating * 10) / 10.0);

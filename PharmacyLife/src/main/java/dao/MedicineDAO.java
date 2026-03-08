@@ -143,21 +143,35 @@ public class MedicineDAO {
     public List<Medicine> searchMedicines(String searchTerm) {
         List<Medicine> medicines = new ArrayList<>();
 
-        String sql = "SELECT m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, "
+        String sql = "SELECT DISTINCT m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, "
                 + "m.OriginalPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, "
                 + "c.CategoryName, "
                 + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
                 + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY UnitId ASC) "
+                + "LEFT JOIN MedicineIngredients mi ON m.MedicineId = mi.MedicineId "
+                + "LEFT JOIN ActiveIngredients ai ON mi.IngredientId = ai.IngredientId "
+                + "LEFT JOIN ConditionMedicines mc ON m.MedicineId = mc.MedicineId "
+                + "LEFT JOIN Conditions con ON mc.ConditionId = con.ConditionId "
                 + "WHERE m.MedicineName LIKE ? "
+                + "OR m.ShortDescription LIKE ? "
+                + "OR m.BrandOrigin LIKE ? "
+                + "OR c.CategoryName LIKE ? "
+                + "OR ai.IngredientName LIKE ? "
+                + "OR ai.Description LIKE ? "
+                + "OR con.ConditionName LIKE ? "
+                + "OR con.Description LIKE ? "
+                + "OR con.Advice LIKE ? "
                 + "ORDER BY m.MedicineName";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
             String searchPattern = "%" + searchTerm + "%";
-            ps.setString(1, searchPattern);
+            for (int i = 1; i <= 9; i++) {
+                ps.setString(i, searchPattern);
+            }
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -482,22 +496,51 @@ public class MedicineDAO {
         return names;
     }
 
+    public List<String> getConditionNamesByMedicineId(int medicineId) {
+        List<String> names = new ArrayList<>();
+        String sql = "SELECT con.ConditionName "
+                + "FROM ConditionMedicines mc "
+                + "JOIN Conditions con ON mc.ConditionId = con.ConditionId "
+                + "WHERE mc.MedicineId = ? "
+                + "ORDER BY con.ConditionName";
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, medicineId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    names.add(rs.getString("ConditionName"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return names;
+    }
+
     public String searchMedicineByKeyword(String keyword) {
         StringBuilder sb = new StringBuilder();
 
         try (Connection conn = dbContext.getConnection()) {
 
-            String sql = "SELECT TOP 3 "
-                    + "MedicineName, ShortDescription, SellingPrice, Unit, ImageUrl "
-                    + "FROM Medicine "
-                    + "WHERE MedicineName LIKE ? "
-                    + "OR ShortDescription LIKE ? "
-                    + "OR BrandOrigin LIKE ?";
+            String sql = "SELECT TOP 3 DISTINCT "
+                    + "m.MedicineName, m.ShortDescription, mu.SellingPrice, mu.UnitName as Unit, m.ImageUrl "
+                    + "FROM Medicine m "
+                    + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY UnitId ASC) "
+                    + "LEFT JOIN MedicineIngredients mi ON m.MedicineId = mi.MedicineId "
+                    + "LEFT JOIN ActiveIngredients ai ON mi.IngredientId = ai.IngredientId "
+                    + "LEFT JOIN ConditionMedicines mc ON m.MedicineId = mc.MedicineId "
+                    + "LEFT JOIN Conditions con ON mc.ConditionId = con.ConditionId "
+                    + "WHERE m.MedicineName LIKE ? "
+                    + "OR m.ShortDescription LIKE ? "
+                    + "OR m.BrandOrigin LIKE ? "
+                    + "OR ai.IngredientName LIKE ? "
+                    + "OR con.ConditionName LIKE ? "
+                    + "OR con.Description LIKE ?";
 
             PreparedStatement ps = conn.prepareStatement(sql);
             String pattern = "%" + keyword + "%";
 
-            for (int i = 1; i <= 3; i++) {
+            for (int i = 1; i <= 6; i++) {
                 ps.setString(i, pattern);
             }
 
