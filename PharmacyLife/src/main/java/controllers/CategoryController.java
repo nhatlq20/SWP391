@@ -87,14 +87,17 @@ public class CategoryController extends HttpServlet {
 	// =============================
 	private void viewDetail(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
-		int id = Integer.parseInt(request.getParameter("id"));
+		int id = parsePositiveInt(request.getParameter("id"));
+		if (id <= 0) {
+			response.sendRedirect(request.getContextPath() + "/category?action=list");
+			return;
+		}
 
 		Category category = dao.getCategoryById(id);
 		List<Medicine> medicine = dao.getMedicineByCategory(id);
 
-		if (medicine == null) {
-			response.sendRedirect("category?action=list");
+		if (category == null) {
+			response.sendRedirect(request.getContextPath() + "/category?action=list");
 			return;
 		}
 
@@ -111,20 +114,25 @@ public class CategoryController extends HttpServlet {
 	private void deleteCategory(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		if (!isAdmin(request)) {
-			response.sendRedirect("category?action=list");
+			response.sendRedirect(request.getContextPath() + "/category?action=list");
 			return;
 		}
 
-		int id = Integer.parseInt(request.getParameter("id"));
+		int id = parsePositiveInt(request.getParameter("id"));
+		if (id <= 0) {
+			response.sendRedirect(request.getContextPath() + "/category?action=list");
+			return;
+		}
+
 		dao.deleteCategory(id);
 
-		response.sendRedirect("category?action=list");
+		response.sendRedirect(request.getContextPath() + "/category?action=list");
 	}
 
 	private void showInsertForm(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		if (!isAdmin(request)) {
-			response.sendRedirect("category?action=list");
+			response.sendRedirect(request.getContextPath() + "/category?action=list");
 			return;
 		}
 		request.setAttribute("nextCategoryCode", dao.generateNextCategoryCode());
@@ -134,7 +142,7 @@ public class CategoryController extends HttpServlet {
 	private void insertCategory(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		if (!isAdmin(request)) {
-			response.sendRedirect("category?action=list");
+			response.sendRedirect(request.getContextPath() + "/category?action=list");
 			return;
 		}
 		String name = request.getParameter("categoryName");
@@ -154,7 +162,7 @@ public class CategoryController extends HttpServlet {
 
 		dao.createCategory(c);
 
-		response.sendRedirect("category?action=list");
+		response.sendRedirect(request.getContextPath() + "/category?action=list");
 
 	}
 
@@ -162,11 +170,26 @@ public class CategoryController extends HttpServlet {
 			throws ServletException, IOException {
 
 		String keyword = request.getParameter("keyword");
+		if (keyword == null) {
+			keyword = "";
+		}
 		List<Category> list = dao.searchCategoryByName(keyword);
 		request.setAttribute("categoryList", list);
 		request.getRequestDispatcher("/view/admin/category-list.jsp")
 				.forward(request, response);
 
+	}
+
+	private int parsePositiveInt(String raw) {
+		if (raw == null) {
+			return -1;
+		}
+		try {
+			int value = Integer.parseInt(raw.trim());
+			return value > 0 ? value : -1;
+		} catch (NumberFormatException ex) {
+			return -1;
+		}
 	}
 
 	private boolean isAdmin(HttpServletRequest request) {

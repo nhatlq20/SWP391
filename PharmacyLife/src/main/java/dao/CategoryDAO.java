@@ -177,8 +177,16 @@ public class CategoryDAO {
     // kien
     public List<Medicine> getMedicineByCategory(int categoryId) {
         List<Medicine> list = new ArrayList<>();
-        String sql = "SELECT MedicineId, MedicineCode, MedicineName, CategoryId, ImageUrl, RemainingQuantity "
-                + "FROM Medicine WHERE CategoryId = ?";
+        String sql = "SELECT m.MedicineId, m.MedicineCode, m.MedicineName, m.CategoryId, m.ImageUrl, m.RemainingQuantity, "
+            + "mu.UnitName, mu.SellingPrice "
+            + "FROM Medicine m "
+            + "OUTER APPLY ( "
+            + "    SELECT TOP 1 UnitName, SellingPrice "
+            + "    FROM MedicineUnit u "
+            + "    WHERE u.MedicineId = m.MedicineId "
+            + "    ORDER BY CASE WHEN u.IsBaseUnit = 1 THEN 0 ELSE 1 END, u.UnitId "
+            + ") mu "
+            + "WHERE m.CategoryId = ?";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -194,6 +202,8 @@ public class CategoryDAO {
                     medicine.setCategoryId(rs.getInt("CategoryId"));
                     medicine.setImageUrl(rs.getString("ImageUrl"));
                     medicine.setRemainingQuantity(rs.getInt("RemainingQuantity"));
+                    medicine.setUnit(rs.getString("UnitName"));
+                    medicine.setSellingPrice(rs.getDouble("SellingPrice"));
                     list.add(medicine);
                 }
             }
