@@ -1,6 +1,7 @@
 package controllers;
 
 import dao.CustomerDAO;
+import dao.ProfileDAO;
 import dao.UserDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -134,9 +135,13 @@ public class RegisterController extends HttpServlet {
         }
 
         // Validate password match
-        if (!password.equals(confirmPassword)) {
-            forwardRegisterError(request, response, "Mật khẩu xác nhận không khớp!", fullName, phone, email);
-            return;
+        if (password.equals(confirmPassword)) {
+            // Check if phone already exists
+            ProfileDAO profileDAO = new ProfileDAO();
+            if (profileDAO.isPhoneNumberExists(phone)) {
+                forwardRegisterError(request, response, "Số điện thoại này đã được đăng ký!", fullName, phone, email);
+                return;
+            }
         }
 
         // Check if email already exists
