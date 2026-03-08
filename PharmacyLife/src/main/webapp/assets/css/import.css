@@ -133,7 +133,8 @@
 .modal {
     display: none;
     position: fixed;
-    z-index: 1000;
+    z-index: 10500;
+    /* Increased to be higher than Header (9999) */
     left: 0;
     top: 0;
     width: 100%;
@@ -141,11 +142,14 @@
     background-color: rgba(15, 23, 42, 0.6);
     backdrop-filter: blur(8px);
     transition: all 0.3s ease;
+    overflow-y: auto;
+    /* Allow scrolling if modal content is too long */
 }
 
 .modal-content {
     background-color: white;
-    margin: 4% auto;
+    margin: 140px auto 40px;
+    /* 140px from top to clear the 115px header with a nice gap */
     padding: 0;
     border-radius: 24px;
     width: 90%;
@@ -153,6 +157,7 @@
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.2);
     overflow: hidden;
+    position: relative;
     animation: modalScaleUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
