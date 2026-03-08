@@ -86,6 +86,10 @@ public class RevenueServlet extends HttpServlet {
             request.setAttribute("actualReceived", displayRecv);
             request.setAttribute("receivable", displayDebt);
             request.setAttribute("statusStats", statusStats);
+
+            // Fetch and set top lists
+            request.setAttribute("topProducts", revenueDAO.getTopSellingProducts(fromDate, toDate, 5));
+            request.setAttribute("topCustomers", revenueDAO.getTopCustomers(fromDate, toDate, 5));
         } catch (Exception e) {
             e.printStackTrace();
         }
