@@ -25,6 +25,7 @@ public class AdminImportController extends HttpServlet {
     private ImportDAO importDAO;
     private MedicineDAO medicineDAO;
     private dao.SupplierDAO supplierDAO;
+    private dao.CategoryDAO categoryDAO;
 
     private boolean isAdmin(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -55,6 +56,7 @@ public class AdminImportController extends HttpServlet {
         importDAO = new ImportDAO();
         medicineDAO = new MedicineDAO();
         supplierDAO = new dao.SupplierDAO();
+        categoryDAO = new dao.CategoryDAO();
     }
 
     // Kiểm tra quyền admin
@@ -219,6 +221,9 @@ public class AdminImportController extends HttpServlet {
         List<models.Supplier> suppliers = importDAO.getAllSuppliers();
         request.setAttribute("suppliers", suppliers);
 
+        List<models.Category> categories = categoryDAO.getAllCategories();
+        request.setAttribute("categories", categories);
+
         request.getRequestDispatcher(getImportView("create", request)).forward(request, response);
     }
 
@@ -244,6 +249,9 @@ public class AdminImportController extends HttpServlet {
 
             List<models.Supplier> suppliers = importDAO.getAllSuppliers();
             request.setAttribute("suppliers", suppliers);
+
+            List<models.Category> categories = categoryDAO.getAllCategories();
+            request.setAttribute("categories", categories);
 
             request.getRequestDispatcher(getImportView("edit", request)).forward(request, response);
         } else {
@@ -495,6 +503,8 @@ public class AdminImportController extends HttpServlet {
                 request.setAttribute("medicines", medicines);
                 List<models.Supplier> suppliers = importDAO.getAllSuppliers();
                 request.setAttribute("suppliers", suppliers);
+                List<models.Category> categories = categoryDAO.getAllCategories();
+                request.setAttribute("categories", categories);
                 request.getRequestDispatcher(getImportView("edit", request)).forward(request, response);
                 return;
             }
