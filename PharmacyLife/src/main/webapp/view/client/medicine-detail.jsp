@@ -270,18 +270,17 @@
                                                                                                 <c:out
                                                                                                     value="${fn:toUpperCase(fn:substring(fn:trim(replyAuthorName), 0, 1))}" />
                                                                                             </div>
-                                                                                            <div
-                                                                                                class="thread-reply-content">
-                                                                                                <span
-                                                                                                    class="reply-staff-name reply-author">
-                                                                                                    <c:out
-                                                                                                        value="${replyAuthorName}" />
-                                                                                                </span>
-                                                                                                <span
-                                                                                                    class="thread-reply-text reply-body">
-                                                                                                    <c:out
-                                                                                                        value="${replyBodyText}" />
-                                                                                                </span>
+                                                                                            <div class="thread-reply-content">
+                                                                                                <div class="reply-inline-group">
+                                                                                                   <div>
+                                                                                                        <span class="reply-staff-name reply-author">
+                                                                                                            <c:out value="${replyAuthorName}" />
+                                                                                                        </span>
+                                                                                                        <span class="thread-reply-text reply-body">
+                                                                                                            <c:out value="${replyBodyText}" />
+                                                                                                        </span>
+                                                                                                   </div>
+                                                                                                </div>
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>

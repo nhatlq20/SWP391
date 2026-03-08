@@ -1,6 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+            <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
             <!DOCTYPE html>
             <html>
 
@@ -25,11 +26,11 @@
                         <div class="row mb-4">
                             <div class="col-12 col-md-6 text-start">
                                 <span class="category-info-label">Mã danh mục:</span>
-                                <span class="category-info-value ms-2">${category.categoryCode}</span>
+                                <span class="category-info-value ms-2"><c:out value="${category.categoryCode}" /></span>
                             </div>
                             <div class="col-12 col-md-6 text-end">
                                 <span class="category-info-label">Tên danh mục:</span>
-                                <span class="category-info-value ms-2">${category.categoryName}</span>
+                                <span class="category-info-value ms-2"><c:out value="${category.categoryName}" /></span>
                             </div>
                         </div>
                         <div class="table-responsive">
@@ -49,22 +50,53 @@
                                         <c:when test="${not empty medicineList}">
                                             <c:forEach items="${medicineList}" var="m">
                                                 <tr>
-                                                    <td>${m.medicineCode}</td>
+                                                    <td><c:out value="${m.medicineCode}" /></td>
                                                     <td>
-                                                        <img src="${pageContext.request.contextPath}${m.imageUrl}" alt="${m.medicineName}" class="medicine-img">
+                                                        <c:choose>
+                                                            <c:when test="${not empty m.imageUrl}">
+                                                                <c:set var="imageUrlTrimmed" value="${fn:trim(m.imageUrl)}" />
+                                                                <c:choose>
+                                                                    <c:when test="${fn:startsWith(imageUrlTrimmed, 'http://') or fn:startsWith(imageUrlTrimmed, 'https://')}">
+                                                                        <img src="<c:out value='${imageUrlTrimmed}'/>" alt="<c:out value='${m.medicineName}'/>" class="medicine-img">
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <img src="${pageContext.request.contextPath}<c:out value='${imageUrlTrimmed}'/>" alt="<c:out value='${m.medicineName}'/>" class="medicine-img">
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span class="text-muted">-</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                     </td>
-                                                    <td>${m.medicineName}</td>
+                                                    <td><c:out value="${m.medicineName}" /></td>
                                                     <td class="price">
-                                                        <fmt:formatNumber value="${m.sellingPrice}" pattern="#,##0.0" />đ
+                                                        <c:choose>
+                                                            <c:when test="${m.sellingPrice gt 0}">
+                                                                <fmt:formatNumber value="${m.sellingPrice}" pattern="#,##0.0" />đ
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span class="text-muted">-</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                     </td>
-                                                    <td>${m.unit}</td>
-                                                    <td>${m.remainingQuantity}</td>
+                                                    <td>
+                                                        <c:choose>
+                                                            <c:when test="${not empty m.unit}">
+                                                                <c:out value="${m.unit}" />
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span class="text-muted">-</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </td>
+                                                    <td><c:out value="${m.remainingQuantity}" /></td>
                                                 </tr>
                                             </c:forEach>
                                         </c:when>
                                         <c:otherwise>
                                             <tr>
-                                                <td colspan="6" class "text-center text-muted py-4">Danh mục này chưa có thuốc.</td>
+                                                <td colspan="6" class="text-center text-muted py-4">Danh mục này chưa có thuốc.</td>
                                             </tr>
                                         </c:otherwise>
                                     </c:choose>
