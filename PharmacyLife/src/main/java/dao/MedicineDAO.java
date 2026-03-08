@@ -374,22 +374,79 @@ public class MedicineDAO {
         }
     }
 
-    public boolean addQuantityAndSetOriginalPrice(int medicineId, int quantityToAdd, double newOriginalPrice) {
-        String sql = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity + ?, OriginalPrice = ? WHERE MedicineId = ?";
+    public double updateStockAndReturnPriceRatio(int medicineId, int quantityToAdd, double newOriginalPrice) {
+        String querySql = "SELECT OriginalPrice FROM Medicine WHERE MedicineId = ?";
+        String updateQtySql = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity + ? WHERE MedicineId = ?";
+        double ratio = 1.0;
 
-        try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = dbContext.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                double currentPrice = 0;
+                try (PreparedStatement psFilter = conn.prepareStatement(querySql)) {
+                    psFilter.setInt(1, medicineId);
+                    try (ResultSet rs = psFilter.executeQuery()) {
+                        if (rs.next()) {
+                            currentPrice = rs.getDouble("OriginalPrice");
+                        }
+                    }
+                }
 
-            ps.setInt(1, quantityToAdd);
-            ps.setDouble(2, newOriginalPrice);
-            ps.setInt(3, medicineId);
+                // Update quantity in Medicine table
+                try (PreparedStatement psQty = conn.prepareStatement(updateQtySql)) {
+                    psQty.setInt(1, quantityToAdd);
+                    psQty.setInt(2, medicineId);
+                    psQty.executeUpdate();
+                }
 
-            int result = ps.executeUpdate();
-            return result > 0;
+                if (newOriginalPrice > currentPrice) {
+                    if (currentPrice > 0) {
+                        ratio = newOriginalPrice / currentPrice;
+                    }
 
+                    // Update OriginalPrice in Medicine
+                    String updateMedPriceSql = "UPDATE Medicine SET OriginalPrice = ? WHERE MedicineId = ?";
+                    try (PreparedStatement psMedPrice = conn.prepareStatement(updateMedPriceSql)) {
+                        psMedPrice.setDouble(1, newOriginalPrice);
+                        psMedPrice.setInt(2, medicineId);
+                        psMedPrice.executeUpdate();
+                    }
+
+                    // Update SellingPrice in MedicineUnit with rounding
+                    String fetchUnitsSql = "SELECT UnitId, SellingPrice FROM MedicineUnit WHERE MedicineId = ?";
+                    String updateUnitPriceSql = "UPDATE MedicineUnit SET SellingPrice = ? WHERE UnitId = ?";
+                    try (PreparedStatement psFetch = conn.prepareStatement(fetchUnitsSql)) {
+                        psFetch.setInt(1, medicineId);
+                        try (ResultSet rsUnits = psFetch.executeQuery()) {
+                            while (rsUnits.next()) {
+                                int unitId = rsUnits.getInt("UnitId");
+                                double oldSellPrice = rsUnits.getDouble("SellingPrice");
+                                double newSellPrice = oldSellPrice * ratio;
+                                newSellPrice = Math.round(newSellPrice / 100.0) * 100.0;
+                                try (PreparedStatement psUpdateUnit = conn.prepareStatement(updateUnitPriceSql)) {
+                                    psUpdateUnit.setDouble(1, newSellPrice);
+                                    psUpdateUnit.setInt(2, unitId);
+                                    psUpdateUnit.executeUpdate();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                conn.commit();
+                return ratio;
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
+        return 1.0;
+    }
+
+    public boolean addQuantityAndSetOriginalPrice(int medicineId, int quantityToAdd, double newOriginalPrice) {
+        return updateStockAndReturnPriceRatio(medicineId, quantityToAdd, newOriginalPrice) >= 1.0;
     }
 
     public boolean medicineExists(int medicineId) {

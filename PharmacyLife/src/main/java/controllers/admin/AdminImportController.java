@@ -11,6 +11,8 @@ import java.util.Map;
 
 import dao.ImportDAO;
 import dao.MedicineDAO;
+import dao.SupplierDAO;
+import models.Supplier;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +26,9 @@ public class AdminImportController extends HttpServlet {
 
     private ImportDAO importDAO;
     private MedicineDAO medicineDAO;
+    private SupplierDAO supplierDAO;
+    private dao.CategoryDAO categoryDAO;
+    private dao.MedicineUnitDAO medicineUnitDAO;
 
     private boolean isAdmin(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -53,6 +58,9 @@ public class AdminImportController extends HttpServlet {
     public void init() throws ServletException {
         importDAO = new ImportDAO();
         medicineDAO = new MedicineDAO();
+        supplierDAO = new SupplierDAO();
+        categoryDAO = new dao.CategoryDAO();
+        medicineUnitDAO = new dao.MedicineUnitDAO();
     }
 
     // Kiểm tra quyền admin
@@ -211,8 +219,14 @@ public class AdminImportController extends HttpServlet {
         List<Medicine> medicines = importDAO.getAllMedicines();
         request.setAttribute("medicines", medicines);
 
-        List<Object[]> suppliers = importDAO.getAllSuppliers();
+        List<Supplier> suppliers = supplierDAO.getAllSuppliers();
         request.setAttribute("suppliers", suppliers);
+
+        List<models.Category> categories = categoryDAO.getAllCategories();
+        request.setAttribute("categories", categories);
+
+        List<models.MedicineUnit> medicineUnits = medicineUnitDAO.getAllUnits();
+        request.setAttribute("medicineUnits", medicineUnits);
 
         request.getRequestDispatcher(getImportView("create", request)).forward(request, response);
     }
@@ -237,8 +251,14 @@ public class AdminImportController extends HttpServlet {
             List<Medicine> medicines = importDAO.getAllMedicines();
             request.setAttribute("medicines", medicines);
 
-            List<Object[]> suppliers = importDAO.getAllSuppliers();
+            List<Supplier> suppliers = supplierDAO.getAllSuppliers();
             request.setAttribute("suppliers", suppliers);
+
+            List<models.Category> categories = categoryDAO.getAllCategories();
+            request.setAttribute("categories", categories);
+
+            List<models.MedicineUnit> medicineUnits = medicineUnitDAO.getAllUnits();
+            request.setAttribute("medicineUnits", medicineUnits);
 
             request.getRequestDispatcher(getImportView("edit", request)).forward(request, response);
         } else {
@@ -351,6 +371,25 @@ public class AdminImportController extends HttpServlet {
 
                             if (medicineId > 0) {
                                 ImportDetail detail = new ImportDetail(newImportId, medicineId, quantity, price);
+                                String unitIdStr = medicineData.get("unitId");
+                                if (unitIdStr != null && !unitIdStr.isEmpty()) {
+                                    detail.setUnitId(Integer.parseInt(unitIdStr));
+                                } else {
+                                    // Lấy UnitId cho đơn vị cơ bản nếu không có đơn vị nào khác được chọn
+                                    List<models.MedicineUnit> units = medicineUnitDAO.getUnitsByMedicineId(medicineId);
+                                    if (units != null) {
+                                        for (models.MedicineUnit unit : units) {
+                                            if (unit.isBaseUnit()) {
+                                                detail.setUnitId(unit.getUnitId());
+                                                break;
+                                            }
+                                        }
+                                        // Fallback: use first unit if no base unit found
+                                        if (detail.getUnitId() == 0 && !units.isEmpty()) {
+                                            detail.setUnitId(units.get(0).getUnitId());
+                                        }
+                                    }
+                                }
                                 detail.recalculateTotal();
                                 importDAO.addImportDetail(detail);
                             }
@@ -366,13 +405,7 @@ public class AdminImportController extends HttpServlet {
                 }
 
                 if ("Đã duyệt".equals(status)) {
-                    List<ImportDetail> detailsToSync = importDAO.getImportDetails(newImportId);
-                    if (detailsToSync != null) {
-                        for (ImportDetail detail : detailsToSync) {
-                            medicineDAO.addQuantityAndSetOriginalPrice(detail.getMedicineId(), detail.getQuantity(),
-                                    detail.getUnitPrice());
-                        }
-                    }
+                    syncImportToInventory(newImportId);
                 }
 
                 response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
@@ -469,6 +502,24 @@ public class AdminImportController extends HttpServlet {
 
                         if (medicineId > 0) {
                             ImportDetail detail = new ImportDetail(importId, medicineId, quantity, price);
+                            String unitIdStr = medicineData.get("unitId");
+                            if (unitIdStr != null && !unitIdStr.isEmpty()) {
+                                detail.setUnitId(Integer.parseInt(unitIdStr));
+                            } else {
+                                // Lấy UnitId cho đơn vị cơ bản
+                                List<models.MedicineUnit> units = medicineUnitDAO.getUnitsByMedicineId(medicineId);
+                                if (units != null) {
+                                    for (models.MedicineUnit unit : units) {
+                                        if (unit.isBaseUnit()) {
+                                            detail.setUnitId(unit.getUnitId());
+                                            break;
+                                        }
+                                    }
+                                    if (detail.getUnitId() == 0 && !units.isEmpty()) {
+                                        detail.setUnitId(units.get(0).getUnitId());
+                                    }
+                                }
+                            }
                             detail.recalculateTotal();
                             importDAO.addImportDetail(detail);
                         }
@@ -488,7 +539,7 @@ public class AdminImportController extends HttpServlet {
                 request.setAttribute("details", updatedDetails);
                 List<Medicine> medicines = importDAO.getAllMedicines();
                 request.setAttribute("medicines", medicines);
-                List<Object[]> suppliers = importDAO.getAllSuppliers();
+                List<Supplier> suppliers = supplierDAO.getAllSuppliers();
                 request.setAttribute("suppliers", suppliers);
                 request.getRequestDispatcher(getImportView("edit", request)).forward(request, response);
                 return;
@@ -496,13 +547,7 @@ public class AdminImportController extends HttpServlet {
 
             if (importDAO.updateImport(imp)) {
                 if (!"Đã duyệt".equals(oldStatus) && "Đã duyệt".equals(imp.getStatus())) {
-                    List<ImportDetail> detailsToSync = importDAO.getImportDetails(importId);
-                    if (detailsToSync != null) {
-                        for (ImportDetail detail : detailsToSync) {
-                            medicineDAO.addQuantityAndSetOriginalPrice(detail.getMedicineId(), detail.getQuantity(),
-                                    detail.getUnitPrice());
-                        }
-                    }
+                    syncImportToInventory(importId);
                 }
                 response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
             } else {
@@ -660,7 +705,7 @@ public class AdminImportController extends HttpServlet {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            return importDAO.getSupplierIdByName(input);
+            return supplierDAO.getSupplierIdByName(input);
         }
     }
 
@@ -693,5 +738,19 @@ public class AdminImportController extends HttpServlet {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         java.util.Date date = sdf.parse(dateStr);
         return new Date(date.getTime());
+    }
+
+    private void syncImportToInventory(int importId) {
+        List<ImportDetail> detailsToSync = importDAO.getImportDetails(importId);
+        if (detailsToSync != null) {
+            for (ImportDetail detail : detailsToSync) {
+                // Update stock and prices (original & unit selling prices are updated
+                // atomically if higher)
+                medicineDAO.updateStockAndReturnPriceRatio(
+                        detail.getMedicineId(),
+                        detail.getQuantity(),
+                        detail.getUnitPrice());
+            }
+        }
     }
 }

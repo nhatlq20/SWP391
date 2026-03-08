@@ -18,6 +18,7 @@ public class ImportDetail {
     private int detailId; // ImportDetailId
     private int importId; // ImportId
     private int medicineId; // MedicineId
+    private int unitId; // UnitId
 
     private String medicineName; // Tên thuốc (join từ bảng Medicine)
     private String medicineCode; // Mã thuốc (join từ bảng Medicine)
@@ -71,6 +72,14 @@ public class ImportDetail {
 
     public void setMedicineId(int medicineId) {
         this.medicineId = medicineId;
+    }
+
+    public int getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(int unitId) {
+        this.unitId = unitId;
     }
 
     public String getMedicineName() {

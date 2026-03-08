@@ -17,13 +17,114 @@
                     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/sidebar.css">
                     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/header.css">
                     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/import.css">
+                    <script type="text/javascript">
+                        // Nuclear option: Define functions in Head
+                        window.openAddMedicineModal = function (event) {
+                            if (event) event.stopPropagation();
+                            console.log("CRITICAL: openAddMedicineModal triggered!");
+                            // alert("DEBUG: Nút 'Thêm thuốc' đã được nhấn!"); // Uncomment if needed
+
+                            var modalObj = document.getElementById('addMedicineModal');
+                            if (!modalObj) {
+                                console.error("Could not find addMedicineModal");
+                                return;
+                            }
+                            modalObj.style.setProperty('display', 'flex', 'important');
+                            modalObj.style.setProperty('z-index', '9999999', 'important');
+
+                            if (typeof window.filterMedicinesByCategory === 'function') {
+                                window.filterMedicinesByCategory();
+                            }
+                        };
+                        window.closeAddMedicineModal = function (event) {
+                            if (event) event.stopPropagation();
+                            var modalObj = document.getElementById('addMedicineModal');
+                            if (modalObj) modalObj.style.setProperty('display', 'none', 'important');
+                        };
+                    </script>
                 </head>
 
                 <body class="bg-light">
                     <jsp:include page="/view/common/header.jsp" />
                     <jsp:include page="/view/common/sidebar.jsp" />
 
-                    <div class="main-content">
+                    <!-- Move modal to top of body for safer stacking -->
+                    <div id="addMedicineModal" class="modal" style="display: none; z-index: 9999999 !important;">
+                        <div class="modal-content" style="max-width: 600px; margin: auto;">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-pills me-2 text-primary"></i>
+                                    Thêm thuốc nhập
+                                </h5>
+                                <button type="button" class="close-btn" onclick="window.closeAddMedicineModal(event)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">Danh mục</label>
+                                        <select id="modalCategoryId" class="form-select"
+                                            onchange="window.filterMedicinesByCategory()">
+                                            <option value="">-- Tất cả danh mục --</option>
+                                            <c:forEach var="cat" items="${categories}">
+                                                <option value="${cat.categoryId}">${cat.categoryName}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">Tên thuốc</label>
+                                        <select id="modalMedicineId" class="form-select">
+                                            <option value="">-- Chọn danh mục trước --</option>
+                                            <c:forEach var="med" items="${medicines}">
+                                                <option value="${med.medicineId}" data-category="${med.categoryId}">
+                                                    ${med.medicineCode} - ${med.medicineName}
+                                                </option>
+                                            </c:forEach>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-semibold">Đơn vị</label>
+                                        <select id="modalUnitId" class="form-select">
+                                            <option value="">-- Chọn thuốc trước --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label fw-semibold">Số lượng</label>
+                                        <input type="number" id="modalQuantity" class="form-control" min="1"
+                                            placeholder="0"
+                                            oninput="window.validateQuantityInput(); window.calculateModalTotal();">
+                                        <div id="quantityError" class="text-danger small mt-1" style="display: none;">
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label fw-semibold">Đơn giá nhập</label>
+                                        <div class="input-group">
+                                            <input type="number" id="modalPrice" class="form-control" min="0"
+                                                step="1000" placeholder="0" oninput="window.calculateModalTotal()">
+                                            <span class="input-group-text small">đ</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-total-box mt-4">
+                                    <span class="modal-total-label">Thành tiền dự kiến</span>
+                                    <span id="modalTotalDisplay" class="modal-total-amount text-primary">0₫</span>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0">
+                                <button type="button"
+                                    class="btn btn-link text-secondary text-decoration-none fw-semibold"
+                                    onclick="window.closeAddMedicineModal(event)">Hủy</button>
+                                <button type="button" class="btn btn-primary px-4 fw-bold" style="border-radius: 12px;"
+                                    onclick="window.addMedicineFromModal()">
+                                    Xác nhận thêm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="main-content" style="pointer-events: auto !important; position: relative; z-index: 10;">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h3 class="fw-bold mb-0"><i class="fas fa-file-import me-2 text-primary"></i>Tạo phiếu nhập
                             </h3>
@@ -53,14 +154,25 @@
                                         <div class="info-item">
                                             <label class="info-label" for="supplierId">Nhà cung cấp</label>
                                             <div class="info-value">
-                                                <select name="supplierId" id="supplierId" required
-                                                    class="form-select border-0 bg-transparent p-0"
-                                                    style="box-shadow: none;">
-                                                    <option value="">-- Chọn nhà cung cấp --</option>
-                                                    <c:forEach var="supplier" items="${suppliers}">
-                                                        <option value="${supplier[0]}">${supplier[1]}</option>
-                                                    </c:forEach>
-                                                </select>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <select name="supplierId" id="supplierId" required
+                                                        class="form-select border-0 bg-transparent p-0"
+                                                        style="box-shadow: none; flex-grow: 1;">
+                                                        <option value="">-- Chọn nhà cung cấp --</option>
+                                                        <c:forEach var="supplier" items="${suppliers}">
+                                                            <option value="${supplier.supplierId}">
+                                                                ${supplier.supplierName}
+                                                            </option>
+                                                        </c:forEach>
+                                                    </select>
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-outline-primary rounded-circle"
+                                                        style="width: 24px; height: 24px; padding: 0; line-height: 22px;"
+                                                        onclick="openQuickSupplierModal()"
+                                                        title="Thêm nhà cung cấp mới">
+                                                        <i class="fas fa-plus" style="font-size: 0.75rem;"></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="info-item">
@@ -101,18 +213,30 @@
                                             <h5 class="fw-bold mb-0" style="color: #1e293b; font-size: 1.1rem;">
                                                 <i class="fas fa-list me-2 text-primary"></i>Danh sách thuốc nhập
                                             </h5>
-                                            <button type="button" class="btn btn-add-medicine btn-primary"
-                                                onclick="openAddMedicineModal()">
+                                            <button type="button" id="btnAddMedicine" class="btn btn-add-medicine"
+                                                onclick="window.openAddMedicineModal(event)"
+                                                style="position: relative; z-index: 20000 !important; pointer-events: auto !important; cursor: pointer !important;">
                                                 <i class="fas fa-plus me-2"></i>Thêm thuốc
                                             </button>
+                                            <script>
+                                                // Immediate backup listener
+                                                (function () {
+                                                    var b = document.getElementById('btnAddMedicine');
+                                                    if (b) b.addEventListener('click', function (e) {
+                                                        console.log("Listener fired for btnAddMedicine");
+                                                        window.openAddMedicineModal(e);
+                                                    });
+                                                })();
+                                            </script>
                                         </div>
 
-                                        <div class="table-responsive">
+                                        <div class="table-responsive" style="position: relative; z-index: 1;">
                                             <table class="table medicine-table align-middle" style="margin-bottom: 0;">
                                                 <thead>
                                                     <tr>
                                                         <th>Mã thuốc</th>
                                                         <th>Tên thuốc</th>
+                                                        <th>Đơn vị</th>
                                                         <th>Số lượng</th>
                                                         <th>Đơn giá</th>
                                                         <th>Thành tiền</th>
@@ -121,7 +245,7 @@
                                                 </thead>
                                                 <tbody id="medicineListBody">
                                                     <tr>
-                                                        <td colspan="6" class="empty-state">
+                                                        <td colspan="7" class="empty-state">
                                                             <div>
                                                                 <i class="fas fa-clipboard-list mb-3"></i>
                                                                 <p>Chưa có dữ liệu thuốc nhập</p>
@@ -149,229 +273,339 @@
                         </div>
                     </div>
 
-                    <!-- Modal Form (Overlaid) -->
-                    <div id="addMedicineModal" class="modal">
-                        <div class="modal-content">
+                    <!-- JS Implementation -->
+                    <script type="text/javascript">
+                        (function () {
+                            try {
+                                console.log("PharmacyLife: Initializing data and secondary logic...");
+
+                                // ==========================================
+                                // 1. Data Initialization & Setup
+                                // ==========================================
+                                let medicineList = [];
+                                let totalAmount = 0;
+
+                                // Data from JSP populated into window-scope for access by functions
+                                window.allMedicineOptions = [
+                                    <c:if test="${not empty medicines}">
+                                        <c:forEach var="med" items="${medicines}" varStatus="status">
+                                            {
+                                                "value": "${med.medicineId}",
+                                            "text": "${fn:escapeXml(med.medicineCode)} - ${fn:escapeXml(med.medicineName)}",
+                                            "categoryId": "${med.categoryId}" 
+                                            }${status.last ? '' : ','}
+                                        </c:forEach>
+                                    </c:if>
+                                ];
+
+                                window.allMedicineUnits = [
+                                    <c:if test="${not empty medicineUnits}">
+                                        <c:forEach var="unit" items="${medicineUnits}" varStatus="status">
+                                            {
+                                                "unitId": "${unit.unitId}",
+                                            "medicineId": "${unit.medicineId}",
+                                            "unitName": "${fn:escapeXml(unit.unitName)}",
+                                            "isBaseUnit": ${unit.isBaseUnit == true} 
+                                            }${status.last ? '' : ','}
+                                        </c:forEach>
+                                    </c:if>
+                                ];
+
+                                // ==========================================
+                                // 2. UI Helper Functions
+                                // ==========================================
+                                function formatCurrency(amount) {
+                                    return new Intl.NumberFormat('vi-VN').format(amount || 0) + '₫';
+                                }
+
+                                window.calculateModalTotal = function () {
+                                    const qty = parseFloat(document.getElementById('modalQuantity')?.value) || 0;
+                                    const price = parseFloat(document.getElementById('modalPrice')?.value) || 0;
+                                    const display = document.getElementById('modalTotalDisplay');
+                                    if (display) display.textContent = formatCurrency(qty * price);
+                                };
+
+                                // ==========================================
+                                // 3. Business Logic Functions
+                                // ==========================================
+                                window.filterMedicinesByCategory = function () {
+                                    const categoryId = document.getElementById('modalCategoryId')?.value;
+                                    const medicineSelect = document.getElementById('modalMedicineId');
+                                    if (!medicineSelect) return;
+
+                                    const currentValue = medicineSelect.value;
+                                    medicineSelect.innerHTML = '<option value="">-- ' + (categoryId ? 'Chọn thuốc' : 'Chọn danh mục hoặc tìm tất cả') + ' --</option>';
+
+                                    if (window.allMedicineOptions && Array.isArray(window.allMedicineOptions)) {
+                                        window.allMedicineOptions.forEach(opt => {
+                                            if (!categoryId || String(opt.categoryId) === String(categoryId)) {
+                                                const newOpt = document.createElement('option');
+                                                newOpt.value = opt.value;
+                                                newOpt.textContent = opt.text;
+                                                newOpt.setAttribute('data-category', opt.categoryId);
+                                                if (opt.value === currentValue) newOpt.selected = true;
+                                                medicineSelect.appendChild(newOpt);
+                                            }
+                                        });
+                                    }
+                                };
+
+                                window.updateUnitOptions = function () {
+                                    const medId = document.getElementById('modalMedicineId')?.value;
+                                    const unitSelect = document.getElementById('modalUnitId');
+                                    if (!unitSelect) return;
+
+                                    unitSelect.innerHTML = '<option value="">-- Chọn đơn vị --</option>';
+                                    if (!medId || !window.allMedicineUnits) return;
+
+                                    window.allMedicineUnits.filter(u => String(u.medicineId) === String(medId)).forEach(u => {
+                                        let opt = document.createElement('option');
+                                        opt.value = u.unitId;
+                                        opt.textContent = u.unitName;
+                                        if (u.isBaseUnit) opt.selected = true;
+                                        unitSelect.appendChild(opt);
+                                    });
+                                };
+
+                                window.validateQuantityInput = function () {
+                                    const input = document.getElementById('modalQuantity');
+                                    const errorDiv = document.getElementById('quantityError');
+                                    if (!input || !errorDiv) return;
+
+                                    const val = input.value;
+                                    let msg = '';
+                                    if (val === '' || val === null) msg = 'Vui lòng nhập số lượng.';
+                                    else if (isNaN(val) || parseInt(val) <= 0) msg = 'Số lượng phải lớn hơn 0.';
+                                    else if (parseInt(val) > 1000) msg = 'Số lượng không được vượt quá 1000.';
+
+                                    if (msg) { errorDiv.textContent = msg; errorDiv.style.display = 'block'; }
+                                    else { errorDiv.textContent = ''; errorDiv.style.display = 'none'; }
+                                };
+
+                                window.addMedicineFromModal = function () {
+                                    const medicineId = document.getElementById('modalMedicineId')?.value;
+                                    const unitSelect = document.getElementById('modalUnitId');
+                                    const unitId = unitSelect?.value;
+                                    const unitName = unitSelect?.options[unitSelect.selectedIndex]?.text || '';
+                                    const quantityInput = document.getElementById('modalQuantity');
+                                    const price = parseFloat(document.getElementById('modalPrice')?.value);
+                                    const quantity = parseInt(quantityInput?.value);
+
+                                    if (!medicineId || !unitId || !price || isNaN(quantity) || quantity <= 0) {
+                                        alert("Vui lòng nhập đầy đủ và chính xác thông tin thuốc.");
+                                        return;
+                                    }
+
+                                    const selectedOption = document.getElementById('modalMedicineId')?.options[document.getElementById('modalMedicineId').selectedIndex];
+                                    const optionText = selectedOption?.text || '';
+                                    const medicineCode = optionText.split(' - ')[0];
+                                    const medicineName = optionText.split(' - ')[1] || '';
+
+                                    medicineList.push({
+                                        medicineId: medicineId,
+                                        unitId: unitId,
+                                        unitName: unitName,
+                                        medicineCode: medicineCode,
+                                        medicineName: medicineName,
+                                        quantity: quantity,
+                                        price: price,
+                                        total: quantity * price
+                                    });
+                                    updateTable();
+                                    window.closeAddMedicineModal();
+                                };
+
+                                window.removeMedicine = function (index) {
+                                    medicineList.splice(index, 1);
+                                    updateTable();
+                                };
+
+                                function updateTable() {
+                                    const tbody = document.getElementById('medicineListBody');
+                                    const hiddenContainer = document.getElementById('hiddenInputsContainer');
+                                    if (!tbody || !hiddenContainer) return;
+
+                                    tbody.innerHTML = '';
+                                    hiddenContainer.innerHTML = '';
+                                    totalAmount = 0;
+
+                                    if (medicineList.length === 0) {
+                                        tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><div><i class="fas fa-clipboard-list mb-3"></i><p>Chưa có dữ liệu thuốc nhập</p></div></td></tr>`;
+                                    } else {
+                                        medicineList.forEach((item, index) => {
+                                            totalAmount += item.total;
+                                            tbody.innerHTML += `<tr>
+                                                <td><strong>\${item.medicineCode}</strong></td>
+                                                <td>\${item.medicineName || '-'}</td>
+                                                <td>\${item.unitName || '-'}</td>
+                                                <td>\${item.quantity}</td>
+                                                <td><span class="price">\${formatCurrency(item.price)}</span></td>
+                                                <td><span class="price">\${formatCurrency(item.total)}</span></td>
+                                                <td style="text-align: center;">
+                                                    <button type="button" class="btn-action btn-delete" onclick="removeMedicine(\${index})">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>`;
+                                            hiddenContainer.innerHTML += `<input type="hidden" name="medicines[\${index}].medicineId" value="\${item.medicineId}">` +
+                                                `<input type="hidden" name="medicines[\${index}].unitId" value="\${item.unitId}">` +
+                                                `<input type="hidden" name="medicines[\${index}].quantity" value="\${item.quantity}">` +
+                                                `<input type="hidden" name="medicines[\${index}].price" value="\${item.price}">`;
+                                        });
+                                    }
+                                    const totalDisp = document.getElementById('totalDisplay');
+                                    if (totalDisp) totalDisp.textContent = formatCurrency(totalAmount);
+                                }
+
+                                window.saveQuickSupplier = function () {
+                                    const name = document.getElementById('qsName').value.trim();
+                                    const address = document.getElementById('qsAddress').value.trim();
+                                    const contact = document.getElementById('qsContact').value.trim();
+                                    const errorDiv = document.getElementById('qsError');
+                                    const btn = document.getElementById('btnSaveSupplier');
+                                    const spinner = document.getElementById('qsSpinner');
+
+                                    if (!name) {
+                                        if (errorDiv) { errorDiv.textContent = 'Vui lòng nhập tên nhà cung cấp'; errorDiv.style.display = 'block'; }
+                                        return;
+                                    }
+
+                                    if (errorDiv) errorDiv.style.display = 'none';
+                                    if (btn) btn.disabled = true;
+                                    if (spinner) spinner.style.display = 'inline-block';
+
+                                    const params = new URLSearchParams();
+                                    params.append('supplierName', name);
+                                    params.append('supplierAddress', address);
+                                    params.append('contactInfo', contact);
+
+                                    fetch('${pageContext.request.contextPath}/admin/suppliers/quick-add', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                        body: params
+                                    })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                const select = document.getElementById('supplierId');
+                                                if (select) {
+                                                    const option = new Option(data.name, data.id);
+                                                    select.add(option);
+                                                    select.value = data.id;
+                                                }
+                                                window.closeQuickSupplierModal();
+                                                alert('Đã thêm nhà cung cấp: ' + data.name);
+                                            } else {
+                                                if (errorDiv) { errorDiv.textContent = data.message || 'Lỗi khi thêm nhà cung cấp'; errorDiv.style.display = 'block'; }
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.error('Error:', error);
+                                            if (errorDiv) { errorDiv.textContent = 'Lỗi hệ thống khi kết nối server'; errorDiv.style.display = 'block'; }
+                                        })
+                                        .finally(() => {
+                                            if (btn) btn.disabled = false;
+                                            if (spinner) spinner.style.display = 'none';
+                                        });
+                                };
+
+                                window.openQuickSupplierModal = function () {
+                                    const modal = document.getElementById('quickSupplierModal');
+                                    if (!modal) return;
+                                    modal.style.setProperty('display', 'flex', 'important');
+                                    document.getElementById('qsName').value = '';
+                                    document.getElementById('qsAddress').value = '';
+                                    document.getElementById('qsContact').value = '';
+                                    document.getElementById('qsError').style.display = 'none';
+                                };
+
+                                window.closeQuickSupplierModal = function () {
+                                    const modal = document.getElementById('quickSupplierModal');
+                                    if (modal) modal.style.setProperty('display', 'none', 'important');
+                                };
+
+                                // Initialization & Event Binding
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    console.log("DOM loaded, initializing listeners...");
+                                    const modalMedSelect = document.getElementById('modalMedicineId');
+                                    if (modalMedSelect) {
+                                        modalMedSelect.addEventListener('change', function () {
+                                            const p = document.getElementById('modalPrice');
+                                            if (p) p.value = '';
+                                            window.calculateModalTotal();
+                                            window.updateUnitOptions();
+                                        });
+                                    }
+
+                                    const importForm = document.getElementById('importForm');
+                                    if (importForm) {
+                                        importForm.addEventListener('submit', function (e) {
+                                            if (medicineList.length === 0) {
+                                                alert('Vui lòng thêm ít nhất một loại thuốc.');
+                                                e.preventDefault();
+                                            }
+                                        });
+                                    }
+                                });
+
+                                // Event for outside click
+                                window.onclick = function (event) {
+                                    const modalMed = document.getElementById('addMedicineModal');
+                                    const modalSup = document.getElementById('quickSupplierModal');
+                                    if (event.target === modalMed) window.closeAddMedicineModal(event);
+                                    if (event.target === modalSup) window.closeQuickSupplierModal();
+                                };
+
+                            } catch (err) {
+                                console.error("Critical error in PharmacyLife JS initialization:", err);
+                            }
+                        })();
+                    </script>
+
+                    <!-- Quick Add Supplier Modal -->
+                    <div id="quickSupplierModal" class="modal" style="display: none; z-index: 9999999 !important;">
+                        <div class="modal-content" style="max-width: 500px;">
                             <div class="modal-header">
-                                <h5 class="modal-title"><i class="fas fa-plus-circle me-2 text-primary"></i>Thêm thuốc
-                                    vào phiếu nhập</h5>
+                                <h5 class="modal-title"><i class="fas fa-truck-field me-2 text-primary"></i>Thêm nhà
+                                    cung cấp mới</h5>
                                 <button type="button" class="close-btn"
-                                    onclick="closeAddMedicineModal()">&times;</button>
+                                    onclick="closeQuickSupplierModal()">&times;</button>
                             </div>
                             <div class="modal-body">
-                                <div class="form-group mb-4">
-                                    <label class="form-label fw-bold">Chọn thuốc nhập</label>
-                                    <select id="modalMedicineId" class="form-select shadow-sm">
-                                        <option value="">-- Tìm và chọn thuốc --</option>
-                                        <c:forEach var="med" items="${medicines}">
-                                            <option value="${med.medicineId}">${med.medicineCode} - ${med.medicineName}
-                                            </option>
-                                        </c:forEach>
-                                    </select>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-4">
-                                            <label class="form-label fw-bold">Số lượng</label>
-                                            <div class="input-group">
-                                                <input type="number" id="modalQuantity" class="form-control shadow-sm"
-                                                    min="1" placeholder="Nhập SL"
-                                                    oninput="validateQuantityInput(); calculateModalTotal();">
-                                            </div>
-                                            <div id="quantityError"
-                                                style="color: #dc3545; font-size: 0.8rem; margin-top: 4px; display: none;">
-                                            </div>
-                                        </div>
+                                <form id="quickSupplierForm">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Tên nhà cung cấp <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" id="qsName" class="form-control" required
+                                            placeholder="Nhập tên nhà cung cấp">
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-4">
-                                            <label class="form-label fw-bold">Giá nhập (VNĐ)</label>
-                                            <input type="number" id="modalPrice" class="form-control shadow-sm" min="0"
-                                                step="1000" placeholder="Nhập đơn giá" oninput="calculateModalTotal()">
-                                        </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Địa chỉ</label>
+                                        <input type="text" id="qsAddress" class="form-control"
+                                            placeholder="Số nhà, đường, quận/huyện...">
                                     </div>
-                                </div>
-
-                                <div class="modal-total-box">
-                                    <span class="modal-total-label">Tổng cộng dự kiến:</span>
-                                    <span id="modalTotalDisplay" class="modal-total-amount">0₫</span>
-                                </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Thông tin liên hệ</label>
+                                        <input type="text" id="qsContact" class="form-control"
+                                            placeholder="Số điện thoại hoặc email">
+                                    </div>
+                                </form>
+                                <div id="qsError" class="alert alert-danger"
+                                    style="display: none; padding: 8px; font-size: 0.9rem;"></div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-light px-4 py-2 fw-semibold"
-                                    style="border-radius: 8px;" onclick="closeAddMedicineModal()">Hủy bỏ</button>
-                                <button type="button" class="btn btn-primary px-4 py-2 fw-semibold"
-                                    style="border-radius: 8px; background-color: #4F81E1; border: none;"
-                                    onclick="addMedicineFromModal()">Thêm vào danh sách</button>
+                                <button type="button" class="btn btn-light"
+                                    onclick="closeQuickSupplierModal()">Hủy</button>
+                                <button type="button" class="btn btn-primary" id="btnSaveSupplier"
+                                    onclick="saveQuickSupplier()">
+                                    <span id="qsSpinner" class="spinner-border spinner-border-sm me-2"
+                                        style="display: none;"></span>
+                                    Lưu nhà cung cấp
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <script>
-                        let medicineList = [];
-                        let totalAmount = 0;
-
-                        function openAddMedicineModal() {
-                            document.getElementById('addMedicineModal').style.display = 'block';
-                            document.getElementById('modalMedicineId').value = '';
-                            document.getElementById('modalQuantity').value = '';
-                            document.getElementById('modalPrice').value = '';
-                            document.getElementById('modalTotalDisplay').textContent = '0₫';
-                        }
-
-                        function closeAddMedicineModal() {
-                            document.getElementById('addMedicineModal').style.display = 'none';
-                        }
-
-                        document.getElementById('modalMedicineId').addEventListener('change', function () {
-                            const medicineId = this.value;
-                            if (medicineId && medicineId.trim() !== '') {
-                                // Clear price field - user must enter manually
-                                document.getElementById('modalPrice').value = '';
-                                calculateModalTotal();
-                            } else {
-                                document.getElementById('modalPrice').value = '';
-                                calculateModalTotal();
-                            }
-                        });
-
-                        function calculateModalTotal() {
-                            const quantity = parseFloat(document.getElementById('modalQuantity').value) || 0;
-                            const price = parseFloat(document.getElementById('modalPrice').value) || 0;
-                            const total = quantity * price;
-                            document.getElementById('modalTotalDisplay').textContent = formatCurrency(total);
-                        }
-
-                        function validateQuantityInput() {
-                            const quantityInput = document.getElementById('modalQuantity');
-                            const errorDiv = document.getElementById('quantityError');
-                            const value = quantityInput.value;
-                            let errorMsg = '';
-                            if (value === '' || value === null) {
-                                errorMsg = 'Vui lòng nhập số lượng.';
-                            } else if (isNaN(value) || parseInt(value) <= 0) {
-                                errorMsg = 'Số lượng phải lớn hơn 0.';
-                            } else if (parseInt(value) > 1000) {
-                                errorMsg = 'Số lượng không được vượt quá 1000.';
-                            }
-                            if (errorMsg !== '') {
-                                errorDiv.textContent = errorMsg;
-                                errorDiv.style.display = 'block';
-                            } else {
-                                errorDiv.textContent = '';
-                                errorDiv.style.display = 'none';
-                            }
-                            calculateModalTotal();
-                        }
-
-                        function addMedicineFromModal() {
-                            const medicineId = document.getElementById('modalMedicineId').value;
-                            const quantityInput = document.getElementById('modalQuantity');
-                            const price = parseFloat(document.getElementById('modalPrice').value);
-                            const errorDiv = document.getElementById('quantityError');
-                            const quantity = parseInt(quantityInput.value);
-
-                            // Validate quantity
-                            let errorMsg = '';
-                            if (quantityInput.value === '' || quantityInput.value === null) {
-                                errorMsg = 'Vui lòng nhập số lượng.';
-                            } else if (isNaN(quantity) || quantity <= 0) {
-                                errorMsg = 'Số lượng phải lớn hơn 0.';
-                            } else if (quantity > 1000) {
-                                errorMsg = 'Số lượng không được vượt quá 1000.';
-                            }
-                            if (!medicineId || !price) {
-                                alert("Vui lòng nhập đầy đủ thông tin thuốc.");
-                                return;
-                            }
-                            if (errorMsg !== '') {
-                                errorDiv.textContent = errorMsg;
-                                errorDiv.style.display = 'block';
-                                quantityInput.focus();
-                                return;
-                            } else {
-                                errorDiv.textContent = '';
-                                errorDiv.style.display = 'none';
-                            }
-
-                            // Lấy tên thuốc từ option
-                            const selectElement = document.getElementById('modalMedicineId');
-                            const selectedOption = selectElement.options[selectElement.selectedIndex];
-                            const optionText = selectedOption.text;
-                            const medicineCode = optionText.split(' - ')[0];
-                            const medicineName = optionText.split(' - ')[1] || '';
-
-                            const total = quantity * price;
-                            medicineList.push({
-                                medicineId: medicineId,
-                                medicineCode: medicineCode,
-                                medicineName: medicineName,
-                                quantity: quantity,
-                                price: price,
-                                total: total
-                            });
-                            updateTable();
-                            closeAddMedicineModal();
-                        }
-
-                        function removeMedicine(index) {
-                            medicineList.splice(index, 1);
-                            updateTable();
-                        }
-
-                        function updateTable() {
-                            const tbody = document.getElementById('medicineListBody');
-                            const hiddenContainer = document.getElementById('hiddenInputsContainer');
-                            tbody.innerHTML = '';
-                            hiddenContainer.innerHTML = '';
-                            totalAmount = 0;
-                            if (medicineList.length === 0) {
-                                tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><div><i class="fas fa-clipboard-list mb-3"></i><p>Chưa có dữ liệu thuốc nhập</p></div></td></tr>`;
-                            } else {
-                                medicineList.forEach((item, index) => {
-                                    totalAmount += item.total;
-                                    tbody.innerHTML += `<tr>
-                                        <td><strong>\${item.medicineCode}</strong></td>
-                                        <td>\${item.medicineName || '-'}</td>
-                                        <td>\${item.quantity}</td>
-                                        <td><span class="price">\${formatCurrency(item.price)}</span></td>
-                                        <td><span class="price">\${formatCurrency(item.total)}</span></td>
-                                        <td style="text-align: center;">
-                                            <button type="button" class="btn-action btn-delete" onclick="removeMedicine(\${index})">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>`;
-                                    hiddenContainer.innerHTML += `<input type="hidden" name="medicines[\${index}].medicineId" value="\${item.medicineId}"><input type="hidden" name="medicines[\${index}].quantity" value="\${item.quantity}"><input type="hidden" name="medicines[\${index}].price" value="\${item.price}">`;
-                                });
-                            }
-                            document.getElementById('totalDisplay').textContent = formatCurrency(totalAmount);
-                        }
-
-                        function formatCurrency(amount) {
-                            return new Intl.NumberFormat('vi-VN').format(amount) + '₫';
-                        }
-
-                        window.onclick = function (event) {
-                            const modal = document.getElementById('addMedicineModal');
-                            if (event.target === modal) closeAddMedicineModal();
-                        }
-                        // Prevent form submit if any invalid quantity
-                        document.getElementById('importForm').addEventListener('submit', function (e) {
-                            let hasError = false;
-                            for (let i = 0; i < medicineList.length; i++) {
-                                const qty = medicineList[i].quantity;
-                                if (!qty || qty <= 0 || qty > 1000) {
-                                    hasError = true;
-                                    break;
-                                }
-                            }
-                            if (hasError) {
-                                alert('Có thuốc với số lượng không hợp lệ. Vui lòng kiểm tra lại.');
-                                e.preventDefault();
-                            }
-                        });
-                    </script>
                     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
                 </body>
 

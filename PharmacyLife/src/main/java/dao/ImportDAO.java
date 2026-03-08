@@ -25,12 +25,12 @@ public class ImportDAO {
     public List<Import> getAllImports() {
         List<Import> imports = new ArrayList<>();
 
-        String sql = "SELECT i.ImportId, i.SupplierId, s.SupplierName, " +
-            "       i.StaffId, st.StaffName, i.ImportCreateAt, i.TotalPrice, i.ImportStatus " +
-            "FROM   Import i " +
-            "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
-            "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
-            "ORDER BY i.ImportCreateAt DESC";
+        String sql = "SELECT i.ImportId, i.ImportCode, i.SupplierId, s.SupplierName, " +
+                "       i.StaffId, st.StaffName, i.ImportCreatedAt, i.TotalPrice, i.ImportStatus " +
+                "FROM   Import i " +
+                "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
+                "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
+                "ORDER BY i.ImportCreatedAt DESC";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
@@ -50,19 +50,18 @@ public class ImportDAO {
     public List<Import> searchImports(String keyword) {
         List<Import> imports = new ArrayList<>();
 
-        String sql = "SELECT i.ImportId, i.SupplierId, s.SupplierName, " +
-            "       i.StaffId, st.StaffName, i.ImportCreateAt, i.TotalPrice, i.ImportStatus " +
-            "FROM   Import i " +
-            "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
-            "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
-            "WHERE  CAST(i.ImportId AS VARCHAR(10)) LIKE ? " +
-            "   OR  s.SupplierName LIKE ? " +
-            "   OR  ('IP' + RIGHT('000' + CAST(i.ImportId AS VARCHAR(10)), 3)) LIKE ? " +
-            "ORDER BY i.ImportCreateAt DESC";
+        String sql = "SELECT i.ImportId, i.ImportCode, i.SupplierId, s.SupplierName, " +
+                "       i.StaffId, st.StaffName, i.ImportCreatedAt, i.TotalPrice, i.ImportStatus " +
+                "FROM   Import i " +
+                "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
+                "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
+                "WHERE  CAST(i.ImportId AS VARCHAR(10)) LIKE ? " +
+                "   OR  s.SupplierName LIKE ? " +
+                "   OR  i.ImportCode LIKE ? " +
+                "ORDER BY i.ImportCreatedAt DESC";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-
 
             String pattern = "%" + keyword + "%";
             ps.setString(1, pattern);
@@ -85,12 +84,12 @@ public class ImportDAO {
     public Import getImportById(int importId) {
         Import imp = null;
 
-        String sql = "SELECT i.ImportId, i.SupplierId, s.SupplierName, " +
-            "       i.StaffId, st.StaffName, i.ImportCreateAt, i.TotalPrice, i.ImportStatus " +
-            "FROM   Import i " +
-            "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
-            "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
-            "WHERE  i.ImportId = ?";
+        String sql = "SELECT i.ImportId, i.ImportCode, i.SupplierId, s.SupplierName, " +
+                "       i.StaffId, st.StaffName, i.ImportCreatedAt, i.TotalPrice, i.ImportStatus " +
+                "FROM   Import i " +
+                "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
+                "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
+                "WHERE  i.ImportId = ?";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -110,46 +109,70 @@ public class ImportDAO {
 
     // Tạo phiếu nhập mới
     public boolean createImport(Import imp) {
-        String sql = "INSERT INTO Import (SupplierId, StaffId, ImportCreateAt, TotalPrice, ImportStatus) " +
-            "VALUES (?, ?, ?, ?, ?)";
+        String insertSql = "INSERT INTO Import (ImportCode, SupplierId, StaffId, ImportCreatedAt, TotalPrice, ImportStatus) "
+                +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+        String updateSql = "UPDATE Import SET ImportCode = ? WHERE ImportId = ?";
 
-        try (Connection conn = dbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        Connection conn = null;
+        try {
+            conn = dbContext.getConnection();
+            conn.setAutoCommit(false); // Bắt đầu transaction
 
-            ps.setInt(1, imp.getSupplierId());
-            ps.setInt(2, imp.getStaffId());
+            try (PreparedStatement ps = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
+                // Sử dụng mã tạm thời vì cột ImportCode có ràng buộc NOT NULL
+                ps.setString(1, "TEMP");
+                ps.setInt(2, imp.getSupplierId());
+                ps.setInt(3, imp.getStaffId());
 
-            Date importDate = imp.getImportDate();
-            if (importDate == null) {
-                importDate = new Date(System.currentTimeMillis());
-            }
-            ps.setDate(3, importDate);
+                java.sql.Timestamp importDate = imp.getImportDate() != null
+                        ? new java.sql.Timestamp(imp.getImportDate().getTime())
+                        : new java.sql.Timestamp(System.currentTimeMillis());
+                ps.setTimestamp(4, importDate);
 
-            // Lần đầu tạo có thể chưa có chi tiết, cho 0 rồi sẽ update sau
-            double total = imp.getTotalAmount() > 0 ? imp.getTotalAmount() : 0.0;
-            ps.setDouble(4, total);
+                ps.setDouble(5, imp.getTotalAmount() > 0 ? imp.getTotalAmount() : 0.0);
+                ps.setString(6, (imp.getStatus() != null && !imp.getStatus().isEmpty()) ? imp.getStatus() : "Pending");
 
-            // Default Status if null
-            String status = imp.getStatus();
-            if (status == null || status.isEmpty()) {
-                status = "Đang chờ";
-            }
-            ps.setString(5, status);
+                int affected = ps.executeUpdate();
+                if (affected > 0) {
+                    try (ResultSet rs = ps.getGeneratedKeys()) {
+                        if (rs.next()) {
+                            int generatedId = rs.getInt(1);
+                            imp.setImportId(generatedId);
 
-            int affected = ps.executeUpdate();
-            if (affected > 0) {
-                try (ResultSet rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        int generatedId = rs.getInt(1);
-                        imp.setImportId(generatedId);
-                        // Sinh mã hiển thị (không lưu DB)
-                        imp.setImportCode(formatImportCode(generatedId));
+                            // Sinh mã thực tế dựa trên ID (IP001, IP002...)
+                            String code = formatImportCode(generatedId);
+                            imp.setImportCode(code);
+
+                            // Cập nhật lại mã chính xác vào database
+                            try (PreparedStatement psUpdate = conn.prepareStatement(updateSql)) {
+                                psUpdate.setString(1, code);
+                                psUpdate.setInt(2, generatedId);
+                                psUpdate.executeUpdate();
+                            }
+                            conn.commit();
+                            return true;
+                        }
                     }
                 }
-                return true;
             }
+            if (conn != null)
+                conn.rollback();
         } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                }
+            }
             e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                }
+            }
         }
         return false;
     }
@@ -157,8 +180,8 @@ public class ImportDAO {
     // Cập nhật phiếu nhập
     public boolean updateImport(Import imp) {
         String sql = "UPDATE Import " +
-            "SET SupplierId = ?, StaffId = ?, ImportCreateAt = ?, TotalPrice = ?, ImportStatus = ? " +
-            "WHERE ImportId = ?";
+                "SET SupplierId = ?, StaffId = ?, ImportCreatedAt = ?, TotalPrice = ?, ImportStatus = ? " +
+                "WHERE ImportId = ?";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -193,55 +216,11 @@ public class ImportDAO {
                 PreparedStatement ps = conn.prepareStatement(deleteSql)) {
 
             ps.setInt(1, importId);
-            if (ps.executeUpdate() > 0) {
-                // Sau khi xóa, rename lại các phiếu sau nó để giữ thứ tự liên tục
-                renumberImportsAfter(conn, importId);
-                return true;
-            }
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
-    }
-
-    private void renumberImportsAfter(Connection conn, int deletedImportId) {
-        try {
-            // Lấy tất cả phiếu có ID > deletedImportId
-            String selectSql = "SELECT ImportId FROM Import WHERE ImportId > ? ORDER BY ImportId ASC";
-            try (PreparedStatement selectPs = conn.prepareStatement(selectSql)) {
-                selectPs.setInt(1, deletedImportId);
-                ResultSet rs = selectPs.executeQuery();
-                java.util.List<Integer> idsToRename = new java.util.ArrayList<>();
-                while (rs.next()) {
-                    idsToRename.add(rs.getInt("ImportId"));
-                }
-
-                // Update từng phiếu, giảm ID đi 1
-                for (Integer oldId : idsToRename) {
-                    int newId = oldId - 1;
-                    String newCode = formatImportCode(newId);
-
-                    // Update Import
-                    String updateImportSql = "UPDATE Import SET ImportId = ?, ImportCode = ? WHERE ImportId = ?";
-                    try (PreparedStatement updateImportPs = conn.prepareStatement(updateImportSql)) {
-                        updateImportPs.setInt(1, newId);
-                        updateImportPs.setString(2, newCode);
-                        updateImportPs.setInt(3, oldId);
-                        updateImportPs.executeUpdate();
-                    }
-
-                    // Update ImportDetail (FK)
-                    String updateDetailSql = "UPDATE ImportDetail SET ImportId = ? WHERE ImportId = ?";
-                    try (PreparedStatement updateDetailPs = conn.prepareStatement(updateDetailSql)) {
-                        updateDetailPs.setInt(1, newId);
-                        updateDetailPs.setInt(2, oldId);
-                        updateDetailPs.executeUpdate();
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     // ======================== IMPORT DETAIL ========================
@@ -268,7 +247,7 @@ public class ImportDAO {
     public List<ImportDetail> getImportDetails(int importId) {
         List<ImportDetail> details = new ArrayList<>();
 
-        String sql = "SELECT d.ImportDetailId, d.ImportId, d.MedicineId, " +
+        String sql = "SELECT d.ImportDetailId, d.ImportId, d.MedicineId, d.UnitId, " +
                 "       m.MedicineCode, m.MedicineName, d.ImportQuantity, d.UnitPrice " +
                 "FROM   ImportDetail d " +
                 "LEFT JOIN Medicine m ON d.MedicineId = m.MedicineId " +
@@ -285,6 +264,7 @@ public class ImportDAO {
                     detail.setDetailId(rs.getInt("ImportDetailId"));
                     detail.setImportId(rs.getInt("ImportId"));
                     detail.setMedicineId(rs.getInt("MedicineId"));
+                    detail.setUnitId(rs.getInt("UnitId"));
                     detail.setMedicineCode(rs.getString("MedicineCode"));
                     detail.setMedicineName(rs.getString("MedicineName"));
                     detail.setQuantity(rs.getInt("ImportQuantity"));
@@ -301,16 +281,17 @@ public class ImportDAO {
 
     // Thêm chi tiết thuốc vào phiếu nhập
     public boolean addImportDetail(ImportDetail detail) {
-        String sql = "INSERT INTO ImportDetail (ImportId, MedicineId, ImportQuantity, UnitPrice) " +
-                "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO ImportDetail (ImportId, MedicineId, UnitId, ImportQuantity, UnitPrice) " +
+                "VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, detail.getImportId());
             ps.setInt(2, detail.getMedicineId());
-            ps.setInt(3, detail.getQuantity());
-            ps.setDouble(4, detail.getUnitPrice());
+            ps.setInt(3, detail.getUnitId());
+            ps.setInt(4, detail.getQuantity());
+            ps.setDouble(5, detail.getUnitPrice());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -405,15 +386,21 @@ public class ImportDAO {
         Import imp = new Import();
         int importId = rs.getInt("ImportId");
         imp.setImportId(importId);
+
+        String dbCode = rs.getString("ImportCode");
+        if (dbCode != null && !dbCode.isEmpty()) {
+            imp.setImportCode(dbCode);
+        } else {
+            imp.setImportCode(formatImportCode(importId));
+        }
+
         imp.setSupplierId(rs.getInt("SupplierId"));
         imp.setSupplierName(rs.getString("SupplierName"));
         imp.setStaffId(rs.getInt("StaffId"));
         imp.setStaffName(rs.getString("StaffName"));
-        imp.setImportDate(rs.getDate("ImportCreateAt"));
+        imp.setImportDate(rs.getDate("ImportCreatedAt"));
         imp.setTotalAmount(rs.getDouble("TotalPrice"));
-        imp.setStatus(rs.getString("ImportStatus")); // Set ImportStatus
-        // Sinh mã hiển thị từ ImportId
-        imp.setImportCode(formatImportCode(importId));
+        imp.setStatus(rs.getString("ImportStatus"));
         return imp;
     }
 
@@ -456,23 +443,6 @@ public class ImportDAO {
         return 0;
     }
 
-    // Lấy SupplierId từ tên (nếu chuỗi input không phải số ID)
-    public int getSupplierIdByName(String name) {
-        // Assume name match
-        String sql = "SELECT SupplierId FROM Supplier WHERE SupplierName LIKE ?";
-        try (Connection conn = dbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, "%" + name + "%");
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next())
-                    return rs.getInt("SupplierId");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
     // Parse int safely
     public int parseId(String input) {
         if (input == null || input.trim().isEmpty())
@@ -503,7 +473,7 @@ public class ImportDAO {
 
     public List<Medicine> getAllMedicines() {
         List<Medicine> list = new ArrayList<>();
-        String sql = "SELECT MedicineId, MedicineCode, MedicineName, OriginalPrice FROM Medicine";
+        String sql = "SELECT MedicineId, MedicineCode, MedicineName, OriginalPrice, CategoryId FROM Medicine";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
@@ -513,6 +483,7 @@ public class ImportDAO {
                 m.setMedicineCode(rs.getString("MedicineCode"));
                 m.setMedicineName(rs.getString("MedicineName"));
                 m.setOriginalPrice(rs.getDouble("OriginalPrice"));
+                m.setCategoryId(rs.getInt("CategoryId"));
                 list.add(m);
             }
         } catch (SQLException e) {
@@ -537,18 +508,4 @@ public class ImportDAO {
         return 0;
     }
 
-    public List<Object[]> getAllSuppliers() {
-        List<Object[]> list = new ArrayList<>();
-        String sql = "SELECT SupplierId, SupplierName FROM Supplier ORDER BY SupplierName";
-        try (Connection conn = dbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                list.add(new Object[] { rs.getInt("SupplierId"), rs.getString("SupplierName") });
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
 }
