@@ -360,6 +360,11 @@ public class AdminImportController extends HttpServlet {
                                         .append(" phải lớn hơn 0. ");
                                 continue;
                             }
+                            if (price <= 0 || price > 100000000) {
+                                detailErrors.append("Giá nhập thuốc mã ").append(medicineIdStr)
+                                        .append(" phải > 0 và <= 100.000.000. ");
+                                continue;
+                            }
 
                             if (medicineId > 0) {
                                 ImportDetail detail = new ImportDetail(newImportId, medicineId, unitId, quantity,
@@ -503,6 +508,10 @@ public class AdminImportController extends HttpServlet {
                         int newQty = (int) Double.parseDouble(qStr);
                         double newPrice = Double.parseDouble(pStr);
 
+                        if (newQty <= 0 || newPrice <= 0 || newPrice > 100000000) {
+                            continue;
+                        }
+
                         ImportDetail oldDetail = null;
                         for (ImportDetail d : currentDetails) {
                             if (d.getDetailId() == detailId) {
@@ -549,8 +558,8 @@ public class AdminImportController extends HttpServlet {
                         int quantity = (int) Double.parseDouble(quantityStr);
                         double price = Double.parseDouble(priceStr);
 
-                        if (quantity <= 0) {
-                            detailErrors.append("Số lượng bỏ qua (<=0). ");
+                        if (quantity <= 0 || price <= 0 || price > 100000000) {
+                            detailErrors.append("Số lượng hoặc đơn giá bỏ qua (không hợp lệ). ");
                             continue;
                         }
 
