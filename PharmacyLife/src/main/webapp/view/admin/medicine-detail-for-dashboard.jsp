@@ -106,7 +106,7 @@
                                     <div class="info-item">
                                         <div class="info-label">Số lượng tồn kho</div>
                                         <div class="info-value">
-                                            ${medicine.remainingQuantity}
+                                            ${medicine.stockDisplay}
                                             <c:choose>
                                                 <c:when test="${medicine.remainingQuantity > 20}">
                                                     <span class="badge badge-stock ms-2">Còn hàng</span>

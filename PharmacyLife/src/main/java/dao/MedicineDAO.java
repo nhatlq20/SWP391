@@ -28,7 +28,7 @@ public class MedicineDAO {
                 + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
-                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY UnitId ASC) "
+                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY IsBaseUnit DESC, ConversionRate ASC) "
                 + "ORDER BY c.CategoryId ASC";
 
         try (Connection conn = dbContext.getConnection();
@@ -53,7 +53,7 @@ public class MedicineDAO {
                 + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
-                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY UnitId ASC) "
+                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY IsBaseUnit DESC, ConversionRate ASC) "
                 + "WHERE m.MedicineId = ?";
 
         try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -80,7 +80,7 @@ public class MedicineDAO {
                 + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
-                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY UnitId ASC) "
+                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY IsBaseUnit DESC, ConversionRate ASC) "
                 + "WHERE m.CategoryId = ? ORDER BY m.MedicineName";
 
         try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -107,7 +107,7 @@ public class MedicineDAO {
                 + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
-                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY UnitId ASC) "
+                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY IsBaseUnit DESC, ConversionRate ASC) "
                 + "WHERE m.MedicineCode = ?";
 
         try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -149,7 +149,7 @@ public class MedicineDAO {
                 + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
-                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY UnitId ASC) "
+                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY IsBaseUnit DESC, ConversionRate ASC) "
                 + "LEFT JOIN MedicineIngredients mi ON m.MedicineId = mi.MedicineId "
                 + "LEFT JOIN ActiveIngredients ai ON mi.IngredientId = ai.IngredientId "
                 + "LEFT JOIN ConditionMedicines mc ON m.MedicineId = mc.MedicineId "
@@ -196,7 +196,7 @@ public class MedicineDAO {
                 + "COALESCE(SUM(oi.OrderQuantity), 0) as TotalSold "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
-                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY UnitId ASC) "
+                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY IsBaseUnit DESC, ConversionRate ASC) "
                 + "LEFT JOIN OrderItems oi ON m.MedicineId = oi.MedicineId "
                 + "GROUP BY m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, "
                 + "m.OriginalPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, c.CategoryName, "
@@ -223,7 +223,7 @@ public class MedicineDAO {
                 + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
-                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY UnitId ASC) "
+                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY IsBaseUnit DESC, ConversionRate ASC) "
                 + "WHERE m.RemainingQuantity > 0 ORDER BY m.MedicineName";
 
         try (Connection conn = dbContext.getConnection();
@@ -389,7 +389,7 @@ public class MedicineDAO {
     }
 
     public boolean updateStockQuantity(int medicineId, int unitId, int delta) {
-        String sql = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity + (? * (SELECT ISNULL(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?)) WHERE MedicineId = ?";
+        String sql = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity + (? * (SELECT COALESCE(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?)) WHERE MedicineId = ?";
 
         try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -593,7 +593,7 @@ public class MedicineDAO {
             String sql = "SELECT TOP 3 DISTINCT "
                     + "m.MedicineName, m.ShortDescription, mu.SellingPrice, mu.UnitName as Unit, m.ImageUrl "
                     + "FROM Medicine m "
-                    + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY UnitId ASC) "
+                    + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY IsBaseUnit DESC, ConversionRate ASC) "
                     + "LEFT JOIN MedicineIngredients mi ON m.MedicineId = mi.MedicineId "
                     + "LEFT JOIN ActiveIngredients ai ON mi.IngredientId = ai.IngredientId "
                     + "LEFT JOIN ConditionMedicines mc ON m.MedicineId = mc.MedicineId "

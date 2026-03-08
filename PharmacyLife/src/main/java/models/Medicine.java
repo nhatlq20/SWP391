@@ -203,6 +203,32 @@ public class Medicine {
         this.remainingQuantity = remainingQuantity;
     }
 
+    /**
+     * Returns a human-readable stock display (e.g., "29 Hộp, 5 Gói")
+     * based on the total remainingQuantity and baseUnit's conversion rate.
+     */
+    public String getStockDisplay() {
+        if (baseUnit == null || baseUnit.getConversionRate() <= 1) {
+            return remainingQuantity + " " + getUnit();
+        }
+        int rate = baseUnit.getConversionRate();
+        int boxes = remainingQuantity / rate;
+        int packs = remainingQuantity % rate;
+        StringBuilder sb = new StringBuilder();
+        if (boxes > 0) {
+            sb.append(boxes).append(" Hộp");
+        }
+        if (packs > 0) {
+            if (sb.length() > 0)
+                sb.append(", ");
+            sb.append(packs).append(" ").append(getUnit());
+        }
+        if (sb.length() == 0) {
+            return "Hết hàng";
+        }
+        return sb.toString();
+    }
+
     public Category getCategory() {
         return category;
     }

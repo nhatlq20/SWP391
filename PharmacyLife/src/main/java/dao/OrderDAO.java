@@ -104,16 +104,114 @@ public class OrderDAO {
         return items;
     }
 
-    public boolean updateStatus(int orderId, String status, int staffId) {
-        String sql = "UPDATE Orders SET Status = ?, StaffId = ? WHERE OrderId = ?";
-        try (Connection conn = dbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, status);
-            ps.setInt(2, staffId);
-            ps.setInt(3, orderId);
-            return ps.executeUpdate() > 0;
+    public boolean updateStatus(int orderId, String newStatus, int staffId) {
+        String sqlGetOldStatus = "SELECT Status FROM Orders WHERE OrderId = ?";
+        String sqlUpdateStatus = "UPDATE Orders SET Status = ?, StaffId = ? WHERE OrderId = ?";
+        String sqlReplenishStock = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity + (? * (SELECT COALESCE(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?)) WHERE MedicineId = ?";
+        String sqlSubtractStock = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity - (? * (SELECT COALESCE(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?)) "
+                + "WHERE MedicineId = ? AND RemainingQuantity >= (? * (SELECT COALESCE(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?))";
+        String sqlGetItems = "SELECT MedicineId, UnitId, OrderQuantity FROM OrderItems WHERE OrderId = ?";
+
+        Connection conn = null;
+        try {
+            conn = dbContext.getConnection();
+            conn.setAutoCommit(false);
+
+            // 1. Get old status
+            String oldStatus = "";
+            try (PreparedStatement ps = conn.prepareStatement(sqlGetOldStatus)) {
+                ps.setInt(1, orderId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        oldStatus = rs.getString("Status");
+                    } else {
+                        conn.rollback();
+                        return false;
+                    }
+                }
+            }
+
+            // If status hasn't changed, just return true
+            if (newStatus.equalsIgnoreCase(oldStatus)) {
+                conn.rollback();
+                return true;
+            }
+
+            // 2. Update status
+            try (PreparedStatement ps = conn.prepareStatement(sqlUpdateStatus)) {
+                ps.setString(1, newStatus);
+                ps.setInt(2, staffId);
+                ps.setInt(3, orderId);
+                ps.executeUpdate();
+            }
+
+            // 3. Handle stock changes
+            if ("Cancelled".equalsIgnoreCase(newStatus)) {
+                // Replenish stock (Order was active or other state, now cancelled)
+                try (PreparedStatement psItems = conn.prepareStatement(sqlGetItems);
+                        PreparedStatement psStock = conn.prepareStatement(sqlReplenishStock)) {
+                    psItems.setInt(1, orderId);
+                    try (ResultSet rs = psItems.executeQuery()) {
+                        while (rs.next()) {
+                            int medicineId = rs.getInt("MedicineId");
+                            int unitId = rs.getInt("UnitId");
+                            int qty = rs.getInt("OrderQuantity");
+
+                            psStock.setInt(1, qty);
+                            psStock.setInt(2, unitId);
+                            psStock.setInt(3, medicineId);
+                            psStock.executeUpdate();
+                        }
+                    }
+                }
+            } else if ("Cancelled".equalsIgnoreCase(oldStatus)) {
+                // Subtract stock (Order was cancelled, now re-activated/restored)
+                try (PreparedStatement psItems = conn.prepareStatement(sqlGetItems);
+                        PreparedStatement psStock = conn.prepareStatement(sqlSubtractStock)) {
+                    psItems.setInt(1, orderId);
+                    try (ResultSet rs = psItems.executeQuery()) {
+                        while (rs.next()) {
+                            int medicineId = rs.getInt("MedicineId");
+                            int unitId = rs.getInt("UnitId");
+                            int qty = rs.getInt("OrderQuantity");
+
+                            // Params: delta, unitId, medicineId, delta, unitId
+                            psStock.setInt(1, qty);
+                            psStock.setInt(2, unitId);
+                            psStock.setInt(3, medicineId);
+                            psStock.setInt(4, qty);
+                            psStock.setInt(5, unitId);
+
+                            int updated = psStock.executeUpdate();
+                            if (updated == 0) {
+                                // Not enough stock to re-activate
+                                conn.rollback();
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            conn.commit();
+            return true;
         } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
             e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
         return false;
     }
@@ -152,8 +250,8 @@ public class OrderDAO {
         String sqlOrder = "INSERT INTO Orders (CustomerId, StaffId, OrderDate, ShippingName, ShippingPhone, ShippingAddress, Status, TotalAmount) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlItem = "INSERT INTO OrderItems (OrderId, MedicineId, UnitId, OrderQuantity, UnitPrice) VALUES (?, ?, ?, ?, ?)";
-        String sqlUpdateStock = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity - (? * (SELECT ISNULL(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?)) "
-                + "WHERE MedicineId = ? AND RemainingQuantity >= (? * (SELECT ISNULL(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?))";
+        String sqlUpdateStock = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity - (? * (SELECT COALESCE(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?)) "
+                + "WHERE MedicineId = ? AND RemainingQuantity >= (? * (SELECT COALESCE(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?))";
 
         Connection conn = null;
         lastErrorMessage = "";
