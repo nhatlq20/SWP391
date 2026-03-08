@@ -388,13 +388,14 @@ public class MedicineDAO {
         }
     }
 
-    public boolean updateStockQuantity(int medicineId, int delta) {
-        String sql = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity + ? WHERE MedicineId = ?";
+    public boolean updateStockQuantity(int medicineId, int unitId, int delta) {
+        String sql = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity + (? * (SELECT ISNULL(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?)) WHERE MedicineId = ?";
 
         try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, delta);
-            ps.setInt(2, medicineId);
+            ps.setInt(2, unitId);
+            ps.setInt(3, medicineId);
 
             int result = ps.executeUpdate();
             return result > 0;
@@ -405,11 +406,29 @@ public class MedicineDAO {
         }
     }
 
-    public boolean addQuantityAndSetOriginalPrice(int medicineId, int quantityToAdd, double newOriginalPrice) {
+    // Legacy support
+    public boolean updateStockQuantity(int medicineId, int delta) {
+        return updateStockQuantity(medicineId, 0, delta);
+    }
+
+    public boolean addQuantityAndSetOriginalPrice(int medicineId, int unitId, int quantityToAdd,
+            double newOriginalPrice) {
         double oldOriginalPrice = 0;
         String getOldPriceSql = "SELECT OriginalPrice FROM Medicine WHERE MedicineId = ?";
+        String getRateSql = "SELECT ConversionRate FROM MedicineUnit WHERE UnitId = ?";
 
         try (Connection conn = dbContext.getConnection()) {
+            int conversionRate = 1;
+            if (unitId > 0) {
+                try (PreparedStatement psR = conn.prepareStatement(getRateSql)) {
+                    psR.setInt(1, unitId);
+                    try (ResultSet rsR = psR.executeQuery()) {
+                        if (rsR.next())
+                            conversionRate = rsR.getInt("ConversionRate");
+                    }
+                }
+            }
+
             // 1. Get old OriginalPrice to calculate adjustment factor
             try (PreparedStatement psOld = conn.prepareStatement(getOldPriceSql)) {
                 psOld.setInt(1, medicineId);
@@ -421,11 +440,12 @@ public class MedicineDAO {
             }
 
             // 2. Update Medicine quantity and OriginalPrice
-            String sql = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity + ?, OriginalPrice = ? WHERE MedicineId = ?";
+            String sql = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity + (? * ?), OriginalPrice = ? WHERE MedicineId = ?";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, quantityToAdd);
-                ps.setDouble(2, newOriginalPrice);
-                ps.setInt(3, medicineId);
+                ps.setInt(2, conversionRate);
+                ps.setDouble(3, newOriginalPrice);
+                ps.setInt(4, medicineId);
 
                 int result = ps.executeUpdate();
                 if (result > 0) {
@@ -447,6 +467,11 @@ public class MedicineDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    // Legacy support
+    public boolean addQuantityAndSetOriginalPrice(int medicineId, int quantityToAdd, double newOriginalPrice) {
+        return addQuantityAndSetOriginalPrice(medicineId, 0, quantityToAdd, newOriginalPrice);
     }
 
     public boolean medicineExists(int medicineId) {

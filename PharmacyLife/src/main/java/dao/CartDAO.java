@@ -8,23 +8,26 @@ import utils.DBContext;
 public class CartDAO {
     private DBContext dbContext = new DBContext();
 
-    public boolean saveCartItem(int customerId, int medicineId, int quantity) {
-        String sql = "IF EXISTS (SELECT 1 FROM Carts WHERE CustomerId = ? AND MedicineId = ?) " +
-                "UPDATE Carts SET CartQuantity = ?, CartUpdate = GETDATE() WHERE CustomerId = ? AND MedicineId = ? " +
+    public boolean saveCartItem(int customerId, int medicineId, int unitId, int quantity) {
+        String sql = "IF EXISTS (SELECT 1 FROM Carts WHERE CustomerId = ? AND MedicineId = ? AND UnitId = ?) " +
+                "UPDATE Carts SET CartQuantity = ? WHERE CustomerId = ? AND MedicineId = ? AND UnitId = ? " +
                 "ELSE " +
-                "INSERT INTO Carts (CustomerId, MedicineId, CartQuantity, CartCreateAt, CartUpdate) VALUES (?, ?, ?, GETDATE(), GETDATE())";
+                "INSERT INTO Carts (CustomerId, MedicineId, UnitId, CartQuantity) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, customerId);
             ps.setInt(2, medicineId);
-            ps.setInt(3, quantity);
-            ps.setInt(4, customerId);
-            ps.setInt(5, medicineId);
-            ps.setInt(6, customerId);
-            ps.setInt(7, medicineId);
-            ps.setInt(8, quantity);
+            ps.setInt(3, unitId);
+            ps.setInt(4, quantity);
+            ps.setInt(5, customerId);
+            ps.setInt(6, medicineId);
+            ps.setInt(7, unitId);
+            ps.setInt(8, customerId);
+            ps.setInt(9, medicineId);
+            ps.setInt(10, unitId);
+            ps.setInt(11, quantity);
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -33,17 +36,27 @@ public class CartDAO {
         return false;
     }
 
-    public boolean removeCartItem(int customerId, int medicineId) {
-        String sql = "DELETE FROM Carts WHERE CustomerId = ? AND MedicineId = ?";
+    // Legacy support
+    public boolean saveCartItem(int customerId, int medicineId, int quantity) {
+        return saveCartItem(customerId, medicineId, 0, quantity);
+    }
+
+    public boolean removeCartItem(int customerId, int medicineId, int unitId) {
+        String sql = "DELETE FROM Carts WHERE CustomerId = ? AND MedicineId = ? AND UnitId = ?";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, customerId);
             ps.setInt(2, medicineId);
+            ps.setInt(3, unitId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public boolean removeCartItem(int customerId, int medicineId) {
+        return removeCartItem(customerId, medicineId, 0);
     }
 
     public boolean clearCart(int customerId) {
@@ -60,8 +73,10 @@ public class CartDAO {
 
     public Cart getCartByCustomerId(int customerId) {
         Cart cart = new Cart();
-        String sql = "SELECT c.*, m.* FROM Carts c " +
+        String sql = "SELECT c.*, m.MedicineCode, m.MedicineName, m.ImageUrl, mu.UnitName, mu.SellingPrice " +
+                "FROM Carts c " +
                 "JOIN Medicine m ON c.MedicineId = m.MedicineId " +
+                "LEFT JOIN MedicineUnit mu ON c.UnitId = mu.UnitId " +
                 "WHERE c.CustomerId = ?";
 
         try (Connection conn = dbContext.getConnection();
@@ -73,11 +88,14 @@ public class CartDAO {
                     m.setMedicineId(rs.getInt("MedicineId"));
                     m.setMedicineCode(rs.getString("MedicineCode"));
                     m.setMedicineName(rs.getString("MedicineName"));
-                    m.setSellingPrice(rs.getDouble("SellingPrice"));
                     m.setImageUrl(rs.getString("ImageUrl"));
-                    m.setUnit(rs.getString("Unit"));
+                    m.setUnit(rs.getString("UnitName"));
 
-                    Cart.Item item = new Cart.Item(m, rs.getInt("CartQuantity"), m.getSellingPrice());
+                    double price = rs.getDouble("SellingPrice");
+                    if (rs.wasNull())
+                        price = 0; // Fallback
+
+                    Cart.Item item = new Cart.Item(m, rs.getInt("UnitId"), rs.getInt("CartQuantity"), price);
                     cart.addItem(item);
                 }
             }

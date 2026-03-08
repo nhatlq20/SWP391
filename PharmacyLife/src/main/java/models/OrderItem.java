@@ -3,6 +3,7 @@ package models;
 public class OrderItem {
     private int orderId;
     private int medicineId;
+    private int unitId; // New field
     private int quantity;
     private double unitPrice;
 
@@ -12,6 +13,15 @@ public class OrderItem {
     public OrderItem() {
     }
 
+    public OrderItem(int orderId, int medicineId, int unitId, int quantity, double unitPrice) {
+        this.orderId = orderId;
+        this.medicineId = medicineId;
+        this.unitId = unitId;
+        this.quantity = quantity;
+        this.unitPrice = unitPrice;
+    }
+
+    // Legacy constructor
     public OrderItem(int orderId, int medicineId, int quantity, double unitPrice) {
         this.orderId = orderId;
         this.medicineId = medicineId;
@@ -43,6 +53,14 @@ public class OrderItem {
 
     public void setMedicineId(int medicineId) {
         this.medicineId = medicineId;
+    }
+
+    public int getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(int unitId) {
+        this.unitId = unitId;
     }
 
     public int getQuantity() {
