@@ -503,7 +503,10 @@ public class ImportDAO {
 
     public List<Medicine> getAllMedicines() {
         List<Medicine> list = new ArrayList<>();
-        String sql = "SELECT MedicineId, MedicineCode, MedicineName, OriginalPrice, CategoryId FROM Medicine";
+        String sql = "SELECT m.MedicineId, m.MedicineCode, m.MedicineName, m.OriginalPrice, m.CategoryId, mu.UnitName "
+                +
+                "FROM Medicine m " +
+                "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY UnitId ASC)";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
@@ -514,6 +517,7 @@ public class ImportDAO {
                 m.setMedicineName(rs.getString("MedicineName"));
                 m.setOriginalPrice(rs.getDouble("OriginalPrice"));
                 m.setCategoryId(rs.getInt("CategoryId"));
+                m.setUnit(rs.getString("UnitName"));
                 list.add(m);
             }
         } catch (SQLException e) {
