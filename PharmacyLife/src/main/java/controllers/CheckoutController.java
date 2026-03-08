@@ -107,6 +107,7 @@ public class CheckoutController extends HttpServlet {
             for (Cart.Item cartItem : cart.getItems()) {
                 models.OrderItem orderItem = new models.OrderItem();
                 orderItem.setMedicineId(cartItem.getMedicine().getMedicineId());
+                orderItem.setUnitId(cartItem.getUnitId());
                 orderItem.setQuantity(cartItem.getQuantity());
                 orderItem.setUnitPrice(cartItem.getPrice());
                 orderItems.add(orderItem);
@@ -127,16 +128,21 @@ public class CheckoutController extends HttpServlet {
                     cartDAO_checkout.clearCart(customerId);
                 }
                 // Increment voucher usage
-                if (order.getVoucherId() > 0) {
-                    VoucherDAO vDAO = new VoucherDAO();
-                    vDAO.incrementUsedQuantity(order.getVoucherId());
+                try {
+                    if (order.getVoucherId() > 0) {
+                        VoucherDAO vDAO = new VoucherDAO();
+                        vDAO.incrementUsedQuantity(order.getVoucherId());
+                    }
+                } catch (Exception e) {
+                    System.err.println("CheckoutController: Failed to update voucher usage (table might be missing): "
+                            + e.getMessage());
                 }
                 // Redirect to success page to prevent double submission
                 response.sendRedirect(request.getContextPath() + "/checkout-success");
             } else {
-                // If saving failed, stay on checkout page and show error
-                request.setAttribute("error",
-                        "Lỗi: Không thể lưu đơn hàng vào hệ thống. Vui lòng kiểm tra lại thông tin!");
+                String dbError = orderDAO.getLastErrorMessage();
+                request.setAttribute("error", (dbError != null && !dbError.isEmpty()) ? dbError
+                        : "Lỗi: Không thể lưu đơn hàng vào hệ thống. Vui lòng kiểm tra lại thông tin!");
                 // Re-populate attributes for the checkout page
                 request.setAttribute("cart", cart);
                 request.setAttribute("totalMoney", cart.getTotalMoney());

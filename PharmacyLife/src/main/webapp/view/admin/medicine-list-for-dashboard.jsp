@@ -219,7 +219,7 @@
                                                                 </c:otherwise>
                                                             </c:choose>
                                                         </td>
-                                                        <td><strong>${medicine.remainingQuantity}</strong></td>
+                                                        <td><strong>${medicine.stockDisplay}</strong></td>
                                                         <td>
                                                             <c:choose>
                                                                 <c:when test="${medicine.remainingQuantity > 20}">
