@@ -374,14 +374,13 @@ public class MedicineDAO {
         }
     }
 
-    public boolean addQuantityAndSetOriginalPrice(int medicineId, int quantityToAdd, double newOriginalPrice) {
-        String sql = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity + ?, OriginalPrice = ? WHERE MedicineId = ?";
+    public boolean updateStockQuantity(int medicineId, int delta) {
+        String sql = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity + ? WHERE MedicineId = ?";
 
         try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, quantityToAdd);
-            ps.setDouble(2, newOriginalPrice);
-            ps.setInt(3, medicineId);
+            ps.setInt(1, delta);
+            ps.setInt(2, medicineId);
 
             int result = ps.executeUpdate();
             return result > 0;
@@ -390,6 +389,50 @@ public class MedicineDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public boolean addQuantityAndSetOriginalPrice(int medicineId, int quantityToAdd, double newOriginalPrice) {
+        double oldOriginalPrice = 0;
+        String getOldPriceSql = "SELECT OriginalPrice FROM Medicine WHERE MedicineId = ?";
+
+        try (Connection conn = dbContext.getConnection()) {
+            // 1. Get old OriginalPrice to calculate adjustment factor
+            try (PreparedStatement psOld = conn.prepareStatement(getOldPriceSql)) {
+                psOld.setInt(1, medicineId);
+                try (ResultSet rs = psOld.executeQuery()) {
+                    if (rs.next()) {
+                        oldOriginalPrice = rs.getDouble("OriginalPrice");
+                    }
+                }
+            }
+
+            // 2. Update Medicine quantity and OriginalPrice
+            String sql = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity + ?, OriginalPrice = ? WHERE MedicineId = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, quantityToAdd);
+                ps.setDouble(2, newOriginalPrice);
+                ps.setInt(3, medicineId);
+
+                int result = ps.executeUpdate();
+                if (result > 0) {
+                    // 3. If price changed, adjust all unit selling prices proportionally
+                    if (oldOriginalPrice > 0 && newOriginalPrice > 0
+                            && Math.abs(newOriginalPrice - oldOriginalPrice) > 0.0001) {
+                        double factor = newOriginalPrice / oldOriginalPrice;
+                        String updateUnitsSql = "UPDATE MedicineUnit SET SellingPrice = SellingPrice * ? WHERE MedicineId = ?";
+                        try (PreparedStatement psUnits = conn.prepareStatement(updateUnitsSql)) {
+                            psUnits.setDouble(1, factor);
+                            psUnits.setInt(2, medicineId);
+                            psUnits.executeUpdate();
+                        }
+                    }
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public boolean medicineExists(int medicineId) {
