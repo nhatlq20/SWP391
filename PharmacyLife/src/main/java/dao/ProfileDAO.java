@@ -214,4 +214,46 @@ public class ProfileDAO {
             e.printStackTrace();
         }
         return false;
-    }}
+    }
+
+    /**
+     * Check if a phone number is already registered in either Staff or Customer table.
+     * 
+     * @param phone The phone number to check
+     * @return true if the phone number exists in either table, false otherwise
+     */
+    public boolean isPhoneNumberExists(String phone) {
+        if (phone == null || phone.trim().isEmpty()) {
+            return false;
+        }
+        
+        String normalizedPhone = phone.trim().replaceAll("[\\\\s.-]", "");
+        
+        // Check in Staff table
+        String staffSql = "SELECT StaffId FROM Staff WHERE REPLACE(REPLACE(REPLACE(StaffPhone, ' ', ''), '.', ''), '-', '') = ?";
+        // Check in Customer table
+        String customerSql = "SELECT CustomerId FROM Customer WHERE REPLACE(REPLACE(REPLACE(PhoneNumber, ' ', ''), '.', ''), '-', '') = ?";
+        
+        try (Connection conn = new DBContext().getConnection()) {
+            // Check Staff
+            try (PreparedStatement ps = conn.prepareStatement(staffSql)) {
+                ps.setString(1, normalizedPhone);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) return true;
+                }
+            }
+            
+            // Check Customer
+            try (PreparedStatement ps = conn.prepareStatement(customerSql)) {
+                ps.setString(1, normalizedPhone);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) return true;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error checking phone existence: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+}

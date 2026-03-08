@@ -201,8 +201,8 @@ public class StaffController extends HttpServlet {
                     ProfileDAO profileDAO = new ProfileDAO();
                     if (staffPhone != null && !staffPhone.trim().isEmpty()) {
                         String normalizedPhone = staffPhone.trim().replaceAll("[\\s.-]", "");
-                        if (profileDAO.isStaffPhoneExists(normalizedPhone, -1)) {
-                            forwardAddWithError(request, response, "Số điện thoại này đã được sử dụng bởi một nhân viên khác!", staffName, staffEmail);
+                        if (profileDAO.isPhoneNumberExists(normalizedPhone)) {
+                            forwardAddWithError(request, response, "Số điện thoại này đã được đăng ký trong hệ thống!", staffName, staffEmail);
                             return;
                         }
                     }
