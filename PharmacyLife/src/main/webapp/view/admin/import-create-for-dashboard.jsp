@@ -36,6 +36,14 @@
                                         aria-label="Close"></button>
                                 </div>
                             </c:if>
+                            <c:if test="${not empty sessionScope.message}">
+                                <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+                                    <i class="fas fa-check-circle me-2"></i>${sessionScope.message}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                                </div>
+                                <c:remove var="message" scope="session" />
+                            </c:if>
 
                             <form method="POST" action="${pageContext.request.contextPath}/admin/imports"
                                 id="importForm">
@@ -182,7 +190,7 @@
                                         <option value="">-- Tìm và chọn thuốc --</option>
                                         <c:forEach var="med" items="${medicines}">
                                             <option value="${med.medicineId}" data-category="${med.categoryId}"
-                                                data-unit="${med.unit}">
+                                                data-unit="${med.unit}" data-unit-id="${med.baseUnit.unitId}">
                                                 ${med.medicineCode} - ${med.medicineName}
                                             </option>
                                         </c:forEach>
@@ -422,7 +430,10 @@
                         }
 
                         function addMedicineFromModal() {
-                            const medicineId = document.getElementById('modalMedicineId').value;
+                            const selectElement = document.getElementById('modalMedicineId');
+                            const medicineId = selectElement.value;
+                            const selectedOption = selectElement.options[selectElement.selectedIndex];
+                            const unitId = selectedOption.getAttribute('data-unit-id');
                             const quantityInput = document.getElementById('modalQuantity');
                             const price = parseFloat(document.getElementById('modalPrice').value);
                             const errorDiv = document.getElementById('quantityError');
@@ -452,20 +463,17 @@
                             }
 
                             // Lấy tên thuốc từ option
-                            const selectElement = document.getElementById('modalMedicineId');
-                            const selectedOption = selectElement.options[selectElement.selectedIndex];
                             const optionText = selectedOption.text;
-                            const medicineCode = optionText.split(' - ')[0];
-                            const medicineName = optionText.split(' - ')[1] || '';
 
                             const total = quantity * price;
                             medicineList.push({
                                 medicineId: medicineId,
-                                medicineCode: medicineCode,
-                                medicineName: medicineName,
+                                medicineCode: selectedOption.text.split(' - ')[0],
+                                medicineName: selectedOption.text.split(' - ')[1],
                                 quantity: quantity,
+                                unitId: unitId,
                                 price: price,
-                                total: total
+                                total: quantity * price
                             });
                             updateTable();
                             closeAddMedicineModal();
@@ -499,7 +507,12 @@
                                             </button>
                                         </td>
                                     </tr>`;
-                                    hiddenContainer.innerHTML += `<input type="hidden" name="medicines[\${index}].medicineId" value="\${item.medicineId}"><input type="hidden" name="medicines[\${index}].quantity" value="\${item.quantity}"><input type="hidden" name="medicines[\${index}].price" value="\${item.price}">`;
+                                    hiddenContainer.innerHTML += `
+                                        <input type="hidden" name="medicines[\${index}].medicineId" value="\${item.medicineId}">
+                                        <input type="hidden" name="medicines[\${index}].unitId" value="\${item.unitId}">
+                                        <input type="hidden" name="medicines[\${index}].quantity" value="\${item.quantity}">
+                                        <input type="hidden" name="medicines[\${index}].price" value="\${item.price}">
+                                    `;
                                 });
                             }
                             document.getElementById('totalDisplay').textContent = formatCurrency(totalAmount);
@@ -515,8 +528,13 @@
                             if (event.target === medicineModal) closeAddMedicineModal();
                             if (event.target === supplierModal) closeAddSupplierModal();
                         }
-                        // Prevent form submit if any invalid quantity
+                        // Prevent form submit if empty or any invalid quantity
                         document.getElementById('importForm').addEventListener('submit', function (e) {
+                            if (medicineList.length === 0) {
+                                alert('Vui lòng thêm ít nhất 1 loại thuốc vào phiếu nhập.');
+                                e.preventDefault();
+                                return;
+                            }
                             let hasError = false;
                             for (let i = 0; i < medicineList.length; i++) {
                                 const qty = medicineList[i].quantity;
@@ -529,6 +547,11 @@
                                 alert('Có thuốc với số lượng không hợp lệ. Vui lòng kiểm tra lại.');
                                 e.preventDefault();
                             }
+                        });
+
+                        // Initialize table on load
+                        document.addEventListener('DOMContentLoaded', function () {
+                            updateTable();
                         });
                     </script>
                     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

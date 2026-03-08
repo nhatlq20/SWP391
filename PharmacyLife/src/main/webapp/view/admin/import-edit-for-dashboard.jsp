@@ -29,6 +29,22 @@
                                 nhập</h3>
                         </div>
                         <div class="form-card">
+                            <c:if test="${not empty error}">
+                                <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+                                    <i class="fas fa-exclamation-circle me-2"></i>${error}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                                </div>
+                            </c:if>
+                            <c:if test="${not empty sessionScope.message}">
+                                <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+                                    <i class="fas fa-check-circle me-2"></i>${sessionScope.message}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                                </div>
+                                <c:remove var="message" scope="session" />
+                            </c:if>
+
                             <c:if test="${not empty importRecord}">
                                 <form action="${pageContext.request.contextPath}/admin/imports" method="POST">
                                     <input type="hidden" name="action" value="update">
@@ -126,57 +142,14 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody id="medicineListBody">
-                                                        <c:choose>
-                                                            <c:when test="${not empty details}">
-                                                                <c:forEach var="detail" items="${details}">
-                                                                    <tr>
-                                                                        <td><strong>${detail.medicineCode}</strong></td>
-                                                                        <td>${detail.medicineName != null ?
-                                                                            detail.medicineName : '-'}</td>
-                                                                        <td>${detail.quantity}</td>
-                                                                        <td><span class="price">
-                                                                                <fmt:formatNumber
-                                                                                    value='${detail.unitPrice}'
-                                                                                    type='number'
-                                                                                    maxFractionDigits='0' />₫
-                                                                            </span></td>
-                                                                        <td><span class="price">
-                                                                                <fmt:formatNumber
-                                                                                    value='${detail.quantity * detail.unitPrice}'
-                                                                                    type='number'
-                                                                                    maxFractionDigits='0' />₫
-                                                                            </span></td>
-                                                                        <td style="text-align: center;">
-                                                                            <form
-                                                                                action="${pageContext.request.contextPath}/admin/imports"
-                                                                                method="POST" style="display: inline;">
-                                                                                <input type="hidden" name="action"
-                                                                                    value="deleteDetail">
-                                                                                <input type="hidden" name="detailId"
-                                                                                    value="${detail.detailId}">
-                                                                                <input type="hidden" name="importId"
-                                                                                    value="${importRecord.importId}">
-                                                                                <button type="submit"
-                                                                                    class="btn-action btn-delete"
-                                                                                    onclick="return confirm('Xóa thuốc này? (Phiếu phải có ít nhất 1 loại thuốc)')">
-                                                                                    <i class="fas fa-trash"></i>
-                                                                                </button>
-                                                                            </form>
-                                                                        </td>
-                                                                    </tr>
-                                                                </c:forEach>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <tr>
-                                                                    <td colspan="6" class="empty-state">
-                                                                        <div>
-                                                                            <i class="fas fa-clipboard-list mb-3"></i>
-                                                                            <p>Chưa có dữ liệu thuốc nhập</p>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            </c:otherwise>
-                                                        </c:choose>
+                                                        <tr>
+                                                            <td colspan="6" class="empty-state">
+                                                                <div>
+                                                                    <i class="fas fa-spinner fa-spin mb-3"></i>
+                                                                    <p>Đang tải dữ liệu...</p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -198,6 +171,14 @@
                             </c:if>
                         </div>
                     </div>
+
+                    <!-- Hidden form for deleting details to avoid nested forms -->
+                    <form id="deleteDetailForm" action="${pageContext.request.contextPath}/admin/imports" method="POST"
+                        style="display: none;">
+                        <input type="hidden" name="action" value="deleteDetail">
+                        <input type="hidden" name="detailId" id="deleteDetailId">
+                        <input type="hidden" name="importId" value="${importRecord.importId}">
+                    </form>
 
                     <!-- Modal Thêm Thuốc -->
                     <div id="addMedicineModal" class="modal">
@@ -225,7 +206,7 @@
                                         <option value="">-- Tìm và chọn thuốc --</option>
                                         <c:forEach var="med" items="${medicines}">
                                             <option value="${med.medicineId}" data-category="${med.categoryId}"
-                                                data-unit="${med.unit}">
+                                                data-unit="${med.unit}" data-unit-id="${med.baseUnit.unitId}">
                                                 ${med.medicineCode} - ${med.medicineName}
                                             </option>
                                         </c:forEach>
@@ -324,10 +305,11 @@
                                 medicineName: "<c:out value="${not empty detail.medicineName ? detail.medicineName : ''}" />",
                                 quantity: <c:out value="${not empty detail.quantity ? detail.quantity : 0}" />,
                                 price: <c:out value="${not empty detail.unitPrice ? detail.unitPrice : 0}" />,
-                                total: <c:out value="${not empty detail.quantity && not empty detail.unitPrice ? (detail.quantity * detail.unitPrice) : 0}" />
+                                total: <c:out value="${detail.totalAmount}" />,
                                 });
                             </c:forEach>
                         </c:if>
+                        console.log("Medicine List initialized:", medicineList);
 
                         function openAddMedicineModal() {
                             document.getElementById('addMedicineModal').style.display = 'block';
@@ -486,12 +468,15 @@
                         }
 
                         function addMedicineFromModal() {
-                            const medicineId = document.getElementById('modalMedicineId').value;
+                            const selectElement = document.getElementById('modalMedicineId');
+                            const medicineId = selectElement.value;
+                            const selectedOption = selectElement.options[selectElement.selectedIndex];
+                            const unitId = selectedOption.getAttribute('data-unit-id');
                             const quantityInput = document.getElementById('modalQuantity');
-                            const quantity = quantityInput.value;
+                            const quantity = parseInt(quantityInput.value);
                             const price = parseFloat(document.getElementById('modalPrice').value);
 
-                            if (!medicineId || quantity === '' || quantity === null || isNaN(parseInt(quantity)) || !price) {
+                            if (!medicineId || isNaN(quantity) || quantity <= 0 || !price) {
                                 validateQuantity();
                                 alert("Vui lòng nhập đầy đủ thông tin thuốc.");
                                 return;
@@ -501,18 +486,17 @@
                                 return;
                             }
 
-                            const selectElement = document.getElementById('modalMedicineId');
-                            const selectedOption = selectElement.options[selectElement.selectedIndex];
                             const optionText = selectedOption.text;
                             const medicineCode = optionText.split(' - ')[0];
                             const medicineName = optionText.split(' - ')[1] || '';
 
-                            const total = parseInt(quantity) * price;
+                            const total = quantity * price;
                             medicineList.push({
                                 medicineId: medicineId,
                                 medicineCode: medicineCode,
                                 medicineName: medicineName,
-                                quantity: parseInt(quantity),
+                                quantity: quantity,
+                                unitId: unitId,
                                 price: price,
                                 total: total
                             });
@@ -522,6 +506,16 @@
 
                         function removeMedicine(index) {
                             medicineList.splice(index, 1);
+                            updateTable();
+                        }
+
+                        function updateItem(index, field, value) {
+                            if (field === 'quantity') {
+                                medicineList[index].quantity = parseInt(value) || 0;
+                            } else if (field === 'price') {
+                                medicineList[index].price = parseFloat(value) || 0;
+                            }
+                            medicineList[index].total = medicineList[index].quantity * medicineList[index].price;
                             updateTable();
                         }
 
@@ -537,33 +531,41 @@
                                 medicineList.forEach((item, index) => {
                                     let deleteBtn = '';
                                     if (item.detailId) {
-                                        // Existing item from database - delete via server
-                                        deleteBtn = `<form action="${pageContext.request.contextPath}/admin/imports" method="POST" style="display: inline;">
-                                            <input type="hidden" name="action" value="deleteDetail">
-                                            <input type="hidden" name="detailId" value="\${item.detailId}">
-                                            <input type="hidden" name="importId" value="${importRecord.importId}">
-                                            <button type="submit" class="btn-action btn-delete" onclick="return confirm('Xóa thuốc này?')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>`;
+                                        deleteBtn = `<button type="button" class="btn-action btn-delete" onclick="submitDeleteDetail(\${item.detailId})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>`;
+                                        // Hidden inputs for existing details updates
+                                        hiddenContainer.innerHTML += `
+                                            <input type="hidden" name="existingDetails[\${item.detailId}].quantity" value="\${item.quantity}">
+                                            <input type="hidden" name="existingDetails[\${item.detailId}].price" value="\${item.price}">
+                                        `;
                                     } else {
-                                        // New item - delete client-side
                                         deleteBtn = `<button type="button" class="btn-action btn-delete" onclick="removeMedicine(\${index})">
                                             <i class="fas fa-trash"></i>
                                         </button>`;
+                                        // Hidden inputs for new items
+                                        hiddenContainer.innerHTML += `
+                                            <input type="hidden" name="newMedicines[\${index}].medicineId" value="\${item.medicineId}">
+                                            <input type="hidden" name="newMedicines[\${index}].unitId" value="\${item.unitId}">
+                                            <input type="hidden" name="newMedicines[\${index}].quantity" value="\${item.quantity}">
+                                            <input type="hidden" name="newMedicines[\${index}].price" value="\${item.price}">
+                                        `;
                                     }
+
                                     tbody.innerHTML += `<tr>
                                         <td><strong>\${item.medicineCode}</strong></td>
                                         <td>\${item.medicineName || '-'}</td>
-                                        <td>\${item.quantity}</td>
-                                        <td><span class="price">\${formatCurrency(item.price)}</span></td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm" style="width: 80px;" 
+                                                value="\${item.quantity}" onchange="updateItem(\${index}, 'quantity', this.value)">
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm" style="width: 120px;" 
+                                                value="\${item.price}" onchange="updateItem(\${index}, 'price', this.value)">
+                                        </td>
                                         <td><span class="price">\${formatCurrency(item.total)}</span></td>
                                         <td style="text-align: center;">\${deleteBtn}</td>
                                     </tr>`;
-                                    if (!item.detailId) {
-                                        // Only add hidden inputs for new items
-                                        hiddenContainer.innerHTML += `<input type="hidden" name="newMedicines[\${index}].medicineId" value="\${item.medicineId}"><input type="hidden" name="newMedicines[\${index}].quantity" value="\${item.quantity}"><input type="hidden" name="newMedicines[\${index}].price" value="\${item.price}">`;
-                                    }
                                 });
                             }
                         }
@@ -578,6 +580,17 @@
                             if (event.target === medicineModal) closeAddMedicineModal();
                             if (event.target === supplierModal) closeAddSupplierModal();
                         }
+                        function submitDeleteDetail(detailId) {
+                            if (confirm('Xóa thuốc này? (Phiếu phải có ít nhất 1 loại thuốc)')) {
+                                document.getElementById('deleteDetailId').value = detailId;
+                                document.getElementById('deleteDetailForm').submit();
+                            }
+                        }
+
+                        // Initialize table on load
+                        document.addEventListener('DOMContentLoaded', function () {
+                            updateTable();
+                        });
                     </script>
                     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
                 </body>

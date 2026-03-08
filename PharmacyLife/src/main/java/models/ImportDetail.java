@@ -22,6 +22,7 @@ public class ImportDetail {
     private String medicineName; // Tên thuốc (join từ bảng Medicine)
     private String medicineCode; // Mã thuốc (join từ bảng Medicine)
 
+    private int unitId; // UnitId
     private int quantity; // ImportQuantity
     private double unitPrice; // UnitPrice
 
@@ -30,9 +31,10 @@ public class ImportDetail {
     public ImportDetail() {
     }
 
-    public ImportDetail(int importId, int medicineId, int quantity, double unitPrice) {
+    public ImportDetail(int importId, int medicineId, int unitId, int quantity, double unitPrice) {
         this.importId = importId;
         this.medicineId = medicineId;
+        this.unitId = unitId;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
         this.totalAmount = quantity * unitPrice;
@@ -71,6 +73,14 @@ public class ImportDetail {
 
     public void setMedicineId(int medicineId) {
         this.medicineId = medicineId;
+    }
+
+    public int getUnitId() {
+        return unitId;
+    }
+
+    public void setUnitId(int unitId) {
+        this.unitId = unitId;
     }
 
     public String getMedicineName() {

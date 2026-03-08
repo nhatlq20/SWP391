@@ -129,10 +129,12 @@
                                                                     class="btn-action btn-view" title="Xem chi tiết">
                                                                     <i class="fas fa-eye"></i>
                                                                 </a>
-                                                                <a href="${pageContext.request.contextPath}/admin/imports?action=edit&code=${imp.importCode}"
-                                                                    class="btn-action btn-edit" title="Sửa">
-                                                                    <i class="fas fa-pen"></i>
-                                                                </a>
+                                                                <c:if test="${imp.status != 'Đã duyệt'}">
+                                                                    <a href="${pageContext.request.contextPath}/admin/imports?action=edit&code=${imp.importCode}"
+                                                                        class="btn-action btn-edit" title="Sửa">
+                                                                        <i class="fas fa-pen"></i>
+                                                                    </a>
+                                                                </c:if>
                                                                 <a href="${pageContext.request.contextPath}/admin/imports?action=delete&code=${imp.importCode}"
                                                                     class="btn-action btn-delete"
                                                                     onclick="return confirm('Bạn có chắc chắn muốn xóa phiếu nhập này?')"

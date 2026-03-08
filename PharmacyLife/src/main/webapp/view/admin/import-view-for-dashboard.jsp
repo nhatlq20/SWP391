@@ -138,10 +138,12 @@
                                         <a href="${pageContext.request.contextPath}/admin/imports" class="btn-back">
                                             <i class="fas fa-arrow-left me-2"></i>Trở lại
                                         </a>
-                                        <a href="${pageContext.request.contextPath}/admin/imports?action=edit&code=${importRecord.importCode}"
-                                            class="btn-edit-detail">
-                                            <i class="fas fa-pen me-2"></i>Chỉnh sửa
-                                        </a>
+                                        <c:if test="${importRecord.status != 'Đã duyệt'}">
+                                            <a href="${pageContext.request.contextPath}/admin/imports?action=edit&code=${importRecord.importCode}"
+                                                class="btn-edit-detail">
+                                                <i class="fas fa-pen me-2"></i>Chỉnh sửa
+                                            </a>
+                                        </c:if>
                                     </div>
                                 </div>
                             </div>
