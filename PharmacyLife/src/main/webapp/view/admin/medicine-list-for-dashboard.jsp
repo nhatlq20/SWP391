@@ -43,8 +43,11 @@
                                                 onclick="sortTable(0, 'text', this); return false;">Mã</a></li>
                                         <li><a class="dropdown-item" href="#"
                                                 onclick="sortTable(3, 'number', this); return false;">Giá bán</a></li>
-                                        <li><a class="dropdown-item" href="#"
-                                                onclick="sortTable(4, 'number', this); return false;">Giá gốc</a></li>
+                                        <c:if test="${fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
+                                            <li><a class="dropdown-item" href="#"
+                                                    onclick="sortTable(4, 'number', this); return false;">Giá gốc</a>
+                                            </li>
+                                        </c:if>
                                         <li><a class="dropdown-item" href="#"
                                                 onclick="sortTable(7, 'number', this); return false;">Số lượng</a></li>
                                     </ul>
@@ -128,7 +131,10 @@
                                                     <th>Ảnh</th>
                                                     <th>Tên thuốc</th>
                                                     <th>Giá bán</th>
-                                                    <th>Giá gốc</th>
+                                                    <c:if
+                                                        test="${fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
+                                                        <th>Giá gốc</th>
+                                                    </c:if>
                                                     <th>Đơn vị</th>
                                                     <th>Danh mục</th>
                                                     <th>Số lượng</th>
@@ -192,12 +198,15 @@
                                                                     type="number" groupingUsed="true" />đ
                                                             </span>
                                                         </td>
-                                                        <td>
-                                                            <span class="price" style="color:#6c757d;">
-                                                                <fmt:formatNumber value="${medicine.originalPrice}"
-                                                                    type="number" groupingUsed="true" />đ
-                                                            </span>
-                                                        </td>
+                                                        <c:if
+                                                            test="${fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
+                                                            <td>
+                                                                <span class="price" style="color:#6c757d;">
+                                                                    <fmt:formatNumber value="${medicine.originalPrice}"
+                                                                        type="number" groupingUsed="true" />đ
+                                                                </span>
+                                                            </td>
+                                                        </c:if>
                                                         <td>${medicine.unit}</td>
                                                         <td>
                                                             <c:choose>
@@ -355,7 +364,8 @@
                                 if (!emptyRow) {
                                     emptyRow = document.createElement('tr');
                                     emptyRow.className = 'empty-state-row';
-                                    emptyRow.innerHTML = '<td colspan="9" class="text-center py-5 text-muted"><i class="fas fa-box-open fa-3x mb-3 d-block"></i><p>Không tìm thấy dữ liệu phù hợp</p></td>';
+                                    var colSpan = document.querySelectorAll('#medicineTable thead th').length;
+                                    emptyRow.innerHTML = '<td colspan="' + colSpan + '" class="text-center py-5 text-muted"><i class="fas fa-box-open fa-3x mb-3 d-block"></i><p>Không tìm thấy dữ liệu phù hợp</p></td>';
                                     document.querySelector('#medicineTable tbody').appendChild(emptyRow);
                                 }
                                 emptyRow.style.display = '';
