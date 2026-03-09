@@ -203,6 +203,19 @@ public class Medicine {
         this.remainingQuantity = remainingQuantity;
     }
 
+    /**
+     * Returns the display quantity by dividing RemainingQuantity by ConversionRate.
+     * If baseUnit is available and ConversionRate > 0, returns remainingQuantity /
+     * conversionRate.
+     * Otherwise, falls back to the raw remainingQuantity.
+     */
+    public int getDisplayQuantity() {
+        if (baseUnit != null && baseUnit.getConversionRate() > 0) {
+            return remainingQuantity / baseUnit.getConversionRate();
+        }
+        return remainingQuantity;
+    }
+
     public Category getCategory() {
         return category;
     }
