@@ -201,6 +201,27 @@ public class MedicineControllerForDashboard extends HttpServlet {
             // Insert Medicine and get the new ID
             int newMedicineId = medicineDAO.createMedicineAndReturnId(medicine);
             if (newMedicineId > 0) {
+                // Correct Hierarchy: Main Unit (Hộp) > Sub Unit 1 (Vỉ) > Sub Unit 2 (Viên)
+                // To store stock in smallest units:
+                // Sub Unit 2 (if exists) Rate = 1
+                // Sub Unit 1 Rate = SubRate2
+                // Main Unit Rate = SubRate1 * SubRate2
+
+                String subUnit1 = request.getParameter("subUnit1");
+                String subRate1Str = request.getParameter("subRate1");
+                String subPrice1Str = request.getParameter("subPrice1");
+
+                String subUnit2 = request.getParameter("subUnit2");
+                String subRate2Str = request.getParameter("subRate2");
+                String subPrice2Str = request.getParameter("subPrice2");
+
+                int rate1 = (subRate1Str != null && !subRate1Str.isEmpty()) ? Integer.parseInt(subRate1Str) : 1;
+                int rate2 = (subRate2Str != null && !subRate2Str.isEmpty()) ? Integer.parseInt(subRate2Str) : 1;
+
+                int mainUnitRate = rate1 * rate2;
+                int unit1Rate = rate2;
+                int unit2Rate = 1;
+
                 // Create the base unit record
                 String unitName = request.getParameter("unit");
                 String sellingPriceStr = request.getParameter("sellingPrice");
@@ -211,38 +232,28 @@ public class MedicineControllerForDashboard extends HttpServlet {
                 MedicineUnit baseUnit = new MedicineUnit();
                 baseUnit.setMedicineId(newMedicineId);
                 baseUnit.setUnitName(unitName != null && !unitName.isEmpty() ? unitName : "Hộp");
-                baseUnit.setConversionRate(1);
+                baseUnit.setConversionRate(mainUnitRate);
                 baseUnit.setSellingPrice(sellingPrice);
                 baseUnit.setBaseUnit(true);
                 medicineUnitDAO.addUnit(baseUnit);
 
                 // Add Sub-Unit 1 if provided
-                String subUnit1 = request.getParameter("subUnit1");
-                String subRate1Str = request.getParameter("subRate1");
-                String subPrice1Str = request.getParameter("subPrice1");
-                int rate1 = 0;
-                if (subUnit1 != null && !subUnit1.isEmpty() && subRate1Str != null && !subRate1Str.isEmpty()) {
-                    rate1 = Integer.parseInt(subRate1Str);
+                if (subUnit1 != null && !subUnit1.isEmpty()) {
                     MedicineUnit unit1 = new MedicineUnit();
                     unit1.setMedicineId(newMedicineId);
                     unit1.setUnitName(subUnit1);
-                    unit1.setConversionRate(rate1);
+                    unit1.setConversionRate(unit1Rate);
                     unit1.setSellingPrice(Double.parseDouble(subPrice1Str));
                     unit1.setBaseUnit(false);
                     medicineUnitDAO.addUnit(unit1);
                 }
 
                 // Add Sub-Unit 2 if provided
-                String subUnit2 = request.getParameter("subUnit2");
-                String subRate2Str = request.getParameter("subRate2");
-                String subPrice2Str = request.getParameter("subPrice2");
-                if (subUnit2 != null && !subUnit2.isEmpty() && subRate2Str != null && !subRate2Str.isEmpty()) {
-                    // Cumulative rate: if 1 Hộp = 10 Vỉ and 1 Vỉ = 10 Viên, then 1 Hộp = 100 Viên
-                    int rate2 = rate1 * Integer.parseInt(subRate2Str);
+                if (subUnit2 != null && !subUnit2.isEmpty()) {
                     MedicineUnit unit2 = new MedicineUnit();
                     unit2.setMedicineId(newMedicineId);
                     unit2.setUnitName(subUnit2);
-                    unit2.setConversionRate(rate2);
+                    unit2.setConversionRate(unit2Rate);
                     unit2.setSellingPrice(Double.parseDouble(subPrice2Str));
                     unit2.setBaseUnit(false);
                     medicineUnitDAO.addUnit(unit2);
@@ -297,6 +308,22 @@ public class MedicineControllerForDashboard extends HttpServlet {
 
             boolean success = medicineDAO.updateMedicine(medicine);
             if (success) {
+                // Correct Hierarchy: Main Unit (Hộp) > Sub Unit 1 (Vỉ) > Sub Unit 2 (Viên)
+                String subUnit1 = request.getParameter("subUnit1");
+                String subRate1Str = request.getParameter("subRate1");
+                String subPrice1Str = request.getParameter("subPrice1");
+
+                String subUnit2 = request.getParameter("subUnit2");
+                String subRate2Str = request.getParameter("subRate2");
+                String subPrice2Str = request.getParameter("subPrice2");
+
+                int rate1Value = (subRate1Str != null && !subRate1Str.isEmpty()) ? Integer.parseInt(subRate1Str) : 1;
+                int rate2Value = (subRate2Str != null && !subRate2Str.isEmpty()) ? Integer.parseInt(subRate2Str) : 1;
+
+                int mainUnitRate = rate1Value * rate2Value;
+                int unit1Rate = rate2Value;
+                int unit2Rate = 1;
+
                 // Update the base unit (unit name and selling price) in MedicineUnit
                 String unitName = request.getParameter("unit");
                 String sellingPriceStr = request.getParameter("sellingPrice");
@@ -304,35 +331,30 @@ public class MedicineControllerForDashboard extends HttpServlet {
                         ? Double.parseDouble(sellingPriceStr)
                         : 0;
 
-                boolean unitUpdated = medicineUnitDAO.updateBaseUnit(medicineId,
-                        unitName != null && !unitName.isEmpty() ? unitName : "Hộp", sellingPrice);
+                boolean unitUpdated = medicineUnitDAO.updateUnitInternal(medicineId,
+                        unitName != null && !unitName.isEmpty() ? unitName : "Hộp",
+                        sellingPrice, mainUnitRate, true);
 
                 // If no base unit row exists yet, create one
                 if (!unitUpdated) {
                     MedicineUnit baseUnit = new MedicineUnit();
                     baseUnit.setMedicineId(medicineId);
                     baseUnit.setUnitName(unitName != null && !unitName.isEmpty() ? unitName : "Hộp");
-                    baseUnit.setConversionRate(1);
+                    baseUnit.setConversionRate(mainUnitRate);
                     baseUnit.setSellingPrice(sellingPrice);
                     baseUnit.setBaseUnit(true);
                     medicineUnitDAO.addUnit(baseUnit);
                 }
 
-                // Delete non base unit and re-insert them because they could've been changed
-                // dynamically
+                // Delete non base unit and re-insert them
                 medicineUnitDAO.deleteNonBaseUnitsByMedicineId(medicineId);
 
                 // Add Sub-Unit 1 if provided
-                String subUnit1 = request.getParameter("subUnit1");
-                String subRate1Str = request.getParameter("subRate1");
-                String subPrice1Str = request.getParameter("subPrice1");
-                int rate1 = 0;
-                if (subUnit1 != null && !subUnit1.isEmpty() && subRate1Str != null && !subRate1Str.isEmpty()) {
-                    rate1 = Integer.parseInt(subRate1Str);
+                if (subUnit1 != null && !subUnit1.isEmpty()) {
                     MedicineUnit unit1 = new MedicineUnit();
                     unit1.setMedicineId(medicineId);
                     unit1.setUnitName(subUnit1);
-                    unit1.setConversionRate(rate1);
+                    unit1.setConversionRate(unit1Rate);
                     unit1.setSellingPrice(
                             subPrice1Str != null && !subPrice1Str.isEmpty() ? Double.parseDouble(subPrice1Str) : 0);
                     unit1.setBaseUnit(false);
@@ -340,16 +362,11 @@ public class MedicineControllerForDashboard extends HttpServlet {
                 }
 
                 // Add Sub-Unit 2 if provided
-                String subUnit2 = request.getParameter("subUnit2");
-                String subRate2Str = request.getParameter("subRate2");
-                String subPrice2Str = request.getParameter("subPrice2");
-                if (subUnit2 != null && !subUnit2.isEmpty() && subRate2Str != null && !subRate2Str.isEmpty()) {
-                    // Cumulative rate: if 1 Hộp = 10 Vỉ and 1 Vỉ = 10 Viên, then 1 Hộp = 100 Viên
-                    int rate2 = rate1 * Integer.parseInt(subRate2Str);
+                if (subUnit2 != null && !subUnit2.isEmpty()) {
                     MedicineUnit unit2 = new MedicineUnit();
                     unit2.setMedicineId(medicineId);
                     unit2.setUnitName(subUnit2);
-                    unit2.setConversionRate(rate2);
+                    unit2.setConversionRate(unit2Rate);
                     unit2.setSellingPrice(
                             subPrice2Str != null && !subPrice2Str.isEmpty() ? Double.parseDouble(subPrice2Str) : 0);
                     unit2.setBaseUnit(false);

@@ -118,6 +118,28 @@ public class MedicineUnitDAO {
     }
 
     /**
+     * Update only the base unit's UnitName, SellingPrice and ConversionRate for a
+     * given medicine.
+     */
+    public boolean updateUnitInternal(int medicineId, String unitName, double sellingPrice, int conversionRate,
+            boolean isBase) {
+        String sql = "UPDATE MedicineUnit SET UnitName = ?, SellingPrice = ?, ConversionRate = ?, IsBaseUnit = ? "
+                + "WHERE UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = ? AND IsBaseUnit = 1 ORDER BY UnitId ASC)";
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, unitName);
+            ps.setDouble(2, sellingPrice);
+            ps.setInt(3, conversionRate);
+            ps.setBoolean(4, isBase);
+            ps.setInt(5, medicineId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
      * Update only the base unit's UnitName and SellingPrice for a given medicine.
      */
     public boolean updateBaseUnit(int medicineId, String unitName, double sellingPrice) {
