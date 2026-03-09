@@ -145,4 +145,58 @@ public class RevenueDAO {
         }
         return stats;
     }
+
+    public java.util.List<models.TopProduct> getTopSellingProducts(Date from, Date to, int limit) throws SQLException {
+        String sql = "SELECT TOP " + limit
+                + " m.MedicineName, SUM(oi.OrderQuantity) as TotalQty, SUM(oi.OrderQuantity * oi.UnitPrice) as TotalRev "
+                +
+                "FROM Orders o " +
+                "JOIN OrderItems oi ON o.OrderId = oi.OrderId " +
+                "JOIN Medicine m ON oi.MedicineId = m.MedicineId " +
+                "WHERE o.Status IN ('Delivered', N'Đã giao hàng') ";
+        if (from != null && to != null) {
+            sql += " AND CAST(o.OrderDate AS DATE) BETWEEN ? AND ? ";
+        }
+        sql += "GROUP BY m.MedicineName " +
+                "ORDER BY TotalQty DESC, TotalRev DESC";
+
+        java.util.List<models.TopProduct> list = new java.util.ArrayList<>();
+        DBContext db = new DBContext();
+        try (Connection conn = db.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            setDateParameters(ps, from, to, 1);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(new models.TopProduct(rs.getString("MedicineName"), rs.getInt("TotalQty"),
+                        rs.getDouble("TotalRev")));
+            }
+        }
+        return list;
+    }
+
+    public java.util.List<models.TopCustomer> getTopCustomers(Date from, Date to, int limit) throws SQLException {
+        String sql = "SELECT TOP " + limit
+                + " c.FullName, COUNT(o.OrderId) as OrderCount, SUM(o.TotalAmount) as TotalSpent " +
+                "FROM Orders o " +
+                "JOIN Customer c ON o.CustomerId = c.CustomerId " +
+                "WHERE o.Status IN ('Delivered', N'Đã giao hàng') ";
+        if (from != null && to != null) {
+            sql += " AND CAST(o.OrderDate AS DATE) BETWEEN ? AND ? ";
+        }
+        sql += "GROUP BY c.FullName " +
+                "ORDER BY TotalSpent DESC, OrderCount DESC";
+
+        java.util.List<models.TopCustomer> list = new java.util.ArrayList<>();
+        DBContext db = new DBContext();
+        try (Connection conn = db.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            setDateParameters(ps, from, to, 1);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(new models.TopCustomer(rs.getString("FullName"), rs.getInt("OrderCount"),
+                        rs.getDouble("TotalSpent")));
+            }
+        }
+        return list;
+    }
 }
