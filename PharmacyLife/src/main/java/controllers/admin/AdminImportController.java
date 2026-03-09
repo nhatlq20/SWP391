@@ -399,7 +399,8 @@ public class AdminImportController extends HttpServlet {
                     List<ImportDetail> detailsToSync = importDAO.getImportDetails(newImportId);
                     if (detailsToSync != null) {
                         for (ImportDetail detail : detailsToSync) {
-                            medicineDAO.addQuantityAndSetOriginalPrice(detail.getMedicineId(), detail.getQuantity(),
+                            medicineDAO.addQuantityAndSetOriginalPrice(detail.getMedicineId(), detail.getUnitId(),
+                                    detail.getQuantity(),
                                     detail.getUnitPrice());
                         }
                     }
@@ -526,10 +527,12 @@ public class AdminImportController extends HttpServlet {
                             if ("Đã duyệt".equals(oldStatus)) {
                                 int diff = newQty - oldDetail.getQuantity();
                                 if (diff != 0) {
-                                    medicineDAO.updateStockQuantity(oldDetail.getMedicineId(), diff);
+                                    medicineDAO.updateStockQuantity(oldDetail.getMedicineId(), oldDetail.getUnitId(),
+                                            diff);
                                 }
                                 if (Math.abs(newPrice - oldDetail.getUnitPrice()) > 0.0001) {
-                                    medicineDAO.addQuantityAndSetOriginalPrice(oldDetail.getMedicineId(), 0, newPrice);
+                                    medicineDAO.addQuantityAndSetOriginalPrice(oldDetail.getMedicineId(),
+                                            oldDetail.getUnitId(), 0, newPrice);
                                 }
                             }
                             oldDetail.setQuantity(newQty);
@@ -599,7 +602,8 @@ public class AdminImportController extends HttpServlet {
                     List<ImportDetail> detailsToSync = importDAO.getImportDetails(importId);
                     if (detailsToSync != null) {
                         for (ImportDetail detail : detailsToSync) {
-                            medicineDAO.addQuantityAndSetOriginalPrice(detail.getMedicineId(), detail.getQuantity(),
+                            medicineDAO.addQuantityAndSetOriginalPrice(detail.getMedicineId(), detail.getUnitId(),
+                                    detail.getQuantity(),
                                     detail.getUnitPrice());
                         }
                     }
@@ -608,7 +612,8 @@ public class AdminImportController extends HttpServlet {
                     List<ImportDetail> detailsToSync = importDAO.getImportDetails(importId);
                     if (detailsToSync != null) {
                         for (ImportDetail detail : detailsToSync) {
-                            medicineDAO.updateStockQuantity(detail.getMedicineId(), -detail.getQuantity());
+                            medicineDAO.updateStockQuantity(detail.getMedicineId(), detail.getUnitId(),
+                                    -detail.getQuantity());
                         }
                     }
                 }
@@ -638,7 +643,8 @@ public class AdminImportController extends HttpServlet {
                 List<ImportDetail> details = importDAO.getImportDetails(importId);
                 if (details != null) {
                     for (ImportDetail detail : details) {
-                        medicineDAO.updateStockQuantity(detail.getMedicineId(), -detail.getQuantity());
+                        medicineDAO.updateStockQuantity(detail.getMedicineId(), detail.getUnitId(),
+                                -detail.getQuantity());
                     }
                 }
             }
