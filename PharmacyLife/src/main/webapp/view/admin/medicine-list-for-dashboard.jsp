@@ -64,7 +64,7 @@
                             <div class="stat-card stat-instock">
                                 <c:set var="inStockCount" value="0" />
                                 <c:forEach var="med" items="${medicines}">
-                                    <c:if test="${med.remainingQuantity > 20}">
+                                    <c:if test="${med.displayQuantity > 20}">
                                         <c:set var="inStockCount" value="${inStockCount + 1}" />
                                     </c:if>
                                 </c:forEach>
@@ -74,7 +74,7 @@
                             <div class="stat-card stat-low">
                                 <c:set var="lowStockCount" value="0" />
                                 <c:forEach var="med" items="${medicines}">
-                                    <c:if test="${med.remainingQuantity > 0 && med.remainingQuantity <= 20}">
+                                    <c:if test="${med.displayQuantity > 0 && med.displayQuantity <= 20}">
                                         <c:set var="lowStockCount" value="${lowStockCount + 1}" />
                                     </c:if>
                                 </c:forEach>
@@ -84,7 +84,7 @@
                             <div class="stat-card stat-out">
                                 <c:set var="outStockCount" value="0" />
                                 <c:forEach var="med" items="${medicines}">
-                                    <c:if test="${med.remainingQuantity == 0}">
+                                    <c:if test="${med.displayQuantity == 0}">
                                         <c:set var="outStockCount" value="${outStockCount + 1}" />
                                     </c:if>
                                 </c:forEach>
@@ -219,13 +219,13 @@
                                                                 </c:otherwise>
                                                             </c:choose>
                                                         </td>
-                                                        <td><strong>${medicine.stockDisplay}</strong></td>
+                                                        <td><strong>${medicine.displayQuantity}</strong></td>
                                                         <td>
                                                             <c:choose>
-                                                                <c:when test="${medicine.remainingQuantity > 20}">
+                                                                <c:when test="${medicine.displayQuantity > 20}">
                                                                     <span class="badge badge-stock">Còn hàng</span>
                                                                 </c:when>
-                                                                <c:when test="${medicine.remainingQuantity > 0}">
+                                                                <c:when test="${medicine.displayQuantity > 0}">
                                                                     <span class="badge badge-low">Sắp hết</span>
                                                                 </c:when>
                                                                 <c:otherwise>

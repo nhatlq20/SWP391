@@ -18,7 +18,6 @@ import models.Category;
         "/admin/medicines-dashboard",
         "/admin/medicine-add-dashboard",
         "/admin/medicine-edit-dashboard",
-        "/admin/medicine-detail-dashboard",
         "/admin/medicine-delete-dashboard",
         "/admin/medicine-next-code"
 })
@@ -42,9 +41,6 @@ public class MedicineControllerForDashboard extends HttpServlet {
                 break;
             case "/admin/medicine-edit-dashboard":
                 showEditForm(request, response);
-                break;
-            case "/admin/medicine-detail-dashboard":
-                showMedicineDetail(request, response);
                 break;
             case "/admin/medicine-delete-dashboard":
                 deleteMedicine(request, response);
@@ -126,26 +122,6 @@ public class MedicineControllerForDashboard extends HttpServlet {
                     request.setAttribute("medicine", medicine);
                     request.setAttribute("categories", categories);
                     request.getRequestDispatcher("/view/admin/medicine-edit-for-dashboard.jsp").forward(request,
-                            response);
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                // Invalid ID
-            }
-        }
-        response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
-    }
-
-    private void showMedicineDetail(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String idParam = request.getParameter("id");
-        if (idParam != null) {
-            try {
-                int medicineId = Integer.parseInt(idParam);
-                Medicine medicine = medicineDAO.getMedicineById(medicineId);
-                if (medicine != null) {
-                    request.setAttribute("medicine", medicine);
-                    request.getRequestDispatcher("/view/admin/medicine-detail-for-dashboard.jsp").forward(request,
                             response);
                     return;
                 }
@@ -240,6 +216,38 @@ public class MedicineControllerForDashboard extends HttpServlet {
                 baseUnit.setBaseUnit(true);
                 medicineUnitDAO.addUnit(baseUnit);
 
+                // Add Sub-Unit 1 if provided
+                String subUnit1 = request.getParameter("subUnit1");
+                String subRate1Str = request.getParameter("subRate1");
+                String subPrice1Str = request.getParameter("subPrice1");
+                int rate1 = 0;
+                if (subUnit1 != null && !subUnit1.isEmpty() && subRate1Str != null && !subRate1Str.isEmpty()) {
+                    rate1 = Integer.parseInt(subRate1Str);
+                    MedicineUnit unit1 = new MedicineUnit();
+                    unit1.setMedicineId(newMedicineId);
+                    unit1.setUnitName(subUnit1);
+                    unit1.setConversionRate(rate1);
+                    unit1.setSellingPrice(Double.parseDouble(subPrice1Str));
+                    unit1.setBaseUnit(false);
+                    medicineUnitDAO.addUnit(unit1);
+                }
+
+                // Add Sub-Unit 2 if provided
+                String subUnit2 = request.getParameter("subUnit2");
+                String subRate2Str = request.getParameter("subRate2");
+                String subPrice2Str = request.getParameter("subPrice2");
+                if (subUnit2 != null && !subUnit2.isEmpty() && subRate2Str != null && !subRate2Str.isEmpty()) {
+                    // Cumulative rate: if 1 Hộp = 10 Vỉ and 1 Vỉ = 10 Viên, then 1 Hộp = 100 Viên
+                    int rate2 = rate1 * Integer.parseInt(subRate2Str);
+                    MedicineUnit unit2 = new MedicineUnit();
+                    unit2.setMedicineId(newMedicineId);
+                    unit2.setUnitName(subUnit2);
+                    unit2.setConversionRate(rate2);
+                    unit2.setSellingPrice(Double.parseDouble(subPrice2Str));
+                    unit2.setBaseUnit(false);
+                    medicineUnitDAO.addUnit(unit2);
+                }
+
                 response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
             } else {
                 request.setAttribute("errorMessage", "Không thể thêm thuốc. Vui lòng thử lại.");
@@ -273,9 +281,9 @@ public class MedicineControllerForDashboard extends HttpServlet {
             medicine.setImageUrl(request.getParameter("imageUrl"));
 
             String originalPriceStr = request.getParameter("originalPrice");
-            medicine.setOriginalPrice(originalPriceStr != null && !originalPriceStr.isEmpty()
-                    ? Double.parseDouble(originalPriceStr)
-                    : 0);
+            if (originalPriceStr != null && !originalPriceStr.isEmpty()) {
+                medicine.setOriginalPrice(Double.parseDouble(originalPriceStr));
+            }
 
             String quantityStr = request.getParameter("remainingQuantity");
             if (quantityStr != null && !quantityStr.isEmpty()) {
@@ -308,6 +316,44 @@ public class MedicineControllerForDashboard extends HttpServlet {
                     baseUnit.setSellingPrice(sellingPrice);
                     baseUnit.setBaseUnit(true);
                     medicineUnitDAO.addUnit(baseUnit);
+                }
+
+                // Delete non base unit and re-insert them because they could've been changed
+                // dynamically
+                medicineUnitDAO.deleteNonBaseUnitsByMedicineId(medicineId);
+
+                // Add Sub-Unit 1 if provided
+                String subUnit1 = request.getParameter("subUnit1");
+                String subRate1Str = request.getParameter("subRate1");
+                String subPrice1Str = request.getParameter("subPrice1");
+                int rate1 = 0;
+                if (subUnit1 != null && !subUnit1.isEmpty() && subRate1Str != null && !subRate1Str.isEmpty()) {
+                    rate1 = Integer.parseInt(subRate1Str);
+                    MedicineUnit unit1 = new MedicineUnit();
+                    unit1.setMedicineId(medicineId);
+                    unit1.setUnitName(subUnit1);
+                    unit1.setConversionRate(rate1);
+                    unit1.setSellingPrice(
+                            subPrice1Str != null && !subPrice1Str.isEmpty() ? Double.parseDouble(subPrice1Str) : 0);
+                    unit1.setBaseUnit(false);
+                    medicineUnitDAO.addUnit(unit1);
+                }
+
+                // Add Sub-Unit 2 if provided
+                String subUnit2 = request.getParameter("subUnit2");
+                String subRate2Str = request.getParameter("subRate2");
+                String subPrice2Str = request.getParameter("subPrice2");
+                if (subUnit2 != null && !subUnit2.isEmpty() && subRate2Str != null && !subRate2Str.isEmpty()) {
+                    // Cumulative rate: if 1 Hộp = 10 Vỉ and 1 Vỉ = 10 Viên, then 1 Hộp = 100 Viên
+                    int rate2 = rate1 * Integer.parseInt(subRate2Str);
+                    MedicineUnit unit2 = new MedicineUnit();
+                    unit2.setMedicineId(medicineId);
+                    unit2.setUnitName(subUnit2);
+                    unit2.setConversionRate(rate2);
+                    unit2.setSellingPrice(
+                            subPrice2Str != null && !subPrice2Str.isEmpty() ? Double.parseDouble(subPrice2Str) : 0);
+                    unit2.setBaseUnit(false);
+                    medicineUnitDAO.addUnit(unit2);
                 }
 
                 response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");

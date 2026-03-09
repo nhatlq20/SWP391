@@ -122,7 +122,7 @@ public class MedicineUnitDAO {
      */
     public boolean updateBaseUnit(int medicineId, String unitName, double sellingPrice) {
         String sql = "UPDATE MedicineUnit SET UnitName = ?, SellingPrice = ? "
-                + "WHERE MedicineId = ? AND IsBaseUnit = 1";
+                + "WHERE UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = ? ORDER BY UnitId ASC)";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, unitName);
@@ -143,6 +143,24 @@ public class MedicineUnitDAO {
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, medicineId);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Delete non-base units for a medicine (useful when updating dynamic
+     * sub-units).
+     */
+    public boolean deleteNonBaseUnitsByMedicineId(int medicineId) {
+        String sql = "DELETE FROM MedicineUnit WHERE MedicineId = ? AND UnitId != (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = ? ORDER BY UnitId ASC)";
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, medicineId);
+            ps.setInt(2, medicineId);
             ps.executeUpdate();
             return true;
         } catch (SQLException e) {
