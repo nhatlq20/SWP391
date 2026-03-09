@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpSession;
 import models.Cart;
 
 import models.Medicine;
+import models.MedicineUnit;
+import dao.MedicineUnitDAO;
 
 public class CartController extends HttpServlet {
 
@@ -83,7 +85,7 @@ public class CartController extends HttpServlet {
 
         String action = request.getParameter("action");
         MedicineDAO medicineDAO = new MedicineDAO();
-
+        MedicineUnitDAO unitDAO = new MedicineUnitDAO();
         CartDAO cartDAO = new CartDAO();
         int userId = (int) session.getAttribute("userId");
 
@@ -101,22 +103,60 @@ public class CartController extends HttpServlet {
 
                 Medicine medicine = medicineDAO.getMedicineById(id);
                 if (medicine != null) {
-                    Cart.Item item = new Cart.Item(medicine, quantity, medicine.getSellingPrice());
+                    int unitId = 0;
+                    double unitPrice = medicine.getSellingPrice();
+                    try {
+                        String uIdParam = request.getParameter("unitId");
+                        if (uIdParam != null && !uIdParam.isEmpty()) {
+                            unitId = Integer.parseInt(uIdParam);
+                            MedicineUnit mu = unitDAO.getUnitById(unitId);
+                            if (mu != null) {
+                                unitPrice = mu.getSellingPrice();
+                            }
+                        } else if (medicine.getBaseUnit() != null) {
+                            unitId = medicine.getBaseUnit().getUnitId();
+                            unitPrice = medicine.getBaseUnit().getSellingPrice();
+                        }
+                    } catch (NumberFormatException e) {
+                    }
+
+                    Cart.Item item = new Cart.Item(medicine, unitId, quantity, unitPrice);
                     cart.addItem(item);
                     // Sync with DB
-                    cartDAO.saveCartItem(userId, id, cart.getQuantityById(id));
+                    cartDAO.saveCartItem(userId, id, unitId, cart.getQuantity(id, unitId));
                 }
             } else if ("update".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
                 int quantity = Integer.parseInt(request.getParameter("quantity"));
-                cart.updateQuantity(id, quantity);
+                int unitId = 0;
+                try {
+                    String uIdParam = request.getParameter("unitId");
+                    if (uIdParam != null && !uIdParam.isEmpty()) {
+                        unitId = Integer.parseInt(uIdParam);
+                    } else {
+                        // This might be ambiguous if not passed from frontend
+                        Cart.Item item = cart.getItemById(id);
+                        if (item != null)
+                            unitId = item.getUnitId();
+                    }
+                } catch (NumberFormatException e) {
+                }
+                cart.updateQuantity(id, unitId, quantity);
                 // Sync with DB
-                cartDAO.saveCartItem(userId, id, quantity);
+                cartDAO.saveCartItem(userId, id, unitId, quantity);
             } else if ("remove".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
-                cart.removeItem(id);
+                int unitId = 0;
+                try {
+                    String uIdParam = request.getParameter("unitId");
+                    if (uIdParam != null && !uIdParam.isEmpty()) {
+                        unitId = Integer.parseInt(uIdParam);
+                    }
+                } catch (NumberFormatException e) {
+                }
+                cart.removeItem(id, unitId);
                 // Sync with DB
-                cartDAO.removeCartItem(userId, id);
+                cartDAO.removeCartItem(userId, id, unitId);
             }
         } catch (NumberFormatException e) {
             e.printStackTrace();
@@ -138,7 +178,16 @@ public class CartController extends HttpServlet {
                 if ("update".equals(action) || "add".equals(action)) {
                     try {
                         int id = Integer.parseInt(request.getParameter("id"));
-                        models.Cart.Item item = cart.getItemById(id);
+                        int unitId = 0;
+                        try {
+                            String uIdParam = request.getParameter("unitId");
+                            if (uIdParam != null && !uIdParam.isEmpty()) {
+                                unitId = Integer.parseInt(uIdParam);
+                            }
+                        } catch (NumberFormatException e) {
+                        }
+
+                        models.Cart.Item item = cart.getItem(id, unitId);
                         if (item != null)
                             itemTotal = item.getTotalPrice();
                     } catch (Exception e) {

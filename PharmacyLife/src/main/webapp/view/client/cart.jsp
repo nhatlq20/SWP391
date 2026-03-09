@@ -83,8 +83,16 @@
                                                                                         title="${item.medicine.medicineName}">
                                                                                         ${item.medicine.medicineName}
                                                                                     </h6>
-                                                                                    <small class="text-muted">Code:
-                                                                                        ${item.medicine.medicineCode}</small>
+                                                                                    <div class="d-flex flex-column">
+                                                                                        <small class="text-muted">Đơn
+                                                                                            vị:
+                                                                                            ${item.medicine.unit}</small>
+                                                                                        <small class="text-muted">Đơn
+                                                                                            vị:
+                                                                                            ${item.medicine.unit}</small>
+                                                                                        <small class="text-muted">Code:
+                                                                                            ${item.medicine.medicineCode}</small>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
                                                                         </td>
@@ -100,6 +108,8 @@
                                                                                     value="update">
                                                                                 <input type="hidden" name="id"
                                                                                     value="${item.medicine.medicineId}">
+                                                                                <input type="hidden" name="unitId"
+                                                                                    value="${item.unitId}">
 
                                                                                 <div
                                                                                     class="input-group input-group-sm quantity-group">
@@ -118,7 +128,8 @@
                                                                                 </div>
                                                                             </form>
                                                                         </td>
-                                                                        <td class="text-end price-text">
+                                                                        <td class="text-end price-text"
+                                                                            id="item-total-${item.medicine.medicineId}-${item.unitId}">
                                                                             <fmt:formatNumber value="${item.totalPrice}"
                                                                                 type="currency" currencySymbol="₫"
                                                                                 maxFractionDigits="0" />
@@ -129,6 +140,8 @@
                                                                                     value="remove">
                                                                                 <input type="hidden" name="id"
                                                                                     value="${item.medicine.medicineId}">
+                                                                                <input type="hidden" name="unitId"
+                                                                                    value="${item.unitId}">
                                                                                 <button type="submit"
                                                                                     class="btn btn-outline-danger btn-sm rounded-circle btn-remove-item"
                                                                                     title="Xóa">
@@ -197,6 +210,7 @@
                             const form = btn.closest('form');
                             const input = form.querySelector('input[name="quantity"]');
                             const id = form.querySelector('input[name="id"]').value;
+                            const unitId = form.querySelector('input[name="unitId"]').value;
 
                             let currentVal = parseInt(input.value);
                             if (isNaN(currentVal)) currentVal = 1;
@@ -225,7 +239,7 @@
                                         if (data.success) {
                                             // Update Item Total in table
                                             const row = btn.closest('tr');
-                                            const itemTotalEl = document.getElementById(`item-total-${id}`) || row.querySelector('.price-text');
+                                            const itemTotalEl = document.getElementById(`item-total-${id}-${unitId}`) || row.querySelector('.price-text');
                                             if (itemTotalEl) itemTotalEl.textContent = formatCurrency(data.itemTotal);
 
                                             // Update Subtotal and Total in Sidebar

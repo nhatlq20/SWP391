@@ -13,6 +13,22 @@ public class MedicineUnitDAO {
     public MedicineUnitDAO() {
     }
 
+    public MedicineUnit getUnitById(int unitId) {
+        String sql = "SELECT * FROM MedicineUnit WHERE UnitId = ?";
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, unitId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSet(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     /**
      * Get all units for a given medicine.
      */

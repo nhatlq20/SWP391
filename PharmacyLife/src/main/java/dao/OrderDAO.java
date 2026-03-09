@@ -50,9 +50,8 @@ public class OrderDAO {
     }
 
     public Order getOrderById(int orderId) {
-        String sql = "SELECT o.*, s.StaffName, v.VoucherCode FROM Orders o " +
+        String sql = "SELECT o.*, s.StaffName FROM Orders o " +
                 "LEFT JOIN Staff s ON o.StaffId = s.StaffId " +
-                "LEFT JOIN Vouchers v ON o.VoucherId = v.VoucherId " +
                 "WHERE o.OrderId = ?";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -70,7 +69,8 @@ public class OrderDAO {
         return null;
     }
 
-    public List<OrderItem> getOrderItems(int orderId) {
+    public List<OrderItem> getOrderItems(
+            int orderId) {
         List<OrderItem> items = new ArrayList<>();
         String sql = "SELECT oi.*, m.MedicineName, m.MedicineCode, m.ImageUrl " +
                 "FROM OrderItems oi " +
@@ -84,6 +84,7 @@ public class OrderDAO {
                     OrderItem item = new OrderItem();
                     item.setOrderId(rs.getInt("OrderId"));
                     item.setMedicineId(rs.getInt("MedicineId"));
+                    item.setUnitId(rs.getInt("UnitId"));
                     item.setQuantity(rs.getInt("OrderQuantity"));
                     item.setUnitPrice(rs.getDouble("UnitPrice"));
 
@@ -103,16 +104,114 @@ public class OrderDAO {
         return items;
     }
 
-    public boolean updateStatus(int orderId, String status, int staffId) {
-        String sql = "UPDATE Orders SET Status = ?, StaffId = ? WHERE OrderId = ?";
-        try (Connection conn = dbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, status);
-            ps.setInt(2, staffId);
-            ps.setInt(3, orderId);
-            return ps.executeUpdate() > 0;
+    public boolean updateStatus(int orderId, String newStatus, int staffId) {
+        String sqlGetOldStatus = "SELECT Status FROM Orders WHERE OrderId = ?";
+        String sqlUpdateStatus = "UPDATE Orders SET Status = ?, StaffId = ? WHERE OrderId = ?";
+        String sqlReplenishStock = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity + (? * (SELECT COALESCE(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?)) WHERE MedicineId = ?";
+        String sqlSubtractStock = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity - (? * (SELECT COALESCE(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?)) "
+                + "WHERE MedicineId = ? AND RemainingQuantity >= (? * (SELECT COALESCE(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?))";
+        String sqlGetItems = "SELECT MedicineId, UnitId, OrderQuantity FROM OrderItems WHERE OrderId = ?";
+
+        Connection conn = null;
+        try {
+            conn = dbContext.getConnection();
+            conn.setAutoCommit(false);
+
+            // 1. Get old status
+            String oldStatus = "";
+            try (PreparedStatement ps = conn.prepareStatement(sqlGetOldStatus)) {
+                ps.setInt(1, orderId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        oldStatus = rs.getString("Status");
+                    } else {
+                        conn.rollback();
+                        return false;
+                    }
+                }
+            }
+
+            // If status hasn't changed, just return true
+            if (newStatus.equalsIgnoreCase(oldStatus)) {
+                conn.rollback();
+                return true;
+            }
+
+            // 2. Update status
+            try (PreparedStatement ps = conn.prepareStatement(sqlUpdateStatus)) {
+                ps.setString(1, newStatus);
+                ps.setInt(2, staffId);
+                ps.setInt(3, orderId);
+                ps.executeUpdate();
+            }
+
+            // 3. Handle stock changes
+            if ("Cancelled".equalsIgnoreCase(newStatus)) {
+                // Replenish stock (Order was active or other state, now cancelled)
+                try (PreparedStatement psItems = conn.prepareStatement(sqlGetItems);
+                        PreparedStatement psStock = conn.prepareStatement(sqlReplenishStock)) {
+                    psItems.setInt(1, orderId);
+                    try (ResultSet rs = psItems.executeQuery()) {
+                        while (rs.next()) {
+                            int medicineId = rs.getInt("MedicineId");
+                            int unitId = rs.getInt("UnitId");
+                            int qty = rs.getInt("OrderQuantity");
+
+                            psStock.setInt(1, qty);
+                            psStock.setInt(2, unitId);
+                            psStock.setInt(3, medicineId);
+                            psStock.executeUpdate();
+                        }
+                    }
+                }
+            } else if ("Cancelled".equalsIgnoreCase(oldStatus)) {
+                // Subtract stock (Order was cancelled, now re-activated/restored)
+                try (PreparedStatement psItems = conn.prepareStatement(sqlGetItems);
+                        PreparedStatement psStock = conn.prepareStatement(sqlSubtractStock)) {
+                    psItems.setInt(1, orderId);
+                    try (ResultSet rs = psItems.executeQuery()) {
+                        while (rs.next()) {
+                            int medicineId = rs.getInt("MedicineId");
+                            int unitId = rs.getInt("UnitId");
+                            int qty = rs.getInt("OrderQuantity");
+
+                            // Params: delta, unitId, medicineId, delta, unitId
+                            psStock.setInt(1, qty);
+                            psStock.setInt(2, unitId);
+                            psStock.setInt(3, medicineId);
+                            psStock.setInt(4, qty);
+                            psStock.setInt(5, unitId);
+
+                            int updated = psStock.executeUpdate();
+                            if (updated == 0) {
+                                // Not enough stock to re-activate
+                                conn.rollback();
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            conn.commit();
+            return true;
         } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
             e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
         return false;
     }
@@ -141,14 +240,21 @@ public class OrderDAO {
         return false;
     }
 
+    private String lastErrorMessage = "";
+
+    public String getLastErrorMessage() {
+        return lastErrorMessage;
+    }
+
     public boolean saveOrder(Order order) {
-        String sqlOrder = "INSERT INTO Orders (CustomerId, StaffId, OrderDate, ShippingName, ShippingPhone, ShippingAddress, Status, TotalAmount, VoucherId, DiscountAmount) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        String sqlItem = "INSERT INTO OrderItems (OrderId, MedicineId, OrderQuantity, UnitPrice) VALUES (?, ?, ?, ?)";
-        String sqlUpdateStock = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity - ? WHERE MedicineId = ? AND RemainingQuantity >= ?";
-        String sqlUpdateVoucher = "UPDATE Vouchers SET UsedQuantity = UsedQuantity + 1 WHERE VoucherId = ? AND UsedQuantity < Quantity";
+        String sqlOrder = "INSERT INTO Orders (CustomerId, StaffId, OrderDate, ShippingName, ShippingPhone, ShippingAddress, Status, TotalAmount) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sqlItem = "INSERT INTO OrderItems (OrderId, MedicineId, UnitId, OrderQuantity, UnitPrice) VALUES (?, ?, ?, ?, ?)";
+        String sqlUpdateStock = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity - (? * (SELECT COALESCE(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?)) "
+                + "WHERE MedicineId = ? AND RemainingQuantity >= (? * (SELECT COALESCE(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?))";
 
         Connection conn = null;
+        lastErrorMessage = "";
         try {
             conn = dbContext.getConnection();
             conn.setAutoCommit(false);
@@ -166,14 +272,10 @@ public class OrderDAO {
                 ps.setString(6, order.getShippingAddress());
                 ps.setString(7, order.getStatus());
                 ps.setDouble(8, order.getTotalAmount());
-                if (order.getVoucherId() > 0)
-                    ps.setInt(9, order.getVoucherId());
-                else
-                    ps.setNull(9, Types.INTEGER);
-                ps.setDouble(10, order.getDiscountAmount());
 
                 int affectedRows = ps.executeUpdate();
                 if (affectedRows == 0) {
+                    lastErrorMessage = "Không thể tạo đơn hàng. Vui lòng thử lại.";
                     conn.rollback();
                     return false;
                 }
@@ -182,6 +284,7 @@ public class OrderDAO {
                     if (generatedKeys.next()) {
                         order.setOrderId(generatedKeys.getInt(1));
                     } else {
+                        lastErrorMessage = "Không lấy được mã đơn hàng vừa tạo.";
                         conn.rollback();
                         return false;
                     }
@@ -195,17 +298,23 @@ public class OrderDAO {
                     // Insert OrderItem
                     psItem.setInt(1, order.getOrderId());
                     psItem.setInt(2, item.getMedicineId());
-                    psItem.setInt(3, item.getQuantity());
-                    psItem.setDouble(4, item.getUnitPrice());
+                    psItem.setInt(3, item.getUnitId());
+                    psItem.setInt(4, item.getQuantity());
+                    psItem.setDouble(5, item.getUnitPrice());
                     psItem.addBatch();
 
-                    // Subtract Stock
+                    // Subtract Stock - considering ConversionRate
+                    // Params: delta, unitId, medicineId, delta, unitId
                     psStock.setInt(1, item.getQuantity());
-                    psStock.setInt(2, item.getMedicineId());
-                    psStock.setInt(3, item.getQuantity()); // Condition RemainingQuantity >= quantity
+                    psStock.setInt(2, item.getUnitId());
+                    psStock.setInt(3, item.getMedicineId());
+                    psStock.setInt(4, item.getQuantity());
+                    psStock.setInt(5, item.getUnitId());
+
                     int stockUpdate = psStock.executeUpdate();
                     if (stockUpdate == 0) {
-                        System.err.println("OrderDAO: Not enough stock for MedicineID: " + item.getMedicineId());
+                        lastErrorMessage = "Sản phẩm mã " + item.getMedicineId() + " (Đơn vị ID: " + item.getUnitId()
+                                + ") không đủ hàng hoặc không tồn tại.";
                         conn.rollback();
                         return false;
                     }
@@ -213,28 +322,12 @@ public class OrderDAO {
                 psItem.executeBatch();
             }
 
-            // 3. Update Voucher usage if applicable
-            if (order.getVoucherId() > 0) {
-                try (PreparedStatement psVoucher = conn.prepareStatement(sqlUpdateVoucher)) {
-                    psVoucher.setInt(1, order.getVoucherId());
-                    int voucherUpdate = psVoucher.executeUpdate();
-                    if (voucherUpdate == 0) {
-                        System.err.println("OrderDAO: Voucher reached limit or not found: " + order.getVoucherId());
-                        conn.rollback();
-                        return false;
-                    }
-                }
-            }
-
             conn.commit();
             return true;
         } catch (SQLException e) {
-            System.err.println("CRITICAL DB ERROR in saveOrder:");
-            System.err.println("Message: " + e.getMessage());
-            System.err.println("SQL State: " + e.getSQLState());
+            lastErrorMessage = "Lỗi hệ thống database: " + e.getMessage();
             if (conn != null) {
                 try {
-                    System.out.println("OrderDAO: Rolling back transaction...");
                     conn.rollback();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -265,9 +358,13 @@ public class OrderDAO {
         order.setStatus(rs.getString("Status"));
         order.setTotalAmount(rs.getDouble("TotalAmount"));
 
-        // Map Voucher info
-        order.setVoucherId(rs.getInt("VoucherId"));
-        order.setDiscountAmount(rs.getDouble("DiscountAmount"));
+        // Map Voucher info - Optional columns
+        try {
+            order.setVoucherId(rs.getInt("VoucherId"));
+            order.setDiscountAmount(rs.getDouble("DiscountAmount"));
+        } catch (SQLException e) {
+            // These columns might be missing in some database versions
+        }
         try {
             String vCode = rs.getString("VoucherCode");
             if (vCode != null) {
