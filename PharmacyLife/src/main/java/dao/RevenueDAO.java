@@ -53,7 +53,7 @@ public class RevenueDAO {
     }
 
     public double getTotalRevenue(Date from, Date to) throws SQLException {
-        String sql = "SELECT ISNULL(SUM(TotalAmount),0) FROM Orders WHERE 1=1";
+        String sql = "SELECT ISNULL(SUM(TotalAmount),0) FROM Orders WHERE Status NOT IN ('Cancelled', N'Đã hủy')";
         if (from != null && to != null) {
             sql += " AND CAST(OrderDate AS DATE) BETWEEN ? AND ?";
         }
