@@ -164,6 +164,14 @@
                     </div>
                 </div>
 
+                <!-- Hidden data for units initialization -->
+                <div id="unitsContainer" style="display:none;">
+                    <c:forEach var="u" items="${units}">
+                        <span class="unit-data" data-name="${u.unitName}" data-rate="${u.conversionRate}"
+                            data-price="${u.sellingPrice}" data-base="${u.baseUnit}"></span>
+                    </c:forEach>
+                </div>
+
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
                 <script>
                     // ========== Mapping Rules ==========
@@ -307,8 +315,48 @@
                     subRate1Input.addEventListener('input', autoCalculatePrices);
                     subRate2Input.addEventListener('input', autoCalculatePrices);
 
-                    // Initialize on page load
-                    updateSubUnit1();
+                    // Initialize on page load with existing units from server
+                    (function () {
+                        var units = [];
+                        document.querySelectorAll('.unit-data').forEach(function (el) {
+                            units.push({
+                                unitName: el.getAttribute('data-name'),
+                                conversionRate: Number(el.getAttribute('data-rate')),
+                                sellingPrice: Number(el.getAttribute('data-price')),
+                                isBase: el.getAttribute('data-base') === 'true'
+                            });
+                        });
+
+                        // Sort by conversion rate DESC
+                        units.sort(function (a, b) { return b.conversionRate - a.conversionRate; });
+
+                        if (units.length > 0) {
+                            // Main unit is already set by JSTL in the HTML select
+                            updateSubUnit1();
+
+                            if (units.length > 1) {
+                                // Set sub-unit 1
+                                subUnit1Select.value = units[1].unitName;
+                                updateSubUnit2();
+
+                                // Calculate subRate1: 1 Main Unit = X SubUnit1
+                                var rate1 = units[0].conversionRate / units[1].conversionRate;
+                                subRate1Input.value = rate1;
+                                subPrice1Input.value = units[1].sellingPrice;
+
+                                if (units.length > 2) {
+                                    // Set sub-unit 2
+                                    subUnit2Select.value = units[2].unitName;
+                                    onSubUnit2Change();
+
+                                    // Calculate subRate2: 1 SubUnit1 = Y SubUnit2
+                                    var rate2 = units[1].conversionRate / units[2].conversionRate;
+                                    subRate2Input.value = rate2;
+                                    subPrice2Input.value = units[2].sellingPrice;
+                                }
+                            }
+                        }
+                    })();
                 </script>
             </body>
 
