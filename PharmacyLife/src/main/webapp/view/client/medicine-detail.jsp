@@ -270,16 +270,22 @@
                                                                                                 <c:out
                                                                                                     value="${fn:toUpperCase(fn:substring(fn:trim(replyAuthorName), 0, 1))}" />
                                                                                             </div>
-                                                                                            <div class="thread-reply-content">
-                                                                                                <div class="reply-inline-group">
-                                                                                                   <div>
-                                                                                                        <span class="reply-staff-name reply-author">
-                                                                                                            <c:out value="${replyAuthorName}" />
+                                                                                            <div
+                                                                                                class="thread-reply-content">
+                                                                                                <div
+                                                                                                    class="reply-inline-group">
+                                                                                                    <div>
+                                                                                                        <span
+                                                                                                            class="reply-staff-name reply-author">
+                                                                                                            <c:out
+                                                                                                                value="${replyAuthorName}" />
                                                                                                         </span>
-                                                                                                        <span class="thread-reply-text reply-body">
-                                                                                                            <c:out value="${replyBodyText}" />
+                                                                                                        <span
+                                                                                                            class="thread-reply-text reply-body">
+                                                                                                            <c:out
+                                                                                                                value="${replyBodyText}" />
                                                                                                         </span>
-                                                                                                   </div>
+                                                                                                    </div>
                                                                                                 </div>
                                                                                             </div>
                                                                                         </div>
@@ -370,10 +376,20 @@
                                                 <c:choose>
                                                     <c:when
                                                         test="${not empty medicine.category and not empty medicine.category.categoryId}">
-                                                        <a href="${pageContext.request.contextPath}/category?id=${medicine.category.categoryId}"
-                                                            class="info-value info-value--link text-decoration-none">
-                                                            <c:out value="${medicine.category.categoryName}" />
-                                                        </a>
+                                                        <c:choose>
+                                                            <c:when
+                                                                test="${sessionScope.userType eq 'admin' || sessionScope.userType eq 'staff'}">
+                                                                <a href="${pageContext.request.contextPath}/category?id=${medicine.category.categoryId}"
+                                                                    class="info-value info-value--link text-decoration-none">
+                                                                    <c:out value="${medicine.category.categoryName}" />
+                                                                </a>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span class="info-value">
+                                                                    <c:out value="${medicine.category.categoryName}" />
+                                                                </span>
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                     </c:when>
                                                     <c:otherwise>
                                                         <span class="info-value text-muted">Chưa phân loại</span>
@@ -654,6 +670,10 @@
                                         // Store unitId for cart
                                         var formUnitId = document.getElementById('formUnitId');
                                         if (formUnitId) formUnitId.value = unitId;
+
+                                        // Reset quantity to 1 when unit changes
+                                        var qtyInput = document.getElementById('quantity');
+                                        if (qtyInput) qtyInput.value = 1;
                                     }
 
                                     // Init: activate first pill on load

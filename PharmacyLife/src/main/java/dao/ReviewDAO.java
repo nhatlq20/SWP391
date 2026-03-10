@@ -44,14 +44,14 @@ public class ReviewDAO {
         // lấy danh sách review của 1 loại thuốc
         List<ReviewCustomer> list = new ArrayList<>();
         String sql = "SELECT r.ReviewId, r.CustomerId, c.FullName, r.Rating, r.Comment, r.ReviewCreatedAt, r.ReplyContent, r.ReplyBy, r.ReplyCreatedAt, "
-            +
-            "COALESCE(s.StaffName, rc.FullName) AS ReplyStaffName " +
-            "FROM Reviews r " +
-            "JOIN Customer c ON c.CustomerId = r.CustomerId " +
-            "LEFT JOIN Staff s ON s.StaffId = r.ReplyBy AND r.ReplyBy > 0 " +
-            "LEFT JOIN Customer rc ON rc.CustomerId = -r.ReplyBy AND r.ReplyBy < 0 " +
-            "WHERE r.MedicineId = ? " +
-            "ORDER BY r.ReviewCreatedAt DESC";
+                +
+                "COALESCE(s.StaffName, rc.FullName) AS ReplyStaffName " +
+                "FROM Reviews r " +
+                "JOIN Customer c ON c.CustomerId = r.CustomerId " +
+                "LEFT JOIN Staff s ON s.StaffId = r.ReplyBy AND r.ReplyBy > 0 " +
+                "LEFT JOIN Customer rc ON rc.CustomerId = -r.ReplyBy AND r.ReplyBy < 0 " +
+                "WHERE r.MedicineId = ? " +
+                "ORDER BY r.ReviewCreatedAt DESC";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -220,7 +220,7 @@ public class ReviewDAO {
         }
         String cleaned = authorName.trim();
         // if (cleaned.isEmpty()) {
-        //     cleaned = replyBy > 0 ? "Nhân viên" : "Khách hàng";
+        // cleaned = replyBy > 0 ? "Nhân viên" : "Khách hàng";
         // }
         if (replyBy > 0 && !cleaned.contains("(Dược sĩ)")) {
             return cleaned + " (Dược sĩ)";
@@ -228,8 +228,8 @@ public class ReviewDAO {
         return cleaned;
     }
 
-      public double getAverageRating(int medicineId) {
-        //tính trung bình sao
+    public double getAverageRating(int medicineId) {
+        // tính trung bình sao
         String sql = "SELECT AVG(CAST(Rating AS FLOAT)) as avgRating FROM Reviews WHERE MedicineId = ?";
 
         try (Connection conn = dbContext.getConnection();
@@ -436,11 +436,12 @@ public class ReviewDAO {
     public List<Review> getAllReview() {
         return getAllReviews();
     }
-        // Kiểm tra khách hàng đã đánh giá sản phẩm này chưa
+
+    // Kiểm tra khách hàng đã đánh giá sản phẩm này chưa
     public boolean hasCustomerReviewedMedicine(int customerId, int medicineId) {
         String sql = "SELECT COUNT(*) FROM Reviews WHERE CustomerId = ? AND MedicineId = ?";
         try (Connection conn = dbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, customerId);
             ps.setInt(2, medicineId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -452,6 +453,16 @@ public class ReviewDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public void deleteReviewsByMedicineId(int medicineId) {
+        String sql = "DELETE FROM Reviews WHERE MedicineId = ?";
+        try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, medicineId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private Review mapResultSetToReview(ResultSet rs) throws SQLException {
