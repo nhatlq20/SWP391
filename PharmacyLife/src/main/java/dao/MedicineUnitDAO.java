@@ -191,6 +191,18 @@ public class MedicineUnitDAO {
         return false;
     }
 
+    public boolean deleteUnit(int unitId) {
+        String sql = "DELETE FROM MedicineUnit WHERE UnitId = ?";
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, unitId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     private MedicineUnit mapResultSet(ResultSet rs) throws SQLException {
         MedicineUnit unit = new MedicineUnit();
         unit.setUnitId(rs.getInt("UnitId"));

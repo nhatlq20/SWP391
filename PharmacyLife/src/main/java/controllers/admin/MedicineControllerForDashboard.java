@@ -2,6 +2,7 @@ package controllers.admin;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.ArrayList;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -127,8 +128,10 @@ public class MedicineControllerForDashboard extends HttpServlet {
                 Medicine medicine = medicineDAO.getMedicineById(medicineId);
                 if (medicine != null) {
                     List<Category> categories = categoryDAO.getAllCategories();
+                    List<MedicineUnit> units = medicineUnitDAO.getUnitsByMedicineId(medicineId);
                     request.setAttribute("medicine", medicine);
                     request.setAttribute("categories", categories);
+                    request.setAttribute("units", units);
                     request.getRequestDispatcher("/view/admin/medicine-edit-for-dashboard.jsp").forward(request,
                             response);
                     return;
@@ -361,47 +364,56 @@ public class MedicineControllerForDashboard extends HttpServlet {
                         ? Double.parseDouble(sellingPriceStr)
                         : 0;
 
-                // Note: updateUnitInternal previously assumed base unit = largest unit.
-                // We should be careful here. Let's instead delete all and re-insert to be safe,
-                // or update the logic. Since we're changing the definition of IsBaseUnit,
-                // the safest way is to delete non-base, update base, BUT the base unit ID might
-                // change.
+                // Smart Update: Update existing units instead of deleting all
+                List<MedicineUnit> existingUnits = medicineUnitDAO.getUnitsByMedicineId(medicineId);
+                existingUnits.sort((a, b) -> b.getConversionRate() - a.getConversionRate());
 
-                // Let's just delete ALL units for this medicine and re-insert them to ensure
-                // correctness
-                // with the new IsBaseUnit logic.
-                medicineUnitDAO.deleteUnitsByMedicineId(medicineId);
+                // 1. Prepare New List
+                List<MedicineUnit> newUnits = new ArrayList<>();
 
-                MedicineUnit mUnit = new MedicineUnit();
-                mUnit.setMedicineId(medicineId);
-                mUnit.setUnitName(unitName != null && !unitName.isEmpty() ? unitName : "Hộp");
-                mUnit.setConversionRate(mainUnitRate);
-                mUnit.setSellingPrice(sellingPrice);
-                mUnit.setBaseUnit(!hasSub1 && !hasSub2);
-                medicineUnitDAO.addUnit(mUnit);
+                // Main Unit
+                MedicineUnit mainU = new MedicineUnit();
+                mainU.setMedicineId(medicineId);
+                mainU.setUnitName(unitName != null && !unitName.isEmpty() ? unitName : "Hộp");
+                mainU.setConversionRate(mainUnitRate);
+                mainU.setSellingPrice(sellingPrice);
+                mainU.setBaseUnit(!hasSub1 && !hasSub2);
+                newUnits.add(mainU);
 
-                // Add Sub-Unit 1 if provided
                 if (hasSub1) {
-                    MedicineUnit unit1 = new MedicineUnit();
-                    unit1.setMedicineId(medicineId);
-                    unit1.setUnitName(subUnit1);
-                    unit1.setConversionRate(unit1Rate);
-                    unit1.setSellingPrice(
+                    MedicineUnit u1 = new MedicineUnit();
+                    u1.setMedicineId(medicineId);
+                    u1.setUnitName(subUnit1);
+                    u1.setConversionRate(unit1Rate);
+                    u1.setSellingPrice(
                             subPrice1Str != null && !subPrice1Str.isEmpty() ? Double.parseDouble(subPrice1Str) : 0);
-                    unit1.setBaseUnit(!hasSub2);
-                    medicineUnitDAO.addUnit(unit1);
+                    u1.setBaseUnit(!hasSub2);
+                    newUnits.add(u1);
                 }
 
-                // Add Sub-Unit 2 if provided
                 if (hasSub2) {
-                    MedicineUnit unit2 = new MedicineUnit();
-                    unit2.setMedicineId(medicineId);
-                    unit2.setUnitName(subUnit2);
-                    unit2.setConversionRate(unit2Rate);
-                    unit2.setSellingPrice(
+                    MedicineUnit u2 = new MedicineUnit();
+                    u2.setMedicineId(medicineId);
+                    u2.setUnitName(subUnit2);
+                    u2.setConversionRate(unit2Rate);
+                    u2.setSellingPrice(
                             subPrice2Str != null && !subPrice2Str.isEmpty() ? Double.parseDouble(subPrice2Str) : 0);
-                    unit2.setBaseUnit(true);
-                    medicineUnitDAO.addUnit(unit2);
+                    u2.setBaseUnit(true);
+                    newUnits.add(u2);
+                }
+
+                // 2. Sync with DB
+                for (int i = 0; i < Math.max(newUnits.size(), existingUnits.size()); i++) {
+                    if (i < newUnits.size() && i < existingUnits.size()) {
+                        // Update existing
+                        MedicineUnit toUpdate = newUnits.get(i);
+                        toUpdate.setUnitId(existingUnits.get(i).getUnitId());
+                        medicineUnitDAO.updateUnit(toUpdate);
+                    } else if (i < newUnits.size()) {
+                        medicineUnitDAO.addUnit(newUnits.get(i));
+                    } else if (i < existingUnits.size()) {
+                        medicineUnitDAO.deleteUnit(existingUnits.get(i).getUnitId());
+                    }
                 }
 
                 response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
