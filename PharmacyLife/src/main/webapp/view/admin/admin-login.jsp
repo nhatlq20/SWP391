@@ -8,7 +8,7 @@
             <head>
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Đăng nhập - Pharmacy Life</title>
+                <title>Đăng nhập Nội bộ - Pharmacy Life</title>
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/login.css">
             </head>
 
@@ -29,7 +29,7 @@
                                 class="text-logo">
                         </div>
 
-                        <p class="login-title">Đăng nhập tài khoản Khách hàng</p>
+                        <p class="login-title">Đăng nhập Quản trị & Nhân viên</p>
 
                         <!-- Success Message -->
                         <% if (request.getAttribute("successMessage") !=null) { %>
@@ -52,13 +52,13 @@
                                     <% } %>
 
                                         <!-- Login Form -->
-                                        <form id="loginForm" action="${pageContext.request.contextPath}/login" method="post" novalidate>
+                                        <form id="loginForm" action="${pageContext.request.contextPath}/admin-staff/login" method="post" novalidate>
                                             <!-- Email Field -->
                                             <div class="form-group">
                                                 <label for="email">Địa chỉ email</label>
                                                 <div class="input-wrapper">
                                                     <input type="email" id="email" name="email"
-                                                        placeholder="Nhập email của bạn" value="${email}"
+                                                        placeholder="Nhập email nội bộ" value="${email}"
                                                         autocomplete="username" inputmode="email">
                                                     <img src="${pageContext.request.contextPath}/assets/img/email.png"
                                                         alt="Email Icon" class="input-icon">

@@ -88,7 +88,7 @@
                                                             <td><strong>${s.staffCode}</strong></td>
                                                             <td>${s.staffName}</td>
                                                             <td style="text-align:center;">
-                                                                <div class="action-icons">
+                                                                <div class="action-icons" style="display: flex; justify-content: center; gap: 10px;">
                                                                     <a href="${pageContext.request.contextPath}/admin/manage-staff?action=detail&id=${s.staffId}"
                                                                         class="btn-action btn-view" title="Xem chi tiết">
                                                                         <i class="fas fa-eye"></i>
