@@ -367,7 +367,8 @@ public class AdminImportController extends HttpServlet {
                             }
 
                             if (medicineId > 0) {
-                                ImportDetail detail = new ImportDetail(newImportId, medicineId, unitId, quantity,
+                                int largestUnitId = getLargestUnitId(medicineId, unitId);
+                                ImportDetail detail = new ImportDetail(newImportId, medicineId, largestUnitId, quantity,
                                         price);
                                 if (importDAO.addImportDetail(detail)) {
                                     itemsAdded++;
@@ -399,9 +400,7 @@ public class AdminImportController extends HttpServlet {
                     List<ImportDetail> detailsToSync = importDAO.getImportDetails(newImportId);
                     if (detailsToSync != null) {
                         for (ImportDetail detail : detailsToSync) {
-                            medicineDAO.addQuantityAndSetOriginalPrice(detail.getMedicineId(), detail.getUnitId(),
-                                    detail.getQuantity(),
-                                    detail.getUnitPrice());
+                            applyStockChange(detail.getMedicineId(), detail.getQuantity(), detail.getUnitPrice(), true);
                         }
                     }
                 }
@@ -527,12 +526,10 @@ public class AdminImportController extends HttpServlet {
                             if ("Đã duyệt".equals(oldStatus)) {
                                 int diff = newQty - oldDetail.getQuantity();
                                 if (diff != 0) {
-                                    medicineDAO.updateStockQuantity(oldDetail.getMedicineId(), oldDetail.getUnitId(),
-                                            diff);
+                                    applyStockChange(oldDetail.getMedicineId(), diff, 0, false);
                                 }
                                 if (Math.abs(newPrice - oldDetail.getUnitPrice()) > 0.0001) {
-                                    medicineDAO.addQuantityAndSetOriginalPrice(oldDetail.getMedicineId(),
-                                            oldDetail.getUnitId(), 0, newPrice);
+                                    applyStockChange(oldDetail.getMedicineId(), 0, newPrice, true);
                                 }
                             }
                             oldDetail.setQuantity(newQty);
@@ -567,7 +564,9 @@ public class AdminImportController extends HttpServlet {
                         }
 
                         if (medicineId > 0) {
-                            ImportDetail detail = new ImportDetail(importId, medicineId, unitId, quantity, price);
+                            int largestUnitId = getLargestUnitId(medicineId, unitId);
+                            ImportDetail detail = new ImportDetail(importId, medicineId, largestUnitId, quantity,
+                                    price);
                             if (!importDAO.addImportDetail(detail)) {
                                 detailErrors.append("Không thể thêm thuốc mới ID ").append(medicineId).append(". ");
                             }
@@ -602,9 +601,7 @@ public class AdminImportController extends HttpServlet {
                     List<ImportDetail> detailsToSync = importDAO.getImportDetails(importId);
                     if (detailsToSync != null) {
                         for (ImportDetail detail : detailsToSync) {
-                            medicineDAO.addQuantityAndSetOriginalPrice(detail.getMedicineId(), detail.getUnitId(),
-                                    detail.getQuantity(),
-                                    detail.getUnitPrice());
+                            applyStockChange(detail.getMedicineId(), detail.getQuantity(), detail.getUnitPrice(), true);
                         }
                     }
                 } else if ("Đã duyệt".equals(oldStatus) && !"Đã duyệt".equals(imp.getStatus())) {
@@ -612,8 +609,7 @@ public class AdminImportController extends HttpServlet {
                     List<ImportDetail> detailsToSync = importDAO.getImportDetails(importId);
                     if (detailsToSync != null) {
                         for (ImportDetail detail : detailsToSync) {
-                            medicineDAO.updateStockQuantity(detail.getMedicineId(), detail.getUnitId(),
-                                    -detail.getQuantity());
+                            applyStockChange(detail.getMedicineId(), -detail.getQuantity(), 0, false);
                         }
                     }
                 }
@@ -643,8 +639,7 @@ public class AdminImportController extends HttpServlet {
                 List<ImportDetail> details = importDAO.getImportDetails(importId);
                 if (details != null) {
                     for (ImportDetail detail : details) {
-                        medicineDAO.updateStockQuantity(detail.getMedicineId(), detail.getUnitId(),
-                                -detail.getQuantity());
+                        applyStockChange(detail.getMedicineId(), -detail.getQuantity(), 0, false);
                     }
                 }
             }
@@ -681,7 +676,8 @@ public class AdminImportController extends HttpServlet {
             int unitId = Integer
                     .parseInt(request.getParameter("unitId") != null ? request.getParameter("unitId") : "0");
 
-            ImportDetail detail = new ImportDetail(importId, medicineId, unitId, quantity, price);
+            int largestUnitId = getLargestUnitId(medicineId, unitId);
+            ImportDetail detail = new ImportDetail(importId, medicineId, largestUnitId, quantity, price);
             detail.recalculateTotal();
 
             if (importDAO.addImportDetail(detail)) {
@@ -790,6 +786,60 @@ public class AdminImportController extends HttpServlet {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
             return importDAO.getSupplierIdByName(input);
+        }
+    }
+
+    private int getLargestUnitId(int medicineId, int fallbackUnitId) {
+        dao.MedicineUnitDAO unitDao = new dao.MedicineUnitDAO();
+        java.util.List<models.MedicineUnit> units = unitDao.getUnitsByMedicineId(medicineId);
+        int largestUnitId = fallbackUnitId;
+        int maxConv = 0;
+        if (units != null) {
+            for (models.MedicineUnit u : units) {
+                if (u.getConversionRate() > maxConv) {
+                    maxConv = u.getConversionRate();
+                    largestUnitId = u.getUnitId();
+                }
+            }
+        }
+        return largestUnitId;
+    }
+
+    private void applyStockChange(int medicineId, int quantityBoxes, double pricePerBox, boolean isSetPrice) {
+        dao.MedicineUnitDAO unitDao = new dao.MedicineUnitDAO();
+        java.util.List<models.MedicineUnit> units = unitDao.getUnitsByMedicineId(medicineId);
+
+        models.MedicineUnit largestUnit = null;
+        models.MedicineUnit smallestUnit = null;
+        int maxConv = 0;
+
+        if (units != null) {
+            for (models.MedicineUnit u : units) {
+                if (u.getConversionRate() > maxConv) {
+                    maxConv = u.getConversionRate();
+                    largestUnit = u;
+                }
+                if (u.isBaseUnit()) {
+                    smallestUnit = u;
+                }
+            }
+        }
+
+        if (largestUnit != null && smallestUnit != null) {
+            int convertedQty = quantityBoxes * largestUnit.getConversionRate();
+            if (isSetPrice) {
+                medicineDAO.addQuantityAndSetOriginalPrice(medicineId, smallestUnit.getUnitId(), convertedQty,
+                        pricePerBox);
+            } else {
+                medicineDAO.updateStockQuantity(medicineId, smallestUnit.getUnitId(), convertedQty);
+            }
+        } else {
+            // fallback
+            if (isSetPrice) {
+                medicineDAO.addQuantityAndSetOriginalPrice(medicineId, 0, quantityBoxes, pricePerBox);
+            } else {
+                medicineDAO.updateStockQuantity(medicineId, 0, quantityBoxes);
+            }
         }
     }
 
