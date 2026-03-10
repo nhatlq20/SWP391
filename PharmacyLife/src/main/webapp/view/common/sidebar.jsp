@@ -95,7 +95,7 @@
                             </a>
 
                             <a href="${pageContext.request.contextPath}/admin/manage-staff"
-                                class="sidebar-item ${fn:contains(uri, 'manage-staff') ? 'active' : ''}">
+                                class="sidebar-item ${fn:contains(uri, 'manage-staff') || fn:contains(uri, 'staff') ? 'active' : ''}">
                                 <i class="fas fa-user-shield"></i> <span>Quản lý nhân viên</span>
                             </a>
                         </c:if>
