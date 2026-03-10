@@ -98,10 +98,8 @@ public class RevenueServlet extends HttpServlet {
 
     private double calculateGrowth(double current, double previous) {
         if (previous == 0) {
-            // If baseline is 0, percentage reflects the current volume (e.g. 1 order =
-            // 100%, 2 = 200%)
-            // This is more dynamic than a hardcoded 100%.
-            return current * 100.0;
+            // If baseline is 0, just return 100% if current > 0, else 0%
+            return current > 0 ? 100.0 : 0.0;
         }
         return ((current - previous) / previous) * 100.0;
     }
