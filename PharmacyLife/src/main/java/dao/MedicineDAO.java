@@ -363,6 +363,10 @@ public class MedicineDAO {
     }
 
     public boolean deleteMedicine(int medicineId) {
+        // First delete from child tables that are strictly related to Medicine
+        deleteIngredientsByMedicineId(medicineId);
+        deleteConditionsByMedicineId(medicineId);
+
         String sql = "DELETE FROM Medicine WHERE MedicineId = ?";
 
         try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -375,6 +379,26 @@ public class MedicineDAO {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public void deleteIngredientsByMedicineId(int medicineId) {
+        String sql = "DELETE FROM MedicineIngredients WHERE MedicineId = ?";
+        try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, medicineId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteConditionsByMedicineId(int medicineId) {
+        String sql = "DELETE FROM ConditionMedicines WHERE MedicineId = ?";
+        try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, medicineId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

@@ -393,4 +393,14 @@ public class OrderDAO {
 
         return order;
     }
+
+    public void deleteOrderItemsByMedicineId(int medicineId) {
+        String sql = "DELETE FROM OrderItems WHERE MedicineId = ?";
+        try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, medicineId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

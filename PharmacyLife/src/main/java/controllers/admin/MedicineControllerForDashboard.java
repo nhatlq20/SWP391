@@ -10,6 +10,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import dao.MedicineDAO;
 import dao.CategoryDAO;
 import dao.MedicineUnitDAO;
+import dao.ReviewDAO;
+import dao.CartDAO;
+import dao.OrderDAO;
+import dao.ImportDAO;
 import models.Medicine;
 import models.MedicineUnit;
 import models.Category;
@@ -26,6 +30,10 @@ public class MedicineControllerForDashboard extends HttpServlet {
     private MedicineDAO medicineDAO = new MedicineDAO();
     private CategoryDAO categoryDAO = new CategoryDAO();
     private MedicineUnitDAO medicineUnitDAO = new MedicineUnitDAO();
+    private ReviewDAO reviewDAO = new ReviewDAO();
+    private CartDAO cartDAO = new CartDAO();
+    private OrderDAO orderDAO = new OrderDAO();
+    private ImportDAO importDAO = new ImportDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -138,8 +146,19 @@ public class MedicineControllerForDashboard extends HttpServlet {
         if (idParam != null) {
             try {
                 int medicineId = Integer.parseInt(idParam);
-                // Delete MedicineUnit rows first (FK constraint), then the Medicine
+
+                // Delete from all tables that have a foreign key to MedicineId
+                // Order of deletion matters if there are nested FKs, but here they mostly point
+                // to MedicineId
+
+                reviewDAO.deleteReviewsByMedicineId(medicineId);
+                cartDAO.removeCartItemsByMedicineId(medicineId);
+                orderDAO.deleteOrderItemsByMedicineId(medicineId);
+                importDAO.deleteImportDetailsByMedicineId(medicineId);
                 medicineUnitDAO.deleteUnitsByMedicineId(medicineId);
+
+                // Finally delete the medicine (this also deletes ingredients and conditions
+                // inside DAO)
                 medicineDAO.deleteMedicine(medicineId);
             } catch (NumberFormatException e) {
                 // Invalid ID
@@ -222,7 +241,10 @@ public class MedicineControllerForDashboard extends HttpServlet {
                 int unit1Rate = rate2;
                 int unit2Rate = 1;
 
-                // Create the base unit record
+                boolean hasSub2 = subUnit2 != null && !subUnit2.isEmpty();
+                boolean hasSub1 = subUnit1 != null && !subUnit1.isEmpty();
+
+                // Create the units
                 String unitName = request.getParameter("unit");
                 String sellingPriceStr = request.getParameter("sellingPrice");
                 double sellingPrice = (sellingPriceStr != null && !sellingPriceStr.isEmpty())
@@ -234,28 +256,33 @@ public class MedicineControllerForDashboard extends HttpServlet {
                 baseUnit.setUnitName(unitName != null && !unitName.isEmpty() ? unitName : "Hộp");
                 baseUnit.setConversionRate(mainUnitRate);
                 baseUnit.setSellingPrice(sellingPrice);
-                baseUnit.setBaseUnit(true);
+                // Base unit is the smallest unit. If sub units exist, this is NOT the base
+                // unit.
+                baseUnit.setBaseUnit(!hasSub1 && !hasSub2);
                 medicineUnitDAO.addUnit(baseUnit);
 
                 // Add Sub-Unit 1 if provided
-                if (subUnit1 != null && !subUnit1.isEmpty()) {
+                if (hasSub1) {
                     MedicineUnit unit1 = new MedicineUnit();
                     unit1.setMedicineId(newMedicineId);
                     unit1.setUnitName(subUnit1);
                     unit1.setConversionRate(unit1Rate);
                     unit1.setSellingPrice(Double.parseDouble(subPrice1Str));
-                    unit1.setBaseUnit(false);
+                    // Base unit is the smallest unit. If Sub-Unit 2 exists, this is NOT the base
+                    // unit.
+                    unit1.setBaseUnit(!hasSub2);
                     medicineUnitDAO.addUnit(unit1);
                 }
 
                 // Add Sub-Unit 2 if provided
-                if (subUnit2 != null && !subUnit2.isEmpty()) {
+                if (hasSub2) {
                     MedicineUnit unit2 = new MedicineUnit();
                     unit2.setMedicineId(newMedicineId);
                     unit2.setUnitName(subUnit2);
                     unit2.setConversionRate(unit2Rate);
                     unit2.setSellingPrice(Double.parseDouble(subPrice2Str));
-                    unit2.setBaseUnit(false);
+                    // Sub-Unit 2 is always the smallest unit if it exists
+                    unit2.setBaseUnit(true);
                     medicineUnitDAO.addUnit(unit2);
                 }
 
@@ -324,52 +351,56 @@ public class MedicineControllerForDashboard extends HttpServlet {
                 int unit1Rate = rate2Value;
                 int unit2Rate = 1;
 
-                // Update the base unit (unit name and selling price) in MedicineUnit
+                boolean hasSub2 = subUnit2 != null && !subUnit2.isEmpty();
+                boolean hasSub1 = subUnit1 != null && !subUnit1.isEmpty();
+
+                // Update the first unit (unit name and selling price) in MedicineUnit
                 String unitName = request.getParameter("unit");
                 String sellingPriceStr = request.getParameter("sellingPrice");
                 double sellingPrice = (sellingPriceStr != null && !sellingPriceStr.isEmpty())
                         ? Double.parseDouble(sellingPriceStr)
                         : 0;
 
-                boolean unitUpdated = medicineUnitDAO.updateUnitInternal(medicineId,
-                        unitName != null && !unitName.isEmpty() ? unitName : "Hộp",
-                        sellingPrice, mainUnitRate, true);
+                // Note: updateUnitInternal previously assumed base unit = largest unit.
+                // We should be careful here. Let's instead delete all and re-insert to be safe,
+                // or update the logic. Since we're changing the definition of IsBaseUnit,
+                // the safest way is to delete non-base, update base, BUT the base unit ID might
+                // change.
 
-                // If no base unit row exists yet, create one
-                if (!unitUpdated) {
-                    MedicineUnit baseUnit = new MedicineUnit();
-                    baseUnit.setMedicineId(medicineId);
-                    baseUnit.setUnitName(unitName != null && !unitName.isEmpty() ? unitName : "Hộp");
-                    baseUnit.setConversionRate(mainUnitRate);
-                    baseUnit.setSellingPrice(sellingPrice);
-                    baseUnit.setBaseUnit(true);
-                    medicineUnitDAO.addUnit(baseUnit);
-                }
+                // Let's just delete ALL units for this medicine and re-insert them to ensure
+                // correctness
+                // with the new IsBaseUnit logic.
+                medicineUnitDAO.deleteUnitsByMedicineId(medicineId);
 
-                // Delete non base unit and re-insert them
-                medicineUnitDAO.deleteNonBaseUnitsByMedicineId(medicineId);
+                MedicineUnit mUnit = new MedicineUnit();
+                mUnit.setMedicineId(medicineId);
+                mUnit.setUnitName(unitName != null && !unitName.isEmpty() ? unitName : "Hộp");
+                mUnit.setConversionRate(mainUnitRate);
+                mUnit.setSellingPrice(sellingPrice);
+                mUnit.setBaseUnit(!hasSub1 && !hasSub2);
+                medicineUnitDAO.addUnit(mUnit);
 
                 // Add Sub-Unit 1 if provided
-                if (subUnit1 != null && !subUnit1.isEmpty()) {
+                if (hasSub1) {
                     MedicineUnit unit1 = new MedicineUnit();
                     unit1.setMedicineId(medicineId);
                     unit1.setUnitName(subUnit1);
                     unit1.setConversionRate(unit1Rate);
                     unit1.setSellingPrice(
                             subPrice1Str != null && !subPrice1Str.isEmpty() ? Double.parseDouble(subPrice1Str) : 0);
-                    unit1.setBaseUnit(false);
+                    unit1.setBaseUnit(!hasSub2);
                     medicineUnitDAO.addUnit(unit1);
                 }
 
                 // Add Sub-Unit 2 if provided
-                if (subUnit2 != null && !subUnit2.isEmpty()) {
+                if (hasSub2) {
                     MedicineUnit unit2 = new MedicineUnit();
                     unit2.setMedicineId(medicineId);
                     unit2.setUnitName(subUnit2);
                     unit2.setConversionRate(unit2Rate);
                     unit2.setSellingPrice(
                             subPrice2Str != null && !subPrice2Str.isEmpty() ? Double.parseDouble(subPrice2Str) : 0);
-                    unit2.setBaseUnit(false);
+                    unit2.setBaseUnit(true);
                     medicineUnitDAO.addUnit(unit2);
                 }
 
