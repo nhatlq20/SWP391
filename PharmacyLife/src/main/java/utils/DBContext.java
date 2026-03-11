@@ -7,9 +7,9 @@ import java.sql.SQLException;
 public class DBContext {
     // JDBC URL used to create new connections on demand
     private final String url = "jdbc:sqlserver://localhost:1433;"
-            + "databaseName=SWP391_Test12;"
+            + "databaseName=SWP391_Test14;"
             + "user=sa;"
-            + "password=123;"
+            + "password=ndc2022005;"
             + "encrypt=true;"
             + "trustServerCertificate=true;";
 

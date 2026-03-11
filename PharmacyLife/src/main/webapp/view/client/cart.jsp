@@ -83,14 +83,19 @@
                                                                                         title="${item.medicine.medicineName}">
                                                                                         ${item.medicine.medicineName}
                                                                                     </h6>
-                                                                                    <div class="d-flex flex-column">
-                                                                                        <small class="text-muted">Đơn
-                                                                                            vị:
-                                                                                            ${item.medicine.unit}</small>
-                                                                                        <small class="text-muted">Đơn
-                                                                                            vị:
-                                                                                            ${item.medicine.unit}</small>
-                                                                                        <small class="text-muted">Code:
+                                                                                    <div
+                                                                                        class="d-flex flex-column gap-1">
+                                                                                        <div class="cart-unit-info">
+                                                                                            <span class="unit-label">Đơn
+                                                                                                vị:</span>
+                                                                                            <span
+                                                                                                class="unit-badge">${item.unitName}</span>
+                                                                                            <!-- <c:if test="${item.conversionRate > 1}">
+                                                                                                <span class="conversion-text">(Quy đổi: ${item.conversionRate} ${item.medicine.baseUnit.unitName})</span>
+                                                                                            </c:if> -->
+                                                                                        </div>
+                                                                                        <small class="text-muted">Mã
+                                                                                            thuốc:
                                                                                             ${item.medicine.medicineCode}</small>
                                                                                     </div>
                                                                                 </div>

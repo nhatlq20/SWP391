@@ -115,6 +115,8 @@ public class Cart {
 
         private Medicine medicine;
         private int unitId; // New field
+        private String unitName; // Added for UI clarity
+        private int conversionRate; // Added to distinguish units
         private int quantity;
         private double price; // Price at the moment of adding to cart
 
@@ -124,6 +126,15 @@ public class Cart {
         public Item(Medicine medicine, int unitId, int quantity, double price) {
             this.medicine = medicine;
             this.unitId = unitId;
+            this.quantity = quantity;
+            this.price = price;
+        }
+
+        public Item(Medicine medicine, int unitId, String unitName, int conversionRate, int quantity, double price) {
+            this.medicine = medicine;
+            this.unitId = unitId;
+            this.unitName = unitName;
+            this.conversionRate = conversionRate;
             this.quantity = quantity;
             this.price = price;
         }
@@ -149,6 +160,22 @@ public class Cart {
 
         public void setUnitId(int unitId) {
             this.unitId = unitId;
+        }
+
+        public String getUnitName() {
+            return unitName;
+        }
+
+        public void setUnitName(String unitName) {
+            this.unitName = unitName;
+        }
+
+        public int getConversionRate() {
+            return conversionRate;
+        }
+
+        public void setConversionRate(int conversionRate) {
+            this.conversionRate = conversionRate;
         }
 
         public int getQuantity() {
