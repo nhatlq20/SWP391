@@ -25,10 +25,11 @@ public class MedicineDAO {
         String sql = "SELECT m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, "
                 + "m.OriginalPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, "
                 + "c.CategoryName, "
-                + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit "
+                + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit, "
+                + "(SELECT MAX(ConversionRate) FROM MedicineUnit WHERE MedicineId = m.MedicineId) as MaxRate "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
-                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY IsBaseUnit DESC, ConversionRate ASC) "
+                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY ConversionRate DESC) "
                 + "ORDER BY c.CategoryId ASC";
 
         try (Connection conn = dbContext.getConnection();
@@ -50,10 +51,11 @@ public class MedicineDAO {
         String sql = "SELECT m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, "
                 + "m.OriginalPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, "
                 + "c.CategoryName, "
-                + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit "
+                + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit, "
+                + "(SELECT MAX(ConversionRate) FROM MedicineUnit WHERE MedicineId = m.MedicineId) as MaxRate "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
-                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY IsBaseUnit DESC, ConversionRate ASC) "
+                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY ConversionRate DESC) "
                 + "WHERE m.MedicineId = ?";
 
         try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -77,10 +79,11 @@ public class MedicineDAO {
         String sql = "SELECT m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, "
                 + "m.OriginalPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, "
                 + "c.CategoryName, "
-                + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit "
+                + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit, "
+                + "(SELECT MAX(ConversionRate) FROM MedicineUnit WHERE MedicineId = m.MedicineId) as MaxRate "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
-                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY IsBaseUnit DESC, ConversionRate ASC) "
+                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY ConversionRate DESC) "
                 + "WHERE m.CategoryId = ? ORDER BY m.MedicineName";
 
         try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -104,10 +107,11 @@ public class MedicineDAO {
         String sql = "SELECT m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, "
                 + "m.OriginalPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, "
                 + "c.CategoryName, "
-                + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit "
+                + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit, "
+                + "(SELECT MAX(ConversionRate) FROM MedicineUnit WHERE MedicineId = m.MedicineId) as MaxRate "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
-                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY IsBaseUnit DESC, ConversionRate ASC) "
+                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY ConversionRate DESC) "
                 + "WHERE m.MedicineCode = ?";
 
         try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -146,10 +150,11 @@ public class MedicineDAO {
         String sql = "SELECT DISTINCT m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, "
                 + "m.OriginalPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, "
                 + "c.CategoryName, "
-                + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit "
+                + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit, "
+                + "(SELECT MAX(ConversionRate) FROM MedicineUnit WHERE MedicineId = m.MedicineId) as MaxRate "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
-                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY IsBaseUnit DESC, ConversionRate ASC) "
+                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY ConversionRate DESC) "
                 + "LEFT JOIN MedicineIngredients mi ON m.MedicineId = mi.MedicineId "
                 + "LEFT JOIN ActiveIngredients ai ON mi.IngredientId = ai.IngredientId "
                 + "LEFT JOIN ConditionMedicines mc ON m.MedicineId = mc.MedicineId "
@@ -193,10 +198,11 @@ public class MedicineDAO {
                 + "m.OriginalPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, "
                 + "c.CategoryName, "
                 + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit, "
+                + "(SELECT MAX(ConversionRate) FROM MedicineUnit WHERE MedicineId = m.MedicineId) as MaxRate, "
                 + "COALESCE(SUM(oi.OrderQuantity), 0) as TotalSold "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
-                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY IsBaseUnit DESC, ConversionRate ASC) "
+                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY ConversionRate DESC) "
                 + "LEFT JOIN OrderItems oi ON m.MedicineId = oi.MedicineId "
                 + "GROUP BY m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, "
                 + "m.OriginalPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, c.CategoryName, "
@@ -220,10 +226,11 @@ public class MedicineDAO {
         String sql = "SELECT m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, "
                 + "m.OriginalPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, "
                 + "c.CategoryName, "
-                + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit "
+                + "mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit, "
+                + "(SELECT MAX(ConversionRate) FROM MedicineUnit WHERE MedicineId = m.MedicineId) as MaxRate "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
-                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY IsBaseUnit DESC, ConversionRate ASC) "
+                + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY ConversionRate DESC) "
                 + "WHERE m.RemainingQuantity > 0 ORDER BY m.MedicineName";
 
         try (Connection conn = dbContext.getConnection();
@@ -356,6 +363,10 @@ public class MedicineDAO {
     }
 
     public boolean deleteMedicine(int medicineId) {
+        // First delete from child tables that are strictly related to Medicine
+        deleteIngredientsByMedicineId(medicineId);
+        deleteConditionsByMedicineId(medicineId);
+
         String sql = "DELETE FROM Medicine WHERE MedicineId = ?";
 
         try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -368,6 +379,26 @@ public class MedicineDAO {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public void deleteIngredientsByMedicineId(int medicineId) {
+        String sql = "DELETE FROM MedicineIngredients WHERE MedicineId = ?";
+        try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, medicineId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteConditionsByMedicineId(int medicineId) {
+        String sql = "DELETE FROM ConditionMedicines WHERE MedicineId = ?";
+        try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, medicineId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -518,6 +549,14 @@ public class MedicineDAO {
                 baseUnit.setSellingPrice(rs.getDouble("SellingPrice"));
                 baseUnit.setBaseUnit(rs.getBoolean("IsBaseUnit"));
                 medicine.setBaseUnit(baseUnit);
+
+                // Use MaxRate for quantity calculation if available
+                int maxRate = rs.getInt("MaxRate");
+                if (!rs.wasNull() && maxRate > 0) {
+                    // Update the base unit's conversion rate to the max rate for display purposes
+                    // This ensures remainingQuantity / conversionRate = boxes
+                    baseUnit.setConversionRate(maxRate);
+                }
             }
         } catch (SQLException e) {
             // UnitId might not be in result set for some queries
@@ -593,7 +632,7 @@ public class MedicineDAO {
             String sql = "SELECT TOP 3 DISTINCT "
                     + "m.MedicineName, m.ShortDescription, mu.SellingPrice, mu.UnitName as Unit, m.ImageUrl "
                     + "FROM Medicine m "
-                    + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY IsBaseUnit DESC, ConversionRate ASC) "
+                    + "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY ConversionRate DESC) "
                     + "LEFT JOIN MedicineIngredients mi ON m.MedicineId = mi.MedicineId "
                     + "LEFT JOIN ActiveIngredients ai ON mi.IngredientId = ai.IngredientId "
                     + "LEFT JOIN ConditionMedicines mc ON m.MedicineId = mc.MedicineId "

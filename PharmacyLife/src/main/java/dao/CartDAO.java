@@ -104,4 +104,16 @@ public class CartDAO {
         }
         return cart;
     }
+
+    public boolean removeCartItemsByMedicineId(int medicineId) {
+        String sql = "DELETE FROM Carts WHERE MedicineId = ?";
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, medicineId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

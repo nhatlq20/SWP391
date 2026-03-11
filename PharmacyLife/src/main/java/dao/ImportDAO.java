@@ -599,4 +599,15 @@ public class ImportDAO {
         }
         return list;
     }
+
+    public void deleteImportDetailsByMedicineId(int medicineId) {
+        String sql = "DELETE FROM ImportDetail WHERE MedicineId = ?";
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, medicineId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

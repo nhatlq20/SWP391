@@ -32,8 +32,8 @@
                                                     <c:out value='${keyword}' />"
                                                 </span>
                                             </h2>
-                                            <span class="result-count">Tìm thấy <strong>${resultCount}</strong> sản
-                                                phẩm</span>
+                                            <!-- <span class="result-count">Tìm thấy <strong>${resultCount}</strong> sản
+                                                phẩm</span> -->
                                         </c:when>
                                         <c:otherwise>
                                             <h2><i class="fas fa-search me-2"></i>Tìm kiếm sản phẩm</h2>

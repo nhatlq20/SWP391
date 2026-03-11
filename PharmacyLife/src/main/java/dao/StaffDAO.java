@@ -21,7 +21,8 @@ public class StaffDAO {
         List<Staff> list = new ArrayList<>();
 
         String sql = "SELECT s.StaffId, s.StaffCode, s.StaffName, s.StaffPhone, s.StaffAddress, s.StaffDob, r.RoleName, s.StaffIsActive, s.StaffEmail, s.StaffGender "
-               + "FROM Staff s JOIN Role r ON s.RoleId = r.RoleId";
+               + "FROM Staff s JOIN Role r ON s.RoleId = r.RoleId "
+               + "WHERE r.RoleName != 'Admin'";
         
         if (sortOrder != null && !sortOrder.isEmpty()) {
             if ("asc".equalsIgnoreCase(sortOrder)) {

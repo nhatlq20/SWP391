@@ -117,37 +117,11 @@ public class LoginController extends HttpServlet {
         email = email == null ? "" : email.trim().toLowerCase();
         password = password == null ? "" : password.trim();
 
-        // Try to authenticate as Staff first
-        StaffDAO staffDAO = new StaffDAO();
-        Staff staff = staffDAO.login(email, password);
-
-        if (staff != null) {
-            // Staff login successful - Create session
-            HttpSession session = request.getSession();
-            session.setAttribute("loggedInUser", staff);
-            session.setAttribute("userType", "staff");
-            session.setAttribute("userId", staff.getStaffId());
-            session.setAttribute("userName", staff.getStaffName());
-            session.setAttribute("userEmail", staff.getStaffEmail());
-            session.setAttribute("roleId", staff.getRoleId());
-            session.setAttribute("roleName", staff.getRoleName());
-
-            // Redirect based on role
-            String roleName = staff.getRoleName();
-            if ("Admin".equalsIgnoreCase(roleName) || "Staff".equalsIgnoreCase(roleName)) {
-                response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
-            } else {
-                response.sendRedirect(request.getContextPath() + "/home");
-            }
-            return;
-        }
-
-        // Try to authenticate as Customer
+        // Trang login mặc định chỉ cho Customer
         CustomerDAO customerDAO = new CustomerDAO();
         Customer customer = customerDAO.login(email, password);
 
         if (customer != null) {
-            // Customer login successful - Create session
             HttpSession session = request.getSession();
             session.setAttribute("loggedInUser", customer);
             session.setAttribute("userType", "customer");
@@ -157,18 +131,14 @@ public class LoginController extends HttpServlet {
             session.setAttribute("userEmail", customer.getEmail());
             session.setAttribute("roleName", "customer");
 
-            // Load persistent cart from database
             CartDAO cartDAO_login = new CartDAO();
             Cart cart_login = cartDAO_login.getCartByCustomerId(customer.getCustomerId());
             session.setAttribute("cart", cart_login);
 
-            // Redirect to welcome file (home)
             response.sendRedirect(request.getContextPath() + "/home");
             return;
         }
-
-        // Login failed
-        forwardLoginWithError(request, response, email, "Email hoặc mật khẩu không đúng!");
+        forwardLoginWithError(request, response, email, "Tài khoản Khách hàng hoặc mật khẩu không đúng!");
     }
 
     /**
