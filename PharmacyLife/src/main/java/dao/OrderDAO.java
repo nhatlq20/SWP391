@@ -313,8 +313,11 @@ public class OrderDAO {
 
                     int stockUpdate = psStock.executeUpdate();
                     if (stockUpdate == 0) {
-                        lastErrorMessage = "Sản phẩm mã " + item.getMedicineId() + " (Đơn vị ID: " + item.getUnitId()
-                                + ") không đủ hàng hoặc không tồn tại.";
+                        String medName = (item.getMedicine() != null) ? item.getMedicine().getMedicineName() 
+                                                                     : "Sản phẩm mã " + item.getMedicineId();
+                        String unitName = (item.getUnitName() != null) ? item.getUnitName() 
+                                                                       : "Đơn vị ID " + item.getUnitId();
+                        lastErrorMessage = "Thuốc '" + medName + "' (đơn vị: " + unitName + ") hiện không đủ hàng trong kho hoặc không tồn tại.";
                         conn.rollback();
                         return false;
                     }

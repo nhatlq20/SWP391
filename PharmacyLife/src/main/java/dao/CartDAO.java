@@ -73,7 +73,7 @@ public class CartDAO {
 
     public Cart getCartByCustomerId(int customerId) {
         Cart cart = new Cart();
-        String sql = "SELECT c.*, m.MedicineCode, m.MedicineName, m.ImageUrl, " +
+        String sql = "SELECT c.*, m.MedicineCode, m.MedicineName, m.ImageUrl, m.RemainingQuantity, " +
                 "mu.UnitName as SelectedUnitName, mu.SellingPrice, mu.ConversionRate, " +
                 "bu.UnitId as BaseUnitId, bu.UnitName as BaseUnitName " +
                 "FROM Carts c " +
@@ -92,6 +92,7 @@ public class CartDAO {
                     m.setMedicineCode(rs.getString("MedicineCode"));
                     m.setMedicineName(rs.getString("MedicineName"));
                     m.setImageUrl(rs.getString("ImageUrl"));
+                    m.setRemainingQuantity(rs.getInt("RemainingQuantity"));
                     
                     String selectedUnitName = rs.getString("SelectedUnitName");
                     m.setUnit(selectedUnitName);

@@ -38,6 +38,31 @@
                                         </h4>
                                     </div>
 
+                                    <c:if test="${not empty error}">
+                                        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4"
+                                            style="border-radius: 12px; background-color: #fef2f2; color: #991b1b;">
+                                            <div class="d-flex align-items-start">
+                                                <i class="fas fa-exclamation-circle me-3 mt-1"
+                                                    style="font-size: 1.1rem;"></i>
+                                                <div>
+                                                    <h6 class="fw-bold mb-1">Không thể tiếp tục thanh toán</h6>
+                                                    <c:if test="${not empty errorList}">
+                                                        <ul class="mb-0 ps-3">
+                                                            <c:forEach items="${errorList}" var="err">
+                                                                <li>${err}</li>
+                                                            </c:forEach>
+                                                        </ul>
+                                                    </c:if>
+                                                    <c:if test="${empty errorList}">
+                                                        <p class="mb-0">${error}</p>
+                                                    </c:if>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close"></button>
+                                        </div>
+                                    </c:if>
+
                                     <div class="cart-card-inner">
                                         <c:if test="${empty cart.items}">
                                             <div class="empty-cart">
@@ -90,13 +115,8 @@
                                                                                                 vị:</span>
                                                                                             <span
                                                                                                 class="unit-badge">${item.unitName}</span>
-                                                                                            <!-- <c:if test="${item.conversionRate > 1}">
-                                                                                                <span class="conversion-text">(Quy đổi: ${item.conversionRate} ${item.medicine.baseUnit.unitName})</span>
-                                                                                            </c:if> -->
                                                                                         </div>
-                                                                                        <small class="text-muted">Mã
-                                                                                            thuốc:
-                                                                                            ${item.medicine.medicineCode}</small>
+
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
@@ -177,7 +197,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <a href="checkout" class="btn-checkout">
+                                                    <a href="cart?mode=checkout" class="btn-checkout">
                                                         Thanh toán
                                                         <i class="fas fa-arrow-right"></i>
                                                     </a>

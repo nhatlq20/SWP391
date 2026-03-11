@@ -108,8 +108,13 @@ public class CheckoutController extends HttpServlet {
                 models.OrderItem orderItem = new models.OrderItem();
                 orderItem.setMedicineId(cartItem.getMedicine().getMedicineId());
                 orderItem.setUnitId(cartItem.getUnitId());
+                orderItem.setUnitName(cartItem.getUnitName()); // Set Unit Name
                 orderItem.setQuantity(cartItem.getQuantity());
                 orderItem.setUnitPrice(cartItem.getPrice());
+                
+                // Also set Medicine object for name display in errors
+                orderItem.setMedicine(cartItem.getMedicine());
+                
                 orderItems.add(orderItem);
             }
             order.setItems(orderItems);

@@ -48,7 +48,29 @@ public class CartController extends HttpServlet {
             session.setAttribute("cart", cart);
         }
 
-        // Remove hardcoded data
+        // Check if coming from checkout request explicitly or just viewing
+        String mode = request.getParameter("mode");
+        if ("checkout".equals(mode) && cart != null && !cart.getItems().isEmpty()) {
+            java.util.List<String> errors = new java.util.ArrayList<>();
+            for (models.Cart.Item item : cart.getItems()) {
+                int requestedQty = item.getQuantity() * item.getConversionRate();
+                if (item.getMedicine().getRemainingQuantity() < requestedQty) {
+                    if (item.getMedicine().getRemainingQuantity() <= 0) {
+                        errors.add("Thuốc '" + item.getMedicine().getMedicineName() + "' đã hết hàng.");
+                    } else {
+                        errors.add("Thuốc '" + item.getMedicine().getMedicineName() + "' (đơn vị: " + item.getUnitName() + ") hiện không đủ hàng.");
+                    }
+                }
+            }
+            if (!errors.isEmpty()) {
+                request.setAttribute("errorList", errors);
+                // Also set a generic error flag if needed
+                request.setAttribute("error", "Vui lòng điều chỉnh giỏ hàng vì một số sản phẩm không đủ hàng.");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/checkout");
+                return;
+            }
+        }
 
         // Calculate total amount
         double totalMoney = cart.getTotalMoney();
