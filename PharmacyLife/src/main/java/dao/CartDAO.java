@@ -73,10 +73,13 @@ public class CartDAO {
 
     public Cart getCartByCustomerId(int customerId) {
         Cart cart = new Cart();
-        String sql = "SELECT c.*, m.MedicineCode, m.MedicineName, m.ImageUrl, mu.UnitName, mu.SellingPrice " +
+        String sql = "SELECT c.*, m.MedicineCode, m.MedicineName, m.ImageUrl, " +
+                "mu.UnitName as SelectedUnitName, mu.SellingPrice, mu.ConversionRate, " +
+                "bu.UnitId as BaseUnitId, bu.UnitName as BaseUnitName " +
                 "FROM Carts c " +
                 "JOIN Medicine m ON c.MedicineId = m.MedicineId " +
                 "LEFT JOIN MedicineUnit mu ON c.UnitId = mu.UnitId " +
+                "LEFT JOIN MedicineUnit bu ON m.MedicineId = bu.MedicineId AND bu.IsBaseUnit = 1 " +
                 "WHERE c.CustomerId = ?";
 
         try (Connection conn = dbContext.getConnection();
@@ -89,13 +92,26 @@ public class CartDAO {
                     m.setMedicineCode(rs.getString("MedicineCode"));
                     m.setMedicineName(rs.getString("MedicineName"));
                     m.setImageUrl(rs.getString("ImageUrl"));
-                    m.setUnit(rs.getString("UnitName"));
+                    
+                    String selectedUnitName = rs.getString("SelectedUnitName");
+                    m.setUnit(selectedUnitName);
+
+                    // Populate Base Unit info for Medicine
+                    int baseUnitId = rs.getInt("BaseUnitId");
+                    if (!rs.wasNull()) {
+                        models.MedicineUnit bu = new models.MedicineUnit();
+                        bu.setUnitId(baseUnitId);
+                        bu.setUnitName(rs.getString("BaseUnitName"));
+                        bu.setBaseUnit(true);
+                        m.setBaseUnit(bu);
+                    }
 
                     double price = rs.getDouble("SellingPrice");
                     if (rs.wasNull())
                         price = 0; // Fallback
 
-                    Cart.Item item = new Cart.Item(m, rs.getInt("UnitId"), rs.getInt("CartQuantity"), price);
+                    int convRate = rs.getInt("ConversionRate");
+                    Cart.Item item = new Cart.Item(m, rs.getInt("UnitId"), selectedUnitName, convRate, rs.getInt("CartQuantity"), price);
                     cart.addItem(item);
                 }
             }

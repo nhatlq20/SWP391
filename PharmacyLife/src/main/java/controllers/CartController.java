@@ -105,6 +105,12 @@ public class CartController extends HttpServlet {
                 if (medicine != null) {
                     int unitId = 0;
                     double unitPrice = medicine.getSellingPrice();
+                    String unitName = medicine.getUnit();
+                    int convRate = 1;
+                    if (medicine.getBaseUnit() != null) {
+                        convRate = medicine.getBaseUnit().getConversionRate();
+                    }
+
                     try {
                         String uIdParam = request.getParameter("unitId");
                         if (uIdParam != null && !uIdParam.isEmpty()) {
@@ -112,15 +118,19 @@ public class CartController extends HttpServlet {
                             MedicineUnit mu = unitDAO.getUnitById(unitId);
                             if (mu != null) {
                                 unitPrice = mu.getSellingPrice();
+                                unitName = mu.getUnitName();
+                                convRate = mu.getConversionRate();
                             }
                         } else if (medicine.getBaseUnit() != null) {
                             unitId = medicine.getBaseUnit().getUnitId();
                             unitPrice = medicine.getBaseUnit().getSellingPrice();
+                            unitName = medicine.getBaseUnit().getUnitName();
+                            convRate = medicine.getBaseUnit().getConversionRate();
                         }
                     } catch (NumberFormatException e) {
                     }
 
-                    Cart.Item item = new Cart.Item(medicine, unitId, quantity, unitPrice);
+                    Cart.Item item = new Cart.Item(medicine, unitId, unitName, convRate, quantity, unitPrice);
                     cart.addItem(item);
                     // Sync with DB
                     cartDAO.saveCartItem(userId, id, unitId, cart.getQuantity(id, unitId));
