@@ -58,7 +58,7 @@
                                 </div>
 
                                 <c:if test="${not empty successMessage}">
-                                    <div class="alert alert-success mt-3" style="margin-bottom: 0;">
+                                    <div class="alert alert-success mt-3 mb-3">
                                         <i class="fas fa-check-circle me-1"></i> ${successMessage}
                                     </div>
                                 </c:if>

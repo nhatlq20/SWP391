@@ -122,7 +122,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-actions d-flex justify-content-between mt-4">
+                                    <div class="form-actions d-flex justify-content-between mt-5">
                                         <a href="${pageContext.request.contextPath}/admin/manage-staff" class="btn-cancel">
                                             <i class="fas fa-chevron-left"></i> Trở lại
                                         </a>
@@ -173,6 +173,7 @@
                         const normalizedName = normalizeName(staffNameInput.value);
                         const normalizedEmail = staffEmailInput.value.trim().toLowerCase();
                         const passwordValue = staffPasswordInput.value;
+                        const dobValue = document.getElementById("staffDob").value;
 
                         const fullNameRegex = /^[\p{L}][\p{L}\s'.-]{1,99}$/u;
                         const emailRegex = /^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*@(gmail\.com|yahoo\.com|fucantho|fucantho\.edu\.vn|pharmacy\.com|pharmacylife\.com)$/;
@@ -184,6 +185,22 @@
                             event.preventDefault();
                             showClientStaffError("Vui lòng nhập đầy đủ thông tin!");
                             return;
+                        }
+
+                        if (dobValue) {
+                            const dobDate = new Date(dobValue);
+                            const today = new Date();
+                            let age = today.getFullYear() - dobDate.getFullYear();
+                            const monthDiff = today.getMonth() - dobDate.getMonth();
+                            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
+                                age--;
+                            }
+
+                            if (age < 18 || age > 80) {
+                                event.preventDefault();
+                                showClientStaffError("Tuổi nhân viên phải từ 18 đến 80!");
+                                return;
+                            }
                         }
 
                         if (!fullNameRegex.test(normalizedName)) {
