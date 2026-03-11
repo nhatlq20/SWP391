@@ -107,7 +107,9 @@
                                                                             </a>
                                                                         </c:when>
                                                                         <c:when test="${canReview}">
-                                                                            <button type="button" class="btn btn-primary" onclick="openReviewModal()">
+                                                                            <button type="button"
+                                                                                class="btn btn-primary"
+                                                                                onclick="openReviewModal()">
                                                                                 <i class="fas fa-star"></i> Gửi đánh giá
                                                                             </button>
                                                                         </c:when>
@@ -168,8 +170,11 @@
                                                                                     </a>
                                                                                 </c:when>
                                                                                 <c:when test="${canReview}">
-                                                                                    <button type="button" class="btn btn-primary" onclick="openReviewModal()">
-                                                                                        <i class="fas fa-star"></i> Gửi đánh giá
+                                                                                    <button type="button"
+                                                                                        class="btn btn-primary"
+                                                                                        onclick="openReviewModal()">
+                                                                                        <i class="fas fa-star"></i> Gửi
+                                                                                        đánh giá
                                                                                     </button>
                                                                                     </a>
                                                                                 </c:when>
@@ -296,41 +301,74 @@
                                                                     <c:if test="${sessionScope.userType eq 'staff'}">
                                                                         <c:choose>
                                                                             <c:when test="${empty review.replyContent}">
-                                                                                <form method="post" action="${pageContext.request.contextPath}/reply-review" class="mt-2">
-                                                                                    <input type="hidden" name="action" value="reply" />
-                                                                                    <input type="hidden" name="reviewId" value="${review.reviewId}" />
-                                                                                    <input type="hidden" name="medicineId" value="${medicine.medicineId}" />
-                                                                                    <input type="hidden" name="returnTo" value="detail" />
+                                                                                <form method="post"
+                                                                                    action="${pageContext.request.contextPath}/reply-review"
+                                                                                    class="mt-2">
+                                                                                    <input type="hidden" name="action"
+                                                                                        value="reply" />
+                                                                                    <input type="hidden" name="reviewId"
+                                                                                        value="${review.reviewId}" />
+                                                                                    <input type="hidden"
+                                                                                        name="medicineId"
+                                                                                        value="${medicine.medicineId}" />
+                                                                                    <input type="hidden" name="returnTo"
+                                                                                        value="detail" />
                                                                                     <div class="mb-2">
-                                                                                        <textarea name="replyContent" class="form-control" rows="2" placeholder="Nhập phản hồi..."></textarea>
+                                                                                        <textarea name="replyContent"
+                                                                                            class="form-control"
+                                                                                            rows="2"
+                                                                                            placeholder="Nhập phản hồi..."></textarea>
                                                                                     </div>
-                                                                                    <button type="submit" class="btn btn-sm btn-primary">Gửi trả lời</button>
+                                                                                    <button type="submit"
+                                                                                        class="btn btn-sm btn-primary">Gửi
+                                                                                        trả lời</button>
                                                                                 </form>
                                                                             </c:when>
-                                                                           
-                                                                            <c:when test="${review.replyBy eq sessionScope.userId}">
-                                                                                <c:set var="editText" value="${review.replyContent}" />
-                                                                                <c:set var="blocks" value="${fn:split(editText, '@@BR@@')}" />
-                                                                                <c:set var="lastBlock" value="${fn:trim(blocks[fn:length(blocks) - 1])}" />
+
+                                                                            <c:when
+                                                                                test="${review.replyBy eq sessionScope.userId}">
+                                                                                <c:set var="editText"
+                                                                                    value="${review.replyContent}" />
+                                                                                <c:set var="blocks"
+                                                                                    value="${fn:split(editText, '@@BR@@')}" />
+                                                                                <c:set var="lastBlock"
+                                                                                    value="${fn:trim(blocks[fn:length(blocks) - 1])}" />
                                                                                 <c:choose>
-                                                                                    <c:when test="${fn:contains(lastBlock, ': ')}">
-                                                                                        <c:set var="editTextClean" value="${fn:substringAfter(lastBlock, ': ')}" />
+                                                                                    <c:when
+                                                                                        test="${fn:contains(lastBlock, ': ')}">
+                                                                                        <c:set var="editTextClean"
+                                                                                            value="${fn:substringAfter(lastBlock, ': ')}" />
                                                                                     </c:when>
                                                                                     <c:otherwise>
-                                                                                        <c:set var="editTextClean" value="${lastBlock}" />
+                                                                                        <c:set var="editTextClean"
+                                                                                            value="${lastBlock}" />
                                                                                     </c:otherwise>
                                                                                 </c:choose>
-                                                                                <form method="post" action="${pageContext.request.contextPath}/reply-review" class="mt-2">
-                                                                                    <input type="hidden" name="action" value="reply" />
-                                                                                    <input type="hidden" name="reviewId" value="${review.reviewId}" />
-                                                                                    <input type="hidden" name="medicineId" value="${medicine.medicineId}" />
-                                                                                    <input type="hidden" name="returnTo" value="detail" />
-                                                                                    <input type="hidden" name="edit" value="true" />
+                                                                                <form method="post"
+                                                                                    action="${pageContext.request.contextPath}/reply-review"
+                                                                                    class="mt-2">
+                                                                                    <input type="hidden" name="action"
+                                                                                        value="reply" />
+                                                                                    <input type="hidden" name="reviewId"
+                                                                                        value="${review.reviewId}" />
+                                                                                    <input type="hidden"
+                                                                                        name="medicineId"
+                                                                                        value="${medicine.medicineId}" />
+                                                                                    <input type="hidden" name="returnTo"
+                                                                                        value="detail" />
+                                                                                    <input type="hidden" name="edit"
+                                                                                        value="true" />
                                                                                     <div class="mb-2">
-                                                                                        <textarea name="replyContent" class="form-control" rows="2">${fn:escapeXml(editTextClean)}</textarea>
+                                                                                        <textarea name="replyContent"
+                                                                                            class="form-control"
+                                                                                            rows="2">${fn:escapeXml(editTextClean)}</textarea>
                                                                                     </div>
-                                                                                    <button type="submit" class="btn btn-sm btn-primary">Cập nhật</button>
-                                                                                    <button type="submit" name="delete" value="true" class="btn btn-sm btn-danger ms-2">Xóa</button>
+                                                                                    <button type="submit"
+                                                                                        class="btn btn-sm btn-primary">Cập
+                                                                                        nhật</button>
+                                                                                    <button type="submit" name="delete"
+                                                                                        value="true"
+                                                                                        class="btn btn-sm btn-danger ms-2">Xóa</button>
                                                                                 </form>
                                                                             </c:when>
                                                                         </c:choose>
@@ -429,12 +467,6 @@
                                                     </c:otherwise>
                                                 </c:choose>
                                             </div>
-                                            <c:if test="${not empty categoryStock and categoryStock > 0}">
-                                                <div class="info-row">
-                                                    <span class="info-label">Số lượng tồn kho</span>
-                                                    <span class="info-value text-dark"><c:out value="${categoryStock}" /> <c:out value="${medicine.unit}" /></span>
-                                                </div>
-                                            </c:if>
                                             <c:if test="${not empty ingredientNames}">
                                                 <div class="info-row">
                                                     <span class="info-label">Thành phần</span>
@@ -724,147 +756,173 @@
                                     });
                                 </script>
 
-<!-- Review Modal -->
-<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="reviewModalLabel">Đánh giá sản phẩm</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <style>
-                .star-rating {
-                    display: flex;
-                    font-size: 2rem;
-                    cursor: pointer;
-                }
-                .star {
-                    color: #ddd;
-                    transition: color 0.2s;
-                }
-                .star.selected {
-                    color: #ffc107;
-                }
-                .rating-value {
-                    margin-top: 0.5rem;
-                    font-weight: bold;
-                }
-                </style>
-                <form id="reviewForm" action="${pageContext.request.contextPath}/create-review" method="POST">
-                    <!-- Medicine ID (hidden) -->
-                    <input type="hidden" name="medicineId" value="${medicine.medicineId}">
-                    <input type="hidden" name="customerId" value="${sessionScope.customerId}">
+                                <!-- Review Modal -->
+                                <div class="modal fade" id="reviewModal" tabindex="-1"
+                                    aria-labelledby="reviewModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="reviewModalLabel">Đánh giá sản phẩm</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <style>
+                                                    .star-rating {
+                                                        display: flex;
+                                                        font-size: 2rem;
+                                                        cursor: pointer;
+                                                    }
 
-                    <div class="medicine-preview mb-3">
-                        <c:choose>
-                            <c:when test="${not empty medicine.imageUrl}">
-                                <c:set var="imageUrlTrimmed" value="${fn:trim(medicine.imageUrl)}" />
-                                <c:choose>
-                                    <c:when test="${fn:startsWith(imageUrlTrimmed, 'http://') or fn:startsWith(imageUrlTrimmed, 'https://')}">
-                                        <c:set var="imgSrc" value="${imageUrlTrimmed}" />
-                                    </c:when>
-                                    <c:when test="${fn:startsWith(imageUrlTrimmed, '/')}">
-                                        <c:set var="imgSrc" value="${pageContext.request.contextPath}${imageUrlTrimmed}" />
-                                    </c:when>
-                                    <c:when test="${fn:contains(imageUrlTrimmed, 'assets/img')}">
-                                        <c:set var="imgSrc" value="${pageContext.request.contextPath}/${imageUrlTrimmed}" />
-                                    </c:when>
-                                    <c:otherwise>
-                                        <c:set var="imgSrc" value="${pageContext.request.contextPath}/assets/img/${imageUrlTrimmed}" />
-                                    </c:otherwise>
-                                </c:choose>
-                                <img src="<c:out value='${imgSrc}'/>" alt="<c:out value='${medicine.medicineName}'/>" class="img-fluid mb-2" style="max-width: 100px;" />
-                            </c:when>
-                            <c:otherwise>
-                                <img src="${pageContext.request.contextPath}/assets/img/no-image.png" alt="Không có ảnh" class="img-fluid mb-2" style="max-width: 100px;" />
-                            </c:otherwise>
-                        </c:choose>
-                        <p class="mb-0"><strong><c:out value="${medicine.medicineName}" /></strong></p>
-                    </div>
+                                                    .star {
+                                                        color: #ddd;
+                                                        transition: color 0.2s;
+                                                    }
 
-                    <!-- Rating -->
-                    <div class="form-group mb-3">
-                        <label>Đánh giá của bạn:</label>
-                        <div class="star-rating" id="starRating">
-                            <span class="star" data-value="1">★</span>
-                            <span class="star" data-value="2">★</span>
-                            <span class="star" data-value="3">★</span>
-                            <span class="star" data-value="4">★</span>
-                            <span class="star" data-value="5">★</span>
-                        </div>
-                        <input type="hidden" id="ratingValue" name="rating" value="">
-                        <div class="rating-value" id="ratingText"></div>
-                    </div>
+                                                    .star.selected {
+                                                        color: #ffc107;
+                                                    }
 
-                    <!-- Comment -->
-                    <div class="form-group mb-3">
-                        <label for="comment">Bình luận:</label>
-                        <textarea class="form-control" name="comment" id="comment" rows="4" placeholder="Nhập nội dung đánh giá..."></textarea>
-                        <div class="error-message" id="commentError"></div>
-                    </div>
+                                                    .rating-value {
+                                                        margin-top: 0.5rem;
+                                                        font-weight: bold;
+                                                    }
+                                                </style>
+                                                <form id="reviewForm"
+                                                    action="${pageContext.request.contextPath}/create-review"
+                                                    method="POST">
+                                                    <!-- Medicine ID (hidden) -->
+                                                    <input type="hidden" name="medicineId"
+                                                        value="${medicine.medicineId}">
+                                                    <input type="hidden" name="customerId"
+                                                        value="${sessionScope.customerId}">
 
-                    <!-- Actions -->
-                    <div class="d-flex justify-content-end">
-                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+                                                    <div class="medicine-preview mb-3">
+                                                        <c:choose>
+                                                            <c:when test="${not empty medicine.imageUrl}">
+                                                                <c:set var="imageUrlTrimmed"
+                                                                    value="${fn:trim(medicine.imageUrl)}" />
+                                                                <c:choose>
+                                                                    <c:when
+                                                                        test="${fn:startsWith(imageUrlTrimmed, 'http://') or fn:startsWith(imageUrlTrimmed, 'https://')}">
+                                                                        <c:set var="imgSrc"
+                                                                            value="${imageUrlTrimmed}" />
+                                                                    </c:when>
+                                                                    <c:when
+                                                                        test="${fn:startsWith(imageUrlTrimmed, '/')}">
+                                                                        <c:set var="imgSrc"
+                                                                            value="${pageContext.request.contextPath}${imageUrlTrimmed}" />
+                                                                    </c:when>
+                                                                    <c:when
+                                                                        test="${fn:contains(imageUrlTrimmed, 'assets/img')}">
+                                                                        <c:set var="imgSrc"
+                                                                            value="${pageContext.request.contextPath}/${imageUrlTrimmed}" />
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <c:set var="imgSrc"
+                                                                            value="${pageContext.request.contextPath}/assets/img/${imageUrlTrimmed}" />
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                                <img src="<c:out value='${imgSrc}'/>"
+                                                                    alt="<c:out value='${medicine.medicineName}'/>"
+                                                                    class="img-fluid mb-2" style="max-width: 100px;" />
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <img src="${pageContext.request.contextPath}/assets/img/no-image.png"
+                                                                    alt="Không có ảnh" class="img-fluid mb-2"
+                                                                    style="max-width: 100px;" />
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                        <p class="mb-0"><strong>
+                                                                <c:out value="${medicine.medicineName}" />
+                                                            </strong></p>
+                                                    </div>
 
-<script>
-function openReviewModal() {
-    const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
-    modal.show();
-}
+                                                    <!-- Rating -->
+                                                    <div class="form-group mb-3">
+                                                        <label>Đánh giá của bạn:</label>
+                                                        <div class="star-rating" id="starRating">
+                                                            <span class="star" data-value="1">★</span>
+                                                            <span class="star" data-value="2">★</span>
+                                                            <span class="star" data-value="3">★</span>
+                                                            <span class="star" data-value="4">★</span>
+                                                            <span class="star" data-value="5">★</span>
+                                                        </div>
+                                                        <input type="hidden" id="ratingValue" name="rating" value="">
+                                                        <div class="rating-value" id="ratingText"></div>
+                                                    </div>
 
-const ratingLabels = {
-    1: 'Rất tệ',
-    2: 'Tệ',
-    3: 'Bình thường',
-    4: 'Tốt',
-    5: 'Tuyệt vời'
-};
+                                                    <!-- Comment -->
+                                                    <div class="form-group mb-3">
+                                                        <label for="comment">Bình luận:</label>
+                                                        <textarea class="form-control" name="comment" id="comment"
+                                                            rows="4" placeholder="Nhập nội dung đánh giá..."></textarea>
+                                                        <div class="error-message" id="commentError"></div>
+                                                    </div>
 
-// Rating stars interaction
-document.addEventListener('DOMContentLoaded', function() {
-    const stars = document.querySelectorAll('#starRating .star');
-    const ratingValue = document.getElementById('ratingValue');
-    const ratingText = document.getElementById('ratingText');
+                                                    <!-- Actions -->
+                                                    <div class="d-flex justify-content-end">
+                                                        <button type="button" class="btn btn-secondary me-2"
+                                                            data-bs-dismiss="modal">Hủy</button>
+                                                        <button type="submit" class="btn btn-primary">Gửi đánh
+                                                            giá</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-    function updateStars(value) {
-        stars.forEach(s => {
-            if (s.getAttribute('data-value') <= value) {
-                s.classList.add('selected');
-            } else {
-                s.classList.remove('selected');
-            }
-        });
-    }
+                                <script>
+                                    function openReviewModal() {
+                                        const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
+                                        modal.show();
+                                    }
 
-    stars.forEach(star => {
-        star.addEventListener('click', function() {
-            const value = this.getAttribute('data-value');
-            ratingValue.value = value;
-            ratingText.textContent = ratingLabels[value];
-            updateStars(value);
-        });
+                                    const ratingLabels = {
+                                        1: 'Rất tệ',
+                                        2: 'Tệ',
+                                        3: 'Bình thường',
+                                        4: 'Tốt',
+                                        5: 'Tuyệt vời'
+                                    };
 
-        star.addEventListener('mouseover', function() {
-            const value = this.getAttribute('data-value');
-            updateStars(value);
-        });
+                                    // Rating stars interaction
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        const stars = document.querySelectorAll('#starRating .star');
+                                        const ratingValue = document.getElementById('ratingValue');
+                                        const ratingText = document.getElementById('ratingText');
 
-        star.addEventListener('mouseout', function() {
-            const currentValue = ratingValue.value;
-            updateStars(currentValue);
-        });
-    });
-});
-</script>
+                                        function updateStars(value) {
+                                            stars.forEach(s => {
+                                                if (s.getAttribute('data-value') <= value) {
+                                                    s.classList.add('selected');
+                                                } else {
+                                                    s.classList.remove('selected');
+                                                }
+                                            });
+                                        }
+
+                                        stars.forEach(star => {
+                                            star.addEventListener('click', function () {
+                                                const value = this.getAttribute('data-value');
+                                                ratingValue.value = value;
+                                                ratingText.textContent = ratingLabels[value];
+                                                updateStars(value);
+                                            });
+
+                                            star.addEventListener('mouseover', function () {
+                                                const value = this.getAttribute('data-value');
+                                                updateStars(value);
+                                            });
+
+                                            star.addEventListener('mouseout', function () {
+                                                const currentValue = ratingValue.value;
+                                                updateStars(currentValue);
+                                            });
+                                        });
+                                    });
+                                </script>
 
                 </body>
 
