@@ -6,11 +6,20 @@ public class OrderItem {
     private int unitId; // New field
     private int quantity;
     private double unitPrice;
+    private String unitName; // Added for better error reporting
 
     // Helper navigation property for display
     private Medicine medicine;
 
     public OrderItem() {
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
     }
 
     public OrderItem(int orderId, int medicineId, int unitId, int quantity, double unitPrice) {

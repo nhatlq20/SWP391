@@ -38,6 +38,16 @@
                                         </h4>
                                     </div>
 
+                                    <c:if test="${not empty error}">
+                                        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4"
+                                            style="border-radius: 12px; background-color: #fef2f2; color: #991b1b;">
+                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                            ${error}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close"></button>
+                                        </div>
+                                    </c:if>
+
                                     <div class="cart-card-inner">
                                         <c:if test="${empty cart.items}">
                                             <div class="empty-cart">
@@ -86,13 +96,8 @@
                                                                                     <div
                                                                                         class="d-flex flex-column gap-1">
                                                                                         <div class="cart-unit-info">
-                                                                                            <span class="unit-label">Đơn
-                                                                                                vị:</span>
-                                                                                            <span
-                                                                                                class="unit-badge">${item.unitName}</span>
-                                                                                            <!-- <c:if test="${item.conversionRate > 1}">
-                                                                                                <span class="conversion-text">(Quy đổi: ${item.conversionRate} ${item.medicine.baseUnit.unitName})</span>
-                                                                                            </c:if> -->
+                                                                                            <span class="unit-label">Đơn vị:</span>
+                                                                                            <span class="unit-badge">${item.unitName}</span>
                                                                                         </div>
                                                                                         <small class="text-muted">Mã
                                                                                             thuốc:
@@ -177,7 +182,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <a href="checkout" class="btn-checkout">
+                                                    <a href="cart?mode=checkout" class="btn-checkout">
                                                         Thanh toán
                                                         <i class="fas fa-arrow-right"></i>
                                                     </a>
