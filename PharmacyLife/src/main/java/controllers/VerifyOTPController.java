@@ -3,6 +3,7 @@ package controllers;
 import dao.CustomerDAO;
 import dao.UserDAO;
 import java.io.IOException;
+import utils.EmailUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +16,32 @@ public class VerifyOTPController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String action = request.getParameter("action");
+        if ("resend".equals(action)) {
+            HttpSession session = request.getSession();
+            String otpAction = (String) session.getAttribute("otpAction");
+            String email = null;
+
+            if ("register".equals(otpAction)) {
+                email = (String) session.getAttribute("regEmail");
+            } else if ("verify-old-email".equals(otpAction)) {
+                email = (String) session.getAttribute("userEmail");
+            } else if ("verify-new-email".equals(otpAction)) {
+                email = (String) session.getAttribute("newEmailTemp");
+            } else {
+                // assume forgot password
+                email = (String) session.getAttribute("email");
+            }
+
+            if (email != null && otpAction != null) {
+                String newOtp = EmailUtils.generateOTP();
+                session.setAttribute("otp", newOtp);
+                EmailUtils.sendOTPEmail(email, newOtp, otpAction);
+                request.setAttribute("successMessage", "Mã OTP mới đã được gửi đến email của bạn.");
+            } else {
+                request.setAttribute("errorMessage", "Không thể gửi lại mã. Vui lòng thử lại sau.");
+            }
+        }
         request.getRequestDispatcher("view/client/verify-otp.jsp").forward(request, response);
     }
 
