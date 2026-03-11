@@ -652,4 +652,22 @@ public class MedicineDAO {
 
         return sb.toString();
     }
+
+    public int getTotalStockByCategory(int categoryId) {
+        String sql = "SELECT SUM(m.RemainingQuantity) AS totalStock FROM Medicine m WHERE m.CategoryId = ?";
+
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, categoryId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("totalStock");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
 }

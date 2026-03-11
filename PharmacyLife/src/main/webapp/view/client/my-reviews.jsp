@@ -275,14 +275,9 @@
                                         </span>
                                     </td>
                                     <td class="text-center">
-                                        <form method="post" action="${pageContext.request.contextPath}/reviews" onsubmit="return confirm('Bạn chắc chắn muốn xóa đánh giá này?');">
-                                            <input type="hidden" name="action" value="delete" />
-                                            <input type="hidden" name="reviewId" value="${review.reviewId}" />
-                                            <input type="hidden" name="medicineId" value="${review.medicineId}" />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger btn-delete-review" title="Xóa">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" onclick="openDeleteModal('${review.reviewId}', '${review.medicineId}')" class="btn btn-sm btn-outline-danger btn-delete-review" title="Xóa">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -296,6 +291,38 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="deleteReviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn xóa đánh giá này?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form method="post" action="${pageContext.request.contextPath}/reviews" style="display: inline;">
+                    <input type="hidden" name="action" value="delete" id="modalAction" />
+                    <input type="hidden" name="reviewId" id="modalReviewId" />
+                    <input type="hidden" name="medicineId" id="modalMedicineId" />
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openDeleteModal(reviewId, medicineId) {
+    document.getElementById('modalReviewId').value = reviewId;
+    document.getElementById('modalMedicineId').value = medicineId;
+    const modal = new bootstrap.Modal(document.getElementById('deleteReviewModal'));
+    modal.show();
+}
+</script>
 
 <script src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
 </body>

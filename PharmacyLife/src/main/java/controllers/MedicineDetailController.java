@@ -76,6 +76,17 @@ public class MedicineDetailController extends HttpServlet {
             // Lấy danh sách công dụng/tình trạng từ bảng MedicineConditions + Conditions
             List<String> conditionNames = medicineDAO.getConditionNamesByMedicineId(medicineId);
 
+            // Lấy tổng số lượng tồn kho của danh mục
+            int categoryStock = 0;
+            try {
+                if (medicine.getCategory() != null) {
+                    categoryStock = medicineDAO.getTotalStockByCategory(medicine.getCategory().getCategoryId());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                categoryStock = 0; // fallback
+            }
+
             request.setAttribute("medicine", medicine);
             request.setAttribute("ingredientNames", ingredientNames);
             request.setAttribute("conditionNames", conditionNames);
@@ -83,6 +94,7 @@ public class MedicineDetailController extends HttpServlet {
             request.setAttribute("reviews", reviews);
             request.setAttribute("averageRating", Math.round(averageRating * 10) / 10.0);
             request.setAttribute("totalReviews", totalReviews);
+            request.setAttribute("categoryStock", categoryStock);
 
             Integer customerId = getLoggedInCustomerId(request);
             boolean canReview = false;
