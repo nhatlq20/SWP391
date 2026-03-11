@@ -362,7 +362,22 @@ public class ReviewDAO {
         return normalized.toString();
     }
 
+    /**
+     * Add a new reply block. If the review already has replies, the new block is appended.
+     */
     public boolean replyReview(int reviewId, int medicineId, String replyContent, int staffId) {
+        return replyReviewInternal(reviewId, medicineId, replyContent, staffId, false);
+    }
+
+    /**
+     * Edit the last reply block authored by the given staff. If the last block is not by
+     * this staff, the new content will simply be appended just like {@code replyReview}.
+     */
+    public boolean editReply(int reviewId, int medicineId, String replyContent, int staffId) {
+        return replyReviewInternal(reviewId, medicineId, replyContent, staffId, true);
+    }
+
+    private boolean replyReviewInternal(int reviewId, int medicineId, String replyContent, int staffId, boolean editLast) {
         String selectSql = "SELECT ReplyContent, ReplyBy FROM Reviews WHERE ReviewId = ? AND MedicineId = ?";
         String updateSql = "UPDATE Reviews "
                 + "SET ReplyContent = ?, ReplyBy = ?, ReplyCreatedAt = GETDATE() "
@@ -373,7 +388,8 @@ public class ReviewDAO {
                 PreparedStatement updatePs = conn.prepareStatement(updateSql)) {
 
             String authorName = getReplyAuthorName(conn, staffId);
-            String finalReply = buildAuthorLabel(authorName, staffId) + ": " + replyContent;
+            String authorLabel = buildAuthorLabel(authorName, staffId);
+            String finalReply = authorLabel + ": " + replyContent;
 
             selectPs.setInt(1, reviewId);
             selectPs.setInt(2, medicineId);
@@ -393,10 +409,36 @@ public class ReviewDAO {
                     String fallbackAuthor = existingReplyBy != null
                             ? buildAuthorLabel(getReplyAuthorName(conn, existingReplyBy), existingReplyBy)
                             : "Khách hàng";
-                    normalizedExisting = normalizeExistingReplyBlocks(normalizedExisting, fallbackAuthor);
-                    if (!normalizedExisting.isEmpty()) {
-                        fullReplyContent = normalizedExisting + "@@BR@@" + finalReply;
+
+                    // split into blocks
+                    String[] blocks = normalizedExisting.split("@@BR@@");
+                    List<String> blockList = new ArrayList<>();
+                    for (String b : blocks) {
+                        if (b != null && !b.trim().isEmpty()) {
+                            blockList.add(b);
+                        }
                     }
+
+                    if (editLast && !blockList.isEmpty()) {
+                        String last = blockList.get(blockList.size() - 1);
+                        if (last.startsWith(authorLabel + ":")) {
+                            // replace last block
+                            blockList.remove(blockList.size() - 1);
+                        }
+                    }
+
+                    StringBuilder builder = new StringBuilder();
+                    for (String b : blockList) {
+                        if (builder.length() > 0) {
+                            builder.append("@@BR@@");
+                        }
+                        builder.append(b);
+                    }
+                    if (builder.length() > 0) {
+                        builder.append("@@BR@@");
+                    }
+                    builder.append(finalReply);
+                    fullReplyContent = builder.toString();
                 }
             }
 
@@ -433,8 +475,9 @@ public class ReviewDAO {
         return reviews;
     }
 
-    public List<Review> getAllReview() {
-        return getAllReviews();
+    public boolean deleteReply(int reviewId, int medicineId) {
+        // Delete the entire review
+        return deleteReviewByAdminOrStaff(reviewId);
     }
 
     // Kiểm tra khách hàng đã đánh giá sản phẩm này chưa

@@ -40,9 +40,7 @@
                                         <th class="medicine-code-col">Mã thuốc</th>
                                         <th>Ảnh</th>
                                         <th>Tên thuốc</th>
-                                        <th>Giá</th>
-                                        <th>Đơn vị</th>
-                                        <th>Số lượng</th>
+                                        <th>Tồn kho theo đơn vị</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -70,33 +68,34 @@
                                                         </c:choose>
                                                     </td>
                                                     <td><c:out value="${m.medicineName}" /></td>
-                                                    <td class="price">
-                                                        <c:choose>
-                                                            <c:when test="${m.sellingPrice gt 0}">
-                                                                <fmt:formatNumber value="${m.sellingPrice}" pattern="#,##0.0" />đ
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <span class="text-muted">-</span>
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </td>
                                                     <td>
+                                                        <c:set var="units" value="${medicineUnits[m.medicineId]}" />
                                                         <c:choose>
-                                                            <c:when test="${not empty m.unit}">
-                                                                <c:out value="${m.unit}" />
+                                                            <c:when test="${not empty units}">
+                                                                <c:forEach items="${units}" var="unit" varStatus="unitStatus">
+                                                                    <span class="badge bg-info me-2 mb-1" title="Quy đổi: 1 ${unit.unitName} = ${unit.conversionRate} básic unit">
+                                                                        <c:out value="${unit.unitName}" />:
+                                                                        <c:choose>
+                                                                            <c:when test="${unit.conversionRate > 0}">
+                                                                                <c:set var="quantity" value="${m.remainingQuantity / unit.conversionRate}" />
+                                                                                <fmt:formatNumber value="${quantity}" maxFractionDigits="0" />
+                                                                            </c:when>
+                                                                            <c:otherwise>0</c:otherwise>
+                                                                        </c:choose>
+                                                                    </span>
+                                                                </c:forEach>
                                                             </c:when>
                                                             <c:otherwise>
                                                                 <span class="text-muted">-</span>
                                                             </c:otherwise>
                                                         </c:choose>
                                                     </td>
-                                                    <td><c:out value="${m.remainingQuantity}" /></td>
                                                 </tr>
                                             </c:forEach>
                                         </c:when>
                                         <c:otherwise>
                                             <tr>
-                                                <td colspan="6" class="text-center text-muted py-4">Danh mục này chưa có thuốc.</td>
+                                                <td colspan="5" class="text-center text-muted py-4">Danh mục này chưa có thuốc.</td>
                                             </tr>
                                         </c:otherwise>
                                     </c:choose>

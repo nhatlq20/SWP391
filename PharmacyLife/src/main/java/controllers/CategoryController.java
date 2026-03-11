@@ -1,8 +1,11 @@
 package controllers;
 
 import dao.CategoryDAO;
+import dao.MedicineUnitDAO;
 import models.Category;
 import models.Medicine;
+import models.MedicineUnit;
+import java.util.HashMap;
 import java.io.IOException;
 import java.util.List;
 import jakarta.servlet.ServletException;
@@ -16,10 +19,12 @@ public class CategoryController extends HttpServlet {
 
 	private static final int ADMIN_ROLE_ID = 1;
 	private CategoryDAO dao;
+	private MedicineUnitDAO medicineUnitDAO;
 
 	@Override
 	public void init() throws ServletException {
 		dao = new CategoryDAO();
+		medicineUnitDAO = new MedicineUnitDAO();
 	}
 
 	@Override
@@ -101,7 +106,15 @@ public class CategoryController extends HttpServlet {
 			return;
 		}
 
+		// Get units for each medicine
+		HashMap<Integer, List<MedicineUnit>> medicineUnits = new HashMap<>();
+		for (Medicine m : medicine) {
+			List<MedicineUnit> units = medicineUnitDAO.getUnitsByMedicineId(m.getMedicineId());
+			medicineUnits.put(m.getMedicineId(), units);
+		}
+
 		request.setAttribute("medicineList", medicine);
+		request.setAttribute("medicineUnits", medicineUnits);
 		request.setAttribute("category", category);
 
 		request.getRequestDispatcher("/view/admin/category-detail.jsp")

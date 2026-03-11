@@ -61,11 +61,23 @@ public class ReplyReviewController extends HttpServlet {
 
         Integer replyUserId = getReplyUserId(request);
         if (replyUserId == null) {
+            // user not allowed to reply (not logged in or not staff/admin)
             if (ajaxRequest) {
                 writeJson(response, HttpServletResponse.SC_UNAUTHORIZED, "{\"success\":false,\"message\":\"Unauthorized\"}");
                 return;
             }
-            response.sendRedirect(request.getContextPath() + "/login");
+            // instead of sending to login directly, go back to medicine detail if available
+            String medParam = request.getParameter("medicineId");
+            String revParam = request.getParameter("reviewId");
+            if (medParam != null && !medParam.trim().isEmpty()) {
+                String target = request.getContextPath() + "/medicine/detail?id=" + medParam;
+                if (revParam != null && !revParam.trim().isEmpty()) {
+                    target += "#review-" + revParam.trim();
+                }
+                response.sendRedirect(target);
+            } else {
+                response.sendRedirect(request.getContextPath() + "/home");
+            }
             return;
         }
 
@@ -73,13 +85,15 @@ public class ReplyReviewController extends HttpServlet {
         String replyContent = request.getParameter("replyContent");
         String medicineIdParam = request.getParameter("medicineId");
         String returnTo = request.getParameter("returnTo");
+        boolean edit = "true".equalsIgnoreCase(request.getParameter("edit"));
+        boolean delete = "true".equalsIgnoreCase(request.getParameter("delete"));
 
         boolean returnToDetail = "detail".equalsIgnoreCase(returnTo);
         String trimmedReply = replyContent == null ? "" : replyContent.trim();
 
         if (reviewIdParam == null || reviewIdParam.trim().isEmpty()
             || medicineIdParam == null || medicineIdParam.trim().isEmpty()
-                || trimmedReply.isEmpty()) {
+                || (!delete && trimmedReply.isEmpty())) {
             if (ajaxRequest) {
                 writeJson(response, HttpServletResponse.SC_BAD_REQUEST, "{\"success\":false,\"message\":\"Invalid input\"}");
                 return;
@@ -101,7 +115,14 @@ public class ReplyReviewController extends HttpServlet {
             int reviewId = Integer.parseInt(reviewIdParam);
             int medicineId = Integer.parseInt(medicineIdParam);
             ReviewDAO dao = new ReviewDAO();
-            boolean updated = dao.replyReview(reviewId, medicineId, trimmedReply, replyUserId);
+            boolean updated;
+            if (delete) {
+                updated = dao.deleteReply(reviewId, medicineId);
+            } else if (edit) {
+                updated = dao.editReply(reviewId, medicineId, trimmedReply, replyUserId);
+            } else {
+                updated = dao.replyReview(reviewId, medicineId, trimmedReply, replyUserId);
+            }
 
             if (!updated) {
                 if (ajaxRequest) {
