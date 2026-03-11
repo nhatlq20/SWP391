@@ -48,3 +48,26 @@
 .back-link:hover {
     text-decoration: underline;
 }
+
+/* Keep medicine package images fully visible inside cards */
+.medicine-card .card-img-top {
+    height: 220px;
+    width: 100%;
+    object-fit: contain;
+    background: #ffffff;
+    padding: 10px;
+}
+
+@media (max-width: 768px) {
+    .medicine-card .card-img-top {
+        height: 180px;
+        padding: 8px;
+    }
+}
+
+@media (max-width: 576px) {
+    .medicine-card .card-img-top {
+        height: 150px;
+        padding: 6px;
+    }
+}
