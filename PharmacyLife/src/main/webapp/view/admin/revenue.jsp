@@ -7,7 +7,8 @@
             <head>
                 <title>Quản lí doanh thu</title>
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/revenue-dashboard.css">
+                <link rel="stylesheet"
+                    href="${pageContext.request.contextPath}/assets/css/revenue-dashboard.css?v=${System.currentTimeMillis()}">
             </head>
 
             <body>
@@ -40,9 +41,8 @@
                                 </form>
                             </div>
                             <!-- KPI Section Title -->
-                            <div class="d-flex align-items-end mb-3" style="gap:12px;">
-                                <div style="font-size:22px;font-weight:700;color:#2a60e8;">Tổng quan</div>
-                            </div>
+                            <div class="section-title mt-0 mb-3" style="color: #2a60e8;"><i
+                                    class="fas fa-layer-group me-2"></i>Tổng quan</div>
                             <!-- KPI Cards -->
                             <div class="row gap-24 mb-4">
                                 <div class="col-12 col-sm-6 col-lg-3">
@@ -114,7 +114,8 @@
                                 </div>
                             </div>
                             <!-- Order Status Section -->
-                            <div class="section-title">Thống kê đơn hàng</div>
+                            <div class="section-title" style="color: #e67e22;"><i
+                                    class="fas fa-clipboard-list me-2"></i>Thống kê đơn hàng</div>
                             <div class="row gap-24">
                                 <div class="col-12 col-md-4">
                                     <div class="order-status-card">
@@ -151,15 +152,17 @@
                             <!-- Top Lists Section -->
                             <div class="row gap-24 mt-4">
                                 <!-- Top Products -->
-                                <div class="col-12 col-xl-6">
-                                    <div class="section-title">Top 5 Sản phẩm bán chạy nhất</div>
-                                    <div class="table-responsive bg-white rounded shadow-sm p-3 border-0">
-                                        <table class="table table-hover align-middle mb-0">
+                                <div class="col-12 col-xl-6 d-flex flex-column">
+                                    <div class="section-title mt-0" style="color: #27ae60;"><i
+                                            class="fas fa-capsules me-2"></i>Top 5 Sản phẩm bán chạy nhất</div>
+                                    <div class="table-responsive bg-white rounded shadow-sm p-3 border-0 flex-grow-1">
+                                        <table class="table table-hover align-middle mb-0"
+                                            style="table-layout: fixed; width: 100%;">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th>Tên thuốc</th>
-                                                    <th class="text-center">SL bán</th>
-                                                    <th class="text-end">Doanh thu</th>
+                                                    <th style="width: 50%;">Tên thuốc</th>
+                                                    <th class="text-center" style="width: 20%;">SL bán</th>
+                                                    <th class="text-end" style="width: 30%;">Doanh thu</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -184,15 +187,17 @@
                                     </div>
                                 </div>
                                 <!-- Top Customers -->
-                                <div class="col-12 col-xl-6">
-                                    <div class="section-title">Top 5 Khách hàng mua nhiều nhất</div>
-                                    <div class="table-responsive bg-white rounded shadow-sm p-3 border-0">
-                                        <table class="table table-hover align-middle mb-0">
+                                <div class="col-12 col-xl-6 d-flex flex-column">
+                                    <div class="section-title mt-0" style="color: #e74c3c;"><i
+                                            class="fas fa-user-tag me-2"></i>Top 5 Khách hàng mua nhiều nhất</div>
+                                    <div class="table-responsive bg-white rounded shadow-sm p-3 border-0 flex-grow-1">
+                                        <table class="table table-hover align-middle mb-0"
+                                            style="table-layout: fixed; width: 100%;">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th>Khách hàng</th>
-                                                    <th class="text-center">Số đơn</th>
-                                                    <th class="text-end">Tiền đã mua</th>
+                                                    <th style="width: 50%;">Khách hàng</th>
+                                                    <th class="text-center" style="width: 20%;">Số đơn</th>
+                                                    <th class="text-end" style="width: 30%;">Tiền đã mua</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
