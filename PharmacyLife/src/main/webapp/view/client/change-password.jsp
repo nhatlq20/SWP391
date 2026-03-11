@@ -38,20 +38,25 @@
                 </div>
                 </c:if>
 
-                <form action="${pageContext.request.contextPath}/change-password" method="post" class="password-form">
+                <form action="${pageContext.request.contextPath}/change-password" method="post" class="password-form" id="changePasswordForm" novalidate>
                     <div class="form-group">
                         <label>Mật khẩu hiện tại</label>
-                        <input type="password" name="currentPassword" placeholder="Nhập mật khẩu hiện tại của bạn" required>
+                        <input type="password" name="currentPassword" id="currentPassword" placeholder="Nhập mật khẩu hiện tại của bạn" required>
                     </div>
 
                     <div class="form-group">
                         <label>Mật khẩu mới</label>
-                        <input type="password" name="newPassword" placeholder="Nhập mật khẩu mới của bạn" required minlength="8" maxlength="16">
+                        <input type="password" name="newPassword" id="newPassword" placeholder="Nhập mật khẩu mới của bạn" required>
                     </div>
 
                     <div class="form-group">
                         <label>Nhập lại mật khẩu mới</label>
-                        <input type="password" name="confirmPassword" placeholder="Nhập lại mật khẩu mới của bạn" required minlength="8" maxlength="16">
+                        <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Nhập lại mật khẩu mới của bạn" required>
+                    </div>
+
+                    <div id="passwordError" class="alert alert-error" style="display: none; margin-bottom: 20px; align-items: center; gap: 8px;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="errorText"></span>
                     </div>
 
                     <button type="submit" class="submit-btn">Lưu thay đổi</button>
@@ -59,5 +64,49 @@
             </div>
         </div>
     </div>
+
+    <script>
+        const form = document.getElementById('changePasswordForm');
+        const currentPassword = document.getElementById('currentPassword');
+        const newPassword = document.getElementById('newPassword');
+        const confirmPassword = document.getElementById('confirmPassword');
+        const errorDiv = document.getElementById('passwordError');
+        const errorText = document.getElementById('errorText');
+
+        function showError(message) {
+            errorText.innerText = message;
+            errorDiv.style.display = 'flex';
+        }
+
+        function hideError() {
+            errorDiv.style.display = 'none';
+        }
+
+        form.addEventListener('submit', function(e) {
+            hideError();
+
+            if (!currentPassword.value) {
+                e.preventDefault();
+                showError("Vui lòng nhập mật khẩu hiện tại");
+                return;
+            }
+
+            if (newPassword.value.length < 8 || newPassword.value.length > 16) {
+                e.preventDefault();
+                showError("Mật khẩu mới phải từ 8 đến 16 ký tự");
+                return;
+            }
+
+            if (newPassword.value !== confirmPassword.value) {
+                e.preventDefault();
+                showError("Mật khẩu xác nhận không khớp");
+                return;
+            }
+        });
+
+        [currentPassword, newPassword, confirmPassword].forEach(input => {
+            input.addEventListener('input', hideError);
+        });
+    </script>
 </body>
 </html>

@@ -25,66 +25,67 @@ public class EmailUtils {
     }
 
     public static boolean sendOTPEmail(String toEmail, String otp, String action) {
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", HOST);
-        props.put("mail.smtp.port", PORT);
+        executor.submit(() -> {
+            Properties props = new Properties();
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.host", HOST);
+            props.put("mail.smtp.port", PORT);
 
-        Session session = Session.getInstance(props, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(EMAIL, PASSWORD);
+            Session session = Session.getInstance(props, new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(EMAIL, PASSWORD);
+                }
+            });
+
+            try {
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(EMAIL, "PharmacyLife Support"));
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+                message.setSubject("Mã xác thực OTP - PharmacyLife");
+
+                String actionText = "";
+                switch (action) {
+                    case "register":
+                        actionText = "hoàn tất đăng ký tài khoản";
+                        break;
+                    case "change-email":
+                        actionText = "xác thực việc đổi địa chỉ email (email cũ)";
+                        break;
+                    case "verify-new-email":
+                        actionText = "xác thực địa chỉ email mới của bạn";
+                        break;
+                    default:
+                        actionText = "hoàn tất thủ tục thay đổi mật khẩu";
+                        break;
+                }
+
+                String htmlContent = "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">"
+                        + "  <div style=\"margin:50px auto;width:70%;padding:20px 0\">"
+                        + "    <div style=\"border-bottom:1px solid #eee\">"
+                        + "      <a href=\"\" style=\"font-size:1.4em;color: #4F81E1;text-decoration:none;font-weight:600\">PharmacyLife</a>"
+                        + "    </div>"
+                        + "    <p style=\"font-size:1.1em\">Xin chào,</p>"
+                        + "    <p>Cảm ơn bạn đã lựa chọn PharmacyLife. Sử dụng mã OTP sau đây để " + actionText + ". Mã OTP có hiệu lực trong vòng 5 phút.</p>"
+                        + "    <h2 style=\"background: #4F81E1;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;\">" + otp + "</h2>"
+                        + "    <p style=\"font-size:0.9em;\">Trân trọng,<br />Đội ngũ PharmacyLife</p>"
+                        + "    <hr style=\"border:none;border-top:1px solid #eee\" />"
+                        + "    <div style=\"float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300\">"
+                        + "      <p>PharmacyLife Inc</p>"
+                        + "      <p>123 Nguyen Van Cu Street, Can Tho, Viet Nam</p>"
+                        + "    </div>"
+                        + "  </div>"
+                        + "</div>";
+
+                message.setContent(htmlContent, "text/html; charset=utf-8");
+
+                Transport.send(message);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
-
-        try {
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(EMAIL, "PharmacyLife Support"));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
-            message.setSubject("Mã xác thực OTP - PharmacyLife");
-
-            String actionText = "";
-            switch (action) {
-                case "register":
-                    actionText = "hoàn tất đăng ký tài khoản";
-                    break;
-                case "change-email":
-                    actionText = "xác thực việc đổi địa chỉ email (email cũ)";
-                    break;
-                case "verify-new-email":
-                    actionText = "xác thực địa chỉ email mới của bạn";
-                    break;
-                default:
-                    actionText = "hoàn tất thủ tục thay đổi mật khẩu";
-                    break;
-            }
-
-            String htmlContent = "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">"
-                    + "  <div style=\"margin:50px auto;width:70%;padding:20px 0\">"
-                    + "    <div style=\"border-bottom:1px solid #eee\">"
-                    + "      <a href=\"\" style=\"font-size:1.4em;color: #4F81E1;text-decoration:none;font-weight:600\">PharmacyLife</a>"
-                    + "    </div>"
-                    + "    <p style=\"font-size:1.1em\">Xin chào,</p>"
-                    + "    <p>Cảm ơn bạn đã lựa chọn PharmacyLife. Sử dụng mã OTP sau đây để " + actionText + ". Mã OTP có hiệu lực trong vòng 5 phút.</p>"
-                    + "    <h2 style=\"background: #4F81E1;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;\">" + otp + "</h2>"
-                    + "    <p style=\"font-size:0.9em;\">Trân trọng,<br />Đội ngũ PharmacyLife</p>"
-                    + "    <hr style=\"border:none;border-top:1px solid #eee\" />"
-                    + "    <div style=\"float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300\">"
-                    + "      <p>PharmacyLife Inc</p>"
-                    + "      <p>123 Nguyen Van Cu Street, Can Tho, Viet Nam</p>"
-                    + "    </div>"
-                    + "  </div>"
-                    + "</div>";
-
-            message.setContent(htmlContent, "text/html; charset=utf-8");
-
-            Transport.send(message);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        return true;
     }
 
     public static boolean sendOTPEmail(String toEmail, String otp) {

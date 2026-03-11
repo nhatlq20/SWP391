@@ -43,7 +43,7 @@
         </form>
         
         <div class="back-link">
-            Chưa nhận được mã? <a href="${pageContext.request.contextPath}/change-email">Quay lại gửi mã</a>
+            Chưa nhận được mã? <a href="${pageContext.request.contextPath}/verify-otp?action=resend">Gửi lại mã</a>
         </div>
     </div>
 </body>
