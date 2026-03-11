@@ -863,7 +863,7 @@ qty-input::-webkit-inner-spin-button {
 
 .btn-danh-gia {
     margin-left: 50px;
-    width: 250px;
+    width: 220px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -873,8 +873,8 @@ qty-input::-webkit-inner-spin-button {
 .btn-danh-gia a.btn,
 .btn-danh-gia button.btn {
     width: 100%;
-    padding: 10px 10px;
-    font-size: 1.2rem;
+    padding: 8px 10px;
+    font-size: 1rem;
     font-weight: 600;
     border-radius: 20px;
     text-align: center;
