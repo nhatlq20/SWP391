@@ -22,19 +22,29 @@
                         <h2 class="page-title"><i class="fas fa-list me-2 text-primary"></i>Chi tiết danh mục</h2>
                         <a class="btn btn-secondary btn-back" href="${pageContext.request.contextPath}/category?action=list"><i class="fas fa-arrow-left me-1"></i>Trở lại</a>
                     </div>
-                    <div class="category-detail-card">
-                        <div class="row mb-4">
+                    <div class="category-meta-card mb-3">
+                        <div class="row g-3 align-items-center">
                             <div class="col-12 col-md-6 text-start">
                                 <span class="category-info-label">Mã danh mục:</span>
-                                <span class="category-info-value ms-2"><c:out value="${category.categoryCode}" /></span>
+                                <span class="category-info-value category-code-value ms-2">
+                                    <c:choose>
+                                        <c:when test="${not empty category.categoryCode}">
+                                            <c:out value="${category.categoryCode}" />
+                                        </c:when>
+                                        <c:otherwise>Chưa có mã</c:otherwise>
+                                    </c:choose>
+                                </span>
                             </div>
-                            <div class="col-12 col-md-6 text-end">
+                            <div class="col-12 col-md-6 text-md-end text-start">
                                 <span class="category-info-label">Tên danh mục:</span>
                                 <span class="category-info-value ms-2"><c:out value="${category.categoryName}" /></span>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="category-detail-card">
                         <div class="table-responsive">
-                            <table class="table table-hover table-bordered medicine-table align-middle mb-0">
+                            <table class="table table-hover table-bordered medicine-table  mb-0">
                                 <thead>
                                     <tr>
                                         <th class="medicine-code-col">Mã thuốc</th>
@@ -73,7 +83,7 @@
                                                         <c:choose>
                                                             <c:when test="${not empty units}">
                                                                 <c:forEach items="${units}" var="unit" varStatus="unitStatus">
-                                                                    <span class="badge bg-info me-2 mb-1" title="Quy đổi: 1 ${unit.unitName} = ${unit.conversionRate} básic unit">
+                                                                    <span class="unit-pill me-2 mb-1" title="Quy đổi: 1 ${unit.unitName} = ${unit.conversionRate} básic unit">
                                                                         <c:out value="${unit.unitName}" />:
                                                                         <c:choose>
                                                                             <c:when test="${unit.conversionRate > 0}">

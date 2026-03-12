@@ -14,7 +14,7 @@
         
         </head>
 
-        <body class="bg-light">
+        <body class="bg-light" data-open-add-category-modal="${not empty errorMessage}">
             <jsp:include page="/view/common/header.jsp" />
             <jsp:include page="/view/common/sidebar.jsp" />
 
@@ -34,10 +34,10 @@
                         </form>
                         <c:if
                             test="${sessionScope.userType eq 'staff' and fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
-                            <a href="${pageContext.request.contextPath}/category?action=show"
-                                class="btn-add-medicine ms-2">
+                            <button type="button" class="btn-add-medicine ms-2" data-bs-toggle="modal"
+                                data-bs-target="#addCategoryModal">
                                 <i class="fas fa-plus"></i> Thêm danh mục mới
-                            </a>
+                            </button>
                         </c:if>
                     </div>
                 </div>
@@ -88,6 +88,46 @@
                 </div>
             </div>
 
+            <c:if
+                test="${sessionScope.userType eq 'staff' and fn:toLowerCase(fn:trim(sessionScope.roleName)) eq 'admin'}">
+                <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Thêm danh mục mới</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <form action="${pageContext.request.contextPath}/category" method="post">
+                                <input type="hidden" name="action" value="insert" />
+                                <div class="modal-body">
+                                    <c:if test="${not empty errorMessage}">
+                                        <div class="alert alert-danger py-2 mb-3" role="alert">${errorMessage}</div>
+                                    </c:if>
+
+                                    <div class="mb-3">
+                                        <label class="form-label" for="modalCategoryCode">Mã mục</label>
+                                        <input type="text" id="modalCategoryCode" class="form-control"
+                                            value="${nextCategoryCode}" readonly>
+                                    </div>
+
+                                    <div class="mb-0">
+                                        <label class="form-label" for="modalCategoryName">Tên danh mục</label>
+                                        <input type="text" id="modalCategoryName" name="categoryName"
+                                            class="form-control" placeholder="Nhập tên danh mục"
+                                            value="${categoryNameInput}" required />
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="submit" class="btn btn-primary">Thêm</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </c:if>
+
                 <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content border-0 shadow">
@@ -128,6 +168,14 @@
                                 window.location.href = deleteUrl;
                             }
                         });
+
+                        const shouldOpenAddModal = document.body.dataset.openAddCategoryModal === 'true';
+                        if (shouldOpenAddModal) {
+                            const addModalEl = document.getElementById('addCategoryModal');
+                            if (addModalEl) {
+                                new bootstrap.Modal(addModalEl).show();
+                            }
+                        }
                     })();
 
                     function filterCategoryTable() {
