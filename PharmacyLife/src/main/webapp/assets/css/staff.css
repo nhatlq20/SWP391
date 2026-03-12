@@ -201,6 +201,9 @@ table.staff-table tr:last-child td {
     text-decoration: none;
     font-weight: 600;
     transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .btn-cancel:hover {
@@ -216,6 +219,9 @@ table.staff-table tr:last-child td {
     cursor: pointer;
     font-weight: 600;
     transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .btn-submit:hover {

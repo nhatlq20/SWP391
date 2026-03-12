@@ -122,7 +122,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-actions d-flex justify-content-between mt-5">
+                                    <div class="form-actions d-flex justify-content-between align-items-center mt-5">
                                         <a href="${pageContext.request.contextPath}/admin/manage-staff" class="btn-cancel">
                                             <i class="fas fa-chevron-left"></i> Trở lại
                                         </a>
