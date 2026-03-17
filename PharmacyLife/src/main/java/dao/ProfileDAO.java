@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import models.Customer;
 import models.Staff;
 import utils.DBContext;
+import utils.HashMD5;
 
 /**
  * ProfileDAO - Handles profile-related operations for both Customer and Staff
@@ -154,7 +155,7 @@ public class ProfileDAO {
         try (Connection conn = new DBContext().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, newPassword);
+            ps.setString(1, HashMD5.getMd5(newPassword));
             ps.setInt(2, customerId);
             
             int result = ps.executeUpdate();
@@ -174,7 +175,7 @@ public class ProfileDAO {
         try (Connection conn = new DBContext().getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, newPassword);
+            ps.setString(1, HashMD5.getMd5(newPassword));
             ps.setInt(2, staffId);
             
             int result = ps.executeUpdate();

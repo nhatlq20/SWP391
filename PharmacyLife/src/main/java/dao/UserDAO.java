@@ -10,13 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 import models.User;
 import utils.DBContext;
+import utils.HashMD5;
 
 public class UserDAO {
 
     private DBContext dbContext = new DBContext();
 
-    public User CheckUser(String usernameOrEmail, String passwordMd5) {
+    public User CheckUser(String usernameOrEmail, String password) {
         // Since CheckUser is used for login and our tables have different passwords, we'll try Customer and then Staff.
+        String passwordMd5 = HashMD5.getMd5(password);
         final String sqlCustomer = "SELECT CustomerId as UserID, CustomerCode as Username, Email, Password, FullName, PhoneNumber, IsActive, CreatedAt, NULL as UpdatedAt, 'Customer' as RoleName "
                 + "FROM Customer "
                 + "WHERE (CustomerCode = ? OR Email = ?) AND Password = ? AND IsActive = 1";
@@ -159,7 +161,7 @@ public class UserDAO {
             ps.setString(1, user.getUsername()); // We use username as CustomerCode
             ps.setString(2, user.getFullName());
             ps.setString(3, user.getEmail());
-            ps.setString(4, user.getPassword());
+            ps.setString(4, HashMD5.getMd5(user.getPassword()));
             ps.setString(5, user.getPhoneNumber());
             ps.setBoolean(6, user.isIsActive());
             ps.setTimestamp(7, java.sql.Timestamp.valueOf(user.getCreatedAt().atStartOfDay()));
@@ -225,14 +227,14 @@ public class UserDAO {
             // For now, trying both is safer than doing nothing.
             
             try (PreparedStatement ps = conn.prepareStatement(sqlCustomer)) {
-                ps.setString(1, newPassword);
+                ps.setString(1, HashMD5.getMd5(newPassword));
                 ps.setInt(2, userId);
                 int rows = ps.executeUpdate();
                 if (rows > 0) return true;
             }
             
             try (PreparedStatement ps = conn.prepareStatement(sqlStaff)) {
-                ps.setString(1, newPassword);
+                ps.setString(1, HashMD5.getMd5(newPassword));
                 ps.setInt(2, userId);
                 int rows = ps.executeUpdate();
                 if (rows > 0) return true;
@@ -245,20 +247,21 @@ public class UserDAO {
     }
 
     public boolean updatePasswordByEmail(String email, String newPassword) {
+        String hashedPwd = HashMD5.getMd5(newPassword);
         final String sqlCustomer = "UPDATE Customer SET Password = ? WHERE LOWER(Email) = LOWER(?) AND IsActive = 1";
         final String sqlStaff = "UPDATE Staff SET StaffPassword = ? WHERE LOWER(StaffEmail) = LOWER(?) AND StaffIsActive = 1";
         try (Connection conn = dbContext.getConnection()) {
             int totalUpdatedRows = 0;
 
             try (PreparedStatement ps = conn.prepareStatement(sqlCustomer)) {
-                ps.setString(1, newPassword);
+                ps.setString(1, hashedPwd);
                 ps.setString(2, email);
                 int rows = ps.executeUpdate();
                 totalUpdatedRows += rows;
             }
 
             try (PreparedStatement ps = conn.prepareStatement(sqlStaff)) {
-                ps.setString(1, newPassword);
+                ps.setString(1, hashedPwd);
                 ps.setString(2, email);
                 int rows = ps.executeUpdate();
                 totalUpdatedRows += rows;
