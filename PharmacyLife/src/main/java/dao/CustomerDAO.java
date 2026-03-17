@@ -175,7 +175,11 @@ public class CustomerDAO {
             ps.setString(1, customerCode);
             ps.setString(2, fullName);
             ps.setString(3, email);
-            ps.setString(4, HashMD5.getMd5(password));
+            if (password != null) {
+                ps.setString(4, HashMD5.getMd5(password));
+            } else {
+                ps.setNull(4, java.sql.Types.VARCHAR);
+            }
             ps.setString(5, phone);
             ps.setBoolean(6, true); // IsActive
             ps.setTimestamp(7, new Timestamp(System.currentTimeMillis())); // CreatedAt

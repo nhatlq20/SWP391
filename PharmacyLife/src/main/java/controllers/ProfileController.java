@@ -120,6 +120,7 @@ public class ProfileController extends HttpServlet {
             user.setAddress(customer.getAddress());
             user.setDob(customer.getDob());
             user.setGender(customer.getGender());
+            user.setPassword(customer.getPassword());
             user.setRoleID(0); // Use 0 to represent customer since they don't have roleId
 
         } else if ("staff".equals(userType) && loggedInUser instanceof Staff) {
@@ -136,6 +137,7 @@ public class ProfileController extends HttpServlet {
             user.setGender(staffGender);
             // Staff has getRoleId() (lowercase 'd')
             user.setRoleID(staff.getRoleId());
+            user.setPassword(staff.getStaffPassword());
         }
 
         request.setAttribute("user", user);
@@ -314,6 +316,7 @@ public class ProfileController extends HttpServlet {
         private Date dob;
         private String gender;
         private int roleID;
+        private String password;
 
         public String getFullName() {
             return fullName;
@@ -369,6 +372,14 @@ public class ProfileController extends HttpServlet {
 
         public void setRoleID(int roleID) {
             this.roleID = roleID;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
         }
     }
 

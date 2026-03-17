@@ -56,8 +56,8 @@ public class LoginController extends HttpServlet {
 
             if (customer == null) {
                 // Email doesn't exist, create a new customer account
-                // Using a default password since they login with Google
-                String defaultPassword = "GoogleLogin_" + System.currentTimeMillis();
+                // Using NULL for password since they login with Google
+                String defaultPassword = null;
                 // Register with full name and email from Google, and an empty phone number
                 boolean isRegistered = customerDAO.registerCustomer(
                         googleAccount.getName(),
