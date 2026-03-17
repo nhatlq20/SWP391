@@ -24,23 +24,15 @@
                         <div class="main-content">
                             <div class="container">
                                 <!-- Search header -->
-                                <div class="search-header rounded p-4 mb-4">
-                                    <c:choose>
-                                        <c:when test="${not empty keyword}">
-                                            <h2><i class="fas fa-search me-2"></i>Kết quả tìm kiếm cho:
-                                                <span class="keyword-highlight">"
-                                                    <c:out value='${keyword}' />"
-                                                </span>
-                                            </h2>
-                                            <!-- <span class="result-count">Tìm thấy <strong>${resultCount}</strong> sản
-                                                phẩm</span> -->
-                                        </c:when>
-                                        <c:otherwise>
-                                            <h2><i class="fas fa-search me-2"></i>Tìm kiếm sản phẩm</h2>
-                                            <span class="result-count">Vui lòng nhập từ khóa để tìm kiếm</span>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </div>
+                                <c:if test="${not empty keyword}">
+                                    <div class="search-header rounded p-4 mb-4">
+                                        <h2><i class="fas fa-search me-2"></i>Kết quả tìm kiếm cho:
+                                            <span class="keyword-highlight">"
+                                                <c:out value='${keyword}' />"
+                                            </span>
+                                        </h2>
+                                    </div>
+                                </c:if>
 
                                 <!-- Search results -->
                                 <c:choose>
