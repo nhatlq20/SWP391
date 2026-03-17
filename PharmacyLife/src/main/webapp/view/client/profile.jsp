@@ -142,17 +142,19 @@
                             Lưu
                         </button>
                         
-                        <c:if test="${user.roleID == 0}">
+                        <c:if test="${user.roleID == 0 && not empty user.password}">
                             <button type="button" class="btn btn-warning" onclick="window.location.href='${pageContext.request.contextPath}/change-email'" style="background-color: #4F81E1; border-color: #4F81E1;">
                                 <img src="${pageContext.request.contextPath}/assets/img/email.png" alt="Change Email">
                                 Thay đổi Email
                             </button>
                         </c:if>
                         
-                        <button type="button" class="btn btn-secondary" onclick="window.location.href='${pageContext.request.contextPath}/change-password'">
-                            <img src="${pageContext.request.contextPath}/assets/img/pass.png" alt="Change Password">
-                            Đổi mật khẩu
-                        </button>
+                        <c:if test="${not empty user.password}">
+                            <button type="button" class="btn btn-secondary" onclick="window.location.href='${pageContext.request.contextPath}/change-password'">
+                                <img src="${pageContext.request.contextPath}/assets/img/pass.png" alt="Change Password">
+                                Đổi mật khẩu
+                            </button>
+                        </c:if>
                     </div>
                 </form>
             </div>
