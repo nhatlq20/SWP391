@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import models.Staff;
 import utils.DBContext;
+import utils.HashMD5;
 
 public class StaffDAO {
 
@@ -155,7 +156,7 @@ public class StaffDAO {
             ps.setString(1, staffCode);
             ps.setString(2, s.getStaffName());
             ps.setString(3, s.getStaffEmail());
-            ps.setString(4, s.getStaffPassword() != null ? s.getStaffPassword() : "");
+            ps.setString(4, s.getStaffPassword() != null ? HashMD5.getMd5(s.getStaffPassword()) : "");
             ps.setString(5, s.getStaffPhone() != null ? s.getStaffPhone() : "");
             ps.setString(6, s.getStaffAddress() != null ? s.getStaffAddress() : "");
             if (s.getStaffDob() != null) {
@@ -211,7 +212,7 @@ public class StaffDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, email);
-            ps.setString(2, password);
+            ps.setString(2, HashMD5.getMd5(password));
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {

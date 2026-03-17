@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import models.Customer;
 import utils.DBContext;
+import utils.HashMD5;
 
 /**
  *
@@ -25,7 +26,7 @@ public class CustomerDAO {
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, email);
-            ps.setString(2, password);
+            ps.setString(2, HashMD5.getMd5(password));
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
@@ -174,7 +175,7 @@ public class CustomerDAO {
             ps.setString(1, customerCode);
             ps.setString(2, fullName);
             ps.setString(3, email);
-            ps.setString(4, password);
+            ps.setString(4, HashMD5.getMd5(password));
             ps.setString(5, phone);
             ps.setBoolean(6, true); // IsActive
             ps.setTimestamp(7, new Timestamp(System.currentTimeMillis())); // CreatedAt

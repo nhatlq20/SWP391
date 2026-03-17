@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import utils.HashMD5;
 
 /**
  * ChangePasswordController - Handles password change functionality
@@ -107,7 +108,7 @@ public class ChangePasswordController extends HttpServlet {
                 Customer customer = (Customer) loggedInUser;
 
                 // Verify current password
-                if (!customer.getPassword().equals(currentPassword)) {
+                if (!customer.getPassword().equals(HashMD5.getMd5(currentPassword))) {
                     errorMsg = "Mật khẩu hiện tại không đúng!";
                 } else {
                     success = profileDAO.changeCustomerPassword(userId, newPassword);
@@ -121,7 +122,7 @@ public class ChangePasswordController extends HttpServlet {
                 Staff staff = (Staff) loggedInUser;
 
                 // Verify current password
-                if (!staff.getStaffPassword().equals(currentPassword)) {
+                if (!staff.getStaffPassword().equals(HashMD5.getMd5(currentPassword))) {
                     errorMsg = "Mật khẩu hiện tại không đúng!";
                 } else {
                     success = profileDAO.changeStaffPassword(userId, newPassword);
