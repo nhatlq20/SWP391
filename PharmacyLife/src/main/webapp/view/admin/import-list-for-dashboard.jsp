@@ -135,12 +135,11 @@
                                                                         <i class="fas fa-pen"></i>
                                                                     </a>
                                                                 </c:if>
-                                                                <a href="${pageContext.request.contextPath}/admin/imports?action=delete&code=${imp.importCode}"
-                                                                    class="btn-action btn-delete"
-                                                                    onclick="return confirm('Bạn có chắc chắn muốn xóa phiếu nhập này?')"
+                                                                <button type="button" class="btn-action btn-delete" style="border: none;"
+                                                                    onclick="openDeleteModal('${imp.importCode}')"
                                                                     title="Xóa">
                                                                     <i class="fas fa-trash"></i>
-                                                                </a>
+                                                                </button>
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -165,7 +164,36 @@
                         </div>
                     </div>
 
+                    <!-- Delete Confirmation Modal -->
+                    <div class="modal fade" id="deleteImportModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-sm">
+                            <div class="modal-content" style="border-radius: 16px; border: none; padding: 15px;">
+                                <div class="modal-body text-center" style="padding: 20px;">
+                                    <div class="mb-3">
+                                        <i class="fas fa-exclamation-triangle" style="font-size: 50px; color: #ffc107;"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-3" style="color: #333;">Xóa phiếu nhập?</h5>
+                                    <p class="text-muted mb-4" style="font-size: 0.95rem;">
+                                        Mã <strong id="deleteImportCodeText" style="color: #333;"></strong> sẽ bị xóa vĩnh viễn.
+                                    </p>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button type="button" class="btn btn-light w-50" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 500; background: #f8f9fa;">Hủy</button>
+                                        <a href="#" id="confirmDeleteImportBtn" class="btn btn-danger w-50" style="border-radius: 8px; font-weight: 500; background: #dc3545; border: none; padding: 8px 0; color: white; text-decoration: none;">Xóa ngay</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                    <script>
+                        function openDeleteModal(code) {
+                            document.getElementById('deleteImportCodeText').textContent = code;
+                            document.getElementById('confirmDeleteImportBtn').href = '${pageContext.request.contextPath}/admin/imports?action=delete&code=' + code;
+                            var myModal = new bootstrap.Modal(document.getElementById('deleteImportModal'));
+                            myModal.show();
+                        }
+                    </script>
                 </body>
 
                 </html>
