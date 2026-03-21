@@ -81,9 +81,9 @@
                                             <div class="info-item">
                                                 <label class="info-label" for="importDate">Ngày nhập</label>
                                                 <div class="info-value">
-                                                    <input type="date" name="importDate" id="importDate" required
+                                                    <input type="date" name="importDate" id="importDate" required readonly
                                                         class="form-control border-0 bg-transparent p-0"
-                                                        style="box-shadow: none;"
+                                                        style="box-shadow: none; pointer-events: none;"
                                                         value="<fmt:formatDate value='${importRecord.importDate}' pattern='yyyy-MM-dd'/>">
                                                 </div>
                                             </div>
@@ -122,7 +122,7 @@
                                                 <h5 class="fw-bold mb-0" style="color: #1e293b; font-size: 1.1rem;">
                                                     <i class="fas fa-list me-2 text-primary"></i>Danh sách thuốc nhập
                                                 </h5>
-                                                <button type="button" class="btn btn-add-medicine"
+                                                <button type="button" class="btn btn-add-medicine" style="background-color: #4F81E1; color: white; border: none;"
                                                     onclick="openAddMedicineModal()">
                                                     <i class="fas fa-plus me-2"></i>Thêm thuốc
                                                 </button>

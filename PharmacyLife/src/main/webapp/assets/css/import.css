@@ -51,17 +51,17 @@
 }
 
 .btn-add-medicine {
-    background-color: #4F81E1;
-    color: white;
+    background-color: #4F81E1 !important;
+    color: white !important;
     padding: 10px 20px;
     border-radius: 10px;
     font-weight: 600;
-    border: none;
+    border: none !important;
     transition: all 0.2s;
 }
 
 .btn-add-medicine:hover {
-    background-color: #3b6dc2;
+    background-color: #3c6fc1 !important; /* đậm hơn khi hover */
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(79, 129, 225, 0.3);
 }
