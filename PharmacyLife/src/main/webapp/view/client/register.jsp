@@ -254,7 +254,7 @@
                         const confirmPasswordValue = confirmPasswordInput.value;
 
                         const fullNameRegex = /^[\p{L}][\p{L}\s'.-]{1,99}$/u;
-                        const emailRegex = /^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*@(gmail\.com|yahoo\.com|fucantho|fucantho\.edu\.vn|pharmacy\.com|pharmacylife\.com)$/;
+                        const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/;
                         const phoneRegex = /^0(3|5|7|8|9)\d{8}$/;
 
                         fullNameInput.value = normalizedFullName;

@@ -20,8 +20,8 @@ import utils.EmailUtils;
  */
 public class RegisterController extends HttpServlet {
 
-        private static final Pattern EMAIL_PATTERN = Pattern.compile(
-            "^[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*@(gmail\\.com|yahoo\\.com|fucantho|fucantho\\.edu\\.vn|pharmacy\\.com|pharmacylife\\.com)$");
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
     private static final Pattern FULL_NAME_PATTERN = Pattern.compile("^[\\p{L}][\\p{L}\\s'.-]{1,99}$");
     private static final Pattern PHONE_PATTERN = Pattern.compile("^0(3|5|7|8|9)\\d{8}$");
     private static final int MAX_EMAIL_LENGTH = 254;
