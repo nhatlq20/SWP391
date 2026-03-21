@@ -13,13 +13,13 @@ import java.util.regex.Pattern;
 
 public class CategoryDAO {
     private DBContext dbContext = new DBContext();
+    private String categoryImageColumnName;
 
     public List<Category> getAllCategories() {
         List<Category> categories = new ArrayList<>();
-        String sql = "SELECT CategoryID, CategoryCode, CategoryName FROM Category ORDER BY CategoryCode";
-
         try (Connection conn = dbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
+            PreparedStatement ps = conn.prepareStatement(buildCategorySelectSql(conn,
+                "FROM Category ORDER BY CategoryCode"));
                 ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
@@ -27,6 +27,7 @@ public class CategoryDAO {
                 category.setCategoryId(rs.getInt("CategoryID"));
                 category.setCategoryCode(rs.getString("CategoryCode"));
                 category.setCategoryName(rs.getString("CategoryName"));
+                category.setCategoryImageUrl(readCategoryImageUrl(rs));
                 categories.add(category);
             }
         } catch (SQLException e) {
@@ -37,10 +38,9 @@ public class CategoryDAO {
     }
 
     public Category getCategoryById(int categoryID) {
-        String sql = "SELECT CategoryID, CategoryCode, CategoryName FROM Category WHERE CategoryID = ?";
-
         try (Connection conn = dbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+            PreparedStatement ps = conn.prepareStatement(buildCategorySelectSql(conn,
+                "FROM Category WHERE CategoryID = ?"))) {
 
             ps.setInt(1, categoryID);
 
@@ -50,6 +50,7 @@ public class CategoryDAO {
                     category.setCategoryId(rs.getInt("CategoryID"));
                     category.setCategoryCode(rs.getString("CategoryCode"));
                     category.setCategoryName(rs.getString("CategoryName"));
+                    category.setCategoryImageUrl(readCategoryImageUrl(rs));
                     return category;
                 }
             }
@@ -61,13 +62,14 @@ public class CategoryDAO {
     }
 
     public boolean createCategory(Category category) {
-        String sql = "INSERT INTO Category (CategoryCode, CategoryName) VALUES (?, ?)";
-
         try (Connection conn = dbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(buildCategoryInsertSql(conn))) {
 
             ps.setString(1, category.getCategoryCode());
             ps.setString(2, category.getCategoryName());
+            if (hasCategoryImageColumn(conn)) {
+                ps.setString(3, normalizeCategoryImageUrl(category.getCategoryImageUrl()));
+            }
 
             int result = ps.executeUpdate();
             return result > 0;
@@ -79,14 +81,17 @@ public class CategoryDAO {
     }
 
     public boolean updateCategory(Category category) {
-        String sql = "UPDATE Category SET CategoryCode = ?, CategoryName = ? WHERE CategoryID = ?";
-
         try (Connection conn = dbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(buildCategoryUpdateSql(conn))) {
 
             ps.setString(1, category.getCategoryCode());
             ps.setString(2, category.getCategoryName());
-            ps.setInt(3, category.getCategoryId());
+            if (hasCategoryImageColumn(conn)) {
+                ps.setString(3, normalizeCategoryImageUrl(category.getCategoryImageUrl()));
+                ps.setInt(4, category.getCategoryId());
+            } else {
+                ps.setInt(3, category.getCategoryId());
+            }
 
             int result = ps.executeUpdate();
             return result > 0;
@@ -136,10 +141,9 @@ public class CategoryDAO {
 
     public List<Category> searchCategoriesByName(String searchTerm) {
         List<Category> categories = new ArrayList<>();
-        String sql = "SELECT CategoryID, CategoryCode, CategoryName FROM Category WHERE CategoryName LIKE ? ORDER BY CategoryName";
-
         try (Connection conn = dbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+            PreparedStatement ps = conn.prepareStatement(buildCategorySelectSql(conn,
+                "FROM Category WHERE CategoryName LIKE ? ORDER BY CategoryName"))) {
 
             ps.setString(1, "%" + searchTerm + "%");
 
@@ -149,6 +153,7 @@ public class CategoryDAO {
                     category.setCategoryId(rs.getInt("CategoryID"));
                     category.setCategoryCode(rs.getString("CategoryCode"));
                     category.setCategoryName(rs.getString("CategoryName"));
+                    category.setCategoryImageUrl(readCategoryImageUrl(rs));
                     categories.add(category);
                 }
             }
@@ -215,13 +220,14 @@ public class CategoryDAO {
     }
 
     public void insertCaterogy(Category category) {
-        String sql = "INSERT INTO Category(CategoryCode, CategoryName) VALUES(?, ?)";
-
         try (Connection conn = dbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(buildCategoryInsertSql(conn))) {
 
             ps.setString(1, category.getCategoryCode());
             ps.setString(2, category.getCategoryName());
+            if (hasCategoryImageColumn(conn)) {
+                ps.setString(3, normalizeCategoryImageUrl(category.getCategoryImageUrl()));
+            }
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -271,6 +277,100 @@ public class CategoryDAO {
         }
 
         return String.format("%s%03d", prefix, maxNumber + 1);
+    }
+
+    private String buildCategorySelectSql(Connection conn, String tailClause) throws SQLException {
+        String imageColumn = getCategoryImageColumnName(conn);
+        if (imageColumn == null) {
+            return "SELECT CategoryID, CategoryCode, CategoryName " + tailClause;
+        }
+        return "SELECT CategoryID, CategoryCode, CategoryName, " + imageColumn + " AS CategoryImageUrl " + tailClause;
+    }
+
+    private String buildCategoryInsertSql(Connection conn) throws SQLException {
+        String imageColumn = getCategoryImageColumnName(conn);
+        if (imageColumn == null) {
+            return "INSERT INTO Category (CategoryCode, CategoryName) VALUES (?, ?)";
+        }
+        return "INSERT INTO Category (CategoryCode, CategoryName, " + imageColumn + ") VALUES (?, ?, ?)";
+    }
+
+    private String buildCategoryUpdateSql(Connection conn) throws SQLException {
+        String imageColumn = getCategoryImageColumnName(conn);
+        if (imageColumn == null) {
+            return "UPDATE Category SET CategoryCode = ?, CategoryName = ? WHERE CategoryID = ?";
+        }
+        return "UPDATE Category SET CategoryCode = ?, CategoryName = ?, " + imageColumn + " = ? WHERE CategoryID = ?";
+    }
+
+    private boolean hasCategoryImageColumn(Connection conn) throws SQLException {
+        return getCategoryImageColumnName(conn) != null;
+    }
+
+    private String getCategoryImageColumnName(Connection conn) throws SQLException {
+        if (categoryImageColumnName != null && !categoryImageColumnName.isEmpty()
+                && canSelectColumn(conn, categoryImageColumnName)) {
+            return categoryImageColumnName;
+        }
+
+        String[] candidates = {
+                "CategoryImageUrl",
+                "CategoryImageURL",
+                "CategoryImagePath",
+                "ImageUrl",
+                "ImageURL",
+                "CategoryImage"
+        };
+        for (String candidate : candidates) {
+            if (canSelectColumn(conn, candidate)) {
+                categoryImageColumnName = candidate;
+                return categoryImageColumnName;
+            }
+        }
+
+        // Try to auto-migrate schema so selected image can be persisted.
+        ensureCategoryImageColumn(conn);
+        if (canSelectColumn(conn, "CategoryImageUrl")) {
+            categoryImageColumnName = "CategoryImageUrl";
+            return categoryImageColumnName;
+        }
+
+        categoryImageColumnName = "";
+        return null;
+    }
+
+    private boolean canSelectColumn(Connection conn, String columnName) {
+        String sql = "SELECT TOP 1 " + columnName + " FROM Category";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            return true;
+        } catch (SQLException ex) {
+            return false;
+        }
+    }
+
+    private void ensureCategoryImageColumn(Connection conn) {
+        String sql = "ALTER TABLE Category ADD CategoryImageUrl NVARCHAR(500) NULL";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.executeUpdate();
+        } catch (SQLException ignored) {
+            // Ignore if column exists already or account has no alter permission.
+        }
+    }
+
+    private String readCategoryImageUrl(ResultSet rs) {
+        try {
+            return normalizeCategoryImageUrl(rs.getString("CategoryImageUrl"));
+        } catch (SQLException ex) {
+            return "";
+        }
+    }
+
+    private String normalizeCategoryImageUrl(String raw) {
+        if (raw == null) {
+            return "";
+        }
+        return raw.trim();
     }
 
 }
