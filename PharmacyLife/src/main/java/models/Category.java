@@ -5,6 +5,7 @@ public class Category {
     private int categoryId;
     private String categoryCode;
     private String categoryName;
+    private String categoryImageUrl;
 
     private int medicineCount;
 
@@ -58,12 +59,21 @@ public class Category {
         this.categoryName = categoryName;
     }
 
+    public String getCategoryImageUrl() {
+        return categoryImageUrl;
+    }
+
+    public void setCategoryImageUrl(String categoryImageUrl) {
+        this.categoryImageUrl = categoryImageUrl;
+    }
+
     @Override
     public String toString() {
         return "Category{"
                 + "categoryId=" + categoryId
                 + ", categoryCode='" + categoryCode + '\''
                 + ", categoryName='" + categoryName + '\''
+            + ", categoryImageUrl='" + categoryImageUrl + '\''
                 + '}';
     }
 }

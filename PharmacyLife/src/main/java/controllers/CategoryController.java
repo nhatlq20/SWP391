@@ -5,8 +5,11 @@ import dao.MedicineUnitDAO;
 import models.Category;
 import models.Medicine;
 import models.MedicineUnit;
+import java.io.File;
 import java.util.HashMap;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -83,6 +86,7 @@ public class CategoryController extends HttpServlet {
 		List<Category> list = dao.getAllCategories();
 		request.setAttribute("categoryList", list);
 		request.setAttribute("nextCategoryCode", dao.generateNextCategoryCode());
+		request.setAttribute("categoryImageOptions", getAvailableCategoryImages());
 
 		request.getRequestDispatcher("/view/admin/category-list.jsp")
 				.forward(request, response);
@@ -160,13 +164,18 @@ public class CategoryController extends HttpServlet {
 			return;
 		}
 		String name = request.getParameter("categoryName");
+		String categoryImageUrl = request.getParameter("categoryImageUrl");
+		String categoryImageUrlTrimmed = categoryImageUrl == null ? "" : categoryImageUrl.trim();
 
-		if (name == null || name.trim().isEmpty()) {
-			request.setAttribute("errorMessage", "Tên danh mục không được để trống");
+		if (name == null || name.trim().isEmpty() || categoryImageUrlTrimmed.isEmpty()) {
+			request.setAttribute("errorMessage",
+					(name == null || name.trim().isEmpty()) ? "Tên danh mục không được để trống" : "Vui lòng chọn ảnh danh mục");
 			request.setAttribute("categoryNameInput", name == null ? "" : name);
+			request.setAttribute("categoryImageUrlInput", categoryImageUrlTrimmed);
 			List<Category> list = dao.getAllCategories();
 			request.setAttribute("categoryList", list);
 			request.setAttribute("nextCategoryCode", dao.generateNextCategoryCode());
+			request.setAttribute("categoryImageOptions", getAvailableCategoryImages());
 			request.getRequestDispatcher("/view/admin/category-list.jsp").forward(request, response);
 			return;
 		}
@@ -176,6 +185,7 @@ public class CategoryController extends HttpServlet {
 		Category c = new Category();
 		c.setCategoryCode(code);
 		c.setCategoryName(name.trim());
+		c.setCategoryImageUrl(categoryImageUrlTrimmed);
 
 		dao.createCategory(c);
 
@@ -193,9 +203,52 @@ public class CategoryController extends HttpServlet {
 		List<Category> list = dao.searchCategoryByName(keyword);
 		request.setAttribute("categoryList", list);
 		request.setAttribute("nextCategoryCode", dao.generateNextCategoryCode());
+		request.setAttribute("categoryImageOptions", getAvailableCategoryImages());
 		request.getRequestDispatcher("/view/admin/category-list.jsp")
 				.forward(request, response);
 
+	}
+
+	private List<String> getAvailableCategoryImages() {
+		List<String> imagePaths = new ArrayList<>();
+		String imageDirPath = getServletContext().getRealPath("/assets/img/category");
+
+		if (imageDirPath == null) {
+			for (int i = 1; i <= 18; i++) {
+				imagePaths.add("/assets/img/category/" + i + ".png");
+			}
+			return imagePaths;
+		}
+
+		File imageDir = new File(imageDirPath);
+		File[] files = imageDir.listFiles();
+
+		if (files == null) {
+			for (int i = 1; i <= 18; i++) {
+				imagePaths.add("/assets/img/category/" + i + ".png");
+			}
+			return imagePaths;
+		}
+
+		for (File file : files) {
+			if (!file.isFile()) {
+				continue;
+			}
+			String name = file.getName();
+			String lower = name.toLowerCase();
+			if (lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".webp")
+					|| lower.endsWith(".gif")) {
+				imagePaths.add("/assets/img/category/" + name);
+			}
+		}
+
+		imagePaths.sort(Comparator.naturalOrder());
+		if (imagePaths.isEmpty()) {
+			for (int i = 1; i <= 18; i++) {
+				imagePaths.add("/assets/img/category/" + i + ".png");
+			}
+		}
+		return imagePaths;
 	}
 
 	private int parsePositiveInt(String raw) {

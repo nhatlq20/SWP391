@@ -74,9 +74,26 @@
                                         <div class="category-card"
                                             onclick="window.location.href='${pageContext.request.contextPath}/search?categoryId=${c.categoryId}'">
                                             <div class="category-img-wrapper">
-                                                <img src="<c:url value='/assets/img/category/${loop.index + 1}.png'/>"
-                                                    alt="<c:out value='${c.categoryName}'/>" class="category-image"
-                                                    onerror="this.src='${pageContext.request.contextPath}/assets/img/category/default.png';">
+                                                <c:choose>
+                                                    <c:when test="${not empty c.categoryImageUrl}">
+                                                        <c:set var="catImg" value="${fn:trim(c.categoryImageUrl)}" />
+                                                        <c:choose>
+                                                            <c:when test="${fn:startsWith(catImg, 'http://') or fn:startsWith(catImg, 'https://')}">
+                                                                <img src="${catImg}" alt="<c:out value='${c.categoryName}'/>" class="category-image"
+                                                                    onerror="this.src='${pageContext.request.contextPath}/assets/img/category/1.png';">
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <img src="${pageContext.request.contextPath}${catImg}" alt="<c:out value='${c.categoryName}'/>" class="category-image"
+                                                                    onerror="this.src='${pageContext.request.contextPath}/assets/img/category/1.png';">
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <img src="<c:url value='/assets/img/category/${(c.categoryId % 18) + 1}.png'/>"
+                                                            alt="<c:out value='${c.categoryName}'/>" class="category-image"
+                                                            onerror="this.src='${pageContext.request.contextPath}/assets/img/category/1.png';">
+                                                    </c:otherwise>
+                                                </c:choose>
                                             </div>
                                             <div class="category-info">
                                                 <div class="category-name">
@@ -158,8 +175,7 @@
                             <script src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
                             <script>
                                 function addToCartAjax(btn, medicineId) {
-                                    const isLoggedIn = ${ sessionScope.userId != null ? 'true' : 'false'
-                                };
+                                    const isLoggedIn = '<c:out value="${sessionScope.userId != null}"/>' === 'true';
                                 const userRole = '${sessionScope.roleName != null ? sessionScope.roleName : ""}';
                                 const role = userRole.toLowerCase();
 
@@ -211,7 +227,7 @@
                                             console.error('Error adding to cart:', error);
                                         }
                                     });
-        }
+                                }
                             </script>
                 </body>
 

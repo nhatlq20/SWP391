@@ -117,6 +117,33 @@
                                             class="form-control" placeholder="Nhập tên danh mục"
                                             value="${categoryNameInput}" required />
                                     </div>
+<!-- ============================================================================= -->
+                                    <div class="mt-3 mb-0">
+                                        <label class="form-label" for="modalCategoryImageSelect">Chọn ảnh có sẵn</label>
+                                        <select id="modalCategoryImageSelect" name="categoryImageUrl" class="form-select">
+                                            <option value="">-- Chọn ảnh từ danh sách --</option>
+                                            <c:choose>
+                                                <c:when test="${not empty categoryImageOptions}">
+                                                    <c:forEach items="${categoryImageOptions}" var="imgPath">
+                                                        <option value="${imgPath}" ${imgPath eq categoryImageUrlInput ? 'selected' : ''}>${imgPath}</option>
+                                                    </c:forEach>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <c:forEach begin="1" end="18" var="i">
+                                                        <c:set var="defaultPath" value="/assets/img/category/${i}.png" />
+                                                        <option value="${defaultPath}" ${defaultPath eq categoryImageUrlInput ? 'selected' : ''}>${defaultPath}</option>
+                                                    </c:forEach>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </select>
+                                    </div>
+
+                                    <div class="mt-3 mb-0">
+                                        <img id="categoryImagePreview" src="" alt="Preview ảnh danh mục"
+                                            style="display:none; width: 90px; height: 90px; object-fit: cover; border: 1px solid #dee2e6; border-radius: 8px;" />
+                                    </div>
+
+                            <!-- ======================================================= -->
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -175,6 +202,24 @@
                             if (addModalEl) {
                                 new bootstrap.Modal(addModalEl).show();
                             }
+                        }
+
+                        const categoryImageSelect = document.getElementById('modalCategoryImageSelect');
+                        const categoryImagePreview = document.getElementById('categoryImagePreview');
+                        if (categoryImageSelect && categoryImagePreview) {
+                            const setPreview = () => {
+                                const selectedPath = categoryImageSelect.value;
+                                if (!selectedPath) {
+                                    categoryImagePreview.style.display = 'none';
+                                    categoryImagePreview.src = '';
+                                    return;
+                                }
+                                categoryImagePreview.src = '${pageContext.request.contextPath}' + selectedPath;
+                                categoryImagePreview.style.display = 'block';
+                            };
+
+                            categoryImageSelect.addEventListener('change', setPreview);
+                            setPreview();
                         }
                     })();
 
