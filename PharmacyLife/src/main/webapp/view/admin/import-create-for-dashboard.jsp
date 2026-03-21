@@ -81,9 +81,9 @@
                                         <div class="info-item">
                                             <label class="info-label" for="importDate">Ngày nhập</label>
                                             <div class="info-value">
-                                                <input type="date" name="importDate" id="importDate" required
+                                                <input type="date" name="importDate" id="importDate" required readonly
                                                     class="form-control border-0 bg-transparent p-0"
-                                                    style="box-shadow: none;"
+                                                    style="box-shadow: none; pointer-events: none;"
                                                     value="<fmt:formatDate value='<%=new java.util.Date()%>' pattern='yyyy-MM-dd'/>">
                                             </div>
                                         </div>
