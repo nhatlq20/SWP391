@@ -81,8 +81,7 @@
                     </c:if>
 
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h3 class="fw-bold mb-0"><i class="fas fa-shopping-cart me-2 text-primary"></i>Chi tiết đơn hàng
-                        </h3>
+                        <h3 class="fw-bold mb-0"><i class="fas fa-shopping-cart me-2 text-primary"></i>Chi tiết đơn hàng</h3>
                         <div class="breadcrumb-custom">
                             <a href="orders-dashboard">Đơn hàng</a> / <span class="active">#${order.orderId}</span>
                         </div>
@@ -280,6 +279,12 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="mt-2 pb-4">
+                        <a class="btn-back" href="orders-dashboard">
+                            <i class="fas fa-chevron-left"></i> Trở lại
+                        </a>
                     </div>
                 </div>
 

@@ -11,6 +11,25 @@
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/category-detail.css">
+                <style>
+                    .btn-back {
+                        background: #f59e0b;
+                        color: #fff;
+                        border: none;
+                        border-radius: 10px;
+                        padding: 10px 24px;
+                        font-weight: 600;
+                        text-decoration: none;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                        transition: all 0.2s;
+                    }
+                    .btn-back:hover {
+                        background: #d97706;
+                        color: #fff;
+                    }
+                </style>
             </head>
 
             <body>
@@ -18,9 +37,8 @@
                 <jsp:include page="/view/common/sidebar.jsp" />
 
                 <div class="main-content">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="mb-4">
                         <h2 class="page-title"><i class="fas fa-list me-2 text-primary"></i>Chi tiết danh mục</h2>
-                        <a class="btn btn-secondary btn-back" href="${pageContext.request.contextPath}/category?action=list"><i class="fas fa-arrow-left me-1"></i>Trở lại</a>
                     </div>
                     <div class="category-meta-card mb-3">
                         <div class="row g-3 align-items-center">
@@ -112,6 +130,12 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+
+                    <div class="mt-2" style="margin-left: 330px; margin-bottom: 2rem;">
+                        <a class="btn-back" href="${pageContext.request.contextPath}/category?action=list">
+                            <i class="fas fa-chevron-left"></i> Trở lại
+                        </a>
                     </div>
                 </div>
 

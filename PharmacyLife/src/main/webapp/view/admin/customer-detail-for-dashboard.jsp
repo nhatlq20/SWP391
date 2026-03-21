@@ -81,17 +81,15 @@
                     <div class="main-content">
                         <!-- Page Header -->
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h3 class="fw-bold mb-0"><i class="fas fa-user-circle me-2 text-primary"></i>Hồ sơ khách
-                                hàng
-                            </h3>
+                            <h3 class="fw-bold mb-0"><i class="fas fa-user-circle me-2 text-primary"></i>Hồ sơ khách hàng</h3>
                             <div class="breadcrumb-custom">
-                                <a href="customers-dashboard">Khách hàng</a> / <span
-                                    class="active">${customer.fullName}</span>
+                                <a href="customers-dashboard">Khách hàng</a> / <span class="active">${customer.fullName}</span>
                             </div>
                         </div>
 
                         <div class="row">
                             <!-- Left Column: Profile Card -->
+
                             <div class="col-lg-4">
                                 <div class="detail-card">
                                     <div class="detail-card-body text-center py-4">
@@ -108,6 +106,15 @@
                                     </div>
                                 </div>
 
+                                <div class="mt-4">
+                                    <a class="btn-back" href="customers-dashboard">
+                                        <i class="fas fa-chevron-left"></i> Trở lại
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Right Column: Activity/Orders -->
+                            <div class="col-lg-8">
                                 <div class="detail-card">
                                     <div class="detail-card-header">
                                         <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">Thông tin liên hệ</h5>
@@ -138,10 +145,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Right Column: Activity/Orders -->
-                            <div class="col-lg-8">
                                 <div class="detail-card">
                                     <div class="detail-card-header">
                                         <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">Hoạt động gần đây</h5>
@@ -351,6 +355,7 @@
                         </div>
                     </div>
 
+                </div>
                     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
                 </body>
 
