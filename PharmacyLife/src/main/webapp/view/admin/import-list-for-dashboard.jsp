@@ -61,7 +61,7 @@
                                 <div class="search-box">
                                     <i class="fas fa-search"></i>
                                     <input type="text" id="importSearchInput"
-                                        placeholder="Tìm mã phiếu, nhà cung cấp..." oninput="filterImportTable()"
+                                        placeholder="Tìm mã phiếu, nhà cung ..." oninput="filterImportTable()"
                                         onkeydown="if(event.key==='Enter'){event.preventDefault(); filterImportTable();}">
                                 </div>
                                 <a href="${pageContext.request.contextPath}/admin/imports?action=create"
