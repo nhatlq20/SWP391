@@ -54,7 +54,7 @@
                                     <!-- Info Grid for Form Fields -->
                                     <div class="info-grid mb-4">
                                         <div class="info-item">
-                                            <div class="info-label">Mã phiếu nhập (Tạm tính)</div>
+                                            <div class="info-label">Mã phiếu nhập</div>
                                             <div class="info-value text-muted">${newCode != null ? newCode : 'Sẽ được
                                                 tạo tự động'}</div>
                                         </div>
@@ -66,10 +66,10 @@
                                                     <i class="fas fa-plus-circle"></i>
                                                 </button>
                                             </div>
-                                            <div class="info-value">
+                                            <div class="info-value" style="min-width: 0; display: block; width: 100%;">
                                                 <select name="supplierId" id="supplierId" required
                                                     class="form-select border-0 bg-transparent p-0"
-                                                    style="box-shadow: none;">
+                                                    style="box-shadow: none; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width: 100%; padding-right: 1.25rem !important; background-position: right 0px center !important;">
                                                     <option value="">-- Chọn nhà cung cấp --</option>
                                                     <c:forEach var="supplier" items="${suppliers}">
                                                         <option value="${supplier.supplierId}">${supplier.supplierName}
@@ -177,7 +177,8 @@
                                 <div class="form-group mb-3">
                                     <label class="form-label fw-bold">Danh mục thuốc</label>
                                     <select id="modalCategoryId" class="form-select shadow-sm"
-                                        onchange="filterMedicinesByCategory()">
+                                        onchange="filterMedicinesByCategory()"
+                                        style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; padding-right: 2.25rem !important;">
                                         <option value="">-- Tất cả danh mục --</option>
                                         <c:forEach var="cat" items="${categories}">
                                             <option value="${cat.categoryId}">${cat.categoryName}</option>
@@ -186,7 +187,8 @@
                                 </div>
                                 <div class="form-group mb-4">
                                     <label class="form-label fw-bold">Chọn thuốc nhập</label>
-                                    <select id="modalMedicineId" class="form-select shadow-sm">
+                                    <select id="modalMedicineId" class="form-select shadow-sm"
+                                        style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; padding-right: 2.25rem !important;">
                                         <option value="">-- Tìm và chọn thuốc --</option>
                                         <c:forEach var="med" items="${medicines}">
                                             <option value="${med.medicineId}" data-category="${med.categoryId}"

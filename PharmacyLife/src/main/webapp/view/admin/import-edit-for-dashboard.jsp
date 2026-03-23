@@ -65,10 +65,10 @@
                                                         <i class="fas fa-plus-circle"></i>
                                                     </button>
                                                 </div>
-                                                <div class="info-value">
+                                                <div class="info-value" style="min-width: 0; display: block; width: 100%;">
                                                     <select name="supplierId" id="supplierId" required
                                                         class="form-select border-0 bg-transparent p-0"
-                                                        style="box-shadow: none;">
+                                                        style="box-shadow: none; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width: 100%; padding-right: 1.25rem !important; background-position: right 0px center !important;">
                                                         <option value="">-- Chọn nhà cung cấp --</option>
                                                         <c:forEach var="supplier" items="${suppliers}">
                                                             <option value="${supplier.supplierId}"
@@ -81,8 +81,8 @@
                                             <div class="info-item">
                                                 <label class="info-label" for="importDate">Ngày nhập</label>
                                                 <div class="info-value">
-                                                    <input type="date" name="importDate" id="importDate" required readonly
-                                                        class="form-control border-0 bg-transparent p-0"
+                                                    <input type="date" name="importDate" id="importDate" required
+                                                        readonly class="form-control border-0 bg-transparent p-0"
                                                         style="box-shadow: none; pointer-events: none;"
                                                         value="<fmt:formatDate value='${importRecord.importDate}' pattern='yyyy-MM-dd'/>">
                                                 </div>
@@ -122,7 +122,8 @@
                                                 <h5 class="fw-bold mb-0" style="color: #1e293b; font-size: 1.1rem;">
                                                     <i class="fas fa-list me-2 text-primary"></i>Danh sách thuốc nhập
                                                 </h5>
-                                                <button type="button" class="btn btn-add-medicine" style="background-color: #4F81E1; color: white; border: none;"
+                                                <button type="button" class="btn btn-add-medicine"
+                                                    style="background-color: #4F81E1; color: white; border: none;"
                                                     onclick="openAddMedicineModal()">
                                                     <i class="fas fa-plus me-2"></i>Thêm thuốc
                                                 </button>
@@ -193,7 +194,8 @@
                                 <div class="form-group mb-3">
                                     <label class="form-label fw-bold">Danh mục thuốc</label>
                                     <select id="modalCategoryId" class="form-select shadow-sm"
-                                        onchange="filterMedicinesByCategory()">
+                                        onchange="filterMedicinesByCategory()"
+                                        style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; padding-right: 2.25rem !important;">
                                         <option value="">-- Tất cả danh mục --</option>
                                         <c:forEach var="cat" items="${categories}">
                                             <option value="${cat.categoryId}">${cat.categoryName}</option>
@@ -202,7 +204,8 @@
                                 </div>
                                 <div class="form-group mb-4">
                                     <label class="form-label fw-bold">Chọn thuốc nhập</label>
-                                    <select id="modalMedicineId" class="form-select shadow-sm">
+                                    <select id="modalMedicineId" class="form-select shadow-sm"
+                                        style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; padding-right: 2.25rem !important;">
                                         <option value="">-- Tìm và chọn thuốc --</option>
                                         <c:forEach var="med" items="${medicines}">
                                             <option value="${med.medicineId}" data-category="${med.categoryId}"
