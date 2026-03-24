@@ -90,7 +90,7 @@
 
                                     <div class="mt-5">
                                         <a href="${pageContext.request.contextPath}/admin/manage-staff" class="btn-back-sync">
-                                            <i class="fas fa-chevron-left"></i> Quay lại
+                                            <i class="fas fa-chevron-left"></i> Trở lại
                                         </a>
                                     </div>
                                 </div>
