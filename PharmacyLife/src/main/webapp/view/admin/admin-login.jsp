@@ -60,14 +60,14 @@
                                                     <input type="email" id="email" name="email"
                                                         placeholder="Nhập email nội bộ" value="${email}"
                                                         autocomplete="username" inputmode="email">
-                                                    <img src="${pageContext.request.contextPath}/assets/img/email.png"
+                                                    <img src="${pageContext.request.contextPath}/assets/img/mail.png"
                                                         alt="Email Icon" class="input-icon">
                                                 </div>
                                             </div>
 
                                             <!-- Password Field -->
                                             <div class="form-group">
-                                                <label for="password">Mật Khẩu</label>
+                                                <label for="password">Mật khẩu</label>
                                                 <div class="input-wrapper password-wrapper">
                                                     <input type="password" id="password" name="password" class="password-input"
                                                         placeholder="Nhập mật khẩu của bạn"
