@@ -226,6 +226,7 @@ public class CartController extends HttpServlet {
 
             double cartTotal = (cart != null) ? cart.getTotalMoney() : 0;
             double itemTotal = 0;
+            double itemPrice = 0;
             int cartCount = 0;
 
             if (cart != null) {
@@ -241,23 +242,22 @@ public class CartController extends HttpServlet {
                         } catch (NumberFormatException e) {
                         }
 
+                        // Debug: print current cart items
+                        System.out.println("Updating Cart: MedID=" + id + ", UnitID=" + unitId);
+                        
                         models.Cart.Item item = cart.getItem(id, unitId);
-                        if (item != null)
+                        if (item != null) {
                             itemTotal = item.getTotalPrice();
+                            itemPrice = item.getPrice();
+                        }
                     } catch (Exception e) {
                     }
                 }
-                if (cart.getItems() != null) {
-                    for (models.Cart.Item item : cart.getItems()) {
-                        cartCount += item.getQuantity();
-                    }
-                }
+                cartTotal = cart.getTotalMoney();
+                cartCount = cart.getItemCount();
             }
 
-            String json = String.format(
-                    "{\"success\": true, \"cartTotal\": %.0f, \"itemTotal\": %.0f, \"cartCount\": %d}",
-                    cartTotal, itemTotal, cartCount);
-            out.print(json);
+            out.print("{\"success\":true,\"itemPrice\":" + itemPrice + ",\"itemTotal\":" + itemTotal + ",\"cartTotal\":" + cartTotal + ",\"cartCount\":" + cartCount + "}");
             out.flush();
         } else {
             response.sendRedirect("cart");

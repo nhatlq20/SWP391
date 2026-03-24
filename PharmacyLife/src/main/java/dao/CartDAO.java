@@ -73,8 +73,8 @@ public class CartDAO {
 
     public Cart getCartByCustomerId(int customerId) {
         Cart cart = new Cart();
-        String sql = "SELECT c.*, m.MedicineCode, m.MedicineName, m.ImageUrl, m.RemainingQuantity, " +
-                "mu.UnitName as SelectedUnitName, mu.SellingPrice, mu.ConversionRate, " +
+        String sql = "SELECT c.*, m.MedicineCode, m.MedicineName, m.ImageUrl, m.RemainingQuantity, m.SellingPrice as MedicineSellingPrice, " +
+                "mu.UnitName as SelectedUnitName, mu.SellingPrice as UnitSellingPrice, mu.ConversionRate, " +
                 "bu.UnitId as BaseUnitId, bu.UnitName as BaseUnitName " +
                 "FROM Carts c " +
                 "JOIN Medicine m ON c.MedicineId = m.MedicineId " +
@@ -107,9 +107,9 @@ public class CartDAO {
                         m.setBaseUnit(bu);
                     }
 
-                    double price = rs.getDouble("SellingPrice");
+                    double price = rs.getDouble("UnitSellingPrice");
                     if (rs.wasNull())
-                        price = 0; // Fallback
+                        price = rs.getDouble("MedicineSellingPrice");
 
                     int convRate = rs.getInt("ConversionRate");
                     Cart.Item item = new Cart.Item(m, rs.getInt("UnitId"), selectedUnitName, convRate, rs.getInt("CartQuantity"), price);
