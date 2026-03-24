@@ -108,6 +108,7 @@
                 </div>
 
                 <script>
+                    const passwordInput = document.getElementById("password");
                     const togglePasswordButton = document.getElementById("togglePassword");
 
                     function hidePasswordToggle() {

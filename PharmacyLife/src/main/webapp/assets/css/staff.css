@@ -204,6 +204,7 @@ table.staff-table tr:last-child td {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
 }
 
 .btn-cancel:hover {
