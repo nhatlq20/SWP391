@@ -56,8 +56,10 @@
                                             <table class="table table-hover align-middle mb-0">
                                                 <thead>
                                                     <tr>
-                                                        <th style="border-top-left-radius: 16px;">Sản phẩm</th>
-                                                        <th>Mã ĐH</th>
+                                                        <th class="ps-4 pe-0"
+                                                            style="border-top-left-radius: 16px; width: 60px !important; min-width: 60px !important; white-space: nowrap;">Mã ĐH
+                                                        </th>
+                                                        <th class="ps-0">Sản phẩm</th>
                                                         <th>Ngày đặt</th>
                                                         <th class="text-end">Tổng tiền</th>
                                                         <th class="text-center">Trạng thái</th>
@@ -68,7 +70,11 @@
                                                 <tbody>
                                                     <c:forEach items="${orders}" var="o">
                                                         <tr>
-                                                            <td>
+                                                            <td class="ps-4 pe-0" style="width: 60px !important; min-width: 60px !important; white-space: nowrap;"><span
+                                                                    class=" fw-bold text-muted small">
+                                                                    #${o.orderId}</span>
+                                                            </td>
+                                                            <td class="ps-0">
                                                                 <c:if test="${not empty o.items}">
                                                                     <div class="d-flex align-items-center">
                                                                         <img src="${o.items[0].medicine.imageUrl}"
@@ -95,9 +101,6 @@
                                                                         </div>
                                                                     </div>
                                                                 </c:if>
-                                                            </td>
-                                                            <td><span
-                                                                    class="fw-bold text-muted small">#${o.orderId}</span>
                                                             </td>
                                                             <td>
                                                                 <span class="text-slate fw-500"
@@ -149,7 +152,7 @@
                                                                     </c:choose>
                                                                 </span>
                                                             </td>
-                                                      
+
                                                             <td class="text-center">
                                                                 <a href="order-detail?id=${o.orderId}"
                                                                     class="btn-action btn-view" title="Xem chi tiết">

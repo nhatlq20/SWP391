@@ -17,7 +17,7 @@ public class OrderDAO {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.*, s.StaffName FROM Orders o " +
                 "LEFT JOIN Staff s ON o.StaffId = s.StaffId " +
-                "ORDER BY o.OrderId ASC";
+                "ORDER BY o.OrderDate DESC";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
