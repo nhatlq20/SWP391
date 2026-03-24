@@ -51,8 +51,27 @@ public class CartController extends HttpServlet {
         // Check if coming from checkout request explicitly or just viewing
         String mode = request.getParameter("mode");
         if ("checkout".equals(mode) && cart != null && !cart.getItems().isEmpty()) {
+            String selected = request.getParameter("selected");
+            java.util.List<models.Cart.Item> itemsToCheck = cart.getItems();
+
+            if (selected != null && !selected.isEmpty()) {
+                itemsToCheck = new java.util.ArrayList<>();
+                String[] parts = selected.split(",");
+                for (String part : parts) {
+                    String[] ids = part.split("-");
+                    if (ids.length == 2) {
+                        int mid = Integer.parseInt(ids[0]);
+                        int uid = Integer.parseInt(ids[1]);
+                        models.Cart.Item item = cart.getItem(mid, uid);
+                        if (item != null) {
+                            itemsToCheck.add(item);
+                        }
+                    }
+                }
+            }
+
             java.util.List<String> errors = new java.util.ArrayList<>();
-            for (models.Cart.Item item : cart.getItems()) {
+            for (models.Cart.Item item : itemsToCheck) {
                 int requestedQty = item.getQuantity() * item.getConversionRate();
                 if (item.getMedicine().getRemainingQuantity() < requestedQty) {
                     if (item.getMedicine().getRemainingQuantity() <= 0) {
@@ -64,10 +83,13 @@ public class CartController extends HttpServlet {
             }
             if (!errors.isEmpty()) {
                 request.setAttribute("errorList", errors);
-                // Also set a generic error flag if needed
                 request.setAttribute("error", "Vui lòng điều chỉnh giỏ hàng vì một số sản phẩm không đủ hàng.");
             } else {
-                response.sendRedirect(request.getContextPath() + "/checkout");
+                String dest = request.getContextPath() + "/checkout";
+                if (selected != null && !selected.isEmpty()) {
+                    dest += "?selected=" + selected;
+                }
+                response.sendRedirect(dest);
                 return;
             }
         }

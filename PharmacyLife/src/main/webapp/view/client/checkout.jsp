@@ -68,6 +68,7 @@
                                             </c:if>
 
                                             <form action="checkout" method="POST">
+                                                <input type="hidden" name="selectedItems" value="${selectedItems}">
                                                 <div class="row g-3">
                                                     <div class="col-12">
                                                         <label for="fullName" class="form-label required">Họ và
@@ -121,12 +122,12 @@
                                         <div class="order-summary shadow-sm sticky-top" style="top: 130px;">
                                             <h5 class="mb-3 fw-bold">Đơn hàng của bạn</h5>
                                             <div class="d-flex justify-content-between mb-2">
-                                                <span class="text-muted">Sản phẩm (${fn:length(cart.items)})</span>
+                                                <span class="text-muted">Sản phẩm (${fn:length(itemsToCheckout)})</span>
                                                 <a href="cart" class="text-decoration-none small">Sửa</a>
                                             </div>
 
                                             <ul class="list-group list-group-flush mb-3">
-                                                <c:forEach items="${cart.items}" var="item">
+                                                <c:forEach items="${itemsToCheckout}" var="item">
                                                     <li
                                                         class="list-group-item d-flex justify-content-between lh-sm px-0 bg-transparent">
                                                         <div>

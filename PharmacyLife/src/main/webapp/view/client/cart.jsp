@@ -83,6 +83,9 @@
                                                         <table class="table align-middle">
                                                             <thead>
                                                                 <tr>
+                                                                    <th scope="col" style="width: 50px;" class="text-center">
+                                                                        <input type="checkbox" id="selectAll" class="form-check-input" checked>
+                                                                    </th>
                                                                     <th scope="col">Sản phẩm</th>
                                                                     <th scope="col" class="text-center"
                                                                         style="width: 110px;">Đơn giá</th>
@@ -96,7 +99,13 @@
                                                             </thead>
                                                             <tbody>
                                                                 <c:forEach items="${cart.items}" var="item">
-                                                                    <tr>
+                                                                    <tr data-item-id="${item.medicine.medicineId}" data-unit-id="${item.unitId}">
+                                                                        <td class="text-center">
+                                                                            <input type="checkbox" name="selectedItems"
+                                                                                   value="${item.medicine.medicineId}-${item.unitId}"
+                                                                                   class="form-check-input item-checkbox" checked
+                                                                                   onchange="calculateSelectedTotal()">
+                                                                        </td>
                                                                         <td>
                                                                             <div class="d-flex align-items-center">
                                                                                 <img src="${pageContext.request.contextPath}${item.medicine.imageUrl}"
@@ -153,8 +162,9 @@
                                                                                 </div>
                                                                             </form>
                                                                         </td>
-                                                                        <td class="text-end price-text"
-                                                                            id="item-total-${item.medicine.medicineId}-${item.unitId}">
+                                                                         <td class="text-end price-text item-total-val"
+                                                                            id="item-total-${item.medicine.medicineId}-${item.unitId}"
+                                                                            data-raw-value="${item.totalPrice}">
                                                                             <fmt:formatNumber value="${item.totalPrice}"
                                                                                 type="currency" currencySymbol="₫"
                                                                                 maxFractionDigits="0" />
@@ -197,10 +207,10 @@
                                                         </div>
                                                     </div>
 
-                                                    <a href="cart?mode=checkout" class="btn-checkout">
+                                                     <button type="button" onclick="goToCheckout()" class="btn-checkout w-100" id="btn-checkout">
                                                         Thanh toán
                                                         <i class="fas fa-arrow-right"></i>
-                                                    </a>
+                                                    </button>
 
                                                     <a href="home"
                                                         class="btn btn-outline-secondary w-100 mt-3 d-flex align-items-center justify-content-center"
@@ -231,6 +241,57 @@
                             }).format(amount).replace(/\u20AB/g, '₫');
                         }
 
+                        function calculateSelectedTotal() {
+                            let total = 0;
+                            const checkboxes = document.querySelectorAll('.item-checkbox:checked');
+                            checkboxes.forEach(cb => {
+                                const row = cb.closest('tr');
+                                const priceEl = row.querySelector('.item-total-val');
+                                if (priceEl) {
+                                    total += parseFloat(priceEl.getAttribute('data-raw-value'));
+                                }
+                            });
+
+                            const cartTotalEl = document.getElementById('cart-total');
+                            if (cartTotalEl) cartTotalEl.textContent = formatCurrency(total);
+
+                            const btnCheckout = document.getElementById('btn-checkout');
+                            if (btnCheckout) {
+                                if (checkboxes.length === 0) {
+                                    btnCheckout.classList.add('disabled');
+                                    btnCheckout.style.opacity = '0.5';
+                                    btnCheckout.style.cursor = 'not-allowed';
+                                } else {
+                                    btnCheckout.classList.remove('disabled');
+                                    btnCheckout.style.opacity = '1';
+                                    btnCheckout.style.cursor = 'pointer';
+                                }
+                            }
+                        }
+
+                        const selectAllCb = document.getElementById('selectAll');
+                        if (selectAllCb) {
+                            selectAllCb.addEventListener('change', function () {
+                                const isChecked = this.checked;
+                                document.querySelectorAll('.item-checkbox').forEach(cb => {
+                                    cb.checked = isChecked;
+                                });
+                                calculateSelectedTotal();
+                            });
+                        }
+
+                        function goToCheckout() {
+                            const selected = Array.from(document.querySelectorAll('.item-checkbox:checked'))
+                                .map(cb => cb.value)
+                                .join(',');
+
+                            if (selected) {
+                                window.location.href = `cart?mode=checkout&selected=${selected}`;
+                            } else {
+                                alert('Vui lòng chọn ít nhất một sản phẩm để thanh toán!');
+                            }
+                        }
+
                         function updateQuantity(btn, change) {
                             const form = btn.closest('form');
                             const input = form.querySelector('input[name="quantity"]');
@@ -246,10 +307,8 @@
                             if (newVal !== currentVal) {
                                 input.value = newVal;
 
-                                // Disable button to prevent double clicks
                                 btn.disabled = true;
 
-                                // Send AJAX request
                                 const formData = new FormData(form);
                                 fetch('cart', {
                                     method: 'POST',
@@ -262,20 +321,13 @@
                                     .then(data => {
                                         btn.disabled = false;
                                         if (data.success) {
-                                            // Update Item Total in table
-                                            const row = btn.closest('tr');
-                                            const itemTotalEl = document.getElementById(`item-total-${id}-${unitId}`) || row.querySelector('.price-text');
-                                            if (itemTotalEl) itemTotalEl.textContent = formatCurrency(data.itemTotal);
+                                            const itemTotalEl = document.getElementById(`item-total-${id}-${unitId}`);
+                                            if (itemTotalEl) {
+                                                itemTotalEl.textContent = formatCurrency(data.itemTotal);
+                                                itemTotalEl.setAttribute('data-raw-value', data.itemTotal);
+                                            }
+                                            calculateSelectedTotal();
 
-                                            // Update Subtotal and Total in Sidebar
-                                            const sidebar = document.querySelector('.total-section');
-                                            const subtotalEl = document.getElementById('cart-subtotal') || sidebar.querySelector('.price-row:not(.total) span:last-child');
-                                            const totalEl = document.getElementById('cart-total') || sidebar.querySelector('.total-value');
-
-                                            if (subtotalEl) subtotalEl.textContent = formatCurrency(data.cartTotal);
-                                            if (totalEl) totalEl.textContent = formatCurrency(data.cartTotal);
-
-                                            // Update Header Cart Count
                                             if (typeof updateHeaderCartCount === 'function') {
                                                 updateHeaderCartCount(data.cartCount);
                                             } else {
@@ -290,6 +342,8 @@
                                     });
                             }
                         }
+
+                        document.addEventListener('DOMContentLoaded', calculateSelectedTotal);
                     </script>
                 </body>
 
