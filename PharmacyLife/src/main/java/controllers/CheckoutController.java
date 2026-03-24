@@ -35,7 +35,32 @@ public class CheckoutController extends HttpServlet {
         }
 
         request.setAttribute("cart", cart);
-        request.setAttribute("totalMoney", cart.getTotalMoney());
+
+        String selected = request.getParameter("selected");
+        java.util.List<models.Cart.Item> itemsToCheckout = cart.getItems();
+        double totalMoney = cart.getTotalMoney();
+
+        if (selected != null && !selected.isEmpty()) {
+            itemsToCheckout = new java.util.ArrayList<>();
+            totalMoney = 0;
+            String[] parts = selected.split(",");
+            for (String part : parts) {
+                String[] ids = part.split("-");
+                if (ids.length == 2) {
+                    int mid = Integer.parseInt(ids[0]);
+                    int uid = Integer.parseInt(ids[1]);
+                    models.Cart.Item item = cart.getItem(mid, uid);
+                    if (item != null) {
+                        itemsToCheckout.add(item);
+                        totalMoney += item.getTotalPrice();
+                    }
+                }
+            }
+        }
+
+        request.setAttribute("itemsToCheckout", itemsToCheckout);
+        request.setAttribute("totalMoney", totalMoney);
+        request.setAttribute("selectedItems", selected);
 
         request.getRequestDispatcher("view/client/checkout.jsp").forward(request, response);
     }
@@ -100,21 +125,41 @@ public class CheckoutController extends HttpServlet {
             }
 
             order.setStatus("Pending");
-            order.setTotalAmount(cart.getTotalMoney() - discountAmount);
+            
+            String selected = request.getParameter("selectedItems");
+            java.util.List<models.Cart.Item> itemsToProcess = cart.getItems();
+            double subTotal = cart.getTotalMoney();
 
-            // Convert Cart Items to Order Items
+            if (selected != null && !selected.isEmpty()) {
+                itemsToProcess = new java.util.ArrayList<>();
+                subTotal = 0;
+                String[] parts = selected.split(",");
+                for (String part : parts) {
+                    String[] ids = part.split("-");
+                    if (ids.length == 2) {
+                        int mid = Integer.parseInt(ids[0]);
+                        int uid = Integer.parseInt(ids[1]);
+                        models.Cart.Item item = cart.getItem(mid, uid);
+                        if (item != null) {
+                            itemsToProcess.add(item);
+                            subTotal += item.getTotalPrice();
+                        }
+                    }
+                }
+            }
+
+            order.setTotalAmount(subTotal - discountAmount);
+
+            // Convert Processed Items to Order Items
             java.util.List<models.OrderItem> orderItems = new java.util.ArrayList<>();
-            for (Cart.Item cartItem : cart.getItems()) {
+            for (models.Cart.Item cartItem : itemsToProcess) {
                 models.OrderItem orderItem = new models.OrderItem();
                 orderItem.setMedicineId(cartItem.getMedicine().getMedicineId());
                 orderItem.setUnitId(cartItem.getUnitId());
-                orderItem.setUnitName(cartItem.getUnitName()); // Set Unit Name
+                orderItem.setUnitName(cartItem.getUnitName());
                 orderItem.setQuantity(cartItem.getQuantity());
                 orderItem.setUnitPrice(cartItem.getPrice());
-                
-                // Also set Medicine object for name display in errors
                 orderItem.setMedicine(cartItem.getMedicine());
-                
                 orderItems.add(orderItem);
             }
             order.setItems(orderItems);
@@ -126,11 +171,20 @@ public class CheckoutController extends HttpServlet {
             System.out.println("CheckoutController: Save result = " + isSaved);
 
             if (isSaved) {
-                // Clear cart after successful order from session and DB
-                session.removeAttribute("cart");
-                if (customerId != null) {
-                    CartDAO cartDAO_checkout = new CartDAO();
-                    cartDAO_checkout.clearCart(customerId);
+                // Remove only selected items from cart
+                CartDAO cartDAO_checkout = new CartDAO();
+                for (models.Cart.Item processedItem : itemsToProcess) {
+                    cart.removeItem(processedItem.getMedicine().getMedicineId(), processedItem.getUnitId());
+                    if (customerId != null) {
+                        cartDAO_checkout.removeCartItem(customerId, processedItem.getMedicine().getMedicineId(), processedItem.getUnitId());
+                    }
+                }
+
+                // If cart is empty now, remove from session
+                if (cart.getItems().isEmpty()) {
+                    session.removeAttribute("cart");
+                } else {
+                    session.setAttribute("cart", cart);
                 }
                 // Increment voucher usage
                 try {
