@@ -70,17 +70,60 @@ public class CartController extends HttpServlet {
                 }
             }
 
-            java.util.List<String> errors = new java.util.ArrayList<>();
+            // Step 1: Group items by medicineId and sum total consumption (in base units)
+            java.util.Map<Integer, java.util.List<models.Cart.Item>> itemsByMed = new java.util.LinkedHashMap<>();
+            java.util.Map<Integer, Integer> totalConsumptionByMed = new java.util.LinkedHashMap<>();
             for (models.Cart.Item item : itemsToCheck) {
-                int requestedQty = item.getQuantity() * item.getConversionRate();
-                if (item.getMedicine().getRemainingQuantity() < requestedQty) {
-                    if (item.getMedicine().getRemainingQuantity() <= 0) {
-                        errors.add("Thuốc '" + item.getMedicine().getMedicineName() + "' đã hết hàng.");
+                int medId = item.getMedicine().getMedicineId();
+                int convRate = item.getConversionRate() > 0 ? item.getConversionRate() : 1;
+                itemsByMed.computeIfAbsent(medId, k -> new java.util.ArrayList<>()).add(item);
+                totalConsumptionByMed.merge(medId, item.getQuantity() * convRate, Integer::sum);
+            }
+
+            // Step 2: Check total consumption vs stock for each medicine
+            java.util.List<String> errors = new java.util.ArrayList<>();
+            for (java.util.Map.Entry<Integer, java.util.List<models.Cart.Item>> entry : itemsByMed.entrySet()) {
+                int medId = entry.getKey();
+                java.util.List<models.Cart.Item> medItems = entry.getValue();
+                models.Cart.Item firstItem = medItems.get(0);
+                int remainingBase = firstItem.getMedicine().getRemainingQuantity();
+                int totalNeeded = totalConsumptionByMed.get(medId);
+                String medicineName = firstItem.getMedicine().getMedicineName();
+
+                if (totalNeeded > remainingBase) {
+                    if (remainingBase <= 0) {
+                        // Completely out of stock
+                        String unitName = firstItem.getUnitName() != null ? firstItem.getUnitName() : "đơn vị";
+                        errors.add("Thuốc '" + medicineName + "' (đơn vị: " + unitName + ") đã hết hàng.");
+                    } else if (medItems.size() == 1) {
+                        // Only one unit type ordered — simple per-unit message
+                        models.Cart.Item item = medItems.get(0);
+                        int convRate = item.getConversionRate() > 0 ? item.getConversionRate() : 1;
+                        String unitName = item.getUnitName() != null ? item.getUnitName() : "đơn vị";
+                        int remainingInUnit = remainingBase / convRate;
+                        errors.add("Thuốc '" + medicineName + "' (đơn vị: " + unitName
+                                + ") hiện không đủ hàng, hiện còn " + remainingInUnit + " " + unitName + ".");
                     } else {
-                        errors.add("Thuốc '" + item.getMedicine().getMedicineName() + "' (đơn vị: " + item.getUnitName() + ") hiện không đủ hàng.");
+                        // Multiple unit types of same medicine — aggregate error
+                        // Build "8 Hộp + 28 Vỉ + 280 Viên" ordered string
+                        // Build "8 Hộp hoặc 28 Vỉ hoặc 280 Viên" remaining string
+                        StringBuilder orderedSb = new StringBuilder();
+                        StringBuilder remainingSb = new StringBuilder();
+                        for (int i = 0; i < medItems.size(); i++) {
+                            models.Cart.Item item = medItems.get(i);
+                            int convRate = item.getConversionRate() > 0 ? item.getConversionRate() : 1;
+                            String unitName = item.getUnitName() != null ? item.getUnitName() : "đơn vị";
+                            int remainingInUnit = remainingBase / convRate;
+                            if (i > 0) { orderedSb.append(" + "); remainingSb.append(" hoặc "); }
+                            orderedSb.append(item.getQuantity()).append(" ").append(unitName);
+                            remainingSb.append(remainingInUnit).append(" ").append(unitName);
+                        }
+                        errors.add("Thuốc '" + medicineName + "' không đủ hàng — bạn đang đặt "
+                                + orderedSb + " vượt quá tồn kho (hiện còn: " + remainingSb + ").");
                     }
                 }
             }
+
             if (!errors.isEmpty()) {
                 request.setAttribute("errorList", errors);
                 request.setAttribute("error", "Vui lòng điều chỉnh giỏ hàng vì một số sản phẩm không đủ hàng.");
