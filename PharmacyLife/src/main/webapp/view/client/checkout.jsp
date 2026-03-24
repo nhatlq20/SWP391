@@ -75,14 +75,16 @@
                                                             tên</label>
                                                         <input type="text" class="form-control" id="fullName"
                                                             name="fullName" required
-                                                            placeholder="Nhập họ tên người nhận">
+                                                            placeholder="Nhập họ tên người nhận"
+                                                            value="${not empty loggedInUser.fullName ? loggedInUser.fullName : ''}">
                                                     </div>
 
                                                     <div class="col-12">
                                                         <label for="phone" class="form-label required">Số điện
                                                             thoại</label>
                                                         <input type="tel" class="form-control" id="phone" name="phone"
-                                                            required placeholder="Nhập số điện thoại liên hệ">
+                                                            required placeholder="Nhập số điện thoại liên hệ"
+                                                            value="${not empty loggedInUser.phone ? loggedInUser.phone : ''}">
                                                     </div>
 
                                                     <div class="col-12">
@@ -90,7 +92,7 @@
                                                             hàng</label>
                                                         <textarea class="form-control" id="address" name="address"
                                                             rows="3" required
-                                                            placeholder="Nhập địa chỉ chi tiết (số nhà, đường, phường/xã...)"></textarea>
+                                                            placeholder="Nhập địa chỉ chi tiết (số nhà, đường, phường/xã...)">${not empty loggedInUser.address ? loggedInUser.address : ''}</textarea>
                                                     </div>
 
                                                     <div class="col-12">
