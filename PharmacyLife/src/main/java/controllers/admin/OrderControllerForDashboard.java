@@ -85,15 +85,20 @@ public class OrderControllerForDashboard extends HttpServlet {
                 boolean success = orderDAO.updateStatus(orderId, status, staffId);
 
                 if (success) {
-                    // Add success message
                     session.setAttribute("message", "Cập nhật trạng thái đơn hàng #" + orderId + " thành công!");
                     session.setAttribute("messageType", "success");
-
-                    response.sendRedirect(request.getContextPath() + "/admin/order-detail-dashboard?id=" + orderId);
-                    return;
+                } else {
+                    String error = orderDAO.getLastErrorMessage();
+                    if (error == null || error.trim().isEmpty()) {
+                        error = "Cập nhật trạng thái thất bại. Hãy kiểm tra lại số lượng tồn kho hoặc dữ liệu.";
+                    }
+                    session.setAttribute("message", error);
+                    session.setAttribute("messageType", "danger");
                 }
+                response.sendRedirect(request.getContextPath() + "/admin/order-detail-dashboard?id=" + orderId);
             } catch (NumberFormatException e) {
                 // Invalid ID
+                response.sendRedirect(request.getContextPath() + "/admin/orders-dashboard");
             }
         }
     }
