@@ -146,26 +146,11 @@ public class OrderDAO {
             }
 
             // 3. Handle stock changes
-            if ("Cancelled".equalsIgnoreCase(newStatus)) {
-                // Replenish stock (Order was active or other state, now cancelled)
-                try (PreparedStatement psItems = conn.prepareStatement(sqlGetItems);
-                        PreparedStatement psStock = conn.prepareStatement(sqlReplenishStock)) {
-                    psItems.setInt(1, orderId);
-                    try (ResultSet rs = psItems.executeQuery()) {
-                        while (rs.next()) {
-                            int medicineId = rs.getInt("MedicineId");
-                            int unitId = rs.getInt("UnitId");
-                            int qty = rs.getInt("OrderQuantity");
-
-                            psStock.setInt(1, qty);
-                            psStock.setInt(2, unitId);
-                            psStock.setInt(3, medicineId);
-                            psStock.executeUpdate();
-                        }
-                    }
-                }
-            } else if ("Cancelled".equalsIgnoreCase(oldStatus)) {
-                // Subtract stock (Order was cancelled, now re-activated/restored)
+            boolean oldIsDeducted = "Shipping".equalsIgnoreCase(oldStatus) || "Delivered".equalsIgnoreCase(oldStatus);
+            boolean newIsDeducted = "Shipping".equalsIgnoreCase(newStatus) || "Delivered".equalsIgnoreCase(newStatus);
+            
+            if (!oldIsDeducted && newIsDeducted) {
+                // Subtract stock (Status moved to Shipping or Delivered)
                 try (PreparedStatement psItems = conn.prepareStatement(sqlGetItems);
                         PreparedStatement psStock = conn.prepareStatement(sqlSubtractStock)) {
                     psItems.setInt(1, orderId);
@@ -184,10 +169,29 @@ public class OrderDAO {
 
                             int updated = psStock.executeUpdate();
                             if (updated == 0) {
-                                // Not enough stock to re-activate
+                                // Not enough stock
+                                lastErrorMessage = "Không đủ số lượng tồn kho để giao hàng cho mã sản phẩm (ID: " + medicineId + ").";
                                 conn.rollback();
                                 return false;
                             }
+                        }
+                    }
+                }
+            } else if (oldIsDeducted && !newIsDeducted) {
+                // Replenish stock (Order was Shipping/Delivered, now Cancelled or reverted to Pending/Confirmed)
+                try (PreparedStatement psItems = conn.prepareStatement(sqlGetItems);
+                        PreparedStatement psStock = conn.prepareStatement(sqlReplenishStock)) {
+                    psItems.setInt(1, orderId);
+                    try (ResultSet rs = psItems.executeQuery()) {
+                        while (rs.next()) {
+                            int medicineId = rs.getInt("MedicineId");
+                            int unitId = rs.getInt("UnitId");
+                            int qty = rs.getInt("OrderQuantity");
+
+                            psStock.setInt(1, qty);
+                            psStock.setInt(2, unitId);
+                            psStock.setInt(3, medicineId);
+                            psStock.executeUpdate();
                         }
                     }
                 }
@@ -250,8 +254,6 @@ public class OrderDAO {
         String sqlOrder = "INSERT INTO Orders (CustomerId, StaffId, OrderDate, ShippingName, ShippingPhone, ShippingAddress, Status, TotalAmount) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlItem = "INSERT INTO OrderItems (OrderId, MedicineId, UnitId, OrderQuantity, UnitPrice) VALUES (?, ?, ?, ?, ?)";
-        String sqlUpdateStock = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity - (? * (SELECT COALESCE(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?)) "
-                + "WHERE MedicineId = ? AND RemainingQuantity >= (? * (SELECT COALESCE(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ?))";
 
         Connection conn = null;
         lastErrorMessage = "";
@@ -291,9 +293,8 @@ public class OrderDAO {
                 }
             }
 
-            // 2. Insert Items and Update Stock
-            try (PreparedStatement psItem = conn.prepareStatement(sqlItem);
-                    PreparedStatement psStock = conn.prepareStatement(sqlUpdateStock)) {
+            // 2. Insert Items DO NOT UPDATE STOCK HERE
+            try (PreparedStatement psItem = conn.prepareStatement(sqlItem)) {
                 for (OrderItem item : order.getItems()) {
                     // Insert OrderItem
                     psItem.setInt(1, order.getOrderId());
@@ -302,25 +303,6 @@ public class OrderDAO {
                     psItem.setInt(4, item.getQuantity());
                     psItem.setDouble(5, item.getUnitPrice());
                     psItem.addBatch();
-
-                    // Subtract Stock - considering ConversionRate
-                    // Params: delta, unitId, medicineId, delta, unitId
-                    psStock.setInt(1, item.getQuantity());
-                    psStock.setInt(2, item.getUnitId());
-                    psStock.setInt(3, item.getMedicineId());
-                    psStock.setInt(4, item.getQuantity());
-                    psStock.setInt(5, item.getUnitId());
-
-                    int stockUpdate = psStock.executeUpdate();
-                    if (stockUpdate == 0) {
-                        String medName = (item.getMedicine() != null) ? item.getMedicine().getMedicineName() 
-                                                                     : "Sản phẩm mã " + item.getMedicineId();
-                        String unitName = (item.getUnitName() != null) ? item.getUnitName() 
-                                                                       : "Đơn vị ID " + item.getUnitId();
-                        lastErrorMessage = "Thuốc '" + medName + "' (đơn vị: " + unitName + ") hiện không đủ hàng trong kho hoặc không tồn tại.";
-                        conn.rollback();
-                        return false;
-                    }
                 }
                 psItem.executeBatch();
             }
