@@ -37,13 +37,15 @@ public class ResetPasswordController extends HttpServlet {
             return;
         }
 
-        if (newPassword == null || newPassword.length() < MIN_PASSWORD_LENGTH || newPassword.length() > MAX_PASSWORD_LENGTH) {
+        if (newPassword == null || newPassword.length() < MIN_PASSWORD_LENGTH
+                || newPassword.length() > MAX_PASSWORD_LENGTH) {
             request.setAttribute("errorMessage", "mật khẩu phải có độ dài từ 8 đến 16 kí tự");
             request.getRequestDispatcher("view/client/reset-password.jsp").forward(request, response);
             return;
         }
 
-        if (confirmPassword == null || confirmPassword.length() < MIN_PASSWORD_LENGTH || confirmPassword.length() > MAX_PASSWORD_LENGTH) {
+        if (confirmPassword == null || confirmPassword.length() < MIN_PASSWORD_LENGTH
+                || confirmPassword.length() > MAX_PASSWORD_LENGTH) {
             request.setAttribute("errorMessage", "mật khẩu phải có độ dài từ 8 đến 16 kí tự");
             request.getRequestDispatcher("view/client/reset-password.jsp").forward(request, response);
             return;
