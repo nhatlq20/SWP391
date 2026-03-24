@@ -83,8 +83,10 @@
                                                         <table class="table align-middle">
                                                             <thead>
                                                                 <tr>
-                                                                    <th scope="col" style="width: 50px;" class="text-center">
-                                                                        <input type="checkbox" id="selectAll" class="form-check-input" checked>
+                                                                    <th scope="col" style="width: 50px;"
+                                                                        class="text-center">
+                                                                        <input type="checkbox" id="selectAll"
+                                                                            class="form-check-input" checked>
                                                                     </th>
                                                                     <th scope="col">Sản phẩm</th>
                                                                     <th scope="col" class="text-center"
@@ -99,12 +101,14 @@
                                                             </thead>
                                                             <tbody>
                                                                 <c:forEach items="${cart.items}" var="item">
-                                                                    <tr data-item-id="${item.medicine.medicineId}" data-unit-id="${item.unitId}">
+                                                                    <tr data-item-id="${item.medicine.medicineId}"
+                                                                        data-unit-id="${item.unitId}">
                                                                         <td class="text-center">
                                                                             <input type="checkbox" name="selectedItems"
-                                                                                   value="${item.medicine.medicineId}-${item.unitId}"
-                                                                                   class="form-check-input item-checkbox" checked
-                                                                                   onchange="calculateSelectedTotal()">
+                                                                                value="${item.medicine.medicineId}-${item.unitId}"
+                                                                                class="form-check-input item-checkbox"
+                                                                                checked
+                                                                                onchange="calculateSelectedTotal()">
                                                                         </td>
                                                                         <td>
                                                                             <div class="d-flex align-items-center">
@@ -162,7 +166,7 @@
                                                                                 </div>
                                                                             </form>
                                                                         </td>
-                                                                         <td class="text-end price-text item-total-val"
+                                                                        <td class="text-end price-text item-total-val"
                                                                             id="item-total-${item.medicine.medicineId}-${item.unitId}"
                                                                             data-raw-value="${item.totalPrice}">
                                                                             <fmt:formatNumber value="${item.totalPrice}"
@@ -207,7 +211,8 @@
                                                         </div>
                                                     </div>
 
-                                                     <button type="button" onclick="goToCheckout()" class="btn-checkout w-100" id="btn-checkout">
+                                                    <button type="button" onclick="goToCheckout()"
+                                                        class="btn-checkout w-100" id="btn-checkout">
                                                         Thanh toán
                                                         <i class="fas fa-arrow-right"></i>
                                                     </button>
@@ -310,6 +315,8 @@
                                 btn.disabled = true;
 
                                 const formData = new FormData(form);
+                                console.log('Updating:', id, unitId, 'New Quantity:', newVal);
+                                
                                 fetch('cart', {
                                     method: 'POST',
                                     body: new URLSearchParams(formData),
@@ -321,8 +328,17 @@
                                     .then(data => {
                                         btn.disabled = false;
                                         if (data.success) {
-                                            const itemTotalEl = document.getElementById(`item-total-${id}-${unitId}`);
-                                            if (itemTotalEl) {
+                                            const row = form.closest('tr');
+                                            
+                                            // Update Unit Price (incase it changed)
+                                            const priceCell = row.querySelector('td:nth-child(3)');
+                                            if (priceCell && data.itemPrice) {
+                                                priceCell.textContent = formatCurrency(data.itemPrice);
+                                            }
+
+                                            // Update Subtotal (Thành tiền) - Using context-relative search
+                                            const itemTotalEl = row.querySelector('.item-total-val');
+                                            if (itemTotalEl && data.itemTotal !== undefined) {
                                                 itemTotalEl.textContent = formatCurrency(data.itemTotal);
                                                 itemTotalEl.setAttribute('data-raw-value', data.itemTotal);
                                             }

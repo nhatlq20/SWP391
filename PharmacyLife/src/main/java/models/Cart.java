@@ -111,6 +111,16 @@ public class Cart {
         return total;
     }
 
+    public int getItemCount() {
+        int count = 0;
+        if (items != null) {
+            for (Item item : items) {
+                count += item.getQuantity();
+            }
+        }
+        return count;
+    }
+
     public static class Item {
 
         private Medicine medicine;
