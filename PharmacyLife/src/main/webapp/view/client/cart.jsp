@@ -157,8 +157,12 @@
                                                                                         onclick="updateQuantity(this, -1)">-</button>
                                                                                     <input type="text" name="quantity"
                                                                                         value="${item.quantity}"
-                                                                                        class="form-control" readonly
-                                                                                        style="background-color: white;">
+                                                                                        class="form-control quantity-input"
+                                                                                        style="background-color: white;"
+                                                                                        data-original="${item.quantity}"
+                                                                                        onkeydown="handleQtyKeydown(event, this)"
+                                                                                        onblur="handleQtyBlur(this)"
+                                                                                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                                                                     <button
                                                                                         class="btn btn-outline-secondary"
                                                                                         type="button"
@@ -297,11 +301,62 @@
                             }
                         }
 
+                        function submitQuantityUpdate(form, newVal, inputEl) {
+                            inputEl.setAttribute('data-original', newVal);
+                            const formData = new FormData(form);
+
+                            const btnMinus = form.querySelector('button[onclick*="-1"]');
+                            const btnPlus  = form.querySelector('button[onclick*="1"]');
+                            if (btnMinus) btnMinus.disabled = true;
+                            if (btnPlus)  btnPlus.disabled  = true;
+                            inputEl.disabled = true;
+
+                            fetch('cart', {
+                                method: 'POST',
+                                body: new URLSearchParams(formData),
+                                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (btnMinus) btnMinus.disabled = false;
+                                if (btnPlus)  btnPlus.disabled  = false;
+                                inputEl.disabled = false;
+
+                                if (data.success) {
+                                    const row = form.closest('tr');
+                                    const priceCell = row.querySelector('td:nth-child(3)');
+                                    if (priceCell && data.itemPrice) {
+                                        priceCell.textContent = formatCurrency(data.itemPrice);
+                                    }
+                                    const itemTotalEl = row.querySelector('.item-total-val');
+                                    if (itemTotalEl && data.itemTotal !== undefined) {
+                                        itemTotalEl.textContent = formatCurrency(data.itemTotal);
+                                        itemTotalEl.setAttribute('data-raw-value', data.itemTotal);
+                                    }
+                                    calculateSelectedTotal();
+                                    if (typeof updateHeaderCartCount === 'function') {
+                                        updateHeaderCartCount(data.cartCount);
+                                    } else {
+                                        const badge = document.getElementById('cartCount');
+                                        if (badge) badge.textContent = data.cartCount;
+                                    }
+                                } else {
+                                    // Revert to original value if server rejects
+                                    inputEl.value = inputEl.getAttribute('data-original');
+                                }
+                            })
+                            .catch(error => {
+                                if (btnMinus) btnMinus.disabled = false;
+                                if (btnPlus)  btnPlus.disabled  = false;
+                                inputEl.disabled = false;
+                                inputEl.value = inputEl.getAttribute('data-original');
+                                console.error('Error updating quantity:', error);
+                            });
+                        }
+
                         function updateQuantity(btn, change) {
                             const form = btn.closest('form');
                             const input = form.querySelector('input[name="quantity"]');
-                            const id = form.querySelector('input[name="id"]').value;
-                            const unitId = form.querySelector('input[name="unitId"]').value;
 
                             let currentVal = parseInt(input.value);
                             if (isNaN(currentVal)) currentVal = 1;
@@ -311,51 +366,29 @@
 
                             if (newVal !== currentVal) {
                                 input.value = newVal;
+                                submitQuantityUpdate(form, newVal, input);
+                            }
+                        }
 
-                                btn.disabled = true;
+                        function handleQtyKeydown(event, inputEl) {
+                            if (event.key === 'Enter') {
+                                event.preventDefault();
+                                inputEl.blur();
+                            }
+                        }
 
-                                const formData = new FormData(form);
-                                console.log('Updating:', id, unitId, 'New Quantity:', newVal);
-                                
-                                fetch('cart', {
-                                    method: 'POST',
-                                    body: new URLSearchParams(formData),
-                                    headers: {
-                                        'X-Requested-With': 'XMLHttpRequest'
-                                    }
-                                })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        btn.disabled = false;
-                                        if (data.success) {
-                                            const row = form.closest('tr');
-                                            
-                                            // Update Unit Price (incase it changed)
-                                            const priceCell = row.querySelector('td:nth-child(3)');
-                                            if (priceCell && data.itemPrice) {
-                                                priceCell.textContent = formatCurrency(data.itemPrice);
-                                            }
+                        function handleQtyBlur(inputEl) {
+                            const form = inputEl.closest('form');
+                            let newVal = parseInt(inputEl.value);
+                            const originalVal = parseInt(inputEl.getAttribute('data-original'));
 
-                                            // Update Subtotal (Thành tiền) - Using context-relative search
-                                            const itemTotalEl = row.querySelector('.item-total-val');
-                                            if (itemTotalEl && data.itemTotal !== undefined) {
-                                                itemTotalEl.textContent = formatCurrency(data.itemTotal);
-                                                itemTotalEl.setAttribute('data-raw-value', data.itemTotal);
-                                            }
-                                            calculateSelectedTotal();
+                            if (isNaN(newVal) || newVal < 1) {
+                                inputEl.value = originalVal; // Restore if invalid
+                                return;
+                            }
 
-                                            if (typeof updateHeaderCartCount === 'function') {
-                                                updateHeaderCartCount(data.cartCount);
-                                            } else {
-                                                const badge = document.getElementById('cartCount');
-                                                if (badge) badge.textContent = data.cartCount;
-                                            }
-                                        }
-                                    })
-                                    .catch(error => {
-                                        btn.disabled = false;
-                                        console.error('Error updating quantity:', error);
-                                    });
+                            if (newVal !== originalVal) {
+                                submitQuantityUpdate(form, newVal, inputEl);
                             }
                         }
 
