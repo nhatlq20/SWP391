@@ -89,55 +89,12 @@
                                             <option value="">-- Không --</option>
                                         </select>
                                     </div>
-                                    <div class="col-12 mt-4">
-                                        <h5 class="text-primary border-bottom pb-2">Thành phần dược chất</h5>
-                                        <table class="table table-bordered align-middle" id="ingredientsTable">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>Tên hoạt chất</th>
-                                                    <th style="width: 15%;">Hàm lượng</th>
-                                                    <th>Mô tả / Cơ chế</th>
-                                                    <th style="width: 50px;"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <!-- Rows added by JS -->
-                                            </tbody>
-                                        </table>
-                                        <button type="button" class="btn btn-sm btn-primary"
-                                            onclick="addRow('ingredientsTable')"><i class="fas fa-plus me-1"></i> Thêm
-                                            hoạt chất</button>
-                                        <input type="hidden" name="ingredients" id="ingredientsHidden"
-                                            value="${medicine.ingredients}">
-                                    </div>
-
-                                    <div class="col-12 mt-4">
-                                        <h5 class="text-primary border-bottom pb-2">Công dụng & Chỉ định</h5>
-                                        <table class="table table-bordered align-middle" id="usesTable">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>Tên công dụng</th>
-                                                    <th>Mô tả chi tiết</th>
-                                                    <th>Lời khuyên của chuyên gia</th>
-                                                    <th style="width: 50px;"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <!-- Rows added by JS -->
-                                            </tbody>
-                                        </table>
-                                        <button type="button" class="btn btn-sm btn-primary"
-                                            onclick="addRow('usesTable')"><i class="fas fa-plus me-1"></i> Thêm công
-                                            dụng</button>
-                                        <input type="hidden" name="uses" id="usesHidden" value="${medicine.conditions}">
-                                    </div>
 
                                     <!-- Sub Unit Conversion Rates (shown dynamically) -->
                                     <div id="subUnit1RateSection" class="col-12" style="display:none;">
-                                        <div class="row g-3 align-items-end"
-                                            style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #0d6efd;">
-                                            <div class="col-md-4">
-                                                <label class="form-label fw-bold text-primary">
+                                        <div class="row g-4">
+                                            <div class="col-md-6">
+                                                <label class="form-label text-primary fw-bold">
                                                     1 <span class="main-unit-name">Hộp</span> =
                                                 </label>
                                                 <div class="input-group">
@@ -146,7 +103,7 @@
                                                     <span class="input-group-text subunit1-name">đơn vị</span>
                                                 </div>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-6">
                                                 <label class="form-label">Giá bán tương ứng (đ)</label>
                                                 <input name="subPrice1" type="number" min="0" class="form-control"
                                                     placeholder="Giá bán">
@@ -155,10 +112,9 @@
                                     </div>
 
                                     <div id="subUnit2RateSection" class="col-12" style="display:none;">
-                                        <div class="row g-3 align-items-end"
-                                            style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #0d6efd;">
-                                            <div class="col-md-4">
-                                                <label class="form-label fw-bold text-primary">
+                                        <div class="row g-4">
+                                            <div class="col-md-6">
+                                                <label class="form-label text-primary fw-bold">
                                                     1 <span class="subunit1-name-display">đơn vị</span> =
                                                 </label>
                                                 <div class="input-group">
@@ -167,13 +123,65 @@
                                                     <span class="input-group-text subunit2-name">đơn vị</span>
                                                 </div>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-6">
                                                 <label class="form-label">Giá bán tương ứng (đ)</label>
                                                 <input name="subPrice2" type="number" min="0" class="form-control"
                                                     placeholder="Giá bán">
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="col-12 mt-4">
+                                        <div class="table-responsive">
+                                            <table class="table align-middle" id="ingredientsTable"
+                                                style="margin-bottom: 0; border: none;">
+                                                <thead>
+                                                    <tr style="border: none;">
+                                                        <th style="border: none; padding: 0 0 8px 0;">
+                                                            <label class="form-label mb-0">Tên thành phần</label>
+                                                        </th>
+                                                        <th style="width: 18%; border: none; padding: 0 0 8px 12px;">
+                                                            <label class="form-label mb-0">Hàm lượng</label>
+                                                        </th>
+                                                        <th style="border: none; padding: 0 0 8px 12px;">
+                                                            <label class="form-label mb-0">Mô tả</label>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Rows added by JS -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <input type="hidden" name="ingredients" id="ingredientsHidden"
+                                            value="${medicine.ingredients}">
+                                    </div>
+
+                                    <div class="col-12 mt-4">
+                                        <div class="table-responsive">
+                                            <table class="table align-middle" id="usesTable"
+                                                style="margin-bottom: 0; border: none;">
+                                                <thead>
+                                                    <tr style="border: none;">
+                                                        <th style="border: none; padding: 0 0 8px 0;">
+                                                            <label class="form-label mb-0">Tên công dụng</label>
+                                                        </th>
+                                                        <th style="border: none; padding: 0 0 8px 12px;">
+                                                            <label class="form-label mb-0">Mô tả chi tiết</label>
+                                                        </th>
+                                                        <th style="border: none; padding: 0 0 8px 12px;">
+                                                            <label class="form-label mb-0">Lời khuyên</label>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Rows added by JS -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <input type="hidden" name="uses" id="usesHidden" value="${medicine.conditions}">
+                                    </div>
+
                                     <div class="col-12 mt-4">
                                         <label class="form-label">Mô tả tổng quát</label>
                                         <textarea name="shortDescription" rows="4"
@@ -350,16 +358,19 @@
                     function addRow(tableId, data) {
                         var table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
                         var newRow = table.insertRow();
+                        newRow.style.border = 'none';
                         if (tableId === 'ingredientsTable') {
-                            newRow.innerHTML = '<td><input class="form-control ing-name" value="' + (data ? data.name : '') + '" placeholder="Ví dụ: Paracetamol"></td>' +
-                                '<td><input class="form-control ing-strength" value="' + (data ? data.strength : '') + '" placeholder="500mg"></td>' +
-                                '<td><input class="form-control ing-desc" value="' + (data ? data.desc : '') + '" placeholder="Giảm đau, hạ sốt"></td>' +
-                                '<td><button type="button" class="btn btn-sm btn-outline-danger remove-row"><i class="fas fa-times"></i></button></td>';
+                            newRow.innerHTML = `
+                                <td style="border: none; padding: 0;"><input class="form-control ing-name" value="${data ? data.name : ''}" placeholder="Ví dụ: Paracetamol"></td>
+                                <td style="border: none; padding: 0 0 0 12px;"><input class="form-control ing-strength" value="${data ? data.strength : ''}" placeholder="500mg"></td>
+                                <td style="border: none; padding: 0 0 0 12px;"><input class="form-control ing-desc" value="${data ? data.desc : ''}" placeholder="Giảm đau, hạ sốt"></td>
+                            `;
                         } else {
-                            newRow.innerHTML = '<td><input class="form-control use-name" value="' + (data ? data.name : '') + '" placeholder="Ví dụ: Đau đầu"></td>' +
-                                '<td><input class="form-control use-desc" value="' + (data ? data.desc : '') + '" placeholder="Giảm các triệu chứng đau nửa đầu..."></td>' +
-                                '<td><input class="form-control use-advice" value="' + (data ? data.advice : '') + '" placeholder="Lời khuyên (vệ sinh, ăn uống...)"></td>' +
-                                '<td><button type="button" class="btn btn-sm btn-outline-danger remove-row"><i class="fas fa-times"></i></button></td>';
+                            newRow.innerHTML = `
+                                <td style="border: none; padding: 0;"><input class="form-control use-name" value="${data ? data.name : ''}" placeholder="Ví dụ: Đau đầu"></td>
+                                <td style="border: none; padding: 0 0 0 12px;"><input class="form-control use-desc" value="${data ? data.desc : ''}" placeholder="Giảm các triệu chứng đau nửa đầu..."></td>
+                                <td style="border: none; padding: 0 0 0 12px;"><input class="form-control use-advice" value="${data ? data.advice : ''}" placeholder="Lời khuyên (vệ sinh, ăn uống...)"></td>
+                            `;
                         }
                     }
 
