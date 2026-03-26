@@ -72,13 +72,10 @@
                                 <div class="col-md-3">
                                     <label class="form-label">Đơn vị chính</label>
                                     <select name="unit" class="form-select" id="mainUnitSelect">
-                                        <option value="Hộp">Hộp</option>
-                                        <option value="Chai">Chai</option>
-                                        <option value="Tuýp">Tuýp</option>
-                                        <option value="Lọ">Lọ</option>
-                                        <option value="Hũ">Hũ</option>
-                                        <option value="Phần">Phần</option>
-                                        <option value="Lốc">Lốc</option>
+                                        <c:forEach var="ut" items="${unitTypes}">
+                                            <option value="${ut.unitName}" ${ut.unitName eq 'Hộp' ? 'selected' : '' }>
+                                                ${ut.unitName}</option>
+                                        </c:forEach>
                                     </select>
                                 </div>
                                 <div class="col-md-3" id="subUnit1Wrapper">
@@ -96,6 +93,10 @@
                                 <div class="col-md-3">
                                     <label class="form-label">Thành phần</label>
                                     <input name="ingredients" class="form-control" placeholder="Nhập thành phần thuốc">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Công dụng</label>
+                                    <input name="uses" class="form-control" placeholder="Nhập công dụng thuốc">
                                 </div>
 
                                 <!-- Sub Unit Conversion Rates (shown dynamically) -->

@@ -2,8 +2,9 @@ package models;
 
 public class MedicineUnit {
 
-    private int unitId;
+    private int medicineUnitId;
     private int medicineId;
+    private int unitId;
     private String unitName;
     private int conversionRate;
     private double sellingPrice;
@@ -12,14 +13,23 @@ public class MedicineUnit {
     public MedicineUnit() {
     }
 
-    public MedicineUnit(int unitId, int medicineId, String unitName, int conversionRate, double sellingPrice,
-            boolean isBaseUnit) {
-        this.unitId = unitId;
+    public MedicineUnit(int medicineUnitId, int medicineId, int unitId, String unitName, int conversionRate,
+            double sellingPrice, boolean isBaseUnit) {
+        this.medicineUnitId = medicineUnitId;
         this.medicineId = medicineId;
+        this.unitId = unitId;
         this.unitName = unitName;
         this.conversionRate = conversionRate;
         this.sellingPrice = sellingPrice;
         this.isBaseUnit = isBaseUnit;
+    }
+
+    public int getMedicineUnitId() {
+        return medicineUnitId;
+    }
+
+    public void setMedicineUnitId(int medicineUnitId) {
+        this.medicineUnitId = medicineUnitId;
     }
 
     public int getUnitId() {

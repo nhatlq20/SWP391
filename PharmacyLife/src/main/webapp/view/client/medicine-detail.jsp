@@ -520,8 +520,8 @@
                                                 <input type="hidden" name="unitId" id="formUnitId" value="">
                                             </form>
 
-                                            <button class="btn-buy btn btn-primary"
-                                                onclick="submitAddToCart()">Mua</button>
+                                            <button class="btn-buy btn btn-primary" onclick="submitAddToCart()">Thêm vào
+                                                giỏ hàng</button>
 
                                             <!-- Xóa nút đánh giá ở action-buttons cũ (nếu còn) -->
 

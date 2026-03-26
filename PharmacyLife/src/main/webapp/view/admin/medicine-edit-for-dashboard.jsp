@@ -71,16 +71,10 @@
                                     <div class="col-md-3">
                                         <label class="form-label">Đơn vị chính</label>
                                         <select name="unit" class="form-select" id="mainUnitSelect">
-                                            <option value="Hộp" ${medicine.unit=='Hộp' ? 'selected' : '' }>Hộp</option>
-                                            <option value="Chai" ${medicine.unit=='Chai' ? 'selected' : '' }>Chai
-                                            </option>
-                                            <option value="Tuýp" ${medicine.unit=='Tuýp' ? 'selected' : '' }>Tuýp
-                                            </option>
-                                            <option value="Lọ" ${medicine.unit=='Lọ' ? 'selected' : '' }>Lọ</option>
-                                            <option value="Hũ" ${medicine.unit=='Hũ' ? 'selected' : '' }>Hũ</option>
-                                            <option value="Phần" ${medicine.unit=='Phần' ? 'selected' : '' }>Phần
-                                            </option>
-                                            <option value="Lốc" ${medicine.unit=='Lốc' ? 'selected' : '' }>Lốc</option>
+                                            <c:forEach var="ut" items="${unitTypes}">
+                                                <option value="${ut.unitName}" ${ut.unitName eq medicine.unit
+                                                    ? 'selected' : '' }>${ut.unitName}</option>
+                                            </c:forEach>
                                         </select>
                                     </div>
                                     <div class="col-md-3" id="subUnit1Wrapper">
@@ -99,6 +93,11 @@
                                         <label class="form-label">Thành phần</label>
                                         <input name="ingredients" class="form-control" value="${medicine.ingredients}"
                                             placeholder="Nhập thành phần thuốc">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Công dụng</label>
+                                        <input name="uses" class="form-control" value="${medicine.conditions}"
+                                            placeholder="Nhập công dụng thuốc">
                                     </div>
 
                                     <!-- Sub Unit Conversion Rates (shown dynamically) -->
