@@ -422,12 +422,12 @@ public class MedicineControllerForDashboard extends HttpServlet {
                     if (i < newUnits.size() && i < existingUnits.size()) {
                         // Update existing
                         MedicineUnit toUpdate = newUnits.get(i);
-                        toUpdate.setUnitId(existingUnits.get(i).getUnitId());
+                        toUpdate.setMedicineUnitId(existingUnits.get(i).getMedicineUnitId());
                         medicineUnitDAO.updateUnit(toUpdate);
                     } else if (i < newUnits.size()) {
                         medicineUnitDAO.addUnit(newUnits.get(i));
                     } else if (i < existingUnits.size()) {
-                        medicineUnitDAO.deleteUnit(existingUnits.get(i).getUnitId());
+                        medicineUnitDAO.deleteUnit(existingUnits.get(i).getMedicineUnitId());
                     }
                 }
 

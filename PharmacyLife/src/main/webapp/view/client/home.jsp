@@ -164,10 +164,15 @@
                                                                 groupingUsed="true" />₫
                                                             <span class="price-unit">/ ${m.unit}</span>
                                                         </div>
-                                                        <button onclick="addToCartAjax(this, '${m.medicineId}')"
-                                                            class="btn-buy-premium">
-                                                            Thêm vào giỏ hàng
-                                                        </button>
+                                                        <c:set var="userRoleForCart"
+                                                            value="${fn:toLowerCase(fn:trim(sessionScope.roleName))}" />
+                                                        <c:if
+                                                            test="${userRoleForCart ne 'admin' and userRoleForCart ne 'staff'}">
+                                                            <button onclick="addToCartAjax(this, '${m.medicineId}')"
+                                                                class="btn-buy-premium">
+                                                                Thêm vào giỏ hàng
+                                                            </button>
+                                                        </c:if>
                                                     </div>
                                                 </div>
                                             </c:forEach>
