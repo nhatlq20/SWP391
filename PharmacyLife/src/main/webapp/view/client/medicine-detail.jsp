@@ -418,7 +418,7 @@
                                                 <c:forEach var="u" items="${units}" varStatus="st">
                                                     <button type="button" class="unit-pill ${st.first ? 'active' : ''}"
                                                         data-price="${u.sellingPrice}" data-unit="${u.unitName}"
-                                                        data-unitid="${u.unitId}" onclick="selectUnit(this)">
+                                                        data-unitid="${u.medicineUnitId}" onclick="selectUnit(this)">
                                                         ${u.unitName}
                                                     </button>
                                                 </c:forEach>
@@ -517,7 +517,7 @@
                                                 <input type="hidden" name="action" value="add">
                                                 <input type="hidden" name="id" value="${medicine.medicineId}">
                                                 <input type="hidden" name="quantity" id="formQuantity" value="1">
-                                                <input type="hidden" name="unitId" id="formUnitId" value="">
+                                                <input type="hidden" name="muid" id="formMuid" value="">
                                             </form>
 
                                             <button class="btn-buy btn btn-primary" onclick="submitAddToCart()">Thêm vào
@@ -680,13 +680,13 @@
 
                                         const qty = document.getElementById('quantity').value;
                                         const mainImg = document.querySelector('.main-img');
-                                        const unitId = document.getElementById('formUnitId').value;
+                                        const muid = document.getElementById('formMuid').value;
 
                                         const formData = new URLSearchParams();
                                         formData.append('action', 'add');
                                         formData.append('id', '${medicine.medicineId}');
                                         formData.append('quantity', qty);
-                                        if (unitId) formData.append('unitId', unitId);
+                                        if (muid) formData.append('muid', muid);
 
                                         fetch('${pageContext.request.contextPath}/cart', {
                                             method: 'POST',
@@ -739,9 +739,9 @@
                                         var unitEl = document.getElementById('unitDisplay');
                                         if (unitEl) unitEl.textContent = '/ ' + unitName;
 
-                                        // Store unitId for cart
-                                        var formUnitId = document.getElementById('formUnitId');
-                                        if (formUnitId) formUnitId.value = unitId;
+                                        // Store muid for cart
+                                        var formMuid = document.getElementById('formMuid');
+                                        if (formMuid) formMuid.value = unitId;
 
                                         // Reset quantity to 1 when unit changes
                                         var qtyInput = document.getElementById('quantity');

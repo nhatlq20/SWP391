@@ -2,48 +2,20 @@ package models;
 
 public class OrderItem {
     private int orderId;
-    private int medicineId;
-    private int unitId; // New field
+    private int medicineUnitId;
     private int quantity;
     private double unitPrice;
-    private String unitName; // Added for better error reporting
+    private String unitName; // For display/reporting
 
-    // Helper navigation property for display
+    // Navigation property
     private Medicine medicine;
 
     public OrderItem() {
     }
 
-    public String getUnitName() {
-        return unitName;
-    }
-
-    public void setUnitName(String unitName) {
-        this.unitName = unitName;
-    }
-
-    public OrderItem(int orderId, int medicineId, int unitId, int quantity, double unitPrice) {
+    public OrderItem(int orderId, int medicineUnitId, int quantity, double unitPrice) {
         this.orderId = orderId;
-        this.medicineId = medicineId;
-        this.unitId = unitId;
-        this.quantity = quantity;
-        this.unitPrice = unitPrice;
-    }
-
-    // Legacy constructor
-    public OrderItem(int orderId, int medicineId, int quantity, double unitPrice) {
-        this.orderId = orderId;
-        this.medicineId = medicineId;
-        this.quantity = quantity;
-        this.unitPrice = unitPrice;
-    }
-
-    public OrderItem(int orderId, Medicine medicine, int quantity, double unitPrice) {
-        this.orderId = orderId;
-        this.medicine = medicine;
-        if (medicine != null) {
-            this.medicineId = medicine.getMedicineId();
-        }
+        this.medicineUnitId = medicineUnitId;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
     }
@@ -56,20 +28,12 @@ public class OrderItem {
         this.orderId = orderId;
     }
 
-    public int getMedicineId() {
-        return medicineId;
+    public int getMedicineUnitId() {
+        return medicineUnitId;
     }
 
-    public void setMedicineId(int medicineId) {
-        this.medicineId = medicineId;
-    }
-
-    public int getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(int unitId) {
-        this.unitId = unitId;
+    public void setMedicineUnitId(int medicineUnitId) {
+        this.medicineUnitId = medicineUnitId;
     }
 
     public int getQuantity() {
@@ -86,6 +50,14 @@ public class OrderItem {
 
     public void setUnitPrice(double unitPrice) {
         this.unitPrice = unitPrice;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
     }
 
     public Medicine getMedicine() {

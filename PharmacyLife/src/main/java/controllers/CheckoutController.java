@@ -45,15 +45,15 @@ public class CheckoutController extends HttpServlet {
             totalMoney = 0;
             String[] parts = selected.split(",");
             for (String part : parts) {
-                String[] ids = part.split("-");
-                if (ids.length == 2) {
-                    int mid = Integer.parseInt(ids[0]);
-                    int uid = Integer.parseInt(ids[1]);
-                    models.Cart.Item item = cart.getItem(mid, uid);
+                try {
+                    int muid = Integer.parseInt(part);
+                    models.Cart.Item item = cart.getItem(muid);
                     if (item != null) {
                         itemsToCheckout.add(item);
                         totalMoney += item.getTotalPrice();
                     }
+                } catch (NumberFormatException e) {
+                    // Fallback to mid-uid if necessary (though we prefer muid)
                 }
             }
         }
@@ -96,6 +96,29 @@ public class CheckoutController extends HttpServlet {
             order.setShippingPhone(phone);
             order.setShippingAddress(address);
 
+            order.setStatus("Pending");
+            
+            String selected = request.getParameter("selectedItems");
+            java.util.List<models.Cart.Item> itemsToProcess = new java.util.ArrayList<>(cart.getItems());
+            double subTotal = cart.getTotalMoney();
+
+            if (selected != null && !selected.isEmpty()) {
+                itemsToProcess = new java.util.ArrayList<>();
+                subTotal = 0;
+                String[] parts = selected.split(",");
+                for (String part : parts) {
+                    try {
+                        int muid = Integer.parseInt(part);
+                        models.Cart.Item item = cart.getItem(muid);
+                        if (item != null) {
+                            itemsToProcess.add(item);
+                            subTotal += item.getTotalPrice();
+                        }
+                    } catch (NumberFormatException e) {
+                    }
+                }
+            }
+
             // Handle Voucher
             int appliedVoucherId = 0;
             double discountAmount = 0;
@@ -106,8 +129,8 @@ public class CheckoutController extends HttpServlet {
                     VoucherDAO vDAO = new VoucherDAO();
                     Voucher v = vDAO.getVoucherById(appliedVoucherId);
                     if (v != null && v.isActive()) {
-                        // Re-calculate discount for security
-                        double tempTotal = cart.getTotalMoney();
+                        // Re-calculate discount for security using subtotal of selected items
+                        double tempTotal = subTotal;
                         if ("Percent".equalsIgnoreCase(v.getDiscountType())) {
                             discountAmount = tempTotal * (v.getDiscountValue() / 100);
                             if (v.getMaxDiscountAmount() != null && discountAmount > v.getMaxDiscountAmount()) {
@@ -124,38 +147,13 @@ public class CheckoutController extends HttpServlet {
                 e.printStackTrace();
             }
 
-            order.setStatus("Pending");
-            
-            String selected = request.getParameter("selectedItems");
-            java.util.List<models.Cart.Item> itemsToProcess = cart.getItems();
-            double subTotal = cart.getTotalMoney();
-
-            if (selected != null && !selected.isEmpty()) {
-                itemsToProcess = new java.util.ArrayList<>();
-                subTotal = 0;
-                String[] parts = selected.split(",");
-                for (String part : parts) {
-                    String[] ids = part.split("-");
-                    if (ids.length == 2) {
-                        int mid = Integer.parseInt(ids[0]);
-                        int uid = Integer.parseInt(ids[1]);
-                        models.Cart.Item item = cart.getItem(mid, uid);
-                        if (item != null) {
-                            itemsToProcess.add(item);
-                            subTotal += item.getTotalPrice();
-                        }
-                    }
-                }
-            }
-
             order.setTotalAmount(subTotal - discountAmount);
 
             // Convert Processed Items to Order Items
             java.util.List<models.OrderItem> orderItems = new java.util.ArrayList<>();
             for (models.Cart.Item cartItem : itemsToProcess) {
                 models.OrderItem orderItem = new models.OrderItem();
-                orderItem.setMedicineId(cartItem.getMedicine().getMedicineId());
-                orderItem.setUnitId(cartItem.getUnitId());
+                orderItem.setMedicineUnitId(cartItem.getMedicineUnitId());
                 orderItem.setUnitName(cartItem.getUnitName());
                 orderItem.setQuantity(cartItem.getQuantity());
                 orderItem.setUnitPrice(cartItem.getPrice());
@@ -173,10 +171,18 @@ public class CheckoutController extends HttpServlet {
             if (isSaved) {
                 // Remove only selected items from cart
                 CartDAO cartDAO_checkout = new CartDAO();
-                for (models.Cart.Item processedItem : itemsToProcess) {
-                    cart.removeItem(processedItem.getMedicine().getMedicineId(), processedItem.getUnitId());
+                if (selected == null || selected.isEmpty() || itemsToProcess.size() == cart.getItemCount()) {
+                    // Optimized: Clear whole cart if all items were processed
+                    cart.getItems().clear();
                     if (customerId != null) {
-                        cartDAO_checkout.removeCartItem(customerId, processedItem.getMedicine().getMedicineId(), processedItem.getUnitId());
+                        cartDAO_checkout.clearCart(customerId);
+                    }
+                } else {
+                    for (models.Cart.Item processedItem : itemsToProcess) {
+                        cart.removeItem(processedItem.getMedicineUnitId());
+                        if (customerId != null) {
+                            cartDAO_checkout.removeCartItem(customerId, processedItem.getMedicineUnitId());
+                        }
                     }
                 }
 
