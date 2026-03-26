@@ -5,9 +5,7 @@
 package controllers;
 
 import dao.CustomerDAO;
-import dao.StaffDAO;
 import models.Customer;
-import models.Staff;
 import models.Cart;
 import dao.CartDAO;
 import java.io.IOException;

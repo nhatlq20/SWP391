@@ -23,35 +23,17 @@ public class Cart {
         this.items = items;
     }
 
-    public Item getItem(int medicineId, int unitId) {
+    public Item getItem(int medicineUnitId) {
         for (Item item : items) {
-            if (item.getMedicine().getMedicineId() == medicineId && item.getUnitId() == unitId) {
+            if (item.getMedicineUnitId() == medicineUnitId) {
                 return item;
             }
         }
         return null;
     }
 
-    // Proxy for backward compatibility if needed, but better to update calls
-    public Item getItemById(int medicineId) {
-        for (Item item : items) {
-            if (item.getMedicine().getMedicineId() == medicineId) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    public int getQuantity(int medicineId, int unitId) {
-        Item item = getItem(medicineId, unitId);
-        if (item != null) {
-            return item.getQuantity();
-        }
-        return 0;
-    }
-
-    public int getQuantityById(int id) {
-        Item item = getItemById(id);
+    public int getQuantity(int medicineUnitId) {
+        Item item = getItem(medicineUnitId);
         if (item != null) {
             return item.getQuantity();
         }
@@ -59,7 +41,7 @@ public class Cart {
     }
 
     public void addItem(Item t) {
-        Item existingItem = getItem(t.getMedicine().getMedicineId(), t.getUnitId());
+        Item existingItem = getItem(t.getMedicineUnitId());
         if (existingItem != null) {
             existingItem.setQuantity(existingItem.getQuantity() + t.getQuantity());
         } else {
@@ -67,33 +49,15 @@ public class Cart {
         }
     }
 
-    public void removeItem(int medicineId, int unitId) {
-        Item item = getItem(medicineId, unitId);
+    public void removeItem(int medicineUnitId) {
+        Item item = getItem(medicineUnitId);
         if (item != null) {
             items.remove(item);
         }
     }
 
-    public void removeItem(int id) {
-        Item item = getItemById(id);
-        if (item != null) {
-            items.remove(item);
-        }
-    }
-
-    public void updateQuantity(int medicineId, int unitId, int quantity) {
-        Item item = getItem(medicineId, unitId);
-        if (item != null) {
-            if (quantity <= 0) {
-                items.remove(item);
-            } else {
-                item.setQuantity(quantity);
-            }
-        }
-    }
-
-    public void updateQuantity(int id, int quantity) {
-        Item item = getItemById(id);
+    public void updateQuantity(int medicineUnitId, int quantity) {
+        Item item = getItem(medicineUnitId);
         if (item != null) {
             if (quantity <= 0) {
                 items.remove(item);
@@ -124,7 +88,7 @@ public class Cart {
     public static class Item {
 
         private Medicine medicine;
-        private int unitId; // New field
+        private int medicineUnitId;
         private String unitName; // Added for UI clarity
         private int conversionRate; // Added to distinguish units
         private int quantity;
@@ -133,25 +97,18 @@ public class Cart {
         public Item() {
         }
 
-        public Item(Medicine medicine, int unitId, int quantity, double price) {
+        public Item(Medicine medicine, int medicineUnitId, int quantity, double price) {
             this.medicine = medicine;
-            this.unitId = unitId;
+            this.medicineUnitId = medicineUnitId;
             this.quantity = quantity;
             this.price = price;
         }
 
-        public Item(Medicine medicine, int unitId, String unitName, int conversionRate, int quantity, double price) {
+        public Item(Medicine medicine, int medicineUnitId, String unitName, int conversionRate, int quantity, double price) {
             this.medicine = medicine;
-            this.unitId = unitId;
+            this.medicineUnitId = medicineUnitId;
             this.unitName = unitName;
             this.conversionRate = conversionRate;
-            this.quantity = quantity;
-            this.price = price;
-        }
-
-        // Legacy constructor for backward compatibility
-        public Item(Medicine medicine, int quantity, double price) {
-            this.medicine = medicine;
             this.quantity = quantity;
             this.price = price;
         }
@@ -164,12 +121,12 @@ public class Cart {
             this.medicine = medicine;
         }
 
-        public int getUnitId() {
-            return unitId;
+        public int getMedicineUnitId() {
+            return medicineUnitId;
         }
 
-        public void setUnitId(int unitId) {
-            this.unitId = unitId;
+        public void setMedicineUnitId(int medicineUnitId) {
+            this.medicineUnitId = medicineUnitId;
         }
 
         public String getUnitName() {

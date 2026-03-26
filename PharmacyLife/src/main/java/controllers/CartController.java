@@ -58,13 +58,20 @@ public class CartController extends HttpServlet {
                 itemsToCheck = new java.util.ArrayList<>();
                 String[] parts = selected.split(",");
                 for (String part : parts) {
-                    String[] ids = part.split("-");
-                    if (ids.length == 2) {
-                        int mid = Integer.parseInt(ids[0]);
-                        int uid = Integer.parseInt(ids[1]);
-                        models.Cart.Item item = cart.getItem(mid, uid);
+                    try {
+                        int muid = Integer.parseInt(part);
+                        models.Cart.Item item = cart.getItem(muid);
                         if (item != null) {
                             itemsToCheck.add(item);
+                        }
+                    } catch (NumberFormatException e) {
+                        // Support legacy format mid-uid if necessary, but prefer muid
+                        if (part.contains("-")) {
+                            String[] ids = part.split("-");
+                            if (ids.length == 2) {
+                                // Since we moved to muid, we might need a way to look up muid from mid/uid if it's still being sent this way
+                                // But ideally we change the JSP to send just muid.
+                            }
                         }
                     }
                 }
@@ -190,7 +197,7 @@ public class CartController extends HttpServlet {
 
                 Medicine medicine = medicineDAO.getMedicineById(id);
                 if (medicine != null) {
-                    int unitId = 0;
+                    int muid = 0;
                     double unitPrice = medicine.getSellingPrice();
                     String unitName = medicine.getUnit();
                     int convRate = 1;
@@ -199,17 +206,17 @@ public class CartController extends HttpServlet {
                     }
 
                     try {
-                        String uIdParam = request.getParameter("unitId");
-                        if (uIdParam != null && !uIdParam.isEmpty()) {
-                            unitId = Integer.parseInt(uIdParam);
-                            MedicineUnit mu = unitDAO.getUnitById(unitId);
+                        String muidParam = request.getParameter("muid");
+                        if (muidParam != null && !muidParam.isEmpty()) {
+                            muid = Integer.parseInt(muidParam);
+                            MedicineUnit mu = unitDAO.getUnitById(muid);
                             if (mu != null) {
                                 unitPrice = mu.getSellingPrice();
                                 unitName = mu.getUnitName();
                                 convRate = mu.getConversionRate();
                             }
                         } else if (medicine.getBaseUnit() != null) {
-                            unitId = medicine.getBaseUnit().getUnitId();
+                            muid = medicine.getBaseUnit().getMedicineUnitId();
                             unitPrice = medicine.getBaseUnit().getSellingPrice();
                             unitName = medicine.getBaseUnit().getUnitName();
                             convRate = medicine.getBaseUnit().getConversionRate();
@@ -217,43 +224,22 @@ public class CartController extends HttpServlet {
                     } catch (NumberFormatException e) {
                     }
 
-                    Cart.Item item = new Cart.Item(medicine, unitId, unitName, convRate, quantity, unitPrice);
+                    Cart.Item item = new Cart.Item(medicine, muid, unitName, convRate, quantity, unitPrice);
                     cart.addItem(item);
                     // Sync with DB
-                    cartDAO.saveCartItem(userId, id, unitId, cart.getQuantity(id, unitId));
+                    cartDAO.saveCartItem(userId, muid, quantity);
                 }
             } else if ("update".equals(action)) {
-                int id = Integer.parseInt(request.getParameter("id"));
+                int muid = Integer.parseInt(request.getParameter("muid"));
                 int quantity = Integer.parseInt(request.getParameter("quantity"));
-                int unitId = 0;
-                try {
-                    String uIdParam = request.getParameter("unitId");
-                    if (uIdParam != null && !uIdParam.isEmpty()) {
-                        unitId = Integer.parseInt(uIdParam);
-                    } else {
-                        // This might be ambiguous if not passed from frontend
-                        Cart.Item item = cart.getItemById(id);
-                        if (item != null)
-                            unitId = item.getUnitId();
-                    }
-                } catch (NumberFormatException e) {
-                }
-                cart.updateQuantity(id, unitId, quantity);
+                cart.updateQuantity(muid, quantity);
                 // Sync with DB
-                cartDAO.saveCartItem(userId, id, unitId, quantity);
+                cartDAO.saveCartItem(userId, muid, quantity);
             } else if ("remove".equals(action)) {
-                int id = Integer.parseInt(request.getParameter("id"));
-                int unitId = 0;
-                try {
-                    String uIdParam = request.getParameter("unitId");
-                    if (uIdParam != null && !uIdParam.isEmpty()) {
-                        unitId = Integer.parseInt(uIdParam);
-                    }
-                } catch (NumberFormatException e) {
-                }
-                cart.removeItem(id, unitId);
+                int muid = Integer.parseInt(request.getParameter("muid"));
+                cart.removeItem(muid);
                 // Sync with DB
-                cartDAO.removeCartItem(userId, id, unitId);
+                cartDAO.removeCartItem(userId, muid);
             }
         } catch (NumberFormatException e) {
             e.printStackTrace();
@@ -275,20 +261,12 @@ public class CartController extends HttpServlet {
             if (cart != null) {
                 if ("update".equals(action) || "add".equals(action)) {
                     try {
-                        int id = Integer.parseInt(request.getParameter("id"));
-                        int unitId = 0;
-                        try {
-                            String uIdParam = request.getParameter("unitId");
-                            if (uIdParam != null && !uIdParam.isEmpty()) {
-                                unitId = Integer.parseInt(uIdParam);
-                            }
-                        } catch (NumberFormatException e) {
-                        }
-
-                        // Debug: print current cart items
-                        System.out.println("Updating Cart: MedID=" + id + ", UnitID=" + unitId);
+                        int muid = Integer.parseInt(request.getParameter("muid"));
                         
-                        models.Cart.Item item = cart.getItem(id, unitId);
+                        // Debug: print current cart items
+                        System.out.println("Updating Cart: MedicineUnitID=" + muid);
+                        
+                        models.Cart.Item item = cart.getItem(muid);
                         if (item != null) {
                             itemTotal = item.getTotalPrice();
                             itemPrice = item.getPrice();

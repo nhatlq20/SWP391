@@ -101,11 +101,10 @@
                                                             </thead>
                                                             <tbody>
                                                                 <c:forEach items="${cart.items}" var="item">
-                                                                    <tr data-item-id="${item.medicine.medicineId}"
-                                                                        data-unit-id="${item.unitId}">
+                                                                    <tr data-muid="${item.medicineUnitId}">
                                                                         <td class="text-center">
                                                                             <input type="checkbox" name="selectedItems"
-                                                                                value="${item.medicine.medicineId}-${item.unitId}"
+                                                                                value="${item.medicineUnitId}"
                                                                                 class="form-check-input item-checkbox"
                                                                                 checked
                                                                                 onchange="calculateSelectedTotal()">
@@ -144,10 +143,8 @@
                                                                                 class="d-flex justify-content-center align-items-center">
                                                                                 <input type="hidden" name="action"
                                                                                     value="update">
-                                                                                <input type="hidden" name="id"
-                                                                                    value="${item.medicine.medicineId}">
-                                                                                <input type="hidden" name="unitId"
-                                                                                    value="${item.unitId}">
+                                                                                <input type="hidden" name="muid"
+                                                                                    value="${item.medicineUnitId}">
 
                                                                                 <div
                                                                                     class="input-group input-group-sm quantity-group">
@@ -171,7 +168,7 @@
                                                                             </form>
                                                                         </td>
                                                                         <td class="text-end price-text item-total-val"
-                                                                            id="item-total-${item.medicine.medicineId}-${item.unitId}"
+                                                                            id="item-total-${item.medicineUnitId}"
                                                                             data-raw-value="${item.totalPrice}">
                                                                             <fmt:formatNumber value="${item.totalPrice}"
                                                                                 type="currency" currencySymbol="₫"
@@ -181,10 +178,8 @@
                                                                             <form action="cart" method="POST">
                                                                                 <input type="hidden" name="action"
                                                                                     value="remove">
-                                                                                <input type="hidden" name="id"
-                                                                                    value="${item.medicine.medicineId}">
-                                                                                <input type="hidden" name="unitId"
-                                                                                    value="${item.unitId}">
+                                                                                <input type="hidden" name="muid"
+                                                                                    value="${item.medicineUnitId}">
                                                                                 <button type="submit"
                                                                                     class="btn btn-outline-danger btn-sm rounded-circle btn-remove-item"
                                                                                     title="Xóa">
