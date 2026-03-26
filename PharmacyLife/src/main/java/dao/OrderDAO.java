@@ -108,22 +108,29 @@ public class OrderDAO {
         String sqlGetOldStatus = "SELECT Status FROM Orders WHERE OrderId = ?";
         String sqlUpdateStatus = "UPDATE Orders SET Status = ?, StaffId = ? WHERE OrderId = ?";
         
-        // Stock management using MedicineUnitId
-        String sqlReplenishStock = "UPDATE m SET m.RemainingQuantity = m.RemainingQuantity + (? * mu.ConversionRate) " +
-                                    "FROM Medicine m JOIN MedicineUnit mu ON m.MedicineId = mu.MedicineId " +
-                                    "WHERE mu.MedicineUnitId = ?";
+        // Stock management (decrementing base RemainingQuantity in Medicine table)
+        // Correcting to ensure we handle the subtraction correctly based on conversion rate
         String sqlSubtractStock = "UPDATE m SET m.RemainingQuantity = m.RemainingQuantity - (? * mu.ConversionRate) " +
                                     "FROM Medicine m JOIN MedicineUnit mu ON m.MedicineId = mu.MedicineId " +
                                     "WHERE mu.MedicineUnitId = ? AND m.RemainingQuantity >= (? * mu.ConversionRate)";
                                     
-        String sqlGetItems = "SELECT MedicineUnitId, OrderQuantity FROM OrderItems WHERE OrderId = ?";
-
+        String sqlReplenishStock = "UPDATE m SET m.RemainingQuantity = m.RemainingQuantity + (? * mu.ConversionRate) " +
+                                    "FROM Medicine m JOIN MedicineUnit mu ON m.MedicineId = mu.MedicineId " +
+                                    "WHERE mu.MedicineUnitId = ?";
+                                    
+        String sqlGetItems = "SELECT mu.MedicineUnitId, mu.MedicineId, m.MedicineName, oi.OrderQuantity " +
+                            "FROM OrderItems oi " +
+                            "JOIN MedicineUnit mu ON oi.MedicineUnitId = mu.MedicineUnitId " +
+                            "JOIN Medicine m ON mu.MedicineId = m.MedicineId " +
+                            "WHERE oi.OrderId = ?";
+                            
         Connection conn = null;
+        lastErrorMessage = "";
         try {
             conn = dbContext.getConnection();
             conn.setAutoCommit(false);
 
-            // 1. Get old status
+            // 1. Get current status to see if deduction state changes
             String oldStatus = "";
             try (PreparedStatement ps = conn.prepareStatement(sqlGetOldStatus)) {
                 ps.setInt(1, orderId);
@@ -131,6 +138,7 @@ public class OrderDAO {
                     if (rs.next()) {
                         oldStatus = rs.getString("Status");
                     } else {
+                        lastErrorMessage = "Không tìm thấy đơn hàng #" + orderId;
                         conn.rollback();
                         return false;
                     }
@@ -142,36 +150,48 @@ public class OrderDAO {
                 return true;
             }
 
-            // 2. Update status
-            try (PreparedStatement ps = conn.prepareStatement(sqlUpdateStatus)) {
-                ps.setString(1, newStatus);
-                ps.setInt(2, staffId);
-                ps.setInt(3, orderId);
-                ps.executeUpdate();
+            // Define which statuses are considered "stock taken"
+            // Deduct stock ONLY when shipping or already delivered
+            java.util.List<String> deductedStatuses = java.util.Arrays.asList(
+                "Đang giao hàng", "Shipping", 
+                "Đã giao", "Đã giao hàng", "Delivered", 
+                "Thành công", "Completed", "Success"
+            );
+
+            boolean oldIsDeducted = false;
+            for (String s : deductedStatuses) {
+                if (s.equalsIgnoreCase(oldStatus)) {
+                    oldIsDeducted = true;
+                    break;
+                }
+            }
+            
+            boolean newIsDeducted = false;
+            for (String s : deductedStatuses) {
+                if (s.equalsIgnoreCase(newStatus)) {
+                    newIsDeducted = true;
+                    break;
+                }
             }
 
-            // 3. Handle stock changes
-            boolean oldIsDeducted = "Shipping".equalsIgnoreCase(oldStatus) || "Delivered".equalsIgnoreCase(oldStatus);
-            boolean newIsDeducted = "Shipping".equalsIgnoreCase(newStatus) || "Delivered".equalsIgnoreCase(newStatus);
-            
+            // 2. Perform Stock adjustments IF needed BEFORE updating status (so we can fail)
             if (!oldIsDeducted && newIsDeducted) {
-                // Subtract stock
+                // Must subtract stock
                 try (PreparedStatement psItems = conn.prepareStatement(sqlGetItems);
-                        PreparedStatement psStock = conn.prepareStatement(sqlSubtractStock)) {
+                     PreparedStatement psSubtract = conn.prepareStatement(sqlSubtractStock)) {
                     psItems.setInt(1, orderId);
                     try (ResultSet rs = psItems.executeQuery()) {
                         while (rs.next()) {
                             int muId = rs.getInt("MedicineUnitId");
                             int qty = rs.getInt("OrderQuantity");
+                            String medName = rs.getString("MedicineName");
 
-                            psStock.setInt(1, qty);
-                            psStock.setInt(2, muId);
-                            psStock.setInt(3, qty);
-                            psStock.setInt(4, muId);
+                            psSubtract.setInt(1, qty);
+                            psSubtract.setInt(2, muId);
+                            psSubtract.setInt(3, qty);
 
-                            int updated = psStock.executeUpdate();
-                            if (updated == 0) {
-                                lastErrorMessage = "Không đủ số lượng tồn kho để giao hàng cho mã đơn vị sản phẩm (ID: " + muId + ").";
+                            if (psSubtract.executeUpdate() == 0) {
+                                lastErrorMessage = "Sản phẩm '" + medName + "' hiện không đủ số lượng tồn kho để cập nhật đơn hàng.";
                                 conn.rollback();
                                 return false;
                             }
@@ -179,26 +199,36 @@ public class OrderDAO {
                     }
                 }
             } else if (oldIsDeducted && !newIsDeducted) {
-                // Replenish stock
+                // Return stock to inventory (e.g., cancelled or reverted to pending)
                 try (PreparedStatement psItems = conn.prepareStatement(sqlGetItems);
-                        PreparedStatement psStock = conn.prepareStatement(sqlReplenishStock)) {
+                     PreparedStatement psReplenish = conn.prepareStatement(sqlReplenishStock)) {
                     psItems.setInt(1, orderId);
                     try (ResultSet rs = psItems.executeQuery()) {
                         while (rs.next()) {
-                            int muId = rs.getInt("MedicineUnitId");
-                            int qty = rs.getInt("OrderQuantity");
-
-                            psStock.setInt(1, qty);
-                            psStock.setInt(2, muId);
-                            psStock.executeUpdate();
+                            psReplenish.setInt(1, rs.getInt("OrderQuantity"));
+                            psReplenish.setInt(2, rs.getInt("MedicineUnitId"));
+                            psReplenish.executeUpdate();
                         }
                     }
+                }
+            }
+
+            // 3. Finally update the status
+            try (PreparedStatement ps = conn.prepareStatement(sqlUpdateStatus)) {
+                ps.setString(1, newStatus);
+                ps.setInt(2, staffId);
+                ps.setInt(3, orderId);
+                if (ps.executeUpdate() == 0) {
+                    lastErrorMessage = "Không thể cập nhật trạng thái đơn hàng.";
+                    conn.rollback();
+                    return false;
                 }
             }
 
             conn.commit();
             return true;
         } catch (SQLException e) {
+            lastErrorMessage = "Lỗi Database: " + e.getMessage();
             if (conn != null) { try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); } }
             e.printStackTrace();
         } finally {
