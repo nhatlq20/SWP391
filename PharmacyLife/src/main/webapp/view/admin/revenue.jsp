@@ -169,7 +169,9 @@
                                                 <c:forEach var="p" items="${topProducts}">
                                                     <tr>
                                                         <td class="fw-semibold text-primary">${p.medicineName}</td>
-                                                        <td class="text-center">${p.totalQuantity}</td>
+                                                        <td class="text-center">
+                                                            <fmt:formatNumber value="${p.totalQuantity}" maxFractionDigits="1" />
+                                                        </td>
                                                         <td class="text-end text-success fw-bold">
                                                             <fmt:formatNumber value="${p.totalRevenue}"
                                                                 maxFractionDigits="0" /> ₫
