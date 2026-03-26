@@ -94,7 +94,9 @@ public class MedicineControllerForDashboard extends HttpServlet {
     private void showAddForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         List<Category> categories = categoryDAO.getAllCategories();
+        List<models.Unit> unitTypes = medicineUnitDAO.getAllUnitTypes();
         request.setAttribute("categories", categories);
+        request.setAttribute("unitTypes", unitTypes);
         // Default preview code (no category chosen yet)
         request.setAttribute("nextMedicineCode", "MED001");
         request.getRequestDispatcher("/view/admin/medicine-add-for-dashboard.jsp").forward(request, response);
@@ -129,9 +131,11 @@ public class MedicineControllerForDashboard extends HttpServlet {
                 if (medicine != null) {
                     List<Category> categories = categoryDAO.getAllCategories();
                     List<MedicineUnit> units = medicineUnitDAO.getUnitsByMedicineId(medicineId);
+                    List<models.Unit> unitTypes = medicineUnitDAO.getAllUnitTypes();
                     request.setAttribute("medicine", medicine);
                     request.setAttribute("categories", categories);
                     request.setAttribute("units", units);
+                    request.setAttribute("unitTypes", unitTypes);
                     request.getRequestDispatcher("/view/admin/medicine-edit-for-dashboard.jsp").forward(request,
                             response);
                     return;
@@ -219,10 +223,14 @@ public class MedicineControllerForDashboard extends HttpServlet {
             medicine.setBrandOrigin(request.getParameter("brandOrigin"));
             medicine.setShortDescription(request.getParameter("shortDescription"));
             medicine.setIngredients(request.getParameter("ingredients"));
+            medicine.setConditions(request.getParameter("uses"));
 
             // Insert Medicine and get the new ID
             int newMedicineId = medicineDAO.createMedicineAndReturnId(medicine);
             if (newMedicineId > 0) {
+                // Save Ingredients and Uses (Conditions)
+                medicineDAO.saveMedicineIngredients(newMedicineId, medicine.getIngredients());
+                medicineDAO.saveMedicineConditions(newMedicineId, medicine.getConditions());
                 // Correct Hierarchy: Main Unit (Hộp) > Sub Unit 1 (Vỉ) > Sub Unit 2 (Viên)
                 // To store stock in smallest units:
                 // Sub Unit 2 (if exists) Rate = 1
@@ -256,11 +264,11 @@ public class MedicineControllerForDashboard extends HttpServlet {
 
                 MedicineUnit baseUnit = new MedicineUnit();
                 baseUnit.setMedicineId(newMedicineId);
-                baseUnit.setUnitName(unitName != null && !unitName.isEmpty() ? unitName : "Hộp");
+                String mainUnitName = unitName != null && !unitName.isEmpty() ? unitName : "Hộp";
+                baseUnit.setUnitName(mainUnitName);
+                baseUnit.setUnitId(medicineUnitDAO.getUnitIdByName(mainUnitName));
                 baseUnit.setConversionRate(mainUnitRate);
                 baseUnit.setSellingPrice(sellingPrice);
-                // Base unit is the smallest unit. If sub units exist, this is NOT the base
-                // unit.
                 baseUnit.setBaseUnit(!hasSub1 && !hasSub2);
                 medicineUnitDAO.addUnit(baseUnit);
 
@@ -269,10 +277,9 @@ public class MedicineControllerForDashboard extends HttpServlet {
                     MedicineUnit unit1 = new MedicineUnit();
                     unit1.setMedicineId(newMedicineId);
                     unit1.setUnitName(subUnit1);
+                    unit1.setUnitId(medicineUnitDAO.getUnitIdByName(subUnit1));
                     unit1.setConversionRate(unit1Rate);
                     unit1.setSellingPrice(Double.parseDouble(subPrice1Str));
-                    // Base unit is the smallest unit. If Sub-Unit 2 exists, this is NOT the base
-                    // unit.
                     unit1.setBaseUnit(!hasSub2);
                     medicineUnitDAO.addUnit(unit1);
                 }
@@ -282,9 +289,9 @@ public class MedicineControllerForDashboard extends HttpServlet {
                     MedicineUnit unit2 = new MedicineUnit();
                     unit2.setMedicineId(newMedicineId);
                     unit2.setUnitName(subUnit2);
+                    unit2.setUnitId(medicineUnitDAO.getUnitIdByName(subUnit2));
                     unit2.setConversionRate(unit2Rate);
                     unit2.setSellingPrice(Double.parseDouble(subPrice2Str));
-                    // Sub-Unit 2 is always the smallest unit if it exists
                     unit2.setBaseUnit(true);
                     medicineUnitDAO.addUnit(unit2);
                 }
@@ -335,9 +342,13 @@ public class MedicineControllerForDashboard extends HttpServlet {
             medicine.setBrandOrigin(request.getParameter("brandOrigin"));
             medicine.setShortDescription(request.getParameter("shortDescription"));
             medicine.setIngredients(request.getParameter("ingredients"));
+            medicine.setConditions(request.getParameter("uses"));
 
             boolean success = medicineDAO.updateMedicine(medicine);
             if (success) {
+                // Save/Update Ingredients and Uses (Conditions)
+                medicineDAO.saveMedicineIngredients(medicineId, medicine.getIngredients());
+                medicineDAO.saveMedicineConditions(medicineId, medicine.getConditions());
                 // Correct Hierarchy: Main Unit (Hộp) > Sub Unit 1 (Vỉ) > Sub Unit 2 (Viên)
                 String subUnit1 = request.getParameter("subUnit1");
                 String subRate1Str = request.getParameter("subRate1");
@@ -374,7 +385,9 @@ public class MedicineControllerForDashboard extends HttpServlet {
                 // Main Unit
                 MedicineUnit mainU = new MedicineUnit();
                 mainU.setMedicineId(medicineId);
-                mainU.setUnitName(unitName != null && !unitName.isEmpty() ? unitName : "Hộp");
+                String mainUName = unitName != null && !unitName.isEmpty() ? unitName : "Hộp";
+                mainU.setUnitName(mainUName);
+                mainU.setUnitId(medicineUnitDAO.getUnitIdByName(mainUName));
                 mainU.setConversionRate(mainUnitRate);
                 mainU.setSellingPrice(sellingPrice);
                 mainU.setBaseUnit(!hasSub1 && !hasSub2);
@@ -384,6 +397,7 @@ public class MedicineControllerForDashboard extends HttpServlet {
                     MedicineUnit u1 = new MedicineUnit();
                     u1.setMedicineId(medicineId);
                     u1.setUnitName(subUnit1);
+                    u1.setUnitId(medicineUnitDAO.getUnitIdByName(subUnit1));
                     u1.setConversionRate(unit1Rate);
                     u1.setSellingPrice(
                             subPrice1Str != null && !subPrice1Str.isEmpty() ? Double.parseDouble(subPrice1Str) : 0);
@@ -395,6 +409,7 @@ public class MedicineControllerForDashboard extends HttpServlet {
                     MedicineUnit u2 = new MedicineUnit();
                     u2.setMedicineId(medicineId);
                     u2.setUnitName(subUnit2);
+                    u2.setUnitId(medicineUnitDAO.getUnitIdByName(subUnit2));
                     u2.setConversionRate(unit2Rate);
                     u2.setSellingPrice(
                             subPrice2Str != null && !subPrice2Str.isEmpty() ? Double.parseDouble(subPrice2Str) : 0);

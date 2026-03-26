@@ -78,19 +78,25 @@
                                                     <c:when test="${not empty c.categoryImageUrl}">
                                                         <c:set var="catImg" value="${fn:trim(c.categoryImageUrl)}" />
                                                         <c:choose>
-                                                            <c:when test="${fn:startsWith(catImg, 'http://') or fn:startsWith(catImg, 'https://')}">
-                                                                <img src="${catImg}" alt="<c:out value='${c.categoryName}'/>" class="category-image"
+                                                            <c:when
+                                                                test="${fn:startsWith(catImg, 'http://') or fn:startsWith(catImg, 'https://')}">
+                                                                <img src="${catImg}"
+                                                                    alt="<c:out value='${c.categoryName}'/>"
+                                                                    class="category-image"
                                                                     onerror="this.src='${pageContext.request.contextPath}/assets/img/category/1.png';">
                                                             </c:when>
                                                             <c:otherwise>
-                                                                <img src="${pageContext.request.contextPath}${catImg}" alt="<c:out value='${c.categoryName}'/>" class="category-image"
+                                                                <img src="${pageContext.request.contextPath}${catImg}"
+                                                                    alt="<c:out value='${c.categoryName}'/>"
+                                                                    class="category-image"
                                                                     onerror="this.src='${pageContext.request.contextPath}/assets/img/category/1.png';">
                                                             </c:otherwise>
                                                         </c:choose>
                                                     </c:when>
                                                     <c:otherwise>
                                                         <img src="<c:url value='/assets/img/category/${(c.categoryId % 18) + 1}.png'/>"
-                                                            alt="<c:out value='${c.categoryName}'/>" class="category-image"
+                                                            alt="<c:out value='${c.categoryName}'/>"
+                                                            class="category-image"
                                                             onerror="this.src='${pageContext.request.contextPath}/assets/img/category/1.png';">
                                                     </c:otherwise>
                                                 </c:choose>
@@ -160,7 +166,7 @@
                                                         </div>
                                                         <button onclick="addToCartAjax(this, '${m.medicineId}')"
                                                             class="btn-buy-premium">
-                                                            Chọn mua
+                                                            Thêm vào giỏ hàng
                                                         </button>
                                                     </div>
                                                 </div>
@@ -176,57 +182,57 @@
                             <script>
                                 function addToCartAjax(btn, medicineId) {
                                     const isLoggedIn = '<c:out value="${sessionScope.userId != null}"/>' === 'true';
-                                const userRole = '${sessionScope.roleName != null ? sessionScope.roleName : ""}';
-                                const role = userRole.toLowerCase();
+                                    const userRole = '${sessionScope.roleName != null ? sessionScope.roleName : ""}';
+                                    const role = userRole.toLowerCase();
 
-                                if (!isLoggedIn) {
-                                    window.location.href = '${pageContext.request.contextPath}/login';
-                                    return;
-                                }
+                                    if (!isLoggedIn) {
+                                        window.location.href = '${pageContext.request.contextPath}/login';
+                                        return;
+                                    }
 
-                                if (role === 'admin' || role === 'staff') {
-                                    alert('Tài khoản Admin và Staff không thể mua hàng. Vui lòng đăng nhập với tài khoản khách hàng.');
-                                    return;
-                                }
+                                    if (role === 'admin' || role === 'staff') {
+                                        alert('Tài khoản Admin và Staff không thể mua hàng. Vui lòng đăng nhập với tài khoản khách hàng.');
+                                        return;
+                                    }
 
-                                const card = btn.closest('.bestseller-premium-card');
-                                const img = card ? card.querySelector('.card-img-wrapper img') : null;
+                                    const card = btn.closest('.bestseller-premium-card');
+                                    const img = card ? card.querySelector('.card-img-wrapper img') : null;
 
-                                const formData = new URLSearchParams();
-                                formData.append('action', 'add');
-                                formData.append('id', medicineId);
-                                formData.append('quantity', 1);
+                                    const formData = new URLSearchParams();
+                                    formData.append('action', 'add');
+                                    formData.append('id', medicineId);
+                                    formData.append('quantity', 1);
 
-                                fetch('${pageContext.request.contextPath}/cart', {
-                                    method: 'POST',
-                                    headers: {
-                                        'X-Requested-With': 'XMLHttpRequest'
-                                    },
-                                    body: formData
-                                })
-                                    .then(response => {
-                                        if (response.headers.get('content-type')?.includes('application/json')) {
-                                            return response.json();
-                                        } else {
-                                            window.location.href = '${pageContext.request.contextPath}/login';
-                                            throw new Error('Redirected');
-                                        }
+                                    fetch('${pageContext.request.contextPath}/cart', {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-Requested-With': 'XMLHttpRequest'
+                                        },
+                                        body: formData
                                     })
-                                    .then(data => {
-                                        if (data.success) {
-                                            if (typeof animateFlyToCart === 'function' && img) {
-                                                animateFlyToCart(img);
+                                        .then(response => {
+                                            if (response.headers.get('content-type')?.includes('application/json')) {
+                                                return response.json();
+                                            } else {
+                                                window.location.href = '${pageContext.request.contextPath}/login';
+                                                throw new Error('Redirected');
                                             }
-                                            if (typeof updateHeaderCartCount === 'function') {
-                                                setTimeout(() => updateHeaderCartCount(data.cartCount), 800);
+                                        })
+                                        .then(data => {
+                                            if (data.success) {
+                                                if (typeof animateFlyToCart === 'function' && img) {
+                                                    animateFlyToCart(img);
+                                                }
+                                                if (typeof updateHeaderCartCount === 'function') {
+                                                    setTimeout(() => updateHeaderCartCount(data.cartCount), 800);
+                                                }
                                             }
-                                        }
-                                    })
-                                    .catch(error => {
-                                        if (error.message !== 'Redirected') {
-                                            console.error('Error adding to cart:', error);
-                                        }
-                                    });
+                                        })
+                                        .catch(error => {
+                                            if (error.message !== 'Redirected') {
+                                                console.error('Error adding to cart:', error);
+                                            }
+                                        });
                                 }
                             </script>
                 </body>

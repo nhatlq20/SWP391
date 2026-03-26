@@ -14,6 +14,7 @@ public class Medicine {
     private Category category; // For join query results
     private MedicineUnit baseUnit; // Base unit from MedicineUnit table (IsBaseUnit=1)
     private String ingredients; // Thành phần
+    private String conditions; // Công dụng
 
     // Legacy fields kept for backward compatibility (used only when baseUnit is
     // null)
@@ -119,6 +120,14 @@ public class Medicine {
 
     public void setIngredients(String ingredients) {
         this.ingredients = ingredients;
+    }
+
+    public String getConditions() {
+        return conditions;
+    }
+
+    public void setConditions(String conditions) {
+        this.conditions = conditions;
     }
 
     /**
@@ -246,6 +255,8 @@ public class Medicine {
                 ", shortDescription='" + shortDescription + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
                 ", remainingQuantity=" + remainingQuantity +
+                ", ingredients='" + ingredients + '\'' +
+                ", conditions='" + conditions + '\'' +
                 '}';
     }
 }
