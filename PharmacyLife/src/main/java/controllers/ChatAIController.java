@@ -11,15 +11,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name = "ChatAIController", urlPatterns = { "/chat-ai" })
 public class ChatAIController extends HttpServlet {
 
     private static final String API_KEY = Constants.GEMINI_API_KEY;
-    // Gemini 2.5 Flash is the current stable Flash model in 2026.
-    private static final String MODEL = "gemini-2.5-flash";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -52,70 +49,76 @@ public class ChatAIController extends HttpServlet {
         }
 
         try {
-            // STEP 1: AI Prompt Construction
-            String systemInstruction = "Bạn là dược sĩ trợ lý ảo của nhà thuốc PharmacyLife. "
-                    + "Nhiệm vụ của bạn là CHỈ trả lời dựa trên 'DANH MỤC THUỐC' (file dữ liệu) bên dưới. "
-                    + "Hãy trả lời một cách chuyên nghiệp, tận tâm, lễ phép và luôn luôn kết thúc bằng lời khuyên khách hàng nên thăm khám bác sĩ nếu triệu chứng nặng.";
-
-            StringBuilder fullInput = new StringBuilder();
-            fullInput.append("--- HƯỚNG DẪN HỆ THỐNG ---\n").append(systemInstruction).append("\n\n");
-
-            if (!fileContext.isEmpty()) {
-                fullInput.append("--- DANH MỤC THUỐC ---\n").append(fileContext).append("\n\n");
-            }
-
-            fullInput.append("Câu hỏi của khách hàng: ").append(userInput);
+            // 1. GENERATIVE AI CONSULTATION (RAG)
+            String prompt = "Bạn là Dược sĩ ảo tại PharmacyLife. "
+                    + "Hãy dùng DANH MỤC THUỐC này để tư vấn khách hàng: \n\n" + fileContext
+                    + "\n\nKhách hỏi: " + userInput
+                    + "\n(Trả lời lịch sự, chuyên nghiệp, khuyên đi khám nếu bệnh nặng)";
 
             Client client = Client.builder().apiKey(API_KEY).build();
-
-            List<Tool> tools = new ArrayList<>();
-            tools.add(
-                    Tool.builder()
-                            .googleSearch(
-                                    GoogleSearch.builder().build())
-                            .build());
-
-            // Build request with only 'user' role
             List<Content> contents = ImmutableList.of(
-                    Content.builder()
-                            .role("user")
-                            .parts(ImmutableList.of(
-                                    Part.fromText(fullInput.toString())))
-                            .build());
+                    Content.builder().role("user").parts(ImmutableList.of(Part.fromText(prompt))).build());
 
-            GenerateContentConfig config = GenerateContentConfig.builder()
-                    .tools(tools)
-                    .build();
-
-            ResponseStream<GenerateContentResponse> responseStream = client.models.generateContentStream(MODEL,
-                    contents, config);
-            StringBuilder fullResponse = new StringBuilder();
-
+            // Using gemini-1.5-flash for speed/cost efficiency
+            ResponseStream<GenerateContentResponse> responseStream = client.models
+                    .generateContentStream("gemini-1.5-flash", contents, null);
+            StringBuilder aiReply = new StringBuilder();
             for (GenerateContentResponse res : responseStream) {
-                if (res.candidates().isPresent() && !res.candidates().get().isEmpty()) {
-                    Content content = res.candidates().get().get(0).content().get();
-                    if (content.parts().isPresent()) {
-                        List<Part> parts = content.parts().get();
-                        for (Part part : parts) {
-                            if (part.text().isPresent()) {
-                                fullResponse.append(part.text().get());
-                            }
-                        }
-                    }
-                }
+                res.candidates().ifPresent(c -> c.get(0).content().ifPresent(
+                        cnt -> cnt.parts().ifPresent(ps -> ps.forEach(p -> p.text().ifPresent(aiReply::append)))));
             }
             responseStream.close();
 
             response.setContentType("text/plain;charset=UTF-8");
-            response.getWriter().write(fullResponse.toString());
+            response.getWriter().write(aiReply.toString());
 
         } catch (Exception e) {
-            e.printStackTrace();
+            // 2. LOCAL FALLBACK (If AI service is down)
+            StringBuilder matches = new StringBuilder();
+            String[] queryWords = userInput.toLowerCase().split("\\s+");
+            List<String> keySymptoms = new java.util.ArrayList<>();
+            String fillers = " tôi mình bạn mua thuốc cái cho bị đang là có một những ";
+            for (String w : queryWords)
+                if (w.length() >= 2 && !fillers.contains(" " + w + " "))
+                    keySymptoms.add(w);
+            if (keySymptoms.isEmpty())
+                keySymptoms.add(userInput.toLowerCase());
 
-            // Simple fallback if AI fails or Quota exceeded
+            String[] lines = fileContext.split("\n");
+            int found = 0;
+            for (String line : lines) {
+                if (line.contains("|")) {
+                    for (String part : keySymptoms) {
+                        String regex = "(?i).*(\\s|^|[.,/!?;:|])" + java.util.regex.Pattern.quote(part)
+                                + "(\\s|$|[.,/!?;:|]).*";
+                        if (line.toLowerCase().matches(regex)) {
+                            String[] p = line.split("\\|");
+                            if (p.length >= 5) {
+                                matches.append("💊 ").append(p[1]).append(" (").append(p[2]).append(")\n");
+                                matches.append("   - Công dụng: ").append(p[4]).append("\n");
+                                matches.append("   - Giá bán: ").append(p[5]).append("\n\n");
+                                found++;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (found >= 5)
+                    break;
+            }
+
             response.setContentType("text/plain;charset=UTF-8");
-            response.getWriter().write(
-                    "Rất tiếc, AI đang bận hoặc hết lượt tư vấn. Bạn có thể tra cứu thông tin trực tiếp trên website hoặc liên hệ dược sĩ tại quầy để được hỗ trợ nhanh nhất!");
+            if (matches.length() > 0) {
+                response.getWriter().write("⚠️ Hệ thống bận, tôi đã tra cứu nhanh cho bạn:\n\n" + matches.toString());
+            } else {
+                String in = userInput.toLowerCase();
+                if (in.contains("chào") || in.contains("hi"))
+                    response.getWriter()
+                            .write("Chào bạn! Tôi có thể giúp bạn tra cứu thuốc theo triệu chứng (vd: ho, sốt) nhé!");
+                else
+                    response.getWriter()
+                            .write("Hiện tại tôi đang bận, vui lòng thử lại sau hoặc liên hệ dược sĩ trực tiếp!");
+            }
         }
     }
 }
