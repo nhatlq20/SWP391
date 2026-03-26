@@ -29,7 +29,8 @@
                             </div>
                         </c:if>
 
-                        <form method="post" action="${pageContext.request.contextPath}/admin/medicine-add-dashboard">
+                        <form id="medicineForm" method="post"
+                            action="${pageContext.request.contextPath}/admin/medicine-add-dashboard">
                             <div class="row g-4">
                                 <div class="col-md-6">
                                     <label class="form-label">Mã thuốc</label>
@@ -90,13 +91,65 @@
                                         <option value="">-- Không --</option>
                                     </select>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">Thành phần</label>
-                                    <input name="ingredients" class="form-control" placeholder="Nhập thành phần thuốc">
+                                <div class="col-12 mt-4">
+                                    <h5 class="text-primary border-bottom pb-2">Thành phần dược chất</h5>
+                                    <table class="table table-bordered align-middle" id="ingredientsTable">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Tên hoạt chất</th>
+                                                <th style="width: 15%;">Hàm lượng</th>
+                                                <th>Mô tả / Cơ chế</th>
+                                                <th style="width: 50px;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><input class="form-control ing-name"
+                                                        placeholder="Ví dụ: Paracetamol"></td>
+                                                <td><input class="form-control ing-strength" placeholder="500mg"></td>
+                                                <td><input class="form-control ing-desc" placeholder="Giảm đau, hạ sốt">
+                                                </td>
+                                                <td><button type="button"
+                                                        class="btn btn-sm btn-outline-danger remove-row"><i
+                                                            class="fas fa-times"></i></button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="button" class="btn btn-sm btn-primary"
+                                        onclick="addRow('ingredientsTable')"><i class="fas fa-plus me-1"></i> Thêm hoạt
+                                        chất</button>
+                                    <input type="hidden" name="ingredients" id="ingredientsHidden">
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">Công dụng</label>
-                                    <input name="uses" class="form-control" placeholder="Nhập công dụng thuốc">
+
+                                <div class="col-12 mt-4">
+                                    <h5 class="text-primary border-bottom pb-2">Công dụng & Chỉ định</h5>
+                                    <table class="table table-bordered align-middle" id="usesTable">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Tên công dụng</th>
+                                                <th>Mô tả chi tiết</th>
+                                                <th>Lời khuyên của chuyên gia</th>
+                                                <th style="width: 50px;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><input class="form-control use-name" placeholder="Ví dụ: Đau đầu">
+                                                </td>
+                                                <td><input class="form-control use-desc"
+                                                        placeholder="Giảm các triệu chứng đau nửa đầu..."></td>
+                                                <td><input class="form-control use-advice"
+                                                        placeholder="Lời khuyên (vệ sinh, ăn uống...)"></td>
+                                                <td><button type="button"
+                                                        class="btn btn-sm btn-outline-danger remove-row"><i
+                                                            class="fas fa-times"></i></button></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="button" class="btn btn-sm btn-primary"
+                                        onclick="addRow('usesTable')"><i class="fas fa-plus me-1"></i> Thêm công
+                                        dụng</button>
+                                    <input type="hidden" name="uses" id="usesHidden">
                                 </div>
 
                                 <!-- Sub Unit Conversion Rates (shown dynamically) -->
@@ -141,8 +194,8 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-12">
-                                    <label class="form-label">Mô tả</label>
+                                <div class="col-12 mt-4">
+                                    <label class="form-label">Mô tả tổng quát</label>
                                     <textarea name="shortDescription" rows="4" class="form-control"
                                         placeholder="Nhập mô tả của thuốc"></textarea>
                                 </div>
@@ -315,6 +368,77 @@
                         .then(function (code) { codeInput.value = code; })
                         .catch(function () { codeInput.value = 'MED001'; });
                 }
+
+                // ========== Dynamic Table Logic ==========
+                function addRow(tableId) {
+                    var table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
+                    var newRow = table.insertRow();
+                    if (tableId === 'ingredientsTable') {
+                        newRow.innerHTML = '<td><input class="form-control ing-name" placeholder="Ví dụ: Paracetamol"></td>' +
+                            '<td><input class="form-control ing-strength" placeholder="500mg"></td>' +
+                            '<td><input class="form-control ing-desc" placeholder="Giảm đau, hạ sốt"></td>' +
+                            '<td><button type="button" class="btn btn-sm btn-outline-danger remove-row"><i class="fas fa-times"></i></button></td>';
+                    } else {
+                        newRow.innerHTML = '<td><input class="form-control use-name" placeholder="Ví dụ: Đau đầu"></td>' +
+                            '<td><input class="form-control use-desc" placeholder="Giảm các triệu chứng đau nửa đầu..."></td>' +
+                            '<td><input class="form-control use-advice" placeholder="Lời khuyên (vệ sinh, ăn uống...)"></td>' +
+                            '<td><button type="button" class="btn btn-sm btn-outline-danger remove-row"><i class="fas fa-times"></i></button></td>';
+                    }
+                }
+
+                document.addEventListener('click', function (e) {
+                    if (e.target.closest('.remove-row')) {
+                        var row = e.target.closest('tr');
+                        row.parentNode.removeChild(row);
+                    }
+                });
+
+                document.getElementById('medicineForm').addEventListener('submit', function (e) {
+                    console.log('Packaging ingredients and uses...');
+                    // Pack Ingredients
+                    var ingredients = [];
+                    document.querySelectorAll('#ingredientsTable tbody tr').forEach(function (row) {
+                        var nameEl = row.querySelector('.ing-name');
+                        var strengthEl = row.querySelector('.ing-strength');
+                        var descEl = row.querySelector('.ing-desc');
+
+                        var name = nameEl ? nameEl.value.trim() : '';
+                        var strength = strengthEl ? strengthEl.value.trim() : '';
+                        var desc = descEl ? descEl.value.trim() : '';
+
+                        if (name) {
+                            var str = name;
+                            if (strength) str += ' [' + strength + ']';
+                            if (desc) str += ' (' + desc + ')';
+                            ingredients.push(str);
+                        }
+                    });
+                    var ingResult = ingredients.join(', ');
+                    document.getElementById('ingredientsHidden').value = ingResult;
+                    console.log('Ingredients packed:', ingResult);
+
+                    // Pack Uses
+                    var uses = [];
+                    document.querySelectorAll('#usesTable tbody tr').forEach(function (row) {
+                        var nameEl = row.querySelector('.use-name');
+                        var descEl = row.querySelector('.use-desc');
+                        var adviceEl = row.querySelector('.use-advice');
+
+                        var name = nameEl ? nameEl.value.trim() : '';
+                        var desc = descEl ? descEl.value.trim() : '';
+                        var advice = adviceEl ? adviceEl.value.trim() : '';
+
+                        if (name) {
+                            var str = name;
+                            if (desc) str += ' (' + desc + ')';
+                            if (advice) str += ' {' + advice + '}';
+                            uses.push(str);
+                        }
+                    });
+                    var usesResult = uses.join(', ');
+                    document.getElementById('usesHidden').value = usesResult;
+                    console.log('Uses packed:', usesResult);
+                });
 
                 // Initialize on page load
                 updateSubUnit1();

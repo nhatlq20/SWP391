@@ -211,20 +211,16 @@ public class MedicineDAO {
         List<Medicine> medicines = new ArrayList<>();
         String sql = "SELECT TOP " + limit
                 + " m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, "
-                + "m.OriginalPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, "
-                + "c.CategoryName, "
-                + "mu.MedicineUnitId, mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit, "
-                + "(SELECT MAX(ConversionRate) FROM MedicineUnit WHERE MedicineId = m.MedicineId) as MaxRate, "
-                + "COALESCE(SUM(oi.OrderQuantity), 0) as TotalSold "
+                + " m.OriginalPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, "
+                + " c.CategoryName, "
+                + " mu.MedicineUnitId, mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit, "
+                + " (SELECT MAX(ConversionRate) FROM MedicineUnit WHERE MedicineId = m.MedicineId) as MaxRate, "
+                + " (SELECT COALESCE(SUM(OrderQuantity), 0) FROM OrderItems WHERE MedicineId = m.MedicineId) as TotalSold "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
                 + "OUTER APPLY (SELECT TOP 1 mi.MedicineUnitId, mi.UnitId, u.UnitName, mi.ConversionRate, mi.SellingPrice, mi.IsBaseUnit "
                 + "             FROM MedicineUnit mi LEFT JOIN Unit u ON mi.UnitId = u.UnitId "
                 + "             WHERE mi.MedicineId = m.MedicineId ORDER BY mi.ConversionRate DESC) mu "
-                + "LEFT JOIN OrderItems oi ON m.MedicineId = oi.MedicineId "
-                + "GROUP BY m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, "
-                + "m.OriginalPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, c.CategoryName, "
-                + "mu.MedicineUnitId, mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit "
                 + "ORDER BY TotalSold DESC, m.MedicineName ASC";
 
         try (Connection conn = dbContext.getConnection();
@@ -428,14 +424,42 @@ public class MedicineDAO {
             return;
         }
 
-        // 1. Clear existing
+        // 1. Clear existing links
         deleteIngredientsByMedicineId(medicineId);
 
-        // 2. Parse and insert
+        // 2. Parse and insert/link
         String[] parts = ingredientsStr.split(",");
         try (Connection conn = dbContext.getConnection()) {
             for (String part : parts) {
-                String name = part.trim();
+                String input = part.trim();
+                if (input.isEmpty())
+                    continue;
+
+                String name = input;
+                String description = null;
+                String strength = null;
+
+                // 1. Extract Description: (...)
+                if (input.contains("(") && input.contains(")")) {
+                    int dStart = input.lastIndexOf("(");
+                    int dEnd = input.lastIndexOf(")");
+                    if (dEnd > dStart) {
+                        description = input.substring(dStart + 1, dEnd).trim();
+                        input = (input.substring(0, dStart) + input.substring(dEnd + 1)).trim();
+                    }
+                }
+
+                // 2. Extract Strength: [...]
+                if (input.contains("[") && input.contains("]")) {
+                    int sStart = input.lastIndexOf("[");
+                    int sEnd = input.lastIndexOf("]");
+                    if (sEnd > sStart) {
+                        strength = input.substring(sStart + 1, sEnd).trim();
+                        input = (input.substring(0, sStart) + input.substring(sEnd + 1)).trim();
+                    }
+                }
+                name = input.trim();
+
                 if (name.isEmpty())
                     continue;
 
@@ -447,15 +471,24 @@ public class MedicineDAO {
                     try (ResultSet rs = psSelection.executeQuery()) {
                         if (rs.next()) {
                             ingredientId = rs.getInt(1);
+                            if (description != null && !description.isEmpty()) {
+                                String updateDescSql = "UPDATE ActiveIngredients SET Description = ? WHERE IngredientId = ?";
+                                try (PreparedStatement psUpdate = conn.prepareStatement(updateDescSql)) {
+                                    psUpdate.setString(1, description);
+                                    psUpdate.setInt(2, ingredientId);
+                                    psUpdate.executeUpdate();
+                                }
+                            }
                         }
                     }
                 }
 
                 if (ingredientId == -1) {
-                    String insertSql = "INSERT INTO ActiveIngredients (IngredientName) VALUES (?)";
+                    String insertSql = "INSERT INTO ActiveIngredients (IngredientName, Description) VALUES (?, ?)";
                     try (PreparedStatement psInsertion = conn.prepareStatement(insertSql,
                             Statement.RETURN_GENERATED_KEYS)) {
                         psInsertion.setString(1, name);
+                        psInsertion.setString(2, description);
                         psInsertion.executeUpdate();
                         try (ResultSet keys = psInsertion.getGeneratedKeys()) {
                             if (keys.next())
@@ -464,12 +497,13 @@ public class MedicineDAO {
                     }
                 }
 
-                // Link to Medicine
+                // Link to Medicine with Strength
                 if (ingredientId != -1) {
-                    String linkSql = "INSERT INTO MedicineIngredients (MedicineId, IngredientId) VALUES (?, ?)";
+                    String linkSql = "INSERT INTO MedicineIngredients (MedicineId, IngredientId, Strength) VALUES (?, ?, ?)";
                     try (PreparedStatement psLink = conn.prepareStatement(linkSql)) {
                         psLink.setInt(1, medicineId);
                         psLink.setInt(2, ingredientId);
+                        psLink.setString(3, strength);
                         psLink.executeUpdate();
                     }
                 }
@@ -485,14 +519,42 @@ public class MedicineDAO {
             return;
         }
 
-        // 1. Clear existing
+        // 1. Clear existing links
         deleteConditionsByMedicineId(medicineId);
 
         // 2. Parse and insert
         String[] parts = conditionsStr.split(",");
         try (Connection conn = dbContext.getConnection()) {
             for (String part : parts) {
-                String name = part.trim();
+                String input = part.trim();
+                if (input.isEmpty())
+                    continue;
+
+                String name = input;
+                String description = null;
+                String advice = null;
+
+                // 1. Extract Advice: {...}
+                if (input.contains("{") && input.contains("}")) {
+                    int aStart = input.lastIndexOf("{");
+                    int aEnd = input.lastIndexOf("}");
+                    if (aEnd > aStart) {
+                        advice = input.substring(aStart + 1, aEnd).trim();
+                        input = (input.substring(0, aStart) + input.substring(aEnd + 1)).trim();
+                    }
+                }
+
+                // 2. Extract Description: (...)
+                if (input.contains("(") && input.contains(")")) {
+                    int dStart = input.lastIndexOf("(");
+                    int dEnd = input.lastIndexOf(")");
+                    if (dEnd > dStart) {
+                        description = input.substring(dStart + 1, dEnd).trim();
+                        input = (input.substring(0, dStart) + input.substring(dEnd + 1)).trim();
+                    }
+                }
+                name = input.trim();
+
                 if (name.isEmpty())
                     continue;
 
@@ -509,14 +571,42 @@ public class MedicineDAO {
                 }
 
                 if (conditionId == -1) {
-                    String insertSql = "INSERT INTO Conditions (ConditionName) VALUES (?)";
+                    String insertSql = "INSERT INTO Conditions (ConditionName, Description, Advice) VALUES (?, ?, ?)";
                     try (PreparedStatement psInsertion = conn.prepareStatement(insertSql,
                             Statement.RETURN_GENERATED_KEYS)) {
                         psInsertion.setString(1, name);
+                        psInsertion.setString(2, description);
+                        psInsertion.setString(3, advice);
                         psInsertion.executeUpdate();
                         try (ResultSet keys = psInsertion.getGeneratedKeys()) {
                             if (keys.next())
                                 conditionId = keys.getInt(1);
+                        }
+                    }
+                } else {
+                    // Update existing Condition with new Description/Advice if provided
+                    if ((description != null && !description.isEmpty()) || (advice != null && !advice.isEmpty())) {
+                        StringBuilder updateSql = new StringBuilder("UPDATE Conditions SET ");
+                        boolean first = true;
+                        if (description != null && !description.isEmpty()) {
+                            updateSql.append("Description = ?");
+                            first = false;
+                        }
+                        if (advice != null && !advice.isEmpty()) {
+                            if (!first)
+                                updateSql.append(", ");
+                            updateSql.append("Advice = ?");
+                        }
+                        updateSql.append(" WHERE ConditionId = ?");
+
+                        try (PreparedStatement psUpdate = conn.prepareStatement(updateSql.toString())) {
+                            int idx = 1;
+                            if (description != null && !description.isEmpty())
+                                psUpdate.setString(idx++, description);
+                            if (advice != null && !advice.isEmpty())
+                                psUpdate.setString(idx++, advice);
+                            psUpdate.setInt(idx, conditionId);
+                            psUpdate.executeUpdate();
                         }
                     }
                 }
@@ -721,7 +811,7 @@ public class MedicineDAO {
      */
     public List<String> getIngredientNamesByMedicineId(int medicineId) {
         List<String> names = new ArrayList<>();
-        String sql = "SELECT ai.IngredientName "
+        String sql = "SELECT ai.IngredientName, ai.Description, mi.Strength "
                 + "FROM MedicineIngredients mi "
                 + "JOIN ActiveIngredients ai ON mi.IngredientId = ai.IngredientId "
                 + "WHERE mi.MedicineId = ? "
@@ -731,7 +821,18 @@ public class MedicineDAO {
             ps.setInt(1, medicineId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    names.add(rs.getString("IngredientName"));
+                    String name = rs.getString("IngredientName");
+                    String desc = rs.getString("Description");
+                    String strength = rs.getString("Strength");
+
+                    StringBuilder sb = new StringBuilder(name);
+                    if (strength != null && !strength.isEmpty()) {
+                        sb.append(" [").append(strength).append("]");
+                    }
+                    if (desc != null && !desc.isEmpty()) {
+                        sb.append(" (").append(desc).append(")");
+                    }
+                    names.add(sb.toString());
                 }
             }
         } catch (SQLException e) {
@@ -742,7 +843,7 @@ public class MedicineDAO {
 
     public List<String> getConditionNamesByMedicineId(int medicineId) {
         List<String> names = new ArrayList<>();
-        String sql = "SELECT con.ConditionName "
+        String sql = "SELECT con.ConditionName, con.Description, con.Advice "
                 + "FROM ConditionMedicines mc "
                 + "JOIN Conditions con ON mc.ConditionId = con.ConditionId "
                 + "WHERE mc.MedicineId = ? "
@@ -752,7 +853,18 @@ public class MedicineDAO {
             ps.setInt(1, medicineId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    names.add(rs.getString("ConditionName"));
+                    String name = rs.getString("ConditionName");
+                    String desc = rs.getString("Description");
+                    String advice = rs.getString("Advice");
+
+                    StringBuilder sb = new StringBuilder(name);
+                    if (desc != null && !desc.isEmpty()) {
+                        sb.append(" (").append(desc).append(")");
+                    }
+                    if (advice != null && !advice.isEmpty()) {
+                        sb.append(" {").append(advice).append("}");
+                    }
+                    names.add(sb.toString());
                 }
             }
         } catch (SQLException e) {
@@ -762,70 +874,118 @@ public class MedicineDAO {
     }
 
     public String searchMedicineByKeyword(String keyword) {
+        if (keyword == null || keyword.isBlank())
+            return null;
+
+        // 1. Preprocess: Extract important keywords
+        String[] stopWords = { "tôi", "đang", "bị", "muốn", "mua", "có", "không", "cho", "của", "là", "bạn", "với",
+                "và", "giúp", "em", "mình", "cần", "tìm", "thuốc", "loại" };
+        String processed = keyword.toLowerCase();
+        for (String word : stopWords) {
+            processed = processed.replaceAll("\\b" + word + "\\b", " ");
+        }
+        processed = processed.trim().replaceAll("\\s+", " ");
+
+        if (processed.isEmpty())
+            processed = keyword.toLowerCase();
+
+        String[] keywords = processed.split("\\s+");
+        if (keywords.length == 0)
+            return null;
+
         StringBuilder sb = new StringBuilder();
-
         try (Connection conn = dbContext.getConnection()) {
+            // Build dynamic SQL with OR for each keyword and Category matching
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT TOP 3 m.MedicineId, m.MedicineName, m.ShortDescription, m.BrandOrigin, ")
+                    .append("mu.SellingPrice, mu.UnitName as Unit, cat.CategoryName, ")
+                    .append("(SELECT STRING_AGG(CAST(ai2.IngredientName + ISNULL(' ' + mi2.Strength, '') + ISNULL(' (' + ai2.Description + ')', '') AS NVARCHAR(MAX)), ', ') FROM MedicineIngredients mi2 JOIN ActiveIngredients ai2 ON mi2.IngredientId = ai2.IngredientId WHERE mi2.MedicineId = m.MedicineId) as Ingredients, ")
+                    .append("(SELECT STRING_AGG(CAST(con2.ConditionName + ISNULL(' (' + con2.Description + ')', '') AS NVARCHAR(MAX)), ', ') FROM ConditionMedicines mc2 JOIN Conditions con2 ON mc2.ConditionId = con2.ConditionId WHERE mc2.MedicineId = m.MedicineId) as Conditions ")
+                    .append("FROM Medicine m ")
+                    .append("LEFT JOIN Category cat ON m.CategoryId = cat.CategoryId ")
+                    .append("OUTER APPLY (SELECT TOP 1 mi.SellingPrice, u.UnitName FROM MedicineUnit mi LEFT JOIN Unit u ON mi.UnitId = u.UnitId WHERE mi.MedicineId = m.MedicineId ORDER BY mi.ConversionRate DESC) mu ")
+                    .append("WHERE ");
 
-            String sql = "SELECT TOP 3 DISTINCT "
-                    + "m.MedicineName, m.ShortDescription, mu.SellingPrice, mu.UnitName as Unit, m.ImageUrl "
-                    + "FROM Medicine m "
-                    + "OUTER APPLY (SELECT TOP 1 mi.SellingPrice, u.UnitName "
-                    + "             FROM MedicineUnit mi LEFT JOIN Unit u ON mi.UnitId = u.UnitId "
-                    + "             WHERE mi.MedicineId = m.MedicineId ORDER BY mi.ConversionRate DESC) mu "
-                    + "LEFT JOIN MedicineIngredients mi ON m.MedicineId = mi.MedicineId "
-                    + "LEFT JOIN ActiveIngredients ai ON mi.IngredientId = ai.IngredientId "
-                    + "LEFT JOIN ConditionMedicines mc ON m.MedicineId = mc.MedicineId "
-                    + "LEFT JOIN Conditions con ON mc.ConditionId = con.ConditionId "
-                    + "WHERE m.MedicineName LIKE ? "
-                    + "OR m.ShortDescription LIKE ? "
-                    + "OR m.BrandOrigin LIKE ? "
-                    + "OR ai.IngredientName LIKE ? "
-                    + "OR con.ConditionName LIKE ? "
-                    + "OR con.Description LIKE ?";
-
-            PreparedStatement ps = conn.prepareStatement(sql);
-            String pattern = "%" + keyword + "%";
-
-            for (int i = 1; i <= 6; i++) {
-                ps.setString(i, pattern);
+            for (int i = 0; i < keywords.length; i++) {
+                if (i > 0)
+                    sql.append(" OR ");
+                sql.append(
+                        "(m.MedicineName LIKE ? OR m.ShortDescription LIKE ? OR m.BrandOrigin LIKE ? OR cat.CategoryName LIKE ? ")
+                        .append(" OR EXISTS (SELECT 1 FROM MedicineIngredients mi3 JOIN ActiveIngredients ai3 ON mi3.IngredientId = ai3.IngredientId WHERE mi3.MedicineId = m.MedicineId AND (ai3.IngredientName LIKE ? OR ai3.Description LIKE ?)) ")
+                        .append(" OR EXISTS (SELECT 1 FROM ConditionMedicines mc3 JOIN Conditions con3 ON mc3.ConditionId = con3.ConditionId WHERE mc3.MedicineId = m.MedicineId AND (con3.ConditionName LIKE ? OR con3.Description LIKE ?)))");
             }
 
-            ResultSet rs = ps.executeQuery();
-            int count = 0;
+            // Prioritize matches: Category name matches are strong signals, Medicine name
+            // matches are even stronger
+            sql.append(" ORDER BY ");
+            for (int i = 0; i < keywords.length; i++) {
+                if (i > 0)
+                    sql.append(" + ");
+                sql.append("(CASE WHEN cat.CategoryName LIKE ? THEN 5 WHEN m.MedicineName LIKE ? THEN 10 ELSE 0 END)");
+            }
+            sql.append(" DESC, m.MedicineName ASC");
 
-            while (rs.next()) {
-                count++;
-
-                String name = rs.getString("MedicineName");
-                String shortDesc = rs.getString("ShortDescription");
-                double price = rs.getDouble("SellingPrice");
-                String unit = rs.getString("Unit");
-                String img = rs.getString("ImageUrl");
-
-                sb.append("💊 ").append(name);
-                if (price > 0) {
-                    sb.append(" — ").append(String.format("%,.0f₫ / %s", price, unit));
+            PreparedStatement ps = conn.prepareStatement(sql.toString());
+            int paramIndex = 1;
+            // Set params for WHERE clause
+            for (String kw : keywords) {
+                String pattern = "%" + kw + "%";
+                for (int j = 0; j < 8; j++) { // 8 placeholders in the WHERE block for each keyword
+                    ps.setString(paramIndex++, pattern);
                 }
-                sb.append("\n");
-
-                if (shortDesc != null && !shortDesc.isBlank()) {
-                    sb.append("📋 ").append(shortDesc).append("\n");
-                }
-
-                if (img != null && !img.isBlank()) {
-                    sb.append("(Ảnh: ").append(img).append(")\n");
-                }
-
-                sb.append("\n");
+            }
+            // Set params for ORDER BY clause
+            for (String kw : keywords) {
+                String pattern = "%" + kw + "%";
+                ps.setString(paramIndex++, pattern); // for CategoryName
+                ps.setString(paramIndex++, pattern); // for MedicineName
             }
 
-            if (count == 0) {
-                return null;
+            try (ResultSet rs = ps.executeQuery()) {
+                int count = 0;
+                while (rs.next()) {
+                    count++;
+                    String name = rs.getString("MedicineName");
+                    String shortDesc = rs.getString("ShortDescription");
+                    String brand = rs.getString("BrandOrigin");
+                    double price = rs.getDouble("SellingPrice");
+                    String unit = rs.getString("Unit");
+                    String ingredients = rs.getString("Ingredients");
+                    String conditions = rs.getString("Conditions");
+                    String category = rs.getString("CategoryName");
+
+                    sb.append("💊 ").append(name);
+                    if (brand != null && !brand.isBlank())
+                        sb.append(" (").append(brand).append(")");
+
+                    if (category != null && !category.isBlank())
+                        sb.append(" [").append(category).append("]");
+
+                    if (price > 0) {
+                        sb.append(" — ").append(String.format("%,.0f₫/%s", price, unit));
+                    }
+                    sb.append("\n");
+
+                    if (shortDesc != null && !shortDesc.isBlank()) {
+                        sb.append("   - Mô tả: ").append(shortDesc).append("\n");
+                    }
+                    if (ingredients != null && !ingredients.isBlank()) {
+                        sb.append("   - Thành phần: ").append(ingredients).append("\n");
+                    }
+                    if (conditions != null && !conditions.isBlank()) {
+                        sb.append("   - Công dụng: ").append(conditions).append("\n");
+                    }
+                    sb.append("\n");
+                }
+
+                if (count == 0) {
+                    return null;
+                }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "⚠️ Lỗi khi tìm kiếm dữ liệu thuốc trong hệ thống.";
+            return "⚠️ Lỗi khi tìm kiếm dữ liệu thuốc.";
         }
 
         return sb.toString();

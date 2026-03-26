@@ -88,8 +88,10 @@
                                                                         <c:out value='${medicine.unit}' />
                                                                     </span>
                                                                 </div>
-                                                                <a class="btn btn-primary w-100"
-                                                                    href="${pageContext.request.contextPath}/medicine/detail?id=${medicine.medicineId}">Mua</a>
+                                                                <button class="btn btn-primary w-100 add-to-cart-btn"
+                                                                    onclick="addToCartAjax(this, '${medicine.medicineId}')">
+                                                                    Thêm vào giỏ hàng
+                                                                </button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -102,7 +104,7 @@
                                             <div class="empty-state">
                                                 <i class="fas fa-capsules"></i>
                                                 <h4>Không tìm thấy sản phẩm nào</h4>
-                                                <p>Không có kết quả cho từ khóa "
+                                                <p>Không có kết quả cho"
                                                     <c:out value='${keyword}' />". Hãy thử tìm kiếm với từ khóa khác.
                                                 </p>
                                                 <a href="${pageContext.request.contextPath}/home"
@@ -120,6 +122,66 @@
                         <%@ include file="../common/footer.jsp" %>
 
                             <script src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
+                            <script>
+                                function addToCartAjax(btn, medicineId) {
+                                    const isLoggedIn = '<c:out value="${sessionScope.userId != null}"/>' === 'true';
+                                    const userRole = '${sessionScope.roleName != null ? sessionScope.roleName : ""}';
+                                    const role = userRole.toLowerCase();
+
+                                    if (!isLoggedIn) {
+                                        window.location.href = '${pageContext.request.contextPath}/login';
+                                        return;
+                                    }
+
+                                    if (role === 'admin' || role === 'staff') {
+                                        alert('Tài khoản Admin và Staff không thể mua hàng. Vui lòng đăng nhập với tài khoản khách hàng.');
+                                        return;
+                                    }
+
+                                    const formData = new URLSearchParams();
+                                    formData.append('action', 'add');
+                                    formData.append('id', medicineId);
+                                    formData.append('quantity', 1);
+
+                                    fetch('${pageContext.request.contextPath}/cart', {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-Requested-With': 'XMLHttpRequest'
+                                        },
+                                        body: formData
+                                    })
+                                        .then(response => {
+                                            if (response.headers.get('content-type')?.includes('application/json')) {
+                                                return response.json();
+                                            } else {
+                                                window.location.href = '${pageContext.request.contextPath}/login';
+                                                throw new Error('Redirected');
+                                            }
+                                        })
+                                        .then(data => {
+                                            if (data.success) {
+                                                if (typeof updateHeaderCartCount === 'function') {
+                                                    updateHeaderCartCount(data.cartCount);
+                                                }
+                                                // Subtle feedback on the button
+                                                const originalText = btn.innerHTML;
+                                                btn.innerHTML = '<i class="fas fa-check"></i> Đã thêm';
+                                                btn.classList.replace('btn-primary', 'btn-success');
+                                                btn.disabled = true;
+                                                setTimeout(() => {
+                                                    btn.innerHTML = originalText;
+                                                    btn.classList.replace('btn-success', 'btn-primary');
+                                                    btn.disabled = false;
+                                                }, 2000);
+                                            }
+                                        })
+                                        .catch(error => {
+                                            if (error.message !== 'Redirected') {
+                                                console.error('Error adding to cart:', error);
+                                            }
+                                        });
+                                }
+                            </script>
                 </body>
 
                 </html>
