@@ -51,15 +51,15 @@ public class ImportDAO {
     public List<Import> searchImports(String keyword) {
         List<Import> imports = new ArrayList<>();
 
-        String sql = "SELECT i.ImportId, i.SupplierId, s.SupplierName, " +
-                "       i.StaffId, st.StaffName, i.ImportCreateAt, i.TotalPrice, i.ImportStatus " +
-                "FROM   Import i " +
+        String sql = "SELECT i.ImportId, i.ImportCode, i.SupplierId, s.SupplierName, " +
+                "       i.StaffId, st.StaffName, i.ImportCreatedAt, i.TotalPrice, i.ImportStatus " +
+                "FROM   [Import] i " +
                 "LEFT JOIN Supplier s ON i.SupplierId = s.SupplierId " +
                 "LEFT JOIN Staff st   ON i.StaffId   = st.StaffId " +
                 "WHERE  CAST(i.ImportId AS VARCHAR(10)) LIKE ? " +
+                "   OR  i.ImportCode LIKE ? " +
                 "   OR  s.SupplierName LIKE ? " +
-                "   OR  ('IP' + RIGHT('000' + CAST(i.ImportId AS VARCHAR(10)), 3)) LIKE ? " +
-                "ORDER BY i.ImportCreateAt DESC";
+                "ORDER BY i.ImportCreatedAt DESC";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -280,10 +280,13 @@ public class ImportDAO {
     public List<ImportDetail> getImportDetails(int importId) {
         List<ImportDetail> details = new ArrayList<>();
 
-        String sql = "SELECT d.ImportDetailId, d.ImportId, d.MedicineId, d.UnitId, " +
-                "       m.MedicineCode, m.MedicineName, d.ImportQuantity, d.UnitPrice " +
+        String sql = "SELECT d.ImportDetailId, d.ImportId, d.MedicineUnitId, " +
+                "       mu.MedicineId, mu.UnitId, m.MedicineCode, m.MedicineName, u.UnitName, d.ImportQuantity, d.UnitPrice "
+                +
                 "FROM   ImportDetail d " +
-                "LEFT JOIN Medicine m ON d.MedicineId = m.MedicineId " +
+                "JOIN MedicineUnit mu ON d.MedicineUnitId = mu.MedicineUnitId " +
+                "JOIN Medicine m ON mu.MedicineId = m.MedicineId " +
+                "JOIN Unit u ON mu.UnitId = u.UnitId " +
                 "WHERE  d.ImportId = ?";
 
         try (Connection conn = dbContext.getConnection();
@@ -296,10 +299,12 @@ public class ImportDAO {
                     ImportDetail detail = new ImportDetail();
                     detail.setDetailId(rs.getInt("ImportDetailId"));
                     detail.setImportId(rs.getInt("ImportId"));
+                    detail.setMedicineUnitId(rs.getInt("MedicineUnitId"));
                     detail.setMedicineId(rs.getInt("MedicineId"));
                     detail.setUnitId(rs.getInt("UnitId"));
                     detail.setMedicineCode(rs.getString("MedicineCode"));
                     detail.setMedicineName(rs.getString("MedicineName"));
+                    detail.setUnitName(rs.getString("UnitName"));
                     detail.setQuantity(rs.getInt("ImportQuantity"));
                     detail.setUnitPrice(rs.getDouble("UnitPrice"));
                     detail.recalculateTotal();
@@ -314,17 +319,16 @@ public class ImportDAO {
 
     // Thêm chi tiết thuốc vào phiếu nhập
     public boolean addImportDetail(ImportDetail detail) {
-        String sql = "INSERT INTO ImportDetail (ImportId, MedicineId, UnitId, ImportQuantity, UnitPrice) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO ImportDetail (ImportId, MedicineUnitId, ImportQuantity, UnitPrice) " +
+                "VALUES (?, ?, ?, ?)";
 
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, detail.getImportId());
-            ps.setInt(2, detail.getMedicineId());
-            ps.setInt(3, detail.getUnitId());
-            ps.setInt(4, detail.getQuantity());
-            ps.setDouble(5, detail.getUnitPrice());
+            ps.setInt(2, detail.getMedicineUnitId());
+            ps.setInt(3, detail.getQuantity());
+            ps.setDouble(4, detail.getUnitPrice());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -533,10 +537,16 @@ public class ImportDAO {
 
     public List<Medicine> getAllMedicines() {
         List<Medicine> list = new ArrayList<>();
-        String sql = "SELECT m.MedicineId, m.MedicineCode, m.MedicineName, m.OriginalPrice, m.CategoryId, mu.UnitName, mu.UnitId "
-                +
-                "FROM Medicine m " +
-                "LEFT JOIN MedicineUnit mu ON mu.UnitId = (SELECT TOP 1 UnitId FROM MedicineUnit WHERE MedicineId = m.MedicineId ORDER BY UnitId ASC)";
+        String sql = "SELECT m.MedicineId, m.MedicineCode, m.MedicineName, m.OriginalPrice, m.CategoryId, "
+                + "mu.UnitName, mu.UnitId, mu.MedicineUnitId, mu.ConversionRate "
+                + "FROM Medicine m "
+                + "OUTER APPLY ( "
+                + "    SELECT TOP 1 u.UnitName, mi.UnitId, mi.MedicineUnitId, mi.ConversionRate "
+                + "    FROM MedicineUnit mi "
+                + "    JOIN Unit u ON mi.UnitId = u.UnitId "
+                + "    WHERE mi.MedicineId = m.MedicineId "
+                + "    ORDER BY mi.ConversionRate DESC, mi.MedicineUnitId ASC "
+                + ") mu";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
@@ -547,13 +557,14 @@ public class ImportDAO {
                 m.setMedicineName(rs.getString("MedicineName"));
                 m.setOriginalPrice(rs.getDouble("OriginalPrice"));
                 m.setCategoryId(rs.getInt("CategoryId"));
-                m.setUnit(rs.getString("UnitName"));
 
                 int unitId = rs.getInt("UnitId");
                 if (!rs.wasNull() && unitId > 0) {
                     MedicineUnit bu = new MedicineUnit();
                     bu.setUnitId(unitId);
+                    bu.setMedicineUnitId(rs.getInt("MedicineUnitId"));
                     bu.setUnitName(rs.getString("UnitName"));
+                    bu.setConversionRate(rs.getInt("ConversionRate"));
                     m.setBaseUnit(bu);
                 }
                 list.add(m);
@@ -601,7 +612,7 @@ public class ImportDAO {
     }
 
     public void deleteImportDetailsByMedicineId(int medicineId) {
-        String sql = "DELETE FROM ImportDetail WHERE MedicineId = ?";
+        String sql = "DELETE FROM ImportDetail WHERE MedicineUnitId IN (SELECT MedicineUnitId FROM MedicineUnit WHERE MedicineId = ?)";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, medicineId);

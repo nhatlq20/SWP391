@@ -706,14 +706,11 @@ public class MedicineDAO {
 
                 int result = ps.executeUpdate();
                 if (result > 0) {
-                    // 3. If price changed, adjust all unit selling prices proportionally
-                    if (oldOriginalPrice > 0 && newOriginalPrice > 0
-                            && Math.abs(newOriginalPrice - oldOriginalPrice) > 0.0001) {
-                        double factor = newOriginalPrice / oldOriginalPrice;
-                        String updateUnitsSql = "UPDATE MedicineUnit SET SellingPrice = SellingPrice * ? WHERE MedicineId = ?";
+                    // 3. If price increased, increase all unit selling prices by 10%
+                    if (oldOriginalPrice > 0 && newOriginalPrice > oldOriginalPrice + 0.0001) {
+                        String updateUnitsSql = "UPDATE MedicineUnit SET SellingPrice = SellingPrice * 1.1 WHERE MedicineId = ?";
                         try (PreparedStatement psUnits = conn.prepareStatement(updateUnitsSql)) {
-                            psUnits.setDouble(1, factor);
-                            psUnits.setInt(2, medicineId);
+                            psUnits.setInt(1, medicineId);
                             psUnits.executeUpdate();
                         }
                     }

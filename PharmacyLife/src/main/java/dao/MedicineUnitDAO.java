@@ -251,4 +251,20 @@ public class MedicineUnitDAO {
         }
         return unitTypes;
     }
+    public int getMedicineUnitId(int medicineId, int unitId) {
+        String sql = "SELECT MedicineUnitId FROM MedicineUnit WHERE MedicineId = ? AND UnitId = ?";
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, medicineId);
+            ps.setInt(2, unitId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
 }
