@@ -6,23 +6,24 @@ package models;
  * Schema:
  * - ImportDetailId INT IDENTITY(1,1) PRIMARY KEY
  * - ImportId INT NOT NULL
- * - MedicineId INT NOT NULL
- * - ImportQuantity INT
- * - UnitPrice DECIMAL(12,2)
- *
- * Thuộc tính medicineName và totalAmount chỉ dùng để hiển thị,
- * totalAmount được tính từ quantity * unitPrice, không bắt buộc lưu DB.
+ * - MedicineUnitId INT NOT NULL
+ * - ImportQuantity INT NOT NULL
+ * - UnitPrice DECIMAL(12, 2) NOT NULL
  */
 public class ImportDetail {
 
     private int detailId; // ImportDetailId
     private int importId; // ImportId
-    private int medicineId; // MedicineId
+    private int medicineUnitId; // MedicineUnitId
 
-    private String medicineName; // Tên thuốc (join từ bảng Medicine)
-    private String medicineCode; // Mã thuốc (join từ bảng Medicine)
+    // Helper fields (not mapping columns for insert)
+    private int medicineId;
+    private int unitId;
 
-    private int unitId; // UnitId
+    private String medicineName; // Tên thuốc (join từ bảng MedicineUnit -> Medicine)
+    private String medicineCode; // Mã thuốc (join từ bảng MedicineUnit -> Medicine)
+    private String unitName; // Tên đơn vị (join từ bảng MedicineUnit -> Unit)
+
     private int quantity; // ImportQuantity
     private double unitPrice; // UnitPrice
 
@@ -31,21 +32,21 @@ public class ImportDetail {
     public ImportDetail() {
     }
 
-    public ImportDetail(int importId, int medicineId, int unitId, int quantity, double unitPrice) {
+    public ImportDetail(int importId, int medicineUnitId, int quantity, double unitPrice) {
         this.importId = importId;
-        this.medicineId = medicineId;
-        this.unitId = unitId;
+        this.medicineUnitId = medicineUnitId;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
         this.totalAmount = quantity * unitPrice;
     }
 
-    public ImportDetail(int detailId, int importId, int medicineId,
-            String medicineName, int quantity, double unitPrice, double totalAmount) {
+    public ImportDetail(int detailId, int importId, int medicineUnitId,
+            String medicineName, String unitName, int quantity, double unitPrice, double totalAmount) {
         this.detailId = detailId;
         this.importId = importId;
-        this.medicineId = medicineId;
+        this.medicineUnitId = medicineUnitId;
         this.medicineName = medicineName;
+        this.unitName = unitName;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
         this.totalAmount = totalAmount;
@@ -65,6 +66,14 @@ public class ImportDetail {
 
     public void setImportId(int importId) {
         this.importId = importId;
+    }
+
+    public int getMedicineUnitId() {
+        return medicineUnitId;
+    }
+
+    public void setMedicineUnitId(int medicineUnitId) {
+        this.medicineUnitId = medicineUnitId;
     }
 
     public int getMedicineId() {
@@ -99,6 +108,14 @@ public class ImportDetail {
         this.medicineCode = medicineCode;
     }
 
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+
     public int getQuantity() {
         return quantity;
     }
@@ -129,3 +146,5 @@ public class ImportDetail {
         this.totalAmount = this.quantity * this.unitPrice;
     }
 }
+
+

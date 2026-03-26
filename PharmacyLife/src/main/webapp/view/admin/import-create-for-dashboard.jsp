@@ -191,11 +191,14 @@
                                         style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; padding-right: 2.25rem !important;">
                                         <option value="">-- Tìm và chọn thuốc --</option>
                                         <c:forEach var="med" items="${medicines}">
-                                            <option value="${med.medicineId}" data-category="${med.categoryId}"
-                                                data-unit="${med.unit}" data-unit-id="${med.baseUnit.unitId}">
-                                                ${med.medicineCode} - ${med.medicineName}
-                                            </option>
-                                        </c:forEach>
+                                             <option value="${med.medicineId}" data-category="${med.categoryId}"
+                                                 data-unit="${not empty med.unit ? med.unit : ''}"
+                                                 data-unit-id="${not empty med.baseUnit ? med.baseUnit.unitId : 0}"
+                                                 data-original-price="${med.originalPrice}"
+                                                 data-conversion-rate="${not empty med.baseUnit ? med.baseUnit.conversionRate : 1}">
+                                                 ${med.medicineCode} - ${med.medicineName}
+                                             </option>
+                                         </c:forEach>
                                     </select>
                                 </div>
                                 <div class="form-group mb-4">
@@ -310,7 +313,6 @@
                             const medicineSelect = document.getElementById('modalMedicineId');
                             const options = medicineSelect.querySelectorAll('option');
 
-                            let firstVisible = true;
                             options.forEach(option => {
                                 if (option.value === "") { // Header option
                                     option.style.display = "block";
@@ -318,11 +320,9 @@
                                 }
 
                                 const medCategory = option.getAttribute('data-category');
-                                if (!categoryId || medCategory === categoryId) {
+                                // Use non-strict comparison to handle potential type differences
+                                if (!categoryId || categoryId.trim() === "" || medCategory == categoryId) {
                                     option.style.display = "block";
-                                    if (firstVisible && medicineSelect.value === "") {
-                                        // firstVisible = false;
-                                    }
                                 } else {
                                     option.style.display = "none";
                                     if (medicineSelect.value === option.value) {
@@ -396,11 +396,15 @@
                             const medicineId = this.value;
                             const selectedOption = this.options[this.selectedIndex];
                             const unit = selectedOption.getAttribute('data-unit') || '';
+                            const originalPrice = parseFloat(selectedOption.getAttribute('data-original-price')) || 0;
+                            const conversionRate = parseInt(selectedOption.getAttribute('data-conversion-rate')) || 1;
+
                             document.getElementById('modalUnit').value = unit;
 
                             if (medicineId && medicineId.trim() !== '') {
-                                // Clear price field - user must enter manually
-                                document.getElementById('modalPrice').value = '';
+                                // Pre-populate price based on OriginalPrice and ConversionRate
+                                 const calculatedPrice = originalPrice;
+                                document.getElementById('modalPrice').value = calculatedPrice > 0 ? calculatedPrice : '';
                                 calculateModalTotal();
                             } else {
                                 document.getElementById('modalPrice').value = '';

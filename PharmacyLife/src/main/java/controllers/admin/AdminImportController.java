@@ -24,14 +24,9 @@ public class AdminImportController extends HttpServlet {
 
     private ImportDAO importDAO;
     private MedicineDAO medicineDAO;
+    private dao.MedicineUnitDAO medicineUnitDAO;
     private dao.SupplierDAO supplierDAO;
     private dao.CategoryDAO categoryDAO;
-
-    private boolean isAdmin(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        String roleName = (session != null) ? (String) session.getAttribute("roleName") : null;
-        return roleName != null && roleName.equalsIgnoreCase("admin");
-    }
 
     private String getImportView(String name, HttpServletRequest request) {
         // name: list, view, create, edit, details
@@ -51,10 +46,10 @@ public class AdminImportController extends HttpServlet {
         }
     }
 
-    @Override
     public void init() throws ServletException {
         importDAO = new ImportDAO();
         medicineDAO = new MedicineDAO();
+        medicineUnitDAO = new dao.MedicineUnitDAO();
         supplierDAO = new dao.SupplierDAO();
         categoryDAO = new dao.CategoryDAO();
     }
@@ -367,9 +362,27 @@ public class AdminImportController extends HttpServlet {
                             }
 
                             if (medicineId > 0) {
-                                int largestUnitId = getLargestUnitId(medicineId, unitId);
-                                ImportDetail detail = new ImportDetail(newImportId, medicineId, largestUnitId, quantity,
-                                        price);
+                                // Find or create MedicineUnitId
+                                int medicineUnitId = -1;
+                                if (unitId > 0) {
+                                    medicineUnitId = medicineUnitDAO.getMedicineUnitId(medicineId, unitId);
+                                }
+
+                                // Fallback: try to find base unit if no unitId or not found
+                                if (medicineUnitId <= 0) {
+                                    models.MedicineUnit bu = medicineUnitDAO.getBaseUnit(medicineId);
+                                    if (bu != null) {
+                                        medicineUnitId = bu.getMedicineUnitId();
+                                    }
+                                }
+
+                                if (medicineUnitId <= 0) {
+                                    detailErrors.append("Không xác định được đơn vị cho thuốc ID ").append(medicineId)
+                                            .append(". ");
+                                    continue;
+                                }
+
+                                ImportDetail detail = new ImportDetail(newImportId, medicineUnitId, quantity, price);
                                 if (importDAO.addImportDetail(detail)) {
                                     itemsAdded++;
                                 } else {
@@ -400,7 +413,8 @@ public class AdminImportController extends HttpServlet {
                     List<ImportDetail> detailsToSync = importDAO.getImportDetails(newImportId);
                     if (detailsToSync != null) {
                         for (ImportDetail detail : detailsToSync) {
-                            applyStockChange(detail.getMedicineId(), detail.getQuantity(), detail.getUnitPrice(), true);
+                            applyStockChange(detail.getMedicineUnitId(), detail.getQuantity(), detail.getUnitPrice(),
+                                    true);
                         }
                     }
                 }
@@ -526,10 +540,10 @@ public class AdminImportController extends HttpServlet {
                             if ("Đã duyệt".equals(oldStatus)) {
                                 int diff = newQty - oldDetail.getQuantity();
                                 if (diff != 0) {
-                                    applyStockChange(oldDetail.getMedicineId(), diff, 0, false);
+                                    applyStockChange(oldDetail.getMedicineUnitId(), diff, 0, false);
                                 }
                                 if (Math.abs(newPrice - oldDetail.getUnitPrice()) > 0.0001) {
-                                    applyStockChange(oldDetail.getMedicineId(), 0, newPrice, true);
+                                    applyStockChange(oldDetail.getMedicineUnitId(), 0, newPrice, true);
                                 }
                             }
                             oldDetail.setQuantity(newQty);
@@ -564,11 +578,21 @@ public class AdminImportController extends HttpServlet {
                         }
 
                         if (medicineId > 0) {
-                            int largestUnitId = getLargestUnitId(medicineId, unitId);
-                            ImportDetail detail = new ImportDetail(importId, medicineId, largestUnitId, quantity,
-                                    price);
-                            if (!importDAO.addImportDetail(detail)) {
-                                detailErrors.append("Không thể thêm thuốc mới ID ").append(medicineId).append(". ");
+                            int medicineUnitId = -1;
+                            if (unitId > 0) {
+                                medicineUnitId = medicineUnitDAO.getMedicineUnitId(medicineId, unitId);
+                            }
+                            if (medicineUnitId <= 0) {
+                                models.MedicineUnit bu = medicineUnitDAO.getBaseUnit(medicineId);
+                                if (bu != null)
+                                    medicineUnitId = bu.getMedicineUnitId();
+                            }
+
+                            if (medicineUnitId > 0) {
+                                ImportDetail detail = new ImportDetail(importId, medicineUnitId, quantity, price);
+                                if (!importDAO.addImportDetail(detail)) {
+                                    detailErrors.append("Không thể thêm thuốc mới ID ").append(medicineId).append(". ");
+                                }
                             }
                         }
                     } catch (NumberFormatException e) {
@@ -601,7 +625,8 @@ public class AdminImportController extends HttpServlet {
                     List<ImportDetail> detailsToSync = importDAO.getImportDetails(importId);
                     if (detailsToSync != null) {
                         for (ImportDetail detail : detailsToSync) {
-                            applyStockChange(detail.getMedicineId(), detail.getQuantity(), detail.getUnitPrice(), true);
+                            applyStockChange(detail.getMedicineUnitId(), detail.getQuantity(), detail.getUnitPrice(),
+                                    true);
                         }
                     }
                 } else if ("Đã duyệt".equals(oldStatus) && !"Đã duyệt".equals(imp.getStatus())) {
@@ -609,7 +634,7 @@ public class AdminImportController extends HttpServlet {
                     List<ImportDetail> detailsToSync = importDAO.getImportDetails(importId);
                     if (detailsToSync != null) {
                         for (ImportDetail detail : detailsToSync) {
-                            applyStockChange(detail.getMedicineId(), -detail.getQuantity(), 0, false);
+                            applyStockChange(detail.getMedicineUnitId(), -detail.getQuantity(), 0, false);
                         }
                     }
                 }
@@ -639,7 +664,7 @@ public class AdminImportController extends HttpServlet {
                 List<ImportDetail> details = importDAO.getImportDetails(importId);
                 if (details != null) {
                     for (ImportDetail detail : details) {
-                        applyStockChange(detail.getMedicineId(), -detail.getQuantity(), 0, false);
+                        applyStockChange(detail.getMedicineUnitId(), -detail.getQuantity(), 0, false);
                     }
                 }
             }
@@ -676,8 +701,20 @@ public class AdminImportController extends HttpServlet {
             int unitId = Integer
                     .parseInt(request.getParameter("unitId") != null ? request.getParameter("unitId") : "0");
 
-            int largestUnitId = getLargestUnitId(medicineId, unitId);
-            ImportDetail detail = new ImportDetail(importId, medicineId, largestUnitId, quantity, price);
+            int medicineUnitId = medicineUnitDAO.getMedicineUnitId(medicineId, unitId);
+            if (medicineUnitId <= 0) {
+                models.MedicineUnit bu = medicineUnitDAO.getBaseUnit(medicineId);
+                if (bu != null)
+                    medicineUnitId = bu.getMedicineUnitId();
+            }
+
+            if (medicineUnitId <= 0) {
+                request.setAttribute("error", "Không tìm thấy đơn vị phù hợp cho thuốc.");
+                response.sendRedirect(request.getContextPath() + "/admin/imports?action=edit&id=" + importId);
+                return;
+            }
+
+            ImportDetail detail = new ImportDetail(importId, medicineUnitId, quantity, price);
             detail.recalculateTotal();
 
             if (importDAO.addImportDetail(detail)) {
@@ -789,57 +826,24 @@ public class AdminImportController extends HttpServlet {
         }
     }
 
-    private int getLargestUnitId(int medicineId, int fallbackUnitId) {
-        dao.MedicineUnitDAO unitDao = new dao.MedicineUnitDAO();
-        java.util.List<models.MedicineUnit> units = unitDao.getUnitsByMedicineId(medicineId);
-        int largestUnitId = fallbackUnitId;
-        int maxConv = 0;
-        if (units != null) {
-            for (models.MedicineUnit u : units) {
-                if (u.getConversionRate() > maxConv) {
-                    maxConv = u.getConversionRate();
-                    largestUnitId = u.getUnitId();
-                }
-            }
-        }
-        return largestUnitId;
-    }
+    private void applyStockChange(int medicineUnitId, int quantity, double pricePerUnit, boolean isSetPrice) {
+        models.MedicineUnit mu = medicineUnitDAO.getUnitById(medicineUnitId);
+        if (mu == null)
+            return;
 
-    private void applyStockChange(int medicineId, int quantityBoxes, double pricePerBox, boolean isSetPrice) {
-        dao.MedicineUnitDAO unitDao = new dao.MedicineUnitDAO();
-        java.util.List<models.MedicineUnit> units = unitDao.getUnitsByMedicineId(medicineId);
+        int medicineId = mu.getMedicineId();
+        int convertedQty = quantity * mu.getConversionRate();
 
-        models.MedicineUnit largestUnit = null;
-        models.MedicineUnit smallestUnit = null;
-        int maxConv = 0;
+        // Find base unit for correct stock update parameters
+        models.MedicineUnit baseUnit = medicineUnitDAO.getBaseUnit(medicineId);
+        int baseUnitId = (baseUnit != null) ? baseUnit.getUnitId() : 0;
 
-        if (units != null) {
-            for (models.MedicineUnit u : units) {
-                if (u.getConversionRate() > maxConv) {
-                    maxConv = u.getConversionRate();
-                    largestUnit = u;
-                }
-                if (u.isBaseUnit()) {
-                    smallestUnit = u;
-                }
-            }
-        }
-
-        if (largestUnit != null && smallestUnit != null) {
-            int convertedQty = quantityBoxes * largestUnit.getConversionRate();
-            if (isSetPrice) {
-                medicineDAO.addQuantityAndSetOriginalPrice(medicineId, smallestUnit.getUnitId(), convertedQty,
-                        pricePerBox);
-            } else {
-                medicineDAO.updateStockQuantity(medicineId, smallestUnit.getUnitId(), convertedQty);
-            }
+        if (isSetPrice) {
+            // Adjust original price: newPrice / conversionRate = price of 1 base unit
+            double baseUnitPrice = pricePerUnit;
+            medicineDAO.addQuantityAndSetOriginalPrice(medicineId, baseUnitId, convertedQty, baseUnitPrice);
         } else {
-            // fallback
-            if (isSetPrice) {
-                medicineDAO.addQuantityAndSetOriginalPrice(medicineId, 0, quantityBoxes, pricePerBox);
-            } else {
-                medicineDAO.updateStockQuantity(medicineId, 0, quantityBoxes);
-            }
+            medicineDAO.updateStockQuantity(medicineId, baseUnitId, convertedQty);
         }
     }
 

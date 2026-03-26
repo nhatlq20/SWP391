@@ -209,7 +209,10 @@
                                         <option value="">-- Tìm và chọn thuốc --</option>
                                         <c:forEach var="med" items="${medicines}">
                                             <option value="${med.medicineId}" data-category="${med.categoryId}"
-                                                data-unit="${med.unit}" data-unit-id="${med.baseUnit.unitId}">
+                                                data-unit="${not empty med.unit ? med.unit : ''}"
+                                                                                                 data-unit-id="${not empty med.baseUnit ? med.baseUnit.unitId : 0}"
+                                                 data-original-price="${med.originalPrice}"
+                                                 data-conversion-rate="${not empty med.baseUnit ? med.baseUnit.conversionRate : 1}">
                                                 ${med.medicineCode} - ${med.medicineName}
                                             </option>
                                         </c:forEach>
@@ -307,14 +310,14 @@
                                 <c:if test="${not empty details}">
                                     <c:forEach var="detail" items="${details}">
                                         medicineList.push({
-                                            detailId: <c:out value="${not empty detail.detailId ? detail.detailId : 0}" />,
-                                        medicineId: <c:out value="${not empty detail.medicineId ? detail.medicineId : 0}" />,
-                                        medicineCode: "<c:out value="${not empty detail.medicineCode ? detail.medicineCode : ''}" />",
-                                        medicineName: "<c:out value="${not empty detail.medicineName ? detail.medicineName : ''}" />",
-                                        quantity: <c:out value="${not empty detail.quantity ? detail.quantity : 0}" />,
-                                        price: <c:out value="${not empty detail.unitPrice ? detail.unitPrice : 0}" />,
-                                        total: <c:out value="${detail.totalAmount}" />,
-                                });
+                                            detailId: ${not empty detail.detailId ? detail.detailId : 0},
+                                            medicineId: ${not empty detail.medicineId ? detail.medicineId : 0},
+                                            medicineCode: "${not empty detail.medicineCode ? detail.medicineCode : ''}",
+                                            medicineName: "${not empty detail.medicineName ? detail.medicineName : ''}",
+                                            quantity: ${not empty detail.quantity ? detail.quantity : 0},
+                                            price: ${not empty detail.unitPrice ? detail.unitPrice : 0},
+                                            total: ${detail.totalAmount}
+                                        });
                                     </c:forEach>
                                 </c:if>
                                 console.log("Medicine List initialized:", medicineList);
@@ -342,13 +345,13 @@
                                     const options = medicineSelect.querySelectorAll('option');
 
                                     options.forEach(option => {
-                                        if (option.value === "") {
+                                        if (option.value === "") { // Header option
                                             option.style.display = "block";
                                             return;
                                         }
 
                                         const medCategory = option.getAttribute('data-category');
-                                        if (!categoryId || medCategory === categoryId) {
+                                        if (!categoryId || categoryId.trim() === "" || medCategory == categoryId) {
                                             option.style.display = "block";
                                         } else {
                                             option.style.display = "none";
@@ -423,11 +426,15 @@
                                     const medicineId = this.value;
                                     const selectedOption = this.options[this.selectedIndex];
                                     const unit = selectedOption.getAttribute('data-unit') || '';
+                                    const originalPrice = parseFloat(selectedOption.getAttribute('data-original-price')) || 0;
+                                    const conversionRate = parseInt(selectedOption.getAttribute('data-conversion-rate')) || 1;
+
                                     document.getElementById('modalUnit').value = unit;
 
                                     if (medicineId && medicineId.trim() !== '') {
-                                        // Clear price field - user must enter manually
-                                        document.getElementById('modalPrice').value = '';
+                                        // Pre-populate price based on OriginalPrice and ConversionRate
+                                         const calculatedPrice = originalPrice;
+                                        document.getElementById('modalPrice').value = calculatedPrice > 0 ? calculatedPrice : '';
                                         calculateModalTotal();
                                     } else {
                                         document.getElementById('modalPrice').value = '';
