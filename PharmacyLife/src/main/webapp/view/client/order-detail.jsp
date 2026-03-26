@@ -153,7 +153,7 @@
                                                 <tr>
                                                     <td>
                                                         <div class="d-flex align-items-center">
-                                                            <img src="${item.medicine.imageUrl}"
+                                                            <img src="${pageContext.request.contextPath}/${item.medicine.imageUrl}"
                                                                 alt="${item.medicine.medicineName}"
                                                                 class="product-img me-3"
                                                                 onerror="this.src='https://via.placeholder.com/80'">

@@ -77,7 +77,7 @@
                                                             <td class="ps-0">
                                                                 <c:if test="${not empty o.items}">
                                                                     <div class="d-flex align-items-center">
-                                                                        <img src="${o.items[0].medicine.imageUrl}"
+                                                                        <img src="${pageContext.request.contextPath}/${o.items[0].medicine.imageUrl}"
                                                                             alt="Img" class="order-item-img me-3"
                                                                             onerror="this.src='https://via.placeholder.com/50'" />
                                                                         <div>
