@@ -162,7 +162,7 @@ public class RevenueDAO {
             sql += " AND CAST(o.OrderDate AS DATE) BETWEEN ? AND ? ";
         }
         sql += "GROUP BY m.MedicineId, m.MedicineName, max_mu.MaxRate " +
-                "ORDER BY SUM(oi.OrderQuantity * ISNULL(mu.ConversionRate, 1)) DESC, SUM(oi.OrderQuantity * oi.UnitPrice) DESC";
+                "ORDER BY SUM(oi.OrderQuantity * oi.UnitPrice) DESC, SUM(oi.OrderQuantity * ISNULL(mu.ConversionRate, 1)) DESC";
 
         java.util.List<models.TopProduct> list = new java.util.ArrayList<>();
         DBContext db = new DBContext();

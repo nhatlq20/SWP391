@@ -166,3 +166,70 @@ body {
 .row.gap-24 {
     row-gap: 24px;
 }
+
+/* Revenue List Cards */
+.revenue-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid rgba(42, 96, 232, 0.12);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.revenue-card:hover {
+    box-shadow: 0 6px 24px rgba(42, 96, 232, 0.08);
+}
+
+.revenue-card .table {
+    margin-bottom: 0;
+    border: 1px solid #e9ecef; /* Outer border */
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.revenue-card thead th {
+    background-color: #f8faff !important;
+    border-bottom: 2px solid #dee2e6 !important;
+    border-right: 1px solid #e9ecef;
+    color: #333;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    padding: 14px 12px;
+}
+
+.revenue-card thead th:last-child {
+    border-right: none;
+}
+
+.revenue-card tbody td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #e9ecef;
+    border-right: 1px solid #e9ecef;
+    vertical-align: middle;
+    color: #444;
+}
+
+.revenue-card tbody td:last-child {
+    border-right: none;
+}
+
+.revenue-card tbody tr:hover {
+    background-color: #f8fbff;
+}
+
+.revenue-card tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.revenue-card .section-title {
+    margin-top: 0;
+    margin-bottom: 24px;
+    font-size: 1.15rem !important;
+    font-weight: 800;
+}
