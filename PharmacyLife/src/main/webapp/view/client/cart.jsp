@@ -284,13 +284,16 @@
                             });
                         }
 
+                        const contextPath = '${pageContext.request.contextPath}';
+
                         function goToCheckout() {
                             const selected = Array.from(document.querySelectorAll('.item-checkbox:checked'))
                                 .map(cb => cb.value)
                                 .join(',');
 
                             if (selected) {
-                                window.location.href = `cart?mode=checkout&selected=${selected}`;
+                                // Use absolute path and encode selected ids to keep query intact
+                                window.location.href = contextPath + '/cart?mode=checkout&muids=' + encodeURIComponent(selected);
                             } else {
                                 alert('Vui lòng chọn ít nhất một sản phẩm để thanh toán!');
                             }

@@ -68,7 +68,8 @@
                                             </c:if>
 
                                             <form action="checkout" method="POST">
-                                                <input type="hidden" name="selectedItems" value="${selectedItems}">
+                                                <input type="hidden" name="selectedItems"
+                                                    value="${empty selectedItems ? (empty sessionScope.checkoutItems ? param.muids : sessionScope.checkoutItems) : selectedItems}">
                                                 <div class="row g-3">
                                                     <div class="col-12">
                                                         <label for="fullName" class="form-label required">Họ và

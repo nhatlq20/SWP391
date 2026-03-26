@@ -51,15 +51,28 @@ public class CartController extends HttpServlet {
         // Check if coming from checkout request explicitly or just viewing
         String mode = request.getParameter("mode");
         if ("checkout".equals(mode) && cart != null && !cart.getItems().isEmpty()) {
-            String selected = request.getParameter("selected");
+            // Client sends selected medicineUnitIds in `muids` (preferred), fallback legacy `selectedItems`
+            String selected = request.getParameter("muids");
+            if (selected == null || selected.isEmpty()) {
+                selected = request.getParameter("selectedItems");
+            }
             java.util.List<models.Cart.Item> itemsToCheck = cart.getItems();
+
+            if (selected != null) {
+                selected = selected.trim();
+                try {
+                    selected = java.net.URLDecoder.decode(selected, "UTF-8");
+                } catch (Exception e) {
+                    // keep as-is
+                }
+            }
 
             if (selected != null && !selected.isEmpty()) {
                 itemsToCheck = new java.util.ArrayList<>();
                 String[] parts = selected.split(",");
                 for (String part : parts) {
                     try {
-                        int muid = Integer.parseInt(part);
+                        int muid = Integer.parseInt(part.trim());
                         models.Cart.Item item = cart.getItem(muid);
                         if (item != null) {
                             itemsToCheck.add(item);
@@ -135,9 +148,11 @@ public class CartController extends HttpServlet {
                 request.setAttribute("errorList", errors);
                 request.setAttribute("error", "Vui lòng điều chỉnh giỏ hàng vì một số sản phẩm không đủ hàng.");
             } else {
+                // Store selection so CheckoutController can reliably rebuild the order items
+                session.setAttribute("checkoutItems", selected);
                 String dest = request.getContextPath() + "/checkout";
                 if (selected != null && !selected.isEmpty()) {
-                    dest += "?selected=" + selected;
+                    dest += "?muids=" + java.net.URLEncoder.encode(selected, "UTF-8");
                 }
                 response.sendRedirect(dest);
                 return;
@@ -145,6 +160,10 @@ public class CartController extends HttpServlet {
         }
 
         // Calculate total amount
+        if (cart == null) {
+            cart = new Cart();
+            session.setAttribute("cart", cart);
+        }
         double totalMoney = cart.getTotalMoney();
         request.setAttribute("totalMoney", totalMoney);
         request.setAttribute("cart", cart);
