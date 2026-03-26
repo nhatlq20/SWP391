@@ -215,7 +215,7 @@ public class MedicineDAO {
                 + " c.CategoryName, "
                 + " mu.MedicineUnitId, mu.UnitId, mu.UnitName, mu.ConversionRate, mu.SellingPrice, mu.IsBaseUnit, "
                 + " (SELECT MAX(ConversionRate) FROM MedicineUnit WHERE MedicineId = m.MedicineId) as MaxRate, "
-                + " (SELECT COALESCE(SUM(OrderQuantity), 0) FROM OrderItems WHERE MedicineId = m.MedicineId) as TotalSold "
+                + " (SELECT COALESCE(SUM(oi.OrderQuantity * mu2.ConversionRate), 0) FROM OrderItems oi JOIN MedicineUnit mu2 ON oi.MedicineUnitId = mu2.MedicineUnitId JOIN Orders o2 ON oi.OrderId = o2.OrderId WHERE mu2.MedicineId = m.MedicineId AND LOWER(o2.Status) IN ('delivered', N'đã giao', N'đã giao hàng', 'completed', N'hoàn thành', N'giao hàng thành công', N'đã hoàn thành')) as TotalSold "
                 + "FROM Medicine m "
                 + "LEFT JOIN Category c ON m.CategoryId = c.CategoryId "
                 + "OUTER APPLY (SELECT TOP 1 mi.MedicineUnitId, mi.UnitId, u.UnitName, mi.ConversionRate, mi.SellingPrice, mi.IsBaseUnit "
