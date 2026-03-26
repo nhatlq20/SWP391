@@ -36,26 +36,43 @@ public class CheckoutController extends HttpServlet {
 
         request.setAttribute("cart", cart);
 
-        String selected = request.getParameter("selected");
-        java.util.List<models.Cart.Item> itemsToCheckout = cart.getItems();
-        double totalMoney = cart.getTotalMoney();
+        String selected = request.getParameter("muids");
+        if (selected == null || selected.isEmpty()) {
+            selected = request.getParameter("selectedItems");
+        }
+        if (selected == null || selected.isEmpty()) {
+            selected = (String) session.getAttribute("checkoutItems");
+            // Don't clear yet, we might need it for re-renders or post
+        }
+        if (selected != null) {
+            selected = selected.trim();
+            try {
+                selected = java.net.URLDecoder.decode(selected, "UTF-8");
+            } catch (Exception e) {
+                // keep as-is
+            }
+            selected = selected.trim();
+        }
+        
+        java.util.List<models.Cart.Item> itemsToCheckout = new java.util.ArrayList<>();
+        double totalMoney = 0;
 
         if (selected != null && !selected.isEmpty()) {
-            itemsToCheckout = new java.util.ArrayList<>();
-            totalMoney = 0;
             String[] parts = selected.split(",");
             for (String part : parts) {
                 try {
-                    int muid = Integer.parseInt(part);
+                    int muid = Integer.parseInt(part.trim());
                     models.Cart.Item item = cart.getItem(muid);
                     if (item != null) {
                         itemsToCheckout.add(item);
                         totalMoney += item.getTotalPrice();
                     }
                 } catch (NumberFormatException e) {
-                    // Fallback to mid-uid if necessary (though we prefer muid)
                 }
             }
+        } else {
+            itemsToCheckout = cart.getItems();
+            totalMoney = cart.getTotalMoney();
         }
 
         request.setAttribute("itemsToCheckout", itemsToCheckout);
@@ -102,19 +119,36 @@ public class CheckoutController extends HttpServlet {
             java.util.List<models.Cart.Item> itemsToProcess = new java.util.ArrayList<>(cart.getItems());
             double subTotal = cart.getTotalMoney();
 
+            if (selected == null || selected.trim().isEmpty()) {
+                // If hidden input lost (e.g., user refresh or redirect),
+                // fallback to the server-side stored selection.
+                selected = (String) session.getAttribute("checkoutItems");
+            }
+
+            if (selected != null) {
+                selected = selected.trim();
+                try {
+                    selected = java.net.URLDecoder.decode(selected, "UTF-8");
+                } catch (Exception e) {
+                    // keep as-is
+                }
+                selected = selected.trim();
+            }
+
             if (selected != null && !selected.isEmpty()) {
                 itemsToProcess = new java.util.ArrayList<>();
                 subTotal = 0;
                 String[] parts = selected.split(",");
                 for (String part : parts) {
                     try {
-                        int muid = Integer.parseInt(part);
+                        int muid = Integer.parseInt(part.trim());
                         models.Cart.Item item = cart.getItem(muid);
                         if (item != null) {
                             itemsToProcess.add(item);
                             subTotal += item.getTotalPrice();
                         }
                     } catch (NumberFormatException e) {
+                        // ignore invalid muid fragment
                     }
                 }
             }
@@ -171,7 +205,7 @@ public class CheckoutController extends HttpServlet {
             if (isSaved) {
                 // Remove only selected items from cart
                 CartDAO cartDAO_checkout = new CartDAO();
-                if (selected == null || selected.isEmpty() || itemsToProcess.size() == cart.getItemCount()) {
+                if (selected == null || selected.isEmpty() || itemsToProcess.size() == cart.getItems().size()) {
                     // Optimized: Clear whole cart if all items were processed
                     cart.getItems().clear();
                     if (customerId != null) {
