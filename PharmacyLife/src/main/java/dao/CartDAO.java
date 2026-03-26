@@ -19,7 +19,7 @@ public class CartDAO {
             conn.setAutoCommit(false);
 
             // Check if row exists
-            String checkSql = "SELECT COUNT(*) FROM Carts WHERE CustomerId = ? AND MedicineUnitId = ?";
+            String checkSql = "SELECT COUNT(*) FROM Cart WHERE CustomerId = ? AND MedicineUnitId = ?";
             int count = 0;
             try (PreparedStatement ps = conn.prepareStatement(checkSql)) {
                 ps.setInt(1, customerId);
@@ -32,7 +32,7 @@ public class CartDAO {
             int rows;
             if (count > 0) {
                 // UPDATE
-                String updateSql = "UPDATE Carts SET CartQuantity = ?, CartUpdatedAt = GETDATE() WHERE CustomerId = ? AND MedicineUnitId = ?";
+                String updateSql = "UPDATE Cart SET CartQuantity = ?, CartUpdatedAt = GETDATE() WHERE CustomerId = ? AND MedicineUnitId = ?";
                 try (PreparedStatement ps = conn.prepareStatement(updateSql)) {
                     ps.setInt(1, quantity);
                     ps.setInt(2, customerId);
@@ -41,7 +41,7 @@ public class CartDAO {
                 }
             } else {
                 // INSERT
-                String insertSql = "INSERT INTO Carts (CustomerId, MedicineUnitId, CartQuantity) VALUES (?, ?, ?)";
+                String insertSql = "INSERT INTO Cart (CustomerId, MedicineUnitId, CartQuantity) VALUES (?, ?, ?)";
                 try (PreparedStatement ps = conn.prepareStatement(insertSql)) {
                     ps.setInt(1, customerId);
                     ps.setInt(2, medicineUnitId);
@@ -66,7 +66,7 @@ public class CartDAO {
     }
 
     public boolean removeCartItem(int customerId, int medicineUnitId) {
-        String sql = "DELETE FROM Carts WHERE CustomerId = ? AND MedicineUnitId = ?";
+        String sql = "DELETE FROM Cart WHERE CustomerId = ? AND MedicineUnitId = ?";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, customerId);
@@ -79,7 +79,7 @@ public class CartDAO {
     }
 
     public boolean clearCart(int customerId) {
-        String sql = "DELETE FROM Carts WHERE CustomerId = ?";
+        String sql = "DELETE FROM Cart WHERE CustomerId = ?";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, customerId);
@@ -91,7 +91,7 @@ public class CartDAO {
     }
 
     public boolean removeCartItemsByMedicineId(int medicineId) {
-        String sql = "DELETE FROM Carts WHERE MedicineUnitId IN (SELECT MedicineUnitId FROM MedicineUnit WHERE MedicineId = ?)";
+        String sql = "DELETE FROM Cart WHERE MedicineUnitId IN (SELECT MedicineUnitId FROM MedicineUnit WHERE MedicineId = ?)";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, medicineId);
@@ -111,7 +111,7 @@ public class CartDAO {
                 "u.UnitName, " +
                 "bu.MedicineUnitId as BaseMUId, bu.UnitId as BaseUnitId, u_base.UnitName as BaseUnitName, " +
                 "bu.SellingPrice as BasePrice, bu.ConversionRate as BaseConvRate " +
-                "FROM Carts c " +
+                "FROM Cart c " +
                 "JOIN MedicineUnit mu ON c.MedicineUnitId = mu.MedicineUnitId " +
                 "JOIN Medicine m ON mu.MedicineId = m.MedicineId " +
                 "LEFT JOIN Unit u ON mu.UnitId = u.UnitId " +

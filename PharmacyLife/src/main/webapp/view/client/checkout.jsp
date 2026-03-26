@@ -185,10 +185,10 @@
                                                     <div class="voucher-suggestions-list mt-3">
                                                         <p class="text-muted small mb-2 fw-bold"><i class="fas fa-magic me-1"></i>Gợi ý cho bạn:</p>
                                                         <c:forEach items="${vouchers}" var="v">
-                                                            <div class="voucher-card p-2 border rounded mb-2 ${totalMoney >= v.minOrderValue ? 'border-primary' : 'disabled'}" 
+                                                            <div class="voucher-card p-2 border rounded mb-2 ${totalMoney >= v.minOrderValue ? 'border-primary' : 'disabled'}"
                                                                  data-code="${v.voucherCode}"
                                                                  data-applicable="${totalMoney >= v.minOrderValue}"
-                                                                 onclick="if(this.dataset.applicable === 'true') selectVoucher(this.dataset.code)">
+                                                                 onclick="if(this.getAttribute('data-applicable') === 'true') selectVoucher(this.getAttribute('data-code'))">
                                                                 <div class="d-flex justify-content-between align-items-center">
                                                                     <span class="fw-bold text-primary">${v.voucherCode}</span>
                                                                     <span class="badge ${totalMoney >= v.minOrderValue ? 'bg-primary' : 'bg-secondary'}">
@@ -197,9 +197,6 @@
                                                                             <c:otherwise>Giảm <fmt:formatNumber value="${v.discountValue}" type="currency" currencySymbol="₫" maxFractionDigits="0" /></c:otherwise>
                                                                         </c:choose>
                                                                     </span>
-                                                                </div>
-                                                                <div class="text-muted small mt-1" style="font-size: 0.75rem;">
-                                                                    <i class="fas fa-info-circle me-1"></i>Đơn từ <fmt:formatNumber value="${v.minOrderValue}" type="currency" currencySymbol="₫" maxFractionDigits="0" />
                                                                 </div>
                                                             </div>
                                                         </c:forEach>

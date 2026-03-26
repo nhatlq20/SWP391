@@ -14,7 +14,7 @@ public class OrderDAO {
 
     public List<Order> getAllOrders() {
         List<Order> orders = new ArrayList<>();
-        String sql = "SELECT o.*, s.StaffName FROM Orders o " +
+        String sql = "SELECT o.*, s.StaffName FROM [Order] o " +
                 "LEFT JOIN Staff s ON o.StaffId = s.StaffId " +
                 "ORDER BY o.OrderDate DESC";
         try (Connection conn = dbContext.getConnection();
@@ -31,7 +31,7 @@ public class OrderDAO {
 
     public List<Order> getOrdersByCustomerId(int customerId) {
         List<Order> orders = new ArrayList<>();
-        String sql = "SELECT * FROM Orders WHERE CustomerId = ? ORDER BY OrderDate DESC";
+        String sql = "SELECT * FROM [Order] WHERE CustomerId = ? ORDER BY OrderDate DESC";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, customerId);
@@ -49,7 +49,7 @@ public class OrderDAO {
     }
 
     public Order getOrderById(int orderId) {
-        String sql = "SELECT o.*, s.StaffName FROM Orders o " +
+        String sql = "SELECT o.*, s.StaffName FROM [Order] o " +
                 "LEFT JOIN Staff s ON o.StaffId = s.StaffId " +
                 "WHERE o.OrderId = ?";
         try (Connection conn = dbContext.getConnection();
@@ -105,8 +105,8 @@ public class OrderDAO {
     }
 
     public boolean updateStatus(int orderId, String newStatus, int staffId) {
-        String sqlGetOldStatus = "SELECT Status FROM Orders WHERE OrderId = ?";
-        String sqlUpdateStatus = "UPDATE Orders SET Status = ?, StaffId = ? WHERE OrderId = ?";
+        String sqlGetOldStatus = "SELECT Status FROM [Order] WHERE OrderId = ?";
+        String sqlUpdateStatus = "UPDATE [Order] SET Status = ?, StaffId = ? WHERE OrderId = ?";
         
         // Stock management (decrementing base RemainingQuantity in Medicine table)
         // Correcting to ensure we handle the subtraction correctly based on conversion rate
@@ -239,7 +239,7 @@ public class OrderDAO {
 
     public boolean hasCustomerPurchasedMedicine(int customerId, int medicineId) {
         String sql = "SELECT TOP 1 1 "
-                + "FROM Orders o "
+                + "FROM [Order] o "
                 + "JOIN OrderItems oi ON oi.OrderId = o.OrderId "
                 + "JOIN MedicineUnit mu ON oi.MedicineUnitId = mu.MedicineUnitId "
                 + "WHERE o.CustomerId = ? "
@@ -266,8 +266,8 @@ public class OrderDAO {
     }
 
     public boolean saveOrder(Order order) {
-        String sqlOrder = "INSERT INTO Orders (CustomerId, StaffId, OrderDate, ShippingName, ShippingPhone, ShippingAddress, Status, TotalAmount, VoucherId, DiscountAmount) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sqlOrder = "INSERT INTO [Order] (CustomerId, StaffId, OrderDate, ShippingName, ShippingPhone, ShippingAddress, Status, TotalAmount, VoucherId) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlItem = "INSERT INTO OrderItems (OrderId, MedicineUnitId, OrderQuantity, UnitPrice) VALUES (?, ?, ?, ?)";
 
         Connection conn = null;
@@ -289,7 +289,6 @@ public class OrderDAO {
                 ps.setDouble(8, order.getTotalAmount());
                 if (order.getVoucherId() > 0) ps.setInt(9, order.getVoucherId());
                 else ps.setNull(9, Types.INTEGER);
-                ps.setDouble(10, order.getDiscountAmount());
 
                 int affectedRows = ps.executeUpdate();
                 if (affectedRows == 0) {
@@ -345,7 +344,6 @@ public class OrderDAO {
         order.setStatus(rs.getString("Status"));
         order.setTotalAmount(rs.getDouble("TotalAmount"));
         order.setVoucherId(rs.getInt("VoucherId"));
-        order.setDiscountAmount(rs.getDouble("DiscountAmount"));
 
         int staffId = rs.getInt("StaffId");
         if (!rs.wasNull()) {

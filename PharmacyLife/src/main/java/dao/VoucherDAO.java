@@ -11,7 +11,7 @@ public class VoucherDAO {
 
     public List<Voucher> getAllVouchers() {
         List<Voucher> vouchers = new ArrayList<>();
-        String sql = "SELECT * FROM Vouchers ORDER BY CreatedAt DESC";
+        String sql = "SELECT * FROM Voucher ORDER BY CreatedAt DESC";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
@@ -26,7 +26,7 @@ public class VoucherDAO {
 
     public List<Voucher> getValidVouchersForUser() {
         List<Voucher> vouchers = new ArrayList<>();
-        String sql = "SELECT * FROM Vouchers WHERE IsActive = 1 AND StartDate <= GETDATE() AND EndDate >= GETDATE() AND UsedQuantity < Quantity ORDER BY MinOrderValue ASC";
+        String sql = "SELECT * FROM Voucher WHERE IsActive = 1 AND StartDate <= GETDATE() AND EndDate >= GETDATE() AND UsedQuantity < Quantity ORDER BY MinOrderValue ASC";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
@@ -40,7 +40,7 @@ public class VoucherDAO {
     }
 
     public Voucher getVoucherById(int id) {
-        String sql = "SELECT * FROM Vouchers WHERE VoucherId = ?";
+        String sql = "SELECT * FROM Voucher WHERE VoucherId = ?";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -56,7 +56,7 @@ public class VoucherDAO {
     }
 
     public Voucher getVoucherByCode(String code) {
-        String sql = "SELECT * FROM Vouchers WHERE VoucherCode = ? AND IsActive = 1";
+        String sql = "SELECT * FROM Voucher WHERE VoucherCode = ? AND IsActive = 1";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, code);
@@ -72,7 +72,7 @@ public class VoucherDAO {
     }
 
     public boolean addVoucher(Voucher v) {
-        String sql = "INSERT INTO Vouchers (VoucherCode, Description, DiscountType, DiscountValue, MinOrderValue, MaxDiscountAmount, StartDate, EndDate, Quantity, IsActive) "
+        String sql = "INSERT INTO Voucher (VoucherCode, Description, DiscountType, DiscountValue, MinOrderValue, MaxDiscountAmount, StartDate, EndDate, Quantity, IsActive) "
                 +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = dbContext.getConnection();
@@ -98,7 +98,7 @@ public class VoucherDAO {
     }
 
     public boolean updateVoucher(Voucher v) {
-        String sql = "UPDATE Vouchers SET Description = ?, DiscountType = ?, DiscountValue = ?, MinOrderValue = ?, MaxDiscountAmount = ?, StartDate = ?, EndDate = ?, Quantity = ?, IsActive = ? "
+        String sql = "UPDATE Voucher SET Description = ?, DiscountType = ?, DiscountValue = ?, MinOrderValue = ?, MaxDiscountAmount = ?, StartDate = ?, EndDate = ?, Quantity = ?, IsActive = ? "
                 +
                 "WHERE VoucherId = ?";
         try (Connection conn = dbContext.getConnection();
@@ -124,7 +124,7 @@ public class VoucherDAO {
     }
 
     public boolean deleteVoucher(int id) {
-        String sql = "DELETE FROM Vouchers WHERE VoucherId = ?";
+        String sql = "DELETE FROM Voucher WHERE VoucherId = ?";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -136,7 +136,7 @@ public class VoucherDAO {
     }
 
     public boolean incrementUsedQuantity(int id) {
-        String sql = "UPDATE Vouchers SET UsedQuantity = UsedQuantity + 1 WHERE VoucherId = ? AND UsedQuantity < Quantity";
+        String sql = "UPDATE Voucher SET UsedQuantity = UsedQuantity + 1 WHERE VoucherId = ? AND UsedQuantity < Quantity";
         try (Connection conn = dbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
