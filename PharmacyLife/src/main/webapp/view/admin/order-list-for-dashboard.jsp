@@ -121,7 +121,7 @@
                                                         <c:set var="statusBadge" value="badge-shipping" />
                                                         <c:set var="statusText" value="Đang giao hàng" />
                                                     </c:when>
-                                                    <c:when test="${o.status == 'Delivered'}">
+                                                    <c:when test="${o.status == 'Delivered' || o.status == 'Completed'}">
                                                         <c:set var="statusBadge" value="badge-delivered" />
                                                         <c:set var="statusText" value="Đã giao hàng" />
                                                     </c:when>

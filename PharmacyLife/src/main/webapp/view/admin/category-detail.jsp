@@ -40,7 +40,7 @@
                     <div class="mb-4">
                         <h2 class="page-title"><i class="fas fa-list me-2 text-primary"></i>Chi tiết danh mục</h2>
                     </div>
-                    <div class="category-meta-card mb-3">
+                    <div class="category-meta-card mt-5 mb-3 ">
                         <div class="row g-3 align-items-center">
                             <div class="col-12 col-md-6 text-start">
                                 <span class="category-info-label">Mã danh mục:</span>

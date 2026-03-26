@@ -135,12 +135,14 @@ body {
   margin: 2.5rem 20px 0 330px;
   max-width: 1500px;
   box-shadow: 0 2px 8px 0 rgba(10,40,133,0.04);
+ 
 }
 
 .main-content {
   padding-top: 2.5rem;
   min-height: 100vh;
   text-align: left;
+
 }
 
 .category-detail-card,
