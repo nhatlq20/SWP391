@@ -79,6 +79,10 @@ public class CheckoutController extends HttpServlet {
         request.setAttribute("totalMoney", totalMoney);
         request.setAttribute("selectedItems", selected);
 
+        dao.VoucherDAO voucherDAO = new dao.VoucherDAO();
+        java.util.List<models.Voucher> vouchers = voucherDAO.getValidVouchersForUser();
+        request.setAttribute("vouchers", vouchers);
+
         request.getRequestDispatcher("view/client/checkout.jsp").forward(request, response);
     }
 

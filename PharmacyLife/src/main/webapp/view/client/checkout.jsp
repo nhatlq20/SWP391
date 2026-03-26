@@ -37,6 +37,21 @@
                             content: " *";
                             color: red;
                         }
+                        
+                        .voucher-card {
+                            cursor: pointer;
+                            font-size: 0.85rem;
+                            transition: all 0.2s ease;
+                        }
+                        .voucher-card:hover:not(.disabled) {
+                            transform: translateY(-2px);
+                            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+                        }
+                        .voucher-card.disabled {
+                            cursor: not-allowed;
+                            background-color: #f8f9fa;
+                            opacity: 0.7;
+                        }
                     </style>
                 </head>
 
@@ -154,7 +169,7 @@
                                             </div>
 
                                             <div class="voucher-section mb-3">
-                                                <div class="d-flex">
+                                                <div class="d-flex mb-2">
                                                     <input type="text" id="voucherCode" name="voucherCode"
                                                         class="form-control" placeholder="Mã giảm giá"
                                                         style="border-radius: 8px 0 0 8px;">
@@ -164,7 +179,32 @@
                                                         Áp dụng
                                                     </button>
                                                 </div>
-                                                <div id="voucherMessage" class="small mt-1"></div>
+                                                <div id="voucherMessage" class="small mt-1 mb-2"></div>
+                                                
+                                                <c:if test="${not empty vouchers}">
+                                                    <div class="voucher-suggestions-list mt-3">
+                                                        <p class="text-muted small mb-2 fw-bold"><i class="fas fa-magic me-1"></i>Gợi ý cho bạn:</p>
+                                                        <c:forEach items="${vouchers}" var="v">
+                                                            <div class="voucher-card p-2 border rounded mb-2 ${totalMoney >= v.minOrderValue ? 'border-primary' : 'disabled'}" 
+                                                                 data-code="${v.voucherCode}"
+                                                                 data-applicable="${totalMoney >= v.minOrderValue}"
+                                                                 onclick="if(this.dataset.applicable === 'true') selectVoucher(this.dataset.code)">
+                                                                <div class="d-flex justify-content-between align-items-center">
+                                                                    <span class="fw-bold text-primary">${v.voucherCode}</span>
+                                                                    <span class="badge ${totalMoney >= v.minOrderValue ? 'bg-primary' : 'bg-secondary'}">
+                                                                        <c:choose>
+                                                                            <c:when test="${v.discountType == 'Percentage' || v.discountType == 'Percent'}">Giảm ${fn:substringBefore(v.discountValue, '.')}%</c:when>
+                                                                            <c:otherwise>Giảm <fmt:formatNumber value="${v.discountValue}" type="currency" currencySymbol="₫" maxFractionDigits="0" /></c:otherwise>
+                                                                        </c:choose>
+                                                                    </span>
+                                                                </div>
+                                                                <div class="text-muted small mt-1" style="font-size: 0.75rem;">
+                                                                    <i class="fas fa-info-circle me-1"></i>Đơn từ <fmt:formatNumber value="${v.minOrderValue}" type="currency" currencySymbol="₫" maxFractionDigits="0" />
+                                                                </div>
+                                                            </div>
+                                                        </c:forEach>
+                                                    </div>
+                                                </c:if>
                                             </div>
 
                                             <div class="d-flex justify-content-between mb-2 text-success">
@@ -214,6 +254,11 @@
                                         msgEl.className = 'small mt-1 text-danger';
                                     }
                                 });
+                        }
+
+                        function selectVoucher(code) {
+                            document.getElementById('voucherCode').value = code;
+                            applyVoucher();
                         }
 
                         function formatCurrency(n) {

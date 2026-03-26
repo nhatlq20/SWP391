@@ -24,6 +24,21 @@ public class VoucherDAO {
         return vouchers;
     }
 
+    public List<Voucher> getValidVouchersForUser() {
+        List<Voucher> vouchers = new ArrayList<>();
+        String sql = "SELECT * FROM Vouchers WHERE IsActive = 1 AND StartDate <= GETDATE() AND EndDate >= GETDATE() AND UsedQuantity < Quantity ORDER BY MinOrderValue ASC";
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                vouchers.add(mapResultSetToVoucher(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return vouchers;
+    }
+
     public Voucher getVoucherById(int id) {
         String sql = "SELECT * FROM Vouchers WHERE VoucherId = ?";
         try (Connection conn = dbContext.getConnection();
