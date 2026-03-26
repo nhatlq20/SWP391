@@ -34,31 +34,36 @@ public class ChatAIController extends HttpServlet {
             return;
         }
 
-        try {
-            // STEP 1: Search for relevant medicines from the database (RAG)
-            dao.MedicineDAO medicineDAO = new dao.MedicineDAO();
-            String dbContext = medicineDAO.searchMedicineByKeyword(userInput);
+        String fileContext = "";
 
-            // STEP 2: Configure system prompt and context
+        // Read the local knowledge base file (Static data)
+        try {
+            String filePath = request.getServletContext().getRealPath("/WEB-INF/classes/medicine_data.txt");
+            // If running in dev environment, try the absolute path the user provided
+            if (filePath == null) {
+                filePath = "d:\\SWP391\\SWP391\\SWP391\\PharmacyLife\\src\\main\\resources\\medicine_data.txt";
+            }
+            java.nio.file.Path path = java.nio.file.Paths.get(filePath);
+            if (java.nio.file.Files.exists(path)) {
+                fileContext = java.nio.file.Files.readString(path, java.nio.charset.StandardCharsets.UTF_8);
+            }
+        } catch (Exception e) {
+            System.err.println("Warning: Could not read medicine_data.txt: " + e.getMessage());
+        }
+
+        try {
+            // STEP 1: AI Prompt Construction
             String systemInstruction = "Bạn là dược sĩ trợ lý ảo của nhà thuốc PharmacyLife. "
-                    + "Tên của bạn là 'Dược sĩ AI'. "
-                    + "Nhiệm vụ của bạn là CHỈ trả lời các câu hỏi liên quan đến danh mục thuốc có sẵn trong 'DỮ LIỆU HỆ THỐNG' bên dưới. "
-                    + "Nếu thông tin không có trong hệ thống, hãy từ chối trả lời một cách lịch sự bằng câu: 'Rất tiếc, hiện tại hiệu thuốc chúng tôi chưa có thông tin về loại thuốc này. Bạn có thể tham khảo các sản phẩm khác hoặc liên hệ dược sĩ tại quầy.' "
-                    + "ĐẶC BIỆT: Khi người dùng bày tỏ mong muốn mua thuốc hoặc đang gặp các triệu chứng bệnh, hãy chủ động GỢI Ý các loại thuốc tương ứng có trong 'DỮ LIỆU HỆ THỐNG' (kèm theo giá bán và đơn vị) và khuyến khích họ đặt mua trực tuyến tại website PharmacyLife. "
+                    + "Nhiệm vụ của bạn là CHỈ trả lời dựa trên 'DANH MỤC THUỐC' (file dữ liệu) bên dưới. "
                     + "Hãy trả lời một cách chuyên nghiệp, tận tâm, lễ phép và luôn luôn kết thúc bằng lời khuyên khách hàng nên thăm khám bác sĩ nếu triệu chứng nặng.";
 
-            // Combine System instruction and user message into one prompt to avoid
-            // role('system') error
             StringBuilder fullInput = new StringBuilder();
-            fullInput.append("--- HƯỚNG DẪN HỆ THỐNG ---\n")
-                    .append(systemInstruction)
-                    .append("\n-------------------------\n\n");
+            fullInput.append("--- HƯỚNG DẪN HỆ THỐNG ---\n").append(systemInstruction).append("\n\n");
 
-            if (dbContext != null && !dbContext.isEmpty()) {
-                fullInput.append("--- DỮ LIỆU HỆ THỐNG ---\n")
-                        .append(dbContext)
-                        .append("\n------------------------\n\n");
+            if (!fileContext.isEmpty()) {
+                fullInput.append("--- DANH MỤC THUỐC ---\n").append(fileContext).append("\n\n");
             }
+
             fullInput.append("Câu hỏi của khách hàng: ").append(userInput);
 
             Client client = Client.builder().apiKey(API_KEY).build();
@@ -106,8 +111,11 @@ public class ChatAIController extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("Lỗi hệ thống AI: " + e.getMessage());
+
+            // Simple fallback if AI fails or Quota exceeded
+            response.setContentType("text/plain;charset=UTF-8");
+            response.getWriter().write(
+                    "Rất tiếc, AI đang bận hoặc hết lượt tư vấn. Bạn có thể tra cứu thông tin trực tiếp trên website hoặc liên hệ dược sĩ tại quầy để được hỗ trợ nhanh nhất!");
         }
     }
 }
