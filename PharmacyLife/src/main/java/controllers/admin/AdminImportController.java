@@ -661,12 +661,9 @@ public class AdminImportController extends HttpServlet {
         if (importId > 0) {
             Import imp = importDAO.getImportById(importId);
             if (imp != null && "Đã duyệt".equals(imp.getStatus())) {
-                List<ImportDetail> details = importDAO.getImportDetails(importId);
-                if (details != null) {
-                    for (ImportDetail detail : details) {
-                        applyStockChange(detail.getMedicineUnitId(), -detail.getQuantity(), 0, false);
-                    }
-                }
+                request.setAttribute("error", "Không thể xóa phiếu nhập đã duyệt");
+                listImports(request, response);
+                return;
             }
             if (importDAO.deleteImport(importId)) {
                 response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
