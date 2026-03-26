@@ -88,10 +88,16 @@
                                                                         <c:out value='${medicine.unit}' />
                                                                     </span>
                                                                 </div>
-                                                                <button class="btn btn-primary w-100 add-to-cart-btn"
-                                                                    onclick="addToCartAjax(this, '${medicine.medicineId}')">
-                                                                    Thêm vào giỏ hàng
-                                                                </button>
+                                                                <c:set var="userRoleForCart"
+                                                                    value="${fn:toLowerCase(fn:trim(sessionScope.roleName))}" />
+                                                                <c:if
+                                                                    test="${userRoleForCart ne 'admin' and userRoleForCart ne 'staff'}">
+                                                                    <button
+                                                                        class="btn btn-primary w-100 add-to-cart-btn"
+                                                                        onclick="addToCartAjax(this, '${medicine.medicineId}')">
+                                                                        Thêm vào giỏ hàng
+                                                                    </button>
+                                                                </c:if>
                                                             </div>
                                                         </div>
                                                     </div>

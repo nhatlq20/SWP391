@@ -538,8 +538,13 @@
                                                 <input type="hidden" name="muid" id="formMuid" value="">
                                             </form>
 
-                                            <button class="btn-buy btn btn-primary" onclick="submitAddToCart()">Thêm vào
-                                                giỏ hàng</button>
+                                            <c:set var="userRoleForCart"
+                                                value="${fn:toLowerCase(fn:trim(sessionScope.roleName))}" />
+                                            <c:if test="${userRoleForCart ne 'admin' and userRoleForCart ne 'staff'}">
+                                                <button class="btn-buy btn btn-primary" onclick="submitAddToCart()">Thêm
+                                                    vào
+                                                    giỏ hàng</button>
+                                            </c:if>
 
                                             <!-- Xóa nút đánh giá ở action-buttons cũ (nếu còn) -->
 
