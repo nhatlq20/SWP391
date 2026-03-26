@@ -55,6 +55,17 @@
                             </div>
                         </div>
 
+                        <c:if test="${not empty successMessage}">
+                            <div class="alert alert-success mt-3 mb-3">
+                                <i class="fas fa-check-circle me-1"></i> ${successMessage}
+                            </div>
+                        </c:if>
+                        <c:if test="${not empty errorMessage}">
+                            <div class="alert alert-danger mt-3 mb-3">
+                                <i class="fas fa-exclamation-circle me-1"></i> ${errorMessage}
+                            </div>
+                        </c:if>
+
                         <!-- Statistics -->
                         <div class="stats-row">
                             <div class="stat-card stat-total">
@@ -289,6 +300,20 @@
 
                     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
                     <script>
+                        window.addEventListener('DOMContentLoaded', (event) => {
+                            // Auto-hide alerts after 5 seconds
+                            const alerts = document.querySelectorAll('.alert');
+                            alerts.forEach(alert => {
+                                setTimeout(() => {
+                                    alert.style.transition = 'opacity 0.5s ease';
+                                    alert.style.opacity = '0';
+                                    setTimeout(() => {
+                                        alert.style.display = 'none';
+                                    }, 500);
+                                }, 1000);
+                            });
+                        });
+
                         function openDeleteModal(id, name) {
                             document.getElementById('deleteLink').href =
                                 '${pageContext.request.contextPath}/admin/medicine-delete-dashboard?id=' + id;
