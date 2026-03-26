@@ -25,9 +25,8 @@
                             <h3 class="fw-bold mb-0"><i class="fas fa-ticket-alt me-2 text-primary"></i>Quản lý mã giảm
                                 giá</h3>
                             <div class="d-flex align-items-center gap-2">
-                                <a href="${pageContext.request.contextPath}/admin/voucher-add"
-                                    class="btn btn-primary d-flex align-items-center">
-                                    <i class="fas fa-plus me-2"></i> Thêm mã mới
+                                <a href="${pageContext.request.contextPath}/admin/voucher-add" class="btn-add-medicine">
+                                    <i class="fas fa-plus"></i> Thêm mã mới
                                 </a>
                             </div>
                         </div>
@@ -95,11 +94,12 @@
                                                 <td>
                                                     <div class="progress" style="height: 10px; width: 80px;">
                                                         <c:set var="usagePercent"
-                                                            value="${(v.usedQuantity / v.quantity) * 100}" />
+                                                            value="${v.quantity > 0 ? (v.usedQuantity / v.quantity) * 100 : 0}" />
                                                         <c:set var="pbWidth"
                                                             value="${usagePercent > 100 ? 100 : usagePercent}" />
                                                         <div class="progress-bar ${usagePercent > 80 ? 'bg-danger' : 'bg-primary'}"
-                                                            role="progressbar" style="width: ${pbWidth}%">
+                                                            role="progressbar"
+                                                            style="width: <fmt:formatNumber value='${pbWidth}' maxFractionDigits='0' />%">
                                                         </div>
                                                     </div>
                                                     <small class="text-muted">${v.usedQuantity} / ${v.quantity}</small>
