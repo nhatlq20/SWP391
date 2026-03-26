@@ -135,11 +135,13 @@
                                                                         <i class="fas fa-pen"></i>
                                                                     </a>
                                                                 </c:if>
-                                                                <button type="button" class="btn-action btn-delete" style="border: none;"
-                                                                    onclick="openDeleteModal('${imp.importCode}')"
-                                                                    title="Xóa">
-                                                                    <i class="fas fa-trash"></i>
-                                                                </button>
+                                                                 <c:if test="${imp.status != 'Đã duyệt'}">
+                                                                    <button type="button" class="btn-action btn-delete" style="border: none;"
+                                                                        onclick="openDeleteModal('${imp.importCode}')"
+                                                                        title="Xóa">
+                                                                        <i class="fas fa-trash"></i>
+                                                                    </button>
+                                                                 </c:if>
                                                             </div>
                                                         </td>
                                                     </tr>
