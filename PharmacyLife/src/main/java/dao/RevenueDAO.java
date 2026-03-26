@@ -149,16 +149,19 @@ public class RevenueDAO {
 
     public java.util.List<models.TopProduct> getTopSellingProducts(Date from, Date to, int limit) throws SQLException {
         String sql = "SELECT TOP " + limit
-                + " m.MedicineName, SUM(oi.OrderQuantity * mu.ConversionRate) as TotalQty, SUM(oi.OrderQuantity * oi.UnitPrice) as TotalRev "
+                + " m.MedicineName, "
+                + " CAST(SUM(oi.OrderQuantity * ISNULL(mu.ConversionRate, 1)) * 1.0 / ISNULL(max_mu.MaxRate, 1) AS FLOAT) as TotalQty, "
+                + " SUM(oi.OrderQuantity * oi.UnitPrice) as TotalRev "
                 + "FROM [Order] o "
                 + "JOIN OrderItems oi ON o.OrderId = oi.OrderId "
                 + "JOIN MedicineUnit mu ON oi.MedicineUnitId = mu.MedicineUnitId "
                 + "JOIN Medicine m ON mu.MedicineId = m.MedicineId "
+                + "CROSS APPLY (SELECT MAX(ConversionRate) as MaxRate FROM MedicineUnit WHERE MedicineId = m.MedicineId) max_mu "
                 + "WHERE o.Status NOT IN ('Cancelled', N'Đã hủy') ";
         if (from != null && to != null) {
             sql += " AND CAST(o.OrderDate AS DATE) BETWEEN ? AND ? ";
         }
-        sql += "GROUP BY m.MedicineId, m.MedicineName " +
+        sql += "GROUP BY m.MedicineId, m.MedicineName, max_mu.MaxRate " +
                 "ORDER BY SUM(oi.OrderQuantity * ISNULL(mu.ConversionRate, 1)) DESC, SUM(oi.OrderQuantity * oi.UnitPrice) DESC";
 
         java.util.List<models.TopProduct> list = new java.util.ArrayList<>();
@@ -168,7 +171,7 @@ public class RevenueDAO {
             setDateParameters(ps, from, to, 1);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                list.add(new models.TopProduct(rs.getString("MedicineName"), rs.getInt("TotalQty"),
+                list.add(new models.TopProduct(rs.getString("MedicineName"), rs.getDouble("TotalQty"),
                         rs.getDouble("TotalRev")));
             }
         }

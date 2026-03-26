@@ -2,13 +2,13 @@ package models;
 
 public class TopProduct {
     private String medicineName;
-    private int totalQuantity;
+    private double totalQuantity;
     private double totalRevenue;
 
     public TopProduct() {
     }
 
-    public TopProduct(String medicineName, int totalQuantity, double totalRevenue) {
+    public TopProduct(String medicineName, double totalQuantity, double totalRevenue) {
         this.medicineName = medicineName;
         this.totalQuantity = totalQuantity;
         this.totalRevenue = totalRevenue;
@@ -22,11 +22,11 @@ public class TopProduct {
         this.medicineName = medicineName;
     }
 
-    public int getTotalQuantity() {
+    public double getTotalQuantity() {
         return totalQuantity;
     }
 
-    public void setTotalQuantity(int totalQuantity) {
+    public void setTotalQuantity(double totalQuantity) {
         this.totalQuantity = totalQuantity;
     }
 
