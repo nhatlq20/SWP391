@@ -30,7 +30,7 @@
                                 </div>
                             </c:if>
 
-                            <form method="post"
+                            <form id="medicineForm" method="post"
                                 action="${pageContext.request.contextPath}/admin/medicine-edit-dashboard">
                                 <input type="hidden" name="medicineId" value="${medicine.medicineId}">
                                 <div class="row g-4">
@@ -89,15 +89,47 @@
                                             <option value="">-- Không --</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Thành phần</label>
-                                        <input name="ingredients" class="form-control" value="${medicine.ingredients}"
-                                            placeholder="Nhập thành phần thuốc">
+                                    <div class="col-12 mt-4">
+                                        <h5 class="text-primary border-bottom pb-2">Thành phần dược chất</h5>
+                                        <table class="table table-bordered align-middle" id="ingredientsTable">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Tên hoạt chất</th>
+                                                    <th style="width: 15%;">Hàm lượng</th>
+                                                    <th>Mô tả / Cơ chế</th>
+                                                    <th style="width: 50px;"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Rows added by JS -->
+                                            </tbody>
+                                        </table>
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                            onclick="addRow('ingredientsTable')"><i class="fas fa-plus me-1"></i> Thêm
+                                            hoạt chất</button>
+                                        <input type="hidden" name="ingredients" id="ingredientsHidden"
+                                            value="${medicine.ingredients}">
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Công dụng</label>
-                                        <input name="uses" class="form-control" value="${medicine.conditions}"
-                                            placeholder="Nhập công dụng thuốc">
+
+                                    <div class="col-12 mt-4">
+                                        <h5 class="text-primary border-bottom pb-2">Công dụng & Chỉ định</h5>
+                                        <table class="table table-bordered align-middle" id="usesTable">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Tên công dụng</th>
+                                                    <th>Mô tả chi tiết</th>
+                                                    <th>Lời khuyên của chuyên gia</th>
+                                                    <th style="width: 50px;"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Rows added by JS -->
+                                            </tbody>
+                                        </table>
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                            onclick="addRow('usesTable')"><i class="fas fa-plus me-1"></i> Thêm công
+                                            dụng</button>
+                                        <input type="hidden" name="uses" id="usesHidden" value="${medicine.conditions}">
                                     </div>
 
                                     <!-- Sub Unit Conversion Rates (shown dynamically) -->
@@ -142,8 +174,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-12">
-                                        <label class="form-label">Mô tả</label>
+                                    <div class="col-12 mt-4">
+                                        <label class="form-label">Mô tả tổng quát</label>
                                         <textarea name="shortDescription" rows="4"
                                             class="form-control">${medicine.shortDescription}</textarea>
                                     </div>
@@ -314,6 +346,128 @@
                     subRate1Input.addEventListener('input', autoCalculatePrices);
                     subRate2Input.addEventListener('input', autoCalculatePrices);
 
+                    // ========== Dynamic Table Logic ==========
+                    function addRow(tableId, data) {
+                        var table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
+                        var newRow = table.insertRow();
+                        if (tableId === 'ingredientsTable') {
+                            newRow.innerHTML = '<td><input class="form-control ing-name" value="' + (data ? data.name : '') + '" placeholder="Ví dụ: Paracetamol"></td>' +
+                                '<td><input class="form-control ing-strength" value="' + (data ? data.strength : '') + '" placeholder="500mg"></td>' +
+                                '<td><input class="form-control ing-desc" value="' + (data ? data.desc : '') + '" placeholder="Giảm đau, hạ sốt"></td>' +
+                                '<td><button type="button" class="btn btn-sm btn-outline-danger remove-row"><i class="fas fa-times"></i></button></td>';
+                        } else {
+                            newRow.innerHTML = '<td><input class="form-control use-name" value="' + (data ? data.name : '') + '" placeholder="Ví dụ: Đau đầu"></td>' +
+                                '<td><input class="form-control use-desc" value="' + (data ? data.desc : '') + '" placeholder="Giảm các triệu chứng đau nửa đầu..."></td>' +
+                                '<td><input class="form-control use-advice" value="' + (data ? data.advice : '') + '" placeholder="Lời khuyên (vệ sinh, ăn uống...)"></td>' +
+                                '<td><button type="button" class="btn btn-sm btn-outline-danger remove-row"><i class="fas fa-times"></i></button></td>';
+                        }
+                    }
+
+                    function parseInitialData() {
+                        var ingVal = document.getElementById('ingredientsHidden').value;
+                        if (ingVal) {
+                            ingVal.split(',').forEach(function (part) {
+                                var input = part.trim();
+                                if (!input) return;
+                                var name = input, strength = '', desc = '';
+                                if (input.includes('[') && input.includes(']')) {
+                                    var sStart = input.indexOf('[');
+                                    var sEnd = input.indexOf(']');
+                                    strength = input.substring(sStart + 1, sEnd);
+                                    input = (input.substring(0, sStart) + input.substring(sEnd + 1)).trim();
+                                }
+                                if (input.includes('(') && input.endsWith(')')) {
+                                    var dStart = input.indexOf('(');
+                                    desc = input.substring(dStart + 1, input.length - 1);
+                                    name = input.substring(0, dStart).trim();
+                                } else {
+                                    name = input;
+                                }
+                                addRow('ingredientsTable', { name: name, strength: strength, desc: desc });
+                            });
+                        }
+                        var useVal = document.getElementById('usesHidden').value;
+                        if (useVal) {
+                            useVal.split(',').forEach(function (part) {
+                                var input = part.trim();
+                                if (!input) return;
+                                var name = input, desc = '', advice = '';
+
+                                // Parse Advice: Name (Desc) {Advice}
+                                if (input.includes('{') && input.endsWith('}')) {
+                                    var aStart = input.lastIndexOf('{');
+                                    advice = input.substring(aStart + 1, input.length - 1).trim();
+                                    input = input.substring(0, aStart).trim();
+                                }
+
+                                if (input.includes('(') && input.endsWith(')')) {
+                                    var dStart = input.indexOf('(');
+                                    desc = input.substring(dStart + 1, input.length - 1).trim();
+                                    name = input.substring(0, dStart).trim();
+                                } else {
+                                    name = input;
+                                }
+                                addRow('usesTable', { name: name, desc: desc, advice: advice });
+                            });
+                        }
+
+                        // If no rows, add one empty row for each
+                        if (document.querySelectorAll('#ingredientsTable tbody tr').length === 0) addRow('ingredientsTable');
+                        if (document.querySelectorAll('#usesTable tbody tr').length === 0) addRow('usesTable');
+                    }
+
+                    document.addEventListener('click', function (e) {
+                        if (e.target.closest('.remove-row')) {
+                            var row = e.target.closest('tr');
+                            row.parentNode.removeChild(row);
+                        }
+                    });
+
+                    document.getElementById('medicineForm').addEventListener('submit', function (e) {
+                        console.log('Packaging ingredients and uses...');
+                        var ingredients = [];
+                        document.querySelectorAll('#ingredientsTable tbody tr').forEach(function (row) {
+                            var nameEl = row.querySelector('.ing-name');
+                            var strengthEl = row.querySelector('.ing-strength');
+                            var descEl = row.querySelector('.ing-desc');
+
+                            var name = nameEl ? nameEl.value.trim() : '';
+                            var strength = strengthEl ? strengthEl.value.trim() : '';
+                            var desc = descEl ? descEl.value.trim() : '';
+
+                            if (name) {
+                                var str = name;
+                                if (strength) str += ' [' + strength + ']';
+                                if (desc) str += ' (' + desc + ')';
+                                ingredients.push(str);
+                            }
+                        });
+                        var ingResult = ingredients.join(', ');
+                        document.getElementById('ingredientsHidden').value = ingResult;
+                        console.log('Ingredients packed:', ingResult);
+
+                        var uses = [];
+                        document.querySelectorAll('#usesTable tbody tr').forEach(function (row) {
+                            var nameEl = row.querySelector('.use-name');
+                            var descEl = row.querySelector('.use-desc');
+                            var adviceEl = row.querySelector('.use-advice');
+
+                            var name = nameEl ? nameEl.value.trim() : '';
+                            var desc = descEl ? descEl.value.trim() : '';
+                            var advice = adviceEl ? adviceEl.value.trim() : '';
+
+                            if (name) {
+                                var str = name;
+                                if (desc) str += ' (' + desc + ')';
+                                if (advice) str += ' {' + advice + '}';
+                                uses.push(str);
+                            }
+                        });
+                        var usesResult = uses.join(', ');
+                        document.getElementById('usesHidden').value = usesResult;
+                        console.log('Uses packed:', usesResult);
+                    });
+
                     // Initialize on page load with existing units from server
                     (function () {
                         var units = [];
@@ -355,6 +509,8 @@
                                 }
                             }
                         }
+
+                        parseInitialData();
                     })();
                 </script>
             </body>

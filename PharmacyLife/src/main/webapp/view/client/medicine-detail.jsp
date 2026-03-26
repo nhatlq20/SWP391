@@ -472,7 +472,16 @@
                                                     <span class="info-label">Thành phần</span>
                                                     <span class="info-value text-dark">
                                                         <c:forEach var="ing" items="${ingredientNames}" varStatus="st">
-                                                            <c:out value="${ing}" />
+                                                            <c:set var="cleanIng" value="${ing}" />
+                                                            <c:if test="${fn:contains(cleanIng, ' [')}">
+                                                                <c:set var="cleanIng"
+                                                                    value="${fn:substringBefore(cleanIng, ' [')}" />
+                                                            </c:if>
+                                                            <c:if test="${fn:contains(cleanIng, ' (')}">
+                                                                <c:set var="cleanIng"
+                                                                    value="${fn:substringBefore(cleanIng, ' (')}" />
+                                                            </c:if>
+                                                            <c:out value="${cleanIng}" />
                                                             <c:if test="${!st.last}">, </c:if>
                                                         </c:forEach>
                                                     </span>
@@ -484,7 +493,16 @@
                                                     <span class="info-label">Công dụng</span>
                                                     <span class="info-value text-dark">
                                                         <c:forEach var="con" items="${conditionNames}" varStatus="st">
-                                                            <c:out value="${con}" />
+                                                            <c:set var="cleanCon" value="${con}" />
+                                                            <c:if test="${fn:contains(cleanCon, ' (')}">
+                                                                <c:set var="cleanCon"
+                                                                    value="${fn:substringBefore(cleanCon, ' (')}" />
+                                                            </c:if>
+                                                            <c:if test="${fn:contains(cleanCon, ' {')}">
+                                                                <c:set var="cleanCon"
+                                                                    value="${fn:substringBefore(cleanCon, ' {')}" />
+                                                            </c:if>
+                                                            <c:out value="${cleanCon}" />
                                                             <c:if test="${!st.last}">, </c:if>
                                                         </c:forEach>
                                                     </span>
