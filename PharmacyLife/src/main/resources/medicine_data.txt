@@ -1,0 +1,141 @@
+[DANH MỤC TOÀN BỘ THUỐC PHARMACYLIFE - FULL KNOWLEDGE BASE]
+Định dạng: Mã|Tên|Xuất xứ|Thành phần|Công dụng|Giá/Đơn vị nhỏ nhất
+
+[DỊ ỨNG & SAY XE]
+TDU001|Exopadin 60mg|VN|Fexofenadin 60mg|Viêm mũi dị ứng, mày đay|2,000₫/Viên
+TDU002|Cetirizin 10mg|VN|Cetirizin|Dị ứng, ngứa, mề đay|400₫/Viên
+TDU003|Clorpheniramin 4mg|VN|Chlorpheniramine|Viêm mũi hắt hơi, sổ mũi|100₫/Viên
+TDU004|Allerphast 180mg|VN|Fexofenadin 180mg|Viêm mũi dị ứng mạn tính|2,500₫/Viên
+TDU005|Histalong–L 5mg|Ấn Độ|Levocetirizine|Viêm mũi dị ứng|1,900₫/Viên
+TDU006|Cetirizine Stada 10mg|VN|Cetirizine|Dị ứng, mề đay|480₫/Viên
+TDU007|Fefasdin 60|VN|fexofenadin 60mg|Viêm mũi dị ứng|850₫/Viên
+TDU008|Fexofenadine 180mg|VN|fexofenadine 180mg|Viêm mũi dị ứng theo mùa|2,500₫/Viên
+TDU009|Vomina Plus 50mg|VN|Dimenhydrinate|Say tàu xe, chóng mặt|1,000₫/Viên
+TDU010|Siro Aerius 60ml|VN|Desloratadine|Dị ứng trẻ em|87,000₫/Chai
+
+[GIẢI ĐỘC]
+TGD001|Viên nhai OH NO|VN|Nicotine|Cai thuốc lá|3,000₫/Viên
+TGD002|Tiêm Vinluta 600|VN|Glutathion|Giải độc xạ trị|50,000₫/Ống
+TGD003|Bột Glumidtab 600|VN|Glutathion|Độc tính thần kinh|50,000₫/Gói
+TGD004|Methionin 250mg|VN|Methionin|Giải độc Paracetamol|500₫/Viên
+TGD005|Nước Bông Sen|VN|Thảo dược|Cắt cơn cai nghiện|12,500₫/Chai
+TGD006|Jadenu 180mg|Thụy Sĩ|Deferasirox|Quá tải sắt|1,670₫/Viên
+TGD007|Sevelamer 800mg|Ấn Độ|Sevelamer|Tăng phosphat huyết|200₫/Viên
+TGD008|Mifros 300mg|VN|Penicillamine|Nhiễm độc kim loại|1,670₫/Viên
+TGD009|Acetylcystein 200mg|VN|Acetylcysteine|Tiêu nhầy, giải độc gan|750₫/Viên
+TGD010|Than Carbophos 400mg|Pháp|Than hoạt tính|Giải độc thực phẩm|2,250₫/Viên
+
+[DA LIÊU]
+TDL001|Promethazin 2%|VN|Promethazin|Ngứa, côn trùng đốt|11,000₫/Tuýp
+TDL002|Lifedovate Cream|VN|Clobetasone|Viêm ngứa da|50,000₫/Tuýp
+TDL003|PVP-IODINE 10%|VN|Povidone Iodine|Sát trùng vết thương|8,500₫/Chai
+TDL004|Biroxime 1%|Ấn Độ|Clotrimazol|Nấm da chân|29,000₫/Tuýp
+TDL005|Eumovate Cream GSK|VN|Clobetasone|Viêm ngứa da|20,500₫/Tuýp
+TDL006|LeoPovidone 10%|Đan Mạch|Povidone Iodine|Nhiễm khuẩn da|16,000₫/Chai
+TDL007|Kem Nizoral Janssen|Mỹ|Ketoconazol|Nhiễm nấm da|75,000₫/Tuýp
+TDL008|Hồ Nước 20g|VN|Kẽm Oxit|Viêm da, chàm|4,300₫/Chai
+
+[MIẾNG DÁN & CAO XOA]
+MDC001|Cao Sao Vàng|VN|Tinh dầu|Cảm cúm, nhức đầu|29,000₫/Hộp
+MDC002|Dầu gừng Thái Dương|VN|Tinh dầu gừng|Đau lưng, vai gáy|80,000₫/Chai
+MDC003|Dầu gừng (nhỏ)|VN|Tinh dầu gừng|Đau đầu, nhức mỏi|30,000₫/Chai
+MDC004|Khuynh Diệp OPC|VN|Eucalyptol|Cảm cúm, nghẹt mũi|75,000₫/Chai
+MDC005|Salonsip Gel|Nhật|Methyl Salicylate|Đau cơ khớp|1,500₫/Miếng
+MDC006|Salonpas Relief|VN|Methyl Salicylate|Đau cổ, vai, lưng|8,500₫/Miếng
+MDC007|Gel Salonpas 30g|Nhật|Methyl Salicylate|Đau cơ khớp|46,000₫/Tuýp
+MDC008|Dầu nóng Mặt Trời|VN|Methyl Salicylate|Nhức mỏi, cảm cúm|57,000₫/Chai
+MDC009|Bạch Hổ Hoạt Lạc Cao|VN|Methyl Salicylate|Đau lưng, thần kinh tọa|22,000₫/Hộp
+MDC010|An Triệu (Xoa bóp)|VN|Thảo dược|Phong thấp, đau lưng|37,000₫/Chai
+
+[XƯƠNG KHỚP & VITAMIN]
+CXK001|Xương Khớp Trường Phúc|VN|Thảo dược|Đau thần kinh, khớp|5,000₫/Viên
+CXK002|Calcid Soft|VN|Canxi+D3|Loãng xương|1,850₫/Viên
+CXK003|Vai gáy Abipha|VN|Thảo dược|Đau mỏi vai gáy|4,667₫/Viên
+CXK004|Glucosamine Stada|VN|Glucosamine|Thoái hóa khớp gối|5,000₫/Gói
+CXK005|Calcium-D S.Pharm|VN|Canxi+D3|Còi xương, loãng xương|300₫/Viên
+CXK006|Natecal D3|Ý|Canxi+D3|Thiếu vitamin D|4,333₫/Viên
+CXK007|Viartril-S 1500mg|Ý|Glucosamine|Thoái hóa khớp|16,000₫/Gói
+CXK008|Calcium Hasan 500|VN|Canxi|Hỗ trợ loãng xương|2,300₫/Viên
+CXK009|Briozcal Bride|Mỹ|Canxi+D3|Bổ sung canxi|3,930₫/Viên
+CXK010|Bonlutin Catalent|Úc|Dầu cá+Glucosamine|Hỗ trợ khớp|5,500₫/Viên
+TBV001|Bổ xương khớp|VN|Glucosamine|Tái tạo sụn|4,666₫/Viên
+TBV002|Hỗ trợ thoái hóa|Pháp|Diacerein|Thoái hóa khớp gối|31,000₫/Gói
+TBV003|Bổ não Ginko|VN|Bạch quả|Trí nhớ, tuần hoàn não|8,833₫/Viên
+TBV011|Bổ gan giải độc|Mỹ|Thảo dược|Bảo vệ gan|3,750₫/Viên
+
+[GIẢM ĐAU & HẠ SỐT]
+THS001|Tovalgan Ef 500mg|VN|Paracetamol|Hạ sốt nhanh|2,000₫/Viên
+THS002|Bột Glotadol 250|VN|Paracetamol|Hạ sốt trẻ em|2,400₫/Gói
+THS003|Bột Glotadol 150|VN|Paracetamol|Hạ sốt trẻ em|2,200₫/Gói
+THS004|Ameflu K.buồn ngủ|VN|Paracetamol+|Cảm cúm, hạ sốt|110₫/Viên
+THS005|Bột sủi Panactol 250|VN|Paracetamol|Hạ sốt trẻ em|1,700₫/Gói
+THS006|Panactol 150mg|VN|Paracetamol|Hạ sốt trẻ|1,500₫/Gói
+THS007|Bivinadol 500mg|VN|Paracetamol|Hạ sốt nhanh|3,200₫/Viên
+THS008|Glotadol 325|Mỹ|Paracetamol|Giảm đau hạ sốt nhẹ|450₫/Viên
+
+[HÔ HẤP, HO & VIÊM HỌNG]
+THH001|Astex-S 90ml|VN|Tần dày lá|Ho, viêm hô hấp|48,000₫/Chai
+THH002|Siro Deslotid 60ml|VN|Desloratadine|Dị ứng hô hấp|65,000₫/Chai
+THH003|Tocemux 200mg|VN|Acetylcysteine|Tiêu đờm|700₫/Viên
+THH004|Siro Astex 90ml|VN|Tần dày lá|Ho, viêm phế quản|44,000₫/Chai
+THH005|Deslotid 30ml|VN|Desloratadine|Viêm mũi dị ứng|45,000₫/Chai
+THH006|Ngậm Star Benko|VN|Chlorhexidine|Kháng khuẩn họng|48,000₫/Hộp
+THH007|Danospan 100ml|VN|Lá thường xuân|Ho có đờm|60,000₫/Chai
+THH008|Astex dạng gói|VN|Tần dày lá|Giảm ho hiệu quả|85,000₫/Hộp
+THH009|Siro Ambroxol 60ml|VN|Ambroxol|Tiêu đờm hô hấp|3,000₫/Chai
+THH010|Strepsils Maxpro|Anh|Flurbiprofen|Đau họng nhanh|44,000₫/Hộp
+
+[KHÁNG SINH & NHIỄM KHUẨN]
+TKS001|Fucagi 500mg|VN|Mebendazol|Trị giun|8,000₫/Viên
+TKS002|Mỡ Agiclovir 5%|VN|Aciclovir|Nhiễm Herpes|10,000₫/Tuýp
+TKS003|Fugacar 500mg|Mỹ|Mebendazole|Trị các loại giun|22,000₫/Viên
+TKS004|Mebendazole 500mg|VN|Mebendazole|Trị giun tròn|2,200₫/Viên
+TKS005|Alzental 400mg|Hàn|Albendazol|Giun ký sinh trùng|4,000₫/Viên
+TKS006|Fubenzon 500mg|VN|Mebendazol|Trị giun|4,800₫/Viên
+TKS007|Azoltel 400mg|VN|Albendazol|Giun ký sinh trùng|5,000₫/Viên
+TKS008|Viên nhai Mebendazol|VN|Mebendazol|Giun tròn|7,000₫/Viên
+TKS009|Đặt âm đạo Timbov|Moldova|Clotrimazol|Viêm âm đạo|68,333₫/Viên
+TKS010|Dầu gội Clobetasol|VN|Clobetasol|Vảy nến da đầu|98,000₫/Chai
+
+[TIM MẠCH & THẦN KINH]
+TTK001|An thần Mimosa|VN|Thảo dược|An thần, mất ngủ|1,780₫/Viên
+TTK002|Say xe Momvina|VN|Dimenhydrinate|Phòng say tàu xe|91,000₫/Hộp
+TTK003|Npluvico Nature|Mỹ|Bạch quả|Tuần hoàn não|2,800₫/Viên
+TTK004|Laferine 80mg Cho-A|Hàn|Bạch quả|Cải thiện trí nhớ|60,000₫/Ống
+TTK005|Dưỡng Tâm An Thần|VN|Thảo dược|Mất ngủ, căng thẳng|73,000₫/Hộp
+TTK008|Savi Leucin 500mg|VN|Acetylleucin|Trị chóng mặt|2,000₫/Viên
+TTM001|Hoạt Huyết Trường Phúc|VN|Thảo dược|Thiểu năng tuần hoàn|99,000₫/Hộp
+TTM002|Não Thái Dương|VN|Bạch quả|Rối loạn tiền đình|35,000₫/Hộp
+TTM003|Dacolfort Danapha|VN|Diosmin|Suy tĩnh mạch, trĩ|78,000₫/Hộp
+TTM010|Cavinton Forte 10mg|Hungary|Vinpocetine|Thiếu máu nội sọ|190,000₫/Hộp
+
+[TIÊU HÓA-GAN MẬT]
+TTH001|Simegaz Plus|VN|Simethicone|Đầy hơi dạ dày|80,000₫/Hộp
+TTH002|Đại Tràng Trường Phúc|VN|Thảo dược|Viêm loét đại tràng|105,000₫/Hộp
+TTH003|Bổ Gan Trường Phúc|VN|Thảo dược|Giải độc gan|3,300₫/Viên
+TTH004|Gaviscon Dual Action|Anh|Alginate|Trào ngược, ợ nóng|10,000₫/Gói
+TTH005|Bột Fudophos|VN|Nhôm hydroxid|Bảo vệ dạ dày|3,900₫/Gói
+TTH006|Mật nghệ Cholapan|VN|Nghệ|Đầy hơi, khó tiêu|980₫/Viên
+TTH007|Loperamide 2mg|VN|Loperamide|Trị tiêu chảy|50,000₫/Hộp
+TTH008|Duphalac Abbott|Mỹ|Lactulose|Táo bón, nhuận tràng|7,500₫/Gói
+TTH009|Smecta Ipsen|Pháp|Diosmectite|Tiêu chảy, dạ dày|5,000₫/Gói
+TTH010|Boganic Forte|VN|Atiso|Tăng chức năng gan|2,300₫/Viên
+
+[TIẾT NIỆU-SINH DỤC & TIỂU ĐƯỜNG]
+TTN001|Tránh thai BK-1|VN|Levonorgestrel|Tránh thai khẩn cấp|15,000₫/Viên
+TTN002|Bài Thạch Trường Phúc|VN|Thảo dược|Sỏi thận, sỏi mật|99,000₫/Hộp
+TTN003|Ích Mẫu OPC viên|VN|Ích mẫu|Điều hòa kinh nguyệt|60,000₫/Hộp
+TTN005|Sâm Nhung Bổ Thận TW3|VN|Nhung hươu|Bổ thận sinh lực|285,000₫/Lọ
+TTN008|Kim Tiền Thảo Danapha|VN|Kim tiền thảo|Trị sỏi thận|95,000₫/Hộp
+TTD001|Metformin 850mg|VN|Metformin|Hạ đường huyết|65,000₫/Hộp
+TTD002|Metformin Denk 1000mg|Đức|Metformin|Tiểu đường type 2|165,000₫/Hộp
+TTM004|Sitagliptin 100mg|VN|Sitagliptin|Ổn định đường huyết|315,000₫/Hộp
+
+[GÂY TÊ BÔI]
+TTB001|Lidocain 2% Braun|Đức|Lidocain|Gây tê tại chỗ|45,000₫/Ống
+TTB002|Lidocain 10% xịt|Pháp|Lidocain|Gây tê niêm mạc|175,000₫/Chai
+TTB003|Ethyl Chloride Spray|Mỹ|Etyl clorua|Gây tê lạnh da|260,000₫/Chai
+TTB004|Benzocaine gel|Mỹ|Benzocaine|Gây tê răng miệng|85,000₫/Tuýp
+TTB005|Emla 5% Aspen|Anh|Lidocain|Gây tê bề mặt|84,000₫/Tuýp
+TTB006|Xylocaine Jelly 2%|Anh|Lidocain|Bôi trơn gây tê|18,000₫/Tuýp
+... (Và tất cả các loại thuốc khác trong Cơ sở dữ liệu)
