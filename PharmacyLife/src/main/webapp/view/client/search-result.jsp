@@ -40,8 +40,7 @@
                                         <div class="row g-3">
                                             <c:forEach var="medicine" items="${medicines}">
                                                 <div class="col-6 col-md-4 col-lg-3">
-                                                    <div class="card h-100 medicine-card"
-                                                        onclick="window.location.href = '${pageContext.request.contextPath}/medicine/detail?id=${medicine.medicineId}'">
+                                                    <div class="card h-100 medicine-card">
                                                         <c:choose>
                                                             <c:when test="${not empty medicine.imageUrl}">
                                                                 <c:set var="imageUrlTrimmed"
@@ -169,16 +168,6 @@
                                                 if (typeof updateHeaderCartCount === 'function') {
                                                     updateHeaderCartCount(data.cartCount);
                                                 }
-                                                // Subtle feedback on the button
-                                                const originalText = btn.innerHTML;
-                                                btn.innerHTML = '<i class="fas fa-check"></i> Đã thêm';
-                                                btn.classList.replace('btn-primary', 'btn-success');
-                                                btn.disabled = true;
-                                                setTimeout(() => {
-                                                    btn.innerHTML = originalText;
-                                                    btn.classList.replace('btn-success', 'btn-primary');
-                                                    btn.disabled = false;
-                                                }, 2000);
                                             }
                                         })
                                         .catch(error => {
