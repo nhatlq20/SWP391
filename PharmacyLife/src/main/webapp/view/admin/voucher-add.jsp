@@ -110,8 +110,9 @@
                                 </div>
 
                                 <div class="col-12 mt-4">
-                                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold" id="submitBtn">TẠO
-                                        VOUCHER</button>
+                                    <button type="submit" class="btn-submit w-100 py-2 justify-content-center" id="submitBtn">
+                                        <i class="fas fa-plus-circle me-1"></i> Tạo voucher
+                                    </button>
                                 </div>
                             </div>
                         </form>
