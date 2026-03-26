@@ -65,7 +65,7 @@
                             <table class="table table-hover table-bordered medicine-table  mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="medicine-code-col">Mã thuốc</th>
+                                        <th>Mã thuốc</th>
                                         <th>Ảnh</th>
                                         <th>Tên thuốc</th>
                                         <th>Tồn kho theo đơn vị</th>
@@ -101,7 +101,7 @@
                                                         <c:choose>
                                                             <c:when test="${not empty units}">
                                                                 <c:forEach items="${units}" var="unit" varStatus="unitStatus">
-                                                                    <span class="unit-pill me-2 mb-1" title="Quy đổi: 1 ${unit.unitName} = ${unit.conversionRate} básic unit">
+                                                                    <span class="unit-pill me-2 mb-1" title="Quy đổi: 1 ${unit.unitName} = ${unit.conversionRate} basic unit">
                                                                         <c:out value="${unit.unitName}" />:
                                                                         <c:choose>
                                                                             <c:when test="${unit.conversionRate > 0}">
