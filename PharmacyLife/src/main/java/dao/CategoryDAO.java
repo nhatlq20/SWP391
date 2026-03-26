@@ -103,16 +103,40 @@ public class CategoryDAO {
     }
 
     public boolean deleteCategory(int categoryID) {
-        String sql = "DELETE FROM Category WHERE CategoryID = ?";
+        String sqlDeleteOrderItems = "DELETE FROM OrderItems WHERE MedicineUnitId IN (SELECT mu.MedicineUnitId FROM MedicineUnit mu JOIN Medicine m ON mu.MedicineId = m.MedicineId WHERE m.CategoryId = ?)";
+        String sqlDeleteMedicineUnit = "DELETE FROM MedicineUnit WHERE MedicineId IN (SELECT MedicineId FROM Medicine WHERE CategoryId = ?)";
+        String sqlDeleteMedicine = "DELETE FROM Medicine WHERE CategoryId = ?";
+        String sqlDeleteCategory = "DELETE FROM Category WHERE CategoryID = ?";
 
-        try (Connection conn = dbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = dbContext.getConnection()) {
+            conn.setAutoCommit(false);
+            try (
+                PreparedStatement psOrderItems = conn.prepareStatement(sqlDeleteOrderItems);
+                PreparedStatement psMedicineUnit = conn.prepareStatement(sqlDeleteMedicineUnit);
+                PreparedStatement psMedicine = conn.prepareStatement(sqlDeleteMedicine);
+                PreparedStatement psCategory = conn.prepareStatement(sqlDeleteCategory)
+            ) {
+                psOrderItems.setInt(1, categoryID);
+                psOrderItems.executeUpdate();
 
-            ps.setInt(1, categoryID);
+                psMedicineUnit.setInt(1, categoryID);
+                psMedicineUnit.executeUpdate();
 
-            int result = ps.executeUpdate();
-            return result > 0;
+                psMedicine.setInt(1, categoryID);
+                psMedicine.executeUpdate();
 
+                psCategory.setInt(1, categoryID);
+                int result = psCategory.executeUpdate();
+
+                conn.commit();
+                return result > 0;
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+                return false;
+            } finally {
+                conn.setAutoCommit(true);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
