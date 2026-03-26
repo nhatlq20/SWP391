@@ -13,7 +13,7 @@ import utils.DBContext;
 public class RevenueDAO {
     // Thực thu: đơn hàng đã giao và đã nhận tiền
     public double getActualReceived(Date from, Date to) throws SQLException {
-        String sql = "SELECT ISNULL(SUM(TotalAmount),0) FROM Orders WHERE LOWER(Status) IN ('delivered', N'đã giao', N'đã giao hàng', 'completed', N'hoàn thành', N'giao hàng thành công', N'đã hoàn thành')";
+        String sql = "SELECT ISNULL(SUM(TotalAmount),0) FROM [Order] WHERE LOWER(Status) IN ('delivered', N'đã giao', N'đã giao hàng', 'completed', N'hoàn thành', N'giao hàng thành công', N'đã hoàn thành')";
         if (from != null && to != null) {
             sql += " AND CAST(OrderDate AS DATE) BETWEEN ? AND ?";
         }
@@ -37,7 +37,7 @@ public class RevenueDAO {
 
     public int getTotalOrders(Date from, Date to) throws SQLException {
 
-        String sql = "SELECT COUNT(*) FROM Orders WHERE 1=1";
+        String sql = "SELECT COUNT(*) FROM [Order] WHERE 1=1";
         if (from != null && to != null) {
             sql += " AND CAST(OrderDate AS DATE) BETWEEN ? AND ?";
         }
@@ -53,7 +53,7 @@ public class RevenueDAO {
     }
 
     public double getTotalRevenue(Date from, Date to) throws SQLException {
-        String sql = "SELECT ISNULL(SUM(TotalAmount),0) FROM Orders WHERE Status NOT IN ('Cancelled', N'Đã hủy')";
+        String sql = "SELECT ISNULL(SUM(TotalAmount),0) FROM [Order] WHERE Status NOT IN ('Cancelled', N'Đã hủy')";
         if (from != null && to != null) {
             sql += " AND CAST(OrderDate AS DATE) BETWEEN ? AND ?";
         }
@@ -70,7 +70,7 @@ public class RevenueDAO {
 
     public double getTotalDebt(Date from, Date to) throws SQLException {
         // Số còn phải thu: Chờ xử lý, Đã xác nhận, Đang giao hàng
-        String sql = "SELECT ISNULL(SUM(TotalAmount),0) FROM Orders WHERE Status IN ('Pending', N'Chờ xử lý', 'Confirmed', N'Đã xác nhận', 'Shipping', N'Đang giao hàng')";
+        String sql = "SELECT ISNULL(SUM(TotalAmount),0) FROM [Order] WHERE Status IN ('Pending', N'Chờ xử lý', 'Confirmed', N'Đã xác nhận', 'Shipping', N'Đang giao hàng')";
         if (from != null && to != null) {
             sql += " AND CAST(OrderDate AS DATE) BETWEEN ? AND ?";
         }
@@ -86,7 +86,7 @@ public class RevenueDAO {
     }
 
     public double getAverageOrderValue(Date from, Date to) throws SQLException {
-        String sql = "SELECT ISNULL(AVG(TotalAmount),0) FROM Orders WHERE LOWER(Status) IN ('delivered', N'đã giao', N'đã giao hàng', 'completed', N'hoàn thành', N'giao hàng thành công', N'đã hoàn thành')";
+        String sql = "SELECT ISNULL(AVG(TotalAmount),0) FROM [Order] WHERE LOWER(Status) IN ('delivered', N'đã giao', N'đã giao hàng', 'completed', N'hoàn thành', N'giao hàng thành công', N'đã hoàn thành')";
         if (from != null && to != null) {
             sql += " AND CAST(OrderDate AS DATE) BETWEEN ? AND ?";
         }
@@ -102,7 +102,7 @@ public class RevenueDAO {
     }
 
     public Map<String, Integer> getOrderStatusStatistics(Date from, Date to) throws SQLException {
-        String sql = "SELECT Status, COUNT(*) AS Count FROM Orders WHERE 1=1";
+        String sql = "SELECT Status, COUNT(*) AS Count FROM [Order] WHERE 1=1";
         if (from != null && to != null) {
             sql += " AND CAST(OrderDate AS DATE) BETWEEN ? AND ?";
         }
@@ -150,7 +150,7 @@ public class RevenueDAO {
     public java.util.List<models.TopProduct> getTopSellingProducts(Date from, Date to, int limit) throws SQLException {
         String sql = "SELECT TOP " + limit
                 + " m.MedicineName, SUM(oi.OrderQuantity * mu.ConversionRate) as TotalQty, SUM(oi.OrderQuantity * oi.UnitPrice) as TotalRev "
-                + "FROM Orders o "
+                + "FROM [Order] o "
                 + "JOIN OrderItems oi ON o.OrderId = oi.OrderId "
                 + "JOIN MedicineUnit mu ON oi.MedicineUnitId = mu.MedicineUnitId "
                 + "JOIN Medicine m ON mu.MedicineId = m.MedicineId "
@@ -178,7 +178,7 @@ public class RevenueDAO {
     public java.util.List<models.TopCustomer> getTopCustomers(Date from, Date to, int limit) throws SQLException {
         String sql = "SELECT TOP " + limit
                 + " c.FullName, COUNT(o.OrderId) as OrderCount, SUM(o.TotalAmount) as TotalSpent " +
-                "FROM Orders o "
+                "FROM [Order] o "
                 + "JOIN Customer c ON o.CustomerId = c.CustomerId "
                 + "WHERE o.Status NOT IN ('Cancelled', N'Đã hủy') ";
         if (from != null && to != null) {
