@@ -86,6 +86,23 @@ public class MedicineControllerForDashboard extends HttpServlet {
 
     private void showMedicineList(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String status = request.getParameter("status");
+        if (status != null) {
+            switch (status) {
+                case "addSuccess":
+                    request.setAttribute("successMessage", "Thêm thuốc mới thành công!");
+                    break;
+                case "updateSuccess":
+                    request.setAttribute("successMessage", "Cập nhật thông tin thuốc thành công!");
+                    break;
+                case "deleteSuccess":
+                    request.setAttribute("successMessage", "Xóa thuốc thành công!");
+                    break;
+                case "error":
+                    request.setAttribute("errorMessage", "Đã xảy ra lỗi. Vui lòng thử lại!");
+                    break;
+            }
+        }
         List<Medicine> medicines = medicineDAO.getAllMedicines();
         request.setAttribute("medicines", medicines);
         request.getRequestDispatcher("/view/admin/medicine-list-for-dashboard.jsp").forward(request, response);
@@ -167,8 +184,11 @@ public class MedicineControllerForDashboard extends HttpServlet {
                 // Finally delete the medicine (this also deletes ingredients and conditions
                 // inside DAO)
                 medicineDAO.deleteMedicine(medicineId);
-            } catch (NumberFormatException e) {
-                // Invalid ID
+                response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard?status=deleteSuccess");
+                return;
+            } catch (Exception e) {
+                response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard?status=error");
+                return;
             }
         }
         response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
@@ -296,7 +316,7 @@ public class MedicineControllerForDashboard extends HttpServlet {
                     medicineUnitDAO.addUnit(unit2);
                 }
 
-                response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
+                response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard?status=addSuccess");
             } else {
                 request.setAttribute("errorMessage", "Không thể thêm thuốc. Vui lòng thử lại.");
                 List<Category> categories = categoryDAO.getAllCategories();
@@ -431,7 +451,7 @@ public class MedicineControllerForDashboard extends HttpServlet {
                     }
                 }
 
-                response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
+                response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard?status=updateSuccess");
             } else {
                 request.setAttribute("errorMessage", "Không thể cập nhật thuốc. Vui lòng thử lại.");
                 List<Category> categories = categoryDAO.getAllCategories();
