@@ -97,6 +97,12 @@ public class ChangePasswordController extends HttpServlet {
             return;
         }
 
+        if (currentPassword.equals(newPassword)) {
+            request.setAttribute("errorMessage", "Mật khẩu mới không được trùng với mật khẩu cũ!");
+            request.getRequestDispatcher("view/client/change-password.jsp").forward(request, response);
+            return;
+        }
+
         boolean success = false;
         String errorMsg = "";
 
