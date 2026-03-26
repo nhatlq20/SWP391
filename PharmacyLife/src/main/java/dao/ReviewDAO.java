@@ -457,6 +457,7 @@ public class ReviewDAO {
     }
 
     // kien
+    // Lay tat ca cac review 
     public List<Review> getAllReviews() {
         List<Review> reviews = new ArrayList<>();
         String sql = "SELECT * FROM Reviews ORDER BY ReviewCreatedAt DESC";
