@@ -1,29 +1,31 @@
 package models;
 
+/* Represents a medicine product in the system. */
 public class Medicine {
 
-    private int medicineId;
-    private String medicineCode;
-    private int categoryId;
+    private int medicineId; // Primary key
+    private String medicineCode; // Unique code (e.g., MED001)
+    private int categoryId; // Category link
     private String medicineName;
     private String brandOrigin;
     private double originalPrice;
     private String shortDescription;
     private String imageUrl;
-    private int remainingQuantity;
-    private Category category; // For join query results
-    private MedicineUnit baseUnit; // Base unit from MedicineUnit table (IsBaseUnit=1)
-    private String ingredients; // Thành phần
-    private String conditions; // Công dụng
+    private int remainingQuantity; // Stock quantity in smallest unit
+    private Category category; // To store category join information
+    private MedicineUnit baseUnit; // Best-selling unit for this medicine
+    private String ingredients; // Components of the medicine
+    private String conditions; // Usage and medical effects
 
-    // Legacy fields kept for backward compatibility (used only when baseUnit is
-    // null)
+    // Legacy fields for backward compatibility
     private String unit;
     private double sellingPrice;
 
+    /* Default constructor. */
     public Medicine() {
     }
 
+    /* Parameterized constructor for basic information. */
     public Medicine(int medicineId, String medicineCode, String medicineName, double sellingPrice, String imageUrl,
             String shortDescription) {
         this.medicineId = medicineId;
@@ -34,6 +36,7 @@ public class Medicine {
         this.shortDescription = shortDescription;
     }
 
+    /* Full-parameterized constructor for legacy system support. */
     public Medicine(int medicineId, String medicineCode, int categoryId, String medicineName, String brandOrigin,
             String unit, double originalPrice, double sellingPrice, String shortDescription, String imageUrl,
             int remainingQuantity) {
@@ -50,90 +53,101 @@ public class Medicine {
         this.remainingQuantity = remainingQuantity;
     }
 
+    /* Gets the medicine's internal ID. */
     public int getMedicineId() {
         return medicineId;
     }
 
+    /* Sets the medicine's internal ID. */
     public void setMedicineId(int medicineId) {
         this.medicineId = medicineId;
     }
 
-    // Legacy getter for JSP compatibility (maps to MedicineCode)
+    /* Legacy getter for JSP compatibility mapping to Code. */
     public String getMedicineID() {
         return medicineCode;
     }
 
-    // Legacy setter for JSP/Controller compatibility (maps to MedicineCode)
+    /* Legacy setter for JSP compatibility mapping to Code. */
     public void setMedicineID(String medicineID) {
         this.medicineCode = medicineID;
     }
 
+    /* Gets the public medicine code. */
     public String getMedicineCode() {
         return medicineCode;
     }
 
+    /* Sets the public medicine code. */
     public void setMedicineCode(String medicineCode) {
         this.medicineCode = medicineCode;
     }
 
+    /* Gets the category identifier. */
     public int getCategoryId() {
         return categoryId;
     }
 
+    /* Sets the category identifier. */
     public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
     }
 
-    // Legacy setter for Controller compatibility (String to int)
+    /* Legacy setter for String category IDs. */
     public void setCategoryID(String categoryID) {
         try {
             this.categoryId = Integer.parseInt(categoryID);
         } catch (NumberFormatException e) {
-            this.categoryId = 0; // Or handle error
+            this.categoryId = 0;
         }
     }
 
-    // Legacy getter matching property name categoryID (if used in JSP)
+    /* Legacy getter for property name compatibility. */
     public int getCategoryID() {
         return categoryId;
     }
 
+    /* Gets the name of the medicine. */
     public String getMedicineName() {
         return medicineName;
     }
 
+    /* Sets the name of the medicine. */
     public void setMedicineName(String medicineName) {
         this.medicineName = medicineName;
     }
 
+    /* Gets the manufacturer or brand origin. */
     public String getBrandOrigin() {
         return brandOrigin;
     }
 
+    /* Sets the manufacturer or brand origin. */
     public void setBrandOrigin(String brandOrigin) {
         this.brandOrigin = brandOrigin;
     }
 
+    /* Gets the ingredients list as a string. */
     public String getIngredients() {
         return ingredients;
     }
 
+    /* Sets the ingredients list. */
     public void setIngredients(String ingredients) {
         this.ingredients = ingredients;
     }
 
+    /* Gets the conditions or uses for the medicine. */
     public String getConditions() {
         return conditions;
     }
 
+    /* Sets the conditions or uses for the medicine. */
     public void setConditions(String conditions) {
         this.conditions = conditions;
     }
 
-    /**
-     * Returns the unit name from the base unit if available, otherwise falls back
-     * to the legacy field.
-     */
+    /* Gets the unit name, prioritizing base unit over legacy unit field. */
     public String getUnit() {
         if (baseUnit != null) {
             return baseUnit.getUnitName();
@@ -141,22 +155,22 @@ public class Medicine {
         return unit;
     }
 
+    /* Sets the legacy unit field. */
     public void setUnit(String unit) {
         this.unit = unit;
     }
 
+    /* Gets the original purchase price. */
     public double getOriginalPrice() {
         return originalPrice;
     }
 
+    /* Sets the original purchase price. */
     public void setOriginalPrice(double originalPrice) {
         this.originalPrice = originalPrice;
     }
 
-    /**
-     * Returns the selling price from the base unit if available, otherwise falls
-     * back to the legacy field.
-     */
+    /* Gets the retail selling price, prioritizing base unit over legacy field. */
     public double getSellingPrice() {
         if (baseUnit != null) {
             return baseUnit.getSellingPrice();
@@ -164,59 +178,61 @@ public class Medicine {
         return sellingPrice;
     }
 
+    /* Sets the retail selling price. */
     public void setSellingPrice(double sellingPrice) {
         this.sellingPrice = sellingPrice;
     }
 
-    // Legacy setter for BigDecimal compatibility
+    /* Legacy setter for BigDecimal price data. */
     public void setSellingPrice(java.math.BigDecimal sellingPrice) {
         if (sellingPrice != null) {
             this.sellingPrice = sellingPrice.doubleValue();
         }
     }
 
+    /* Gets the short descriptive text for the medicine. */
     public String getShortDescription() {
         return shortDescription;
     }
 
+    /* Sets the short descriptive text. */
     public void setShortDescription(String shortDescription) {
         this.shortDescription = shortDescription;
     }
 
-    // Helper for Controller
+    /* Legacy helper for pack descriptions (currently unused). */
     public void setPackDescription(String packDescription) {
-        // Map to ShortDescription or ignore?
-        // Old model had packDescription. New schema doesn't seem to have it separate?
-        // Check schema: [ShortDescription] nvarchar(255).
-        // Maybe append to short description or ignore.
-        // I'll ignore for now to avoid breaking SQL, or append?
+        // Reserved for future use if needed
     }
 
+    /* Legacy helper to retrieve pack description. */
     public String getPackDescription() {
         return "";
     }
 
+    /* Gets the image URL path. */
     public String getImageUrl() {
         return imageUrl;
     }
 
+    /* Sets the image URL path. */
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
 
+    /* Gets the raw stock remaining in smallest units. */
     public int getRemainingQuantity() {
         return remainingQuantity;
     }
 
+    /* Sets the raw stock remaining. */
     public void setRemainingQuantity(int remainingQuantity) {
         this.remainingQuantity = remainingQuantity;
     }
 
-    /**
-     * Returns the display quantity by dividing RemainingQuantity by ConversionRate.
-     * If baseUnit is available and ConversionRate > 0, returns remainingQuantity /
-     * conversionRate.
-     * Otherwise, falls back to the raw remainingQuantity.
+    /*
+     * Calculates the display quantity (e.g., number of boxes) based on conversion
+     * rate.
      */
     public int getDisplayQuantity() {
         if (baseUnit != null && baseUnit.getConversionRate() > 0) {
@@ -225,22 +241,27 @@ public class Medicine {
         return remainingQuantity;
     }
 
+    /* Gets the linked Category object. */
     public Category getCategory() {
         return category;
     }
 
+    /* Sets the linked Category object. */
     public void setCategory(Category category) {
         this.category = category;
     }
 
+    /* Gets the associated base MedicineUnit. */
     public MedicineUnit getBaseUnit() {
         return baseUnit;
     }
 
+    /* Sets the associated base MedicineUnit. */
     public void setBaseUnit(MedicineUnit baseUnit) {
         this.baseUnit = baseUnit;
     }
 
+    /* Returns a string representation of the medicine data. */
     @Override
     public String toString() {
         return "Medicine{" +

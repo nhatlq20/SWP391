@@ -19,6 +19,7 @@ import models.Medicine;
 import models.MedicineUnit;
 import models.Category;
 
+/* Controller for managing medicine-related operations within the admin dashboard. */
 @WebServlet(name = "MedicineControllerForDashboard", urlPatterns = {
         "/admin/medicines-dashboard",
         "/admin/medicine-add-dashboard",
@@ -28,14 +29,18 @@ import models.Category;
 })
 public class MedicineControllerForDashboard extends HttpServlet {
 
-    private MedicineDAO medicineDAO = new MedicineDAO();
-    private CategoryDAO categoryDAO = new CategoryDAO();
-    private MedicineUnitDAO medicineUnitDAO = new MedicineUnitDAO();
-    private ReviewDAO reviewDAO = new ReviewDAO();
-    private CartDAO cartDAO = new CartDAO();
-    private OrderDAO orderDAO = new OrderDAO();
-    private ImportDAO importDAO = new ImportDAO();
+    private MedicineDAO medicineDAO = new MedicineDAO(); // Medicine data access
+    private CategoryDAO categoryDAO = new CategoryDAO(); // Category data access
+    private MedicineUnitDAO medicineUnitDAO = new MedicineUnitDAO(); // Unit data access
+    private ReviewDAO reviewDAO = new ReviewDAO(); // Review data access
+    private CartDAO cartDAO = new CartDAO(); // Cart data access
+    private OrderDAO orderDAO = new OrderDAO(); // Order data access
+    private ImportDAO importDAO = new ImportDAO(); // Inventory import data access
 
+    /*
+     * Distributes GET requests to specific internal handler methods based on the
+     * URL path.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -63,6 +68,7 @@ public class MedicineControllerForDashboard extends HttpServlet {
         }
     }
 
+    /* Distributes POST requests for creating or updating medicine records. */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -84,22 +90,25 @@ public class MedicineControllerForDashboard extends HttpServlet {
 
     // ========== GET handlers ==========
 
+    /*
+     * Retrieves and displays the full list of medicines with status notifications.
+     */
     private void showMedicineList(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String status = request.getParameter("status");
         if (status != null) {
             switch (status) {
                 case "addSuccess":
-                    request.setAttribute("successMessage", "Thêm thuốc mới thành công!");
+                    request.setAttribute("successMessage", "New medicine added successfully!");
                     break;
                 case "updateSuccess":
-                    request.setAttribute("successMessage", "Cập nhật thông tin thuốc thành công!");
+                    request.setAttribute("successMessage", "Medicine updated successfully!");
                     break;
                 case "deleteSuccess":
-                    request.setAttribute("successMessage", "Xóa thuốc thành công!");
+                    request.setAttribute("successMessage", "Medicine deleted successfully!");
                     break;
                 case "error":
-                    request.setAttribute("errorMessage", "Đã xảy ra lỗi. Vui lòng thử lại!");
+                    request.setAttribute("errorMessage", "An error occurred. Please try again!");
                     break;
             }
         }
@@ -108,6 +117,7 @@ public class MedicineControllerForDashboard extends HttpServlet {
         request.getRequestDispatcher("/view/admin/medicine-list-for-dashboard.jsp").forward(request, response);
     }
 
+    /* Prepares and shows the form for adding a new medicine record. */
     private void showAddForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         List<Category> categories = categoryDAO.getAllCategories();
@@ -119,9 +129,9 @@ public class MedicineControllerForDashboard extends HttpServlet {
         request.getRequestDispatcher("/view/admin/medicine-add-for-dashboard.jsp").forward(request, response);
     }
 
-    /**
-     * AJAX endpoint: returns the next medicine code for the given categoryId as
-     * plain text.
+    /*
+     * AJAX endpoint: Returns the next unique medicine code for a specific category
+     * as plain text.
      */
     private void handleNextMedicineCode(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -138,6 +148,7 @@ public class MedicineControllerForDashboard extends HttpServlet {
         response.getWriter().write(code);
     }
 
+    /* Prepares and shows the edit form for a specific medicine record. */
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String idParam = request.getParameter("id");
@@ -158,12 +169,16 @@ public class MedicineControllerForDashboard extends HttpServlet {
                     return;
                 }
             } catch (NumberFormatException e) {
-                // Invalid ID
+                // Invalid ID format
             }
         }
         response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
     }
 
+    /*
+     * Cascades through related tables to delete all data associated with a medicine
+     * record.
+     */
     private void deleteMedicine(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String idParam = request.getParameter("id");
@@ -171,18 +186,15 @@ public class MedicineControllerForDashboard extends HttpServlet {
             try {
                 int medicineId = Integer.parseInt(idParam);
 
-                // Delete from all tables that have a foreign key to MedicineId
-                // Order of deletion matters if there are nested FKs, but here they mostly point
-                // to MedicineId
-
+                // Cascade deletion across dependent tables to maintain database integrity
                 reviewDAO.deleteReviewsByMedicineId(medicineId);
                 cartDAO.removeCartItemsByMedicineId(medicineId);
                 orderDAO.deleteOrderItemsByMedicineId(medicineId);
                 importDAO.deleteImportDetailsByMedicineId(medicineId);
                 medicineUnitDAO.deleteUnitsByMedicineId(medicineId);
 
-                // Finally delete the medicine (this also deletes ingredients and conditions
-                // inside DAO)
+                // Finally, remove the medicine record (this also handles ingredients and uses
+                // in the DAO)
                 medicineDAO.deleteMedicine(medicineId);
                 response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard?status=deleteSuccess");
                 return;
@@ -196,6 +208,10 @@ public class MedicineControllerForDashboard extends HttpServlet {
 
     // ========== POST handlers ==========
 
+    /*
+     * Processes the creation of a new medicine, including its unit hierarchy and
+     * ingredients.
+     */
     private void createMedicine(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
@@ -220,8 +236,9 @@ public class MedicineControllerForDashboard extends HttpServlet {
             if (quantityStr != null && !quantityStr.isEmpty()) {
                 try {
                     long qLong = Long.parseLong(quantityStr);
+                    // Basic validation for quantity range
                     if (qLong < 0 || qLong > 1000000) {
-                        request.setAttribute("errorMessage", "Số lượng không hợp lệ.");
+                        request.setAttribute("errorMessage", "Invalid quantity value.");
                         request.setAttribute("categories", categoryDAO.getAllCategories());
                         request.setAttribute("nextMedicineCode", medicineDAO.getNextMedicineCode());
                         request.getRequestDispatcher("/view/admin/medicine-add-for-dashboard.jsp").forward(request,
@@ -230,7 +247,7 @@ public class MedicineControllerForDashboard extends HttpServlet {
                     }
                     quantity = (int) qLong;
                 } catch (NumberFormatException ex) {
-                    request.setAttribute("errorMessage", "Số lượng không hợp lệ.");
+                    request.setAttribute("errorMessage", "Invalid quantity format.");
                     request.setAttribute("categories", categoryDAO.getAllCategories());
                     request.setAttribute("nextMedicineCode", medicineDAO.getNextMedicineCode());
                     request.getRequestDispatcher("/view/admin/medicine-add-for-dashboard.jsp").forward(request,
@@ -251,11 +268,9 @@ public class MedicineControllerForDashboard extends HttpServlet {
                 // Save Ingredients and Uses (Conditions)
                 medicineDAO.saveMedicineIngredients(newMedicineId, medicine.getIngredients());
                 medicineDAO.saveMedicineConditions(newMedicineId, medicine.getConditions());
-                // Correct Hierarchy: Main Unit (Hộp) > Sub Unit 1 (Vỉ) > Sub Unit 2 (Viên)
-                // To store stock in smallest units:
-                // Sub Unit 2 (if exists) Rate = 1
-                // Sub Unit 1 Rate = SubRate2
-                // Main Unit Rate = SubRate1 * SubRate2
+
+                // Logic: Handle Unit Hierarchy (e.g., Box > Strip > Tablet)
+                // Calculated rates ensure inventory is tracked in the smallest unit.
 
                 String subUnit1 = request.getParameter("subUnit1");
                 String subRate1Str = request.getParameter("subRate1");
@@ -275,7 +290,7 @@ public class MedicineControllerForDashboard extends HttpServlet {
                 boolean hasSub2 = subUnit2 != null && !subUnit2.isEmpty();
                 boolean hasSub1 = subUnit1 != null && !subUnit1.isEmpty();
 
-                // Create the units
+                // Create the primary/main unit (usually the largest packaging)
                 String unitName = request.getParameter("unit");
                 String sellingPriceStr = request.getParameter("sellingPrice");
                 double sellingPrice = (sellingPriceStr != null && !sellingPriceStr.isEmpty())
@@ -284,7 +299,7 @@ public class MedicineControllerForDashboard extends HttpServlet {
 
                 MedicineUnit baseUnit = new MedicineUnit();
                 baseUnit.setMedicineId(newMedicineId);
-                String mainUnitName = unitName != null && !unitName.isEmpty() ? unitName : "Hộp";
+                String mainUnitName = unitName != null && !unitName.isEmpty() ? unitName : "Box";
                 baseUnit.setUnitName(mainUnitName);
                 baseUnit.setUnitId(medicineUnitDAO.getUnitIdByName(mainUnitName));
                 baseUnit.setConversionRate(mainUnitRate);
@@ -292,7 +307,7 @@ public class MedicineControllerForDashboard extends HttpServlet {
                 baseUnit.setBaseUnit(!hasSub1 && !hasSub2);
                 medicineUnitDAO.addUnit(baseUnit);
 
-                // Add Sub-Unit 1 if provided
+                // Add Sub-Unit 1 if provided (e.g., a strip)
                 if (hasSub1) {
                     MedicineUnit unit1 = new MedicineUnit();
                     unit1.setMedicineId(newMedicineId);
@@ -304,7 +319,7 @@ public class MedicineControllerForDashboard extends HttpServlet {
                     medicineUnitDAO.addUnit(unit1);
                 }
 
-                // Add Sub-Unit 2 if provided
+                // Add Sub-Unit 2 if provided (e.g., a single tablet - the base unit for stock)
                 if (hasSub2) {
                     MedicineUnit unit2 = new MedicineUnit();
                     unit2.setMedicineId(newMedicineId);
@@ -318,20 +333,21 @@ public class MedicineControllerForDashboard extends HttpServlet {
 
                 response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard?status=addSuccess");
             } else {
-                request.setAttribute("errorMessage", "Không thể thêm thuốc. Vui lòng thử lại.");
+                request.setAttribute("errorMessage", "Could not add medicine. Please try again.");
                 List<Category> categories = categoryDAO.getAllCategories();
                 request.setAttribute("categories", categories);
                 request.getRequestDispatcher("/view/admin/medicine-add-for-dashboard.jsp").forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Lỗi: " + e.getMessage());
+            request.setAttribute("errorMessage", "Error: " + e.getMessage());
             List<Category> categories = categoryDAO.getAllCategories();
             request.setAttribute("categories", categories);
             request.getRequestDispatcher("/view/admin/medicine-add-for-dashboard.jsp").forward(request, response);
         }
     }
 
+    /* Processes the update of an existing medicine record and its units. */
     private void updateMedicine(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
@@ -357,7 +373,8 @@ public class MedicineControllerForDashboard extends HttpServlet {
             if (quantityStr != null && !quantityStr.isEmpty()) {
                 medicine.setRemainingQuantity(Integer.parseInt(quantityStr));
             }
-            // else: keep the existing remainingQuantity loaded from DB above
+            // If quantity is missing, retain the existing remainingQuantity loaded from the
+            // DB
 
             medicine.setBrandOrigin(request.getParameter("brandOrigin"));
             medicine.setShortDescription(request.getParameter("shortDescription"));
@@ -366,10 +383,11 @@ public class MedicineControllerForDashboard extends HttpServlet {
 
             boolean success = medicineDAO.updateMedicine(medicine);
             if (success) {
-                // Save/Update Ingredients and Uses (Conditions)
+                // Save or Update related data like Ingredients and Uses
                 medicineDAO.saveMedicineIngredients(medicineId, medicine.getIngredients());
                 medicineDAO.saveMedicineConditions(medicineId, medicine.getConditions());
-                // Correct Hierarchy: Main Unit (Hộp) > Sub Unit 1 (Vỉ) > Sub Unit 2 (Viên)
+
+                // Recalculate Unit Hierarchy Rates (e.g., Box > Strip > Tablet)
                 String subUnit1 = request.getParameter("subUnit1");
                 String subRate1Str = request.getParameter("subRate1");
                 String subPrice1Str = request.getParameter("subPrice1");
@@ -388,24 +406,24 @@ public class MedicineControllerForDashboard extends HttpServlet {
                 boolean hasSub2 = subUnit2 != null && !subUnit2.isEmpty();
                 boolean hasSub1 = subUnit1 != null && !subUnit1.isEmpty();
 
-                // Update the first unit (unit name and selling price) in MedicineUnit
+                // Get main unit details from the request
                 String unitName = request.getParameter("unit");
                 String sellingPriceStr = request.getParameter("sellingPrice");
                 double sellingPrice = (sellingPriceStr != null && !sellingPriceStr.isEmpty())
                         ? Double.parseDouble(sellingPriceStr)
                         : 0;
 
-                // Smart Update: Update existing units instead of deleting all
+                // Sync with DB: Smartly update existing units to maintain referential integrity
                 List<MedicineUnit> existingUnits = medicineUnitDAO.getUnitsByMedicineId(medicineId);
                 existingUnits.sort((a, b) -> b.getConversionRate() - a.getConversionRate());
 
-                // 1. Prepare New List
+                // 1. Construct the list of new unit configurations
                 List<MedicineUnit> newUnits = new ArrayList<>();
 
-                // Main Unit
+                // Define the Primary (Main) Unit
                 MedicineUnit mainU = new MedicineUnit();
                 mainU.setMedicineId(medicineId);
-                String mainUName = unitName != null && !unitName.isEmpty() ? unitName : "Hộp";
+                String mainUName = unitName != null && !unitName.isEmpty() ? unitName : "Box";
                 mainU.setUnitName(mainUName);
                 mainU.setUnitId(medicineUnitDAO.getUnitIdByName(mainUName));
                 mainU.setConversionRate(mainUnitRate);
@@ -437,23 +455,25 @@ public class MedicineControllerForDashboard extends HttpServlet {
                     newUnits.add(u2);
                 }
 
-                // 2. Sync with DB
+                // 2. Efficiently synchronize with the database
                 for (int i = 0; i < Math.max(newUnits.size(), existingUnits.size()); i++) {
                     if (i < newUnits.size() && i < existingUnits.size()) {
-                        // Update existing
+                        // Update an existing unit entry
                         MedicineUnit toUpdate = newUnits.get(i);
                         toUpdate.setMedicineUnitId(existingUnits.get(i).getMedicineUnitId());
                         medicineUnitDAO.updateUnit(toUpdate);
                     } else if (i < newUnits.size()) {
+                        // Insert a newly added unit type
                         medicineUnitDAO.addUnit(newUnits.get(i));
                     } else if (i < existingUnits.size()) {
+                        // Remove unit types that are no longer part of the configuration
                         medicineUnitDAO.deleteUnit(existingUnits.get(i).getMedicineUnitId());
                     }
                 }
 
                 response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard?status=updateSuccess");
             } else {
-                request.setAttribute("errorMessage", "Không thể cập nhật thuốc. Vui lòng thử lại.");
+                request.setAttribute("errorMessage", "Could not update medicine record. Please try again.");
                 List<Category> categories = categoryDAO.getAllCategories();
                 request.setAttribute("medicine", medicine);
                 request.setAttribute("categories", categories);
@@ -461,7 +481,7 @@ public class MedicineControllerForDashboard extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Lỗi: " + e.getMessage());
+            request.setAttribute("errorMessage", "Error: " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
         }
     }

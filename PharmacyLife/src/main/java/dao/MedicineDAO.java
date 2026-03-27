@@ -8,17 +8,21 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/* Data Access Object for Medicine entities, handling all database operations. */
 public class MedicineDAO {
 
-    private DBContext dbContext = new DBContext();
+    private DBContext dbContext = new DBContext(); // Database connection utility
 
+    /* Constructor with custom DBContext. */
     public MedicineDAO(DBContext dbContext) {
         this.dbContext = dbContext;
     }
 
+    /* Default constructor. */
     public MedicineDAO() {
     }
 
+    /* Retrieves all medicines with their categories and base units. */
     public List<Medicine> getAllMedicines() {
         List<Medicine> medicines = new ArrayList<>();
 
@@ -49,6 +53,9 @@ public class MedicineDAO {
         return medicines;
     }
 
+    /*
+     * Retrieves a single medicine by its ID, including ingredients and conditions.
+     */
     public Medicine getMedicineById(int medicineId) {
         String sql = "SELECT m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, "
                 + "m.OriginalPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, "
@@ -84,6 +91,7 @@ public class MedicineDAO {
         return null;
     }
 
+    /* Retrieves all medicines belonging to a specific category. */
     public List<Medicine> getMedicinesByCategory(int categoryId) {
         List<Medicine> medicines = new ArrayList<>();
         String sql = "SELECT m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, "
@@ -115,6 +123,7 @@ public class MedicineDAO {
         return medicines;
     }
 
+    /* Retrieves a medicine by its unique internal code. */
     public Medicine getMedicineByCode(String medicineCode) {
         String sql = "SELECT m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, "
                 + "m.OriginalPrice, m.ShortDescription, m.ImageUrl, m.RemainingQuantity, "
@@ -144,7 +153,7 @@ public class MedicineDAO {
         return null;
     }
 
-    // Legacy support: finding by String ID maps to MedicineCode
+    /* Legacy support: finding by String ID maps to MedicineCode or parsed PK. */
     public Medicine getMedicineById(String medicineID) {
         // First try to parse as int (if it's a PK)
         try {
@@ -158,6 +167,7 @@ public class MedicineDAO {
         return getMedicineByCode(medicineID);
     }
 
+    /* Performs a comprehensive search based on multiple medicine attributes. */
     public List<Medicine> searchMedicines(String searchTerm) {
         List<Medicine> medicines = new ArrayList<>();
 
@@ -207,6 +217,7 @@ public class MedicineDAO {
         return medicines;
     }
 
+    /* Retrieves the top best-selling medicines based on historic order data. */
     public List<Medicine> getBestSellers(int limit) {
         List<Medicine> medicines = new ArrayList<>();
         String sql = "SELECT TOP " + limit
@@ -235,6 +246,7 @@ public class MedicineDAO {
         return medicines;
     }
 
+    /* Retrieves all medicines currently in stock (quantity > 0). */
     public List<Medicine> getMedicinesInStock() {
         List<Medicine> medicines = new ArrayList<>();
         String sql = "SELECT m.MedicineId, m.MedicineCode, m.CategoryId, m.MedicineName, m.BrandOrigin, "
@@ -264,12 +276,7 @@ public class MedicineDAO {
         return medicines;
     }
 
-    /**
-     * Creates a new Medicine record and returns the generated MedicineId, or -1 on
-     * failure.
-     * The caller should then create a corresponding MedicineUnit (base unit)
-     * record.
-     */
+    /* Creates a new medicine record and returns its generated ID. */
     public int createMedicineAndReturnId(Medicine medicine) {
         String sql = "INSERT INTO Medicine (MedicineCode, CategoryId, MedicineName, BrandOrigin, "
                 + "OriginalPrice, ShortDescription, ImageUrl, RemainingQuantity) "
@@ -303,11 +310,12 @@ public class MedicineDAO {
         return -1;
     }
 
-    /** Legacy boolean wrapper kept for any other callers. */
+    /* Legacy boolean wrapper for creating a medicine. */
     public boolean createMedicine(Medicine medicine) {
         return createMedicineAndReturnId(medicine) > 0;
     }
 
+    /* Updates an existing medicine record. */
     public boolean updateMedicine(Medicine medicine) {
         String sql = "UPDATE Medicine SET MedicineCode = ?, CategoryId = ?, MedicineName = ?, BrandOrigin = ?, "
                 + "OriginalPrice = ?, ShortDescription = ?, ImageUrl = ?, "
@@ -335,12 +343,7 @@ public class MedicineDAO {
         }
     }
 
-    /**
-     * Generate the next MedicineCode scoped to a specific Category.
-     * Finds the last code in that category (by MedicineId DESC), extracts the
-     * prefix + numeric suffix and returns prefix + (number+1) with zero-padding.
-     * If the category has no medicines yet, returns "MED001".
-     */
+    /* Generates the next unique medicine code for a category. */
     public String getNextMedicineCode(int categoryId) {
         // Get the last code that belongs to this category
         String sql = "SELECT TOP 1 MedicineCode FROM Medicine WHERE CategoryId = ? ORDER BY MedicineId DESC";
@@ -370,14 +373,12 @@ public class MedicineDAO {
         return "MED001";
     }
 
-    /**
-     * Legacy no-arg overload – uses category-aware method with categoryId=0
-     * fallback.
-     */
+    /* Legacy no-arg overload for generating medicine codes. */
     public String getNextMedicineCode() {
         return getNextMedicineCode(0);
     }
 
+    /* Deletes a medicine and its related data from the database. */
     public boolean deleteMedicine(int medicineId) {
         // First delete from child tables that are strictly related to Medicine
         deleteIngredientsByMedicineId(medicineId);
@@ -398,6 +399,7 @@ public class MedicineDAO {
         }
     }
 
+    /* Deletes all ingredient links for a specific medicine. */
     public void deleteIngredientsByMedicineId(int medicineId) {
         String sql = "DELETE FROM MedicineIngredients WHERE MedicineId = ?";
         try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -408,6 +410,7 @@ public class MedicineDAO {
         }
     }
 
+    /* Deletes all condition links for a specific medicine. */
     public void deleteConditionsByMedicineId(int medicineId) {
         String sql = "DELETE FROM ConditionMedicines WHERE MedicineId = ?";
         try (Connection conn = dbContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -418,6 +421,10 @@ public class MedicineDAO {
         }
     }
 
+    /*
+     * Parses and saves medicine ingredients, linking to the ActiveIngredients
+     * table.
+     */
     public void saveMedicineIngredients(int medicineId, String ingredientsStr) {
         if (ingredientsStr == null || ingredientsStr.isBlank()) {
             deleteIngredientsByMedicineId(medicineId);
@@ -513,6 +520,9 @@ public class MedicineDAO {
         }
     }
 
+    /*
+     * Parses and saves medicine conditions (uses), linking to the Conditions table.
+     */
     public void saveMedicineConditions(int medicineId, String conditionsStr) {
         if (conditionsStr == null || conditionsStr.isBlank()) {
             deleteConditionsByMedicineId(medicineId);
@@ -626,6 +636,7 @@ public class MedicineDAO {
         }
     }
 
+    /* Direct update of remaining quantity for a medicine. */
     public boolean updateQuantity(int medicineId, int newQuantity) {
         String sql = "UPDATE Medicine SET RemainingQuantity = ? WHERE MedicineId = ?";
 
@@ -643,6 +654,7 @@ public class MedicineDAO {
         }
     }
 
+    /* Relative update of stock quantity based on conversion rates. */
     public boolean updateStockQuantity(int medicineId, int unitId, int delta) {
         String sql = "UPDATE Medicine SET RemainingQuantity = RemainingQuantity + (? * (SELECT COALESCE(ConversionRate, 1) FROM MedicineUnit WHERE UnitId = ? AND MedicineId = ?)) WHERE MedicineId = ?";
 
@@ -662,11 +674,15 @@ public class MedicineDAO {
         }
     }
 
-    // Legacy support
+    /* Legacy stock quantity update (no specific unit). */
     public boolean updateStockQuantity(int medicineId, int delta) {
         return updateStockQuantity(medicineId, 0, delta);
     }
 
+    /*
+     * Adjusts quantity and original price, inflating selling prices if costs
+     * increased.
+     */
     public boolean addQuantityAndSetOriginalPrice(int medicineId, int unitId, int quantityToAdd,
             double newOriginalPrice) {
         double oldOriginalPrice = 0;
@@ -723,11 +739,12 @@ public class MedicineDAO {
         return false;
     }
 
-    // Legacy support
+    /* Legacy overload for quantity and price adjustment. */
     public boolean addQuantityAndSetOriginalPrice(int medicineId, int quantityToAdd, double newOriginalPrice) {
         return addQuantityAndSetOriginalPrice(medicineId, 0, quantityToAdd, newOriginalPrice);
     }
 
+    /* Checks if a medicine with the given ID exists in the database. */
     public boolean medicineExists(int medicineId) {
         String sql = "SELECT COUNT(*) FROM Medicine WHERE MedicineId = ?";
 
@@ -747,6 +764,7 @@ public class MedicineDAO {
         return false;
     }
 
+    /* Helper to map a database ResultSet row to a Medicine object. */
     private Medicine mapResultSetToMedicine(ResultSet rs) throws SQLException {
         Medicine medicine = new Medicine();
 
@@ -798,14 +816,10 @@ public class MedicineDAO {
         } catch (SQLException e) {
             // CategoryName might not be in the result set if not joined
         }
-
         return medicine;
     }
 
-    /**
-     * Returns a comma-separated list of IngredientNames for the given medicineId,
-     * joining MedicineIngredients with ActiveIngredients.
-     */
+    /* Retrieves ingredient names and details for a given medicine. */
     public List<String> getIngredientNamesByMedicineId(int medicineId) {
         List<String> names = new ArrayList<>();
         String sql = "SELECT ai.IngredientName, ai.Description, mi.Strength "
@@ -838,6 +852,7 @@ public class MedicineDAO {
         return names;
     }
 
+    /* Retrieves condition names and details for a given medicine. */
     public List<String> getConditionNamesByMedicineId(int medicineId) {
         List<String> names = new ArrayList<>();
         String sql = "SELECT con.ConditionName, con.Description, con.Advice "
@@ -870,6 +885,10 @@ public class MedicineDAO {
         return names;
     }
 
+    /*
+     * Calculates the total remaining quantity for all medicines in a specific
+     * category.
+     */
     public int getTotalStockByCategory(int categoryId) {
         String sql = "SELECT SUM(m.RemainingQuantity) AS totalStock FROM Medicine m WHERE m.CategoryId = ?";
 
