@@ -571,3 +571,26 @@
     background-color: #f9fafb;
     color: #6b7280;
 }
+
+/* ---------- Dynamic Row Buttons ---------- */
+.btn-add-row {
+    background: #eef2ff;
+    color: #4f46e5;
+    border: 1px dashed #4f46e5;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+}
+
+.btn-add-row:hover {
+    background: #e0e7ff;
+    border-style: solid;
+    transform: translateY(-1px);
+}
