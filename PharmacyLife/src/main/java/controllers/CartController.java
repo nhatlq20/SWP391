@@ -51,7 +51,8 @@ public class CartController extends HttpServlet {
         // Check if coming from checkout request explicitly or just viewing
         String mode = request.getParameter("mode");
         if ("checkout".equals(mode) && cart != null && !cart.getItems().isEmpty()) {
-            // Client sends selected medicineUnitIds in `muids` (preferred), fallback legacy `selectedItems`
+            // Client sends selected medicineUnitIds in `muids` (preferred), fallback legacy
+            // `selectedItems`
             String selected = request.getParameter("muids");
             if (selected == null || selected.isEmpty()) {
                 selected = request.getParameter("selectedItems");
@@ -82,7 +83,8 @@ public class CartController extends HttpServlet {
                         if (part.contains("-")) {
                             String[] ids = part.split("-");
                             if (ids.length == 2) {
-                                // Since we moved to muid, we might need a way to look up muid from mid/uid if it's still being sent this way
+                                // Since we moved to muid, we might need a way to look up muid from mid/uid if
+                                // it's still being sent this way
                                 // But ideally we change the JSP to send just muid.
                             }
                         }
@@ -102,6 +104,7 @@ public class CartController extends HttpServlet {
 
             // Step 2: Check total consumption vs stock for each medicine
             java.util.List<String> errors = new java.util.ArrayList<>();
+
             for (java.util.Map.Entry<Integer, java.util.List<models.Cart.Item>> entry : itemsByMed.entrySet()) {
                 int medId = entry.getKey();
                 java.util.List<models.Cart.Item> medItems = entry.getValue();
@@ -112,9 +115,12 @@ public class CartController extends HttpServlet {
 
                 if (totalNeeded > remainingBase) {
                     if (remainingBase <= 0) {
-                        // Completely out of stock
-                        String unitName = firstItem.getUnitName() != null ? firstItem.getUnitName() : "đơn vị";
-                        errors.add("Thuốc '" + medicineName + "' (đơn vị: " + unitName + ") đã hết hàng.");
+                        // Completely out of stock — show EACH item in cart as out of stock
+                        for (models.Cart.Item item : medItems) {
+                            String unitName = item.getUnitName() != null ? item.getUnitName() : "đơn vị";
+                            errors.add("Thuốc '" + medicineName + "' (đơn vị: " + unitName
+                                    + ") đã hết hàng (Còn 0 trong kho).");
+                        }
                     } else if (medItems.size() == 1) {
                         // Only one unit type ordered — simple per-unit message
                         models.Cart.Item item = medItems.get(0);
@@ -122,11 +128,10 @@ public class CartController extends HttpServlet {
                         String unitName = item.getUnitName() != null ? item.getUnitName() : "đơn vị";
                         int remainingInUnit = remainingBase / convRate;
                         errors.add("Thuốc '" + medicineName + "' (đơn vị: " + unitName
-                                + ") hiện không đủ hàng, hiện còn " + remainingInUnit + " " + unitName + ".");
+                                + ") hiện không đủ hàng (Hiện còn " + remainingInUnit + " " + unitName
+                                + " trong kho).");
                     } else {
                         // Multiple unit types of same medicine — aggregate error
-                        // Build "8 Hộp + 28 Vỉ + 280 Viên" ordered string
-                        // Build "8 Hộp hoặc 28 Vỉ hoặc 280 Viên" remaining string
                         StringBuilder orderedSb = new StringBuilder();
                         StringBuilder remainingSb = new StringBuilder();
                         for (int i = 0; i < medItems.size(); i++) {
@@ -134,12 +139,15 @@ public class CartController extends HttpServlet {
                             int convRate = item.getConversionRate() > 0 ? item.getConversionRate() : 1;
                             String unitName = item.getUnitName() != null ? item.getUnitName() : "đơn vị";
                             int remainingInUnit = remainingBase / convRate;
-                            if (i > 0) { orderedSb.append(" + "); remainingSb.append(" hoặc "); }
+                            if (i > 0) {
+                                orderedSb.append(" + ");
+                                remainingSb.append(" hoặc ");
+                            }
                             orderedSb.append(item.getQuantity()).append(" ").append(unitName);
                             remainingSb.append(remainingInUnit).append(" ").append(unitName);
                         }
                         errors.add("Thuốc '" + medicineName + "' không đủ hàng — bạn đang đặt "
-                                + orderedSb + " vượt quá tồn kho (hiện còn: " + remainingSb + ").");
+                                + orderedSb + " vượt quá tồn kho (Hiện còn " + remainingSb + ").");
                     }
                 }
             }
@@ -281,10 +289,10 @@ public class CartController extends HttpServlet {
                 if ("update".equals(action) || "add".equals(action)) {
                     try {
                         int muid = Integer.parseInt(request.getParameter("muid"));
-                        
+
                         // Debug: print current cart items
                         System.out.println("Updating Cart: MedicineUnitID=" + muid);
-                        
+
                         models.Cart.Item item = cart.getItem(muid);
                         if (item != null) {
                             itemTotal = item.getTotalPrice();
@@ -297,7 +305,8 @@ public class CartController extends HttpServlet {
                 cartCount = cart.getItemCount();
             }
 
-            out.print("{\"success\":true,\"itemPrice\":" + itemPrice + ",\"itemTotal\":" + itemTotal + ",\"cartTotal\":" + cartTotal + ",\"cartCount\":" + cartCount + "}");
+            out.print("{\"success\":true,\"itemPrice\":" + itemPrice + ",\"itemTotal\":" + itemTotal + ",\"cartTotal\":"
+                    + cartTotal + ",\"cartCount\":" + cartCount + "}");
             out.flush();
         } else {
             response.sendRedirect("cart");
