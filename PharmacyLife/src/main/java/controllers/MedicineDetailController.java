@@ -15,13 +15,15 @@ import jakarta.servlet.http.HttpSession;
 import models.Medicine;
 import models.ReviewCustomer;
 
+/* Controller for viewing detailed information about a specific medicine, including reviews and stock. */
 public class MedicineDetailController extends HttpServlet {
 
-    private final MedicineDAO medicineDAO = new MedicineDAO();
-    private final MedicineUnitDAO medicineUnitDAO = new MedicineUnitDAO();
-    private final ReviewDAO reviewDAO = new ReviewDAO();
-    private final OrderDAO orderDAO = new OrderDAO();
+    private final MedicineDAO medicineDAO = new MedicineDAO(); // Medicine data access
+    private final MedicineUnitDAO medicineUnitDAO = new MedicineUnitDAO(); // Unit data access
+    private final ReviewDAO reviewDAO = new ReviewDAO(); // Review data access
+    private final OrderDAO orderDAO = new OrderDAO(); // Order data access
 
+    /* Helper function to retrieve the logged-in customer ID from session data. */
     private Integer getLoggedInCustomerId(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session == null) {
@@ -48,6 +50,10 @@ public class MedicineDetailController extends HttpServlet {
         return null;
     }
 
+    /*
+     * Handles GET requests to display medicine details, including reviews and stock
+     * statistics.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -66,17 +72,17 @@ public class MedicineDetailController extends HttpServlet {
                 return;
             }
 
-            // Lấy danh sách reviews của sản phẩm (với thông tin khách hàng)
+            // Retrieve the list of customer reviews for the medicine product
             List<ReviewCustomer> reviews = reviewDAO.getReviewsWithCustomerByMedicine(medicineId);
             double averageRating = reviewDAO.getAverageRating(medicineId);
             int totalReviews = reviewDAO.getTotalReviews(medicineId);
 
-            // Lấy danh sách thành phần từ bảng MedicineIngredients + ActiveIngredients
+            // Fetch medicine component data (ingredients and active ingredients)
             List<String> ingredientNames = medicineDAO.getIngredientNamesByMedicineId(medicineId);
-            // Lấy danh sách công dụng/tình trạng từ bảng MedicineConditions + Conditions
+            // Fetch usage effects and conditions data
             List<String> conditionNames = medicineDAO.getConditionNamesByMedicineId(medicineId);
 
-            // Lấy tổng số lượng tồn kho của danh mục
+            // Fetch the total stock quantity for the entire category
             int categoryStock = 0;
             try {
                 if (medicine.getCategory() != null) {
@@ -84,7 +90,7 @@ public class MedicineDetailController extends HttpServlet {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                categoryStock = 0; // fallback
+                categoryStock = 0; // fallback to zero on error
             }
 
             request.setAttribute("medicine", medicine);
@@ -96,6 +102,7 @@ public class MedicineDetailController extends HttpServlet {
             request.setAttribute("totalReviews", totalReviews);
             request.setAttribute("categoryStock", categoryStock);
 
+            // Determine if the current user is eligible to write a review
             Integer customerId = getLoggedInCustomerId(request);
             boolean canReview = false;
             boolean hasReviewed = false;
@@ -113,6 +120,7 @@ public class MedicineDetailController extends HttpServlet {
         }
     }
 
+    /* Redirects POST requests to doGet for consistent detail display. */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

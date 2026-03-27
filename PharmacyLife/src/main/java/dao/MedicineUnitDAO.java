@@ -6,13 +6,16 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/* Data Access Object for MedicineUnit, managing relationships between medicines and units. */
 public class MedicineUnitDAO {
 
-    private DBContext dbContext = new DBContext();
+    private DBContext dbContext = new DBContext(); // Database connection utility
 
+    /* Default constructor. */
     public MedicineUnitDAO() {
     }
 
+    /* Retrieves a specific medicine unit by its record ID. */
     public MedicineUnit getUnitById(int medicineUnitId) {
         String sql = "SELECT mu.*, u.UnitName FROM MedicineUnit mu "
                 + "LEFT JOIN Unit u ON mu.UnitId = u.UnitId "
@@ -31,9 +34,7 @@ public class MedicineUnitDAO {
         return null;
     }
 
-    /**
-     * Get all units for a given medicine.
-     */
+    /* Retrieves all available units defined for a given medicine. */
     public List<MedicineUnit> getUnitsByMedicineId(int medicineId) {
         List<MedicineUnit> units = new ArrayList<>();
         String sql = "SELECT mu.*, u.UnitName FROM MedicineUnit mu "
@@ -53,10 +54,7 @@ public class MedicineUnitDAO {
         return units;
     }
 
-    /**
-     * Get the base unit (IsBaseUnit = 1) for a given medicine.
-     * Returns null if no base unit is defined.
-     */
+    /* Retrieves the primary/base unit for a medicine (e.g., Smallest unit). */
     public MedicineUnit getBaseUnit(int medicineId) {
         String sql = "SELECT mu.*, u.UnitName FROM MedicineUnit mu "
                 + "LEFT JOIN Unit u ON mu.UnitId = u.UnitId "
@@ -75,10 +73,7 @@ public class MedicineUnitDAO {
         return null;
     }
 
-    /**
-     * Insert a new MedicineUnit record. Returns the generated UnitId, or -1 on
-     * failure.
-     */
+    /* Adds a new unit relationship for a medicine and returns the generated ID. */
     public int addUnit(MedicineUnit unit) {
         String sql = "INSERT INTO MedicineUnit (MedicineId, UnitId, ConversionRate, SellingPrice, IsBaseUnit) "
                 + "VALUES (?, ?, ?, ?, ?)";
@@ -103,9 +98,7 @@ public class MedicineUnitDAO {
         return -1;
     }
 
-    /**
-     * Update an existing MedicineUnit by UnitId.
-     */
+    /* Updates the details of an existing medicine unit. */
     public boolean updateUnit(MedicineUnit unit) {
         String sql = "UPDATE MedicineUnit SET UnitId = ?, ConversionRate = ?, SellingPrice = ?, IsBaseUnit = ? "
                 + "WHERE MedicineUnitId = ?";
@@ -123,10 +116,7 @@ public class MedicineUnitDAO {
         return false;
     }
 
-    /**
-     * Update only the base unit's UnitName, SellingPrice and ConversionRate for a
-     * given medicine.
-     */
+    /* Internal helper to update unit details based on base unit constraints. */
     public boolean updateUnitInternal(int medicineId, int unitId, double sellingPrice, int conversionRate,
             boolean isBase) {
         String sql = "UPDATE MedicineUnit SET UnitId = ?, SellingPrice = ?, ConversionRate = ?, IsBaseUnit = ? "
@@ -145,9 +135,7 @@ public class MedicineUnitDAO {
         return false;
     }
 
-    /**
-     * Update only the base unit's UnitName and SellingPrice for a given medicine.
-     */
+    /* Updates only the primary unit's name and price. */
     public boolean updateBaseUnit(int medicineId, int unitId, double sellingPrice) {
         String sql = "UPDATE MedicineUnit SET UnitId = ?, SellingPrice = ? "
                 + "WHERE MedicineUnitId = (SELECT TOP 1 MedicineUnitId FROM MedicineUnit WHERE MedicineId = ? ORDER BY MedicineUnitId ASC)";
@@ -163,9 +151,7 @@ public class MedicineUnitDAO {
         return false;
     }
 
-    /**
-     * Delete all units for a medicine (useful when deleting a medicine).
-     */
+    /* Deletes all units associated with a specific medicine. */
     public boolean deleteUnitsByMedicineId(int medicineId) {
         String sql = "DELETE FROM MedicineUnit WHERE MedicineId = ?";
         try (Connection conn = dbContext.getConnection();
@@ -179,10 +165,7 @@ public class MedicineUnitDAO {
         return false;
     }
 
-    /**
-     * Delete non-base units for a medicine (useful when updating dynamic
-     * sub-units).
-     */
+    /* Deletes all units for a medicine except for its base unit. */
     public boolean deleteNonBaseUnitsByMedicineId(int medicineId) {
         String sql = "DELETE FROM MedicineUnit WHERE MedicineId = ? AND MedicineUnitId != (SELECT TOP 1 MedicineUnitId FROM MedicineUnit WHERE MedicineId = ? ORDER BY MedicineUnitId ASC)";
         try (Connection conn = dbContext.getConnection();
@@ -197,6 +180,7 @@ public class MedicineUnitDAO {
         return false;
     }
 
+    /* Deletes a single medicine unit by its record ID. */
     public boolean deleteUnit(int medicineUnitId) {
         String sql = "DELETE FROM MedicineUnit WHERE MedicineUnitId = ?";
         try (Connection conn = dbContext.getConnection();
@@ -209,6 +193,7 @@ public class MedicineUnitDAO {
         return false;
     }
 
+    /* Maps a database ResultSet row into a MedicineUnit object. */
     private MedicineUnit mapResultSet(ResultSet rs) throws SQLException {
         MedicineUnit unit = new MedicineUnit();
         unit.setMedicineUnitId(rs.getInt("MedicineUnitId"));
@@ -221,6 +206,7 @@ public class MedicineUnitDAO {
         return unit;
     }
 
+    /* Finds a unit type's internal ID by its categorical name. */
     public int getUnitIdByName(String unitName) {
         String sql = "SELECT UnitId FROM Unit WHERE UnitName = ?";
         try (Connection conn = dbContext.getConnection();
@@ -237,6 +223,7 @@ public class MedicineUnitDAO {
         return -1;
     }
 
+    /* Retrieves a list of all distinct unit types available in the system. */
     public List<models.Unit> getAllUnitTypes() {
         List<models.Unit> unitTypes = new ArrayList<>();
         String sql = "SELECT * FROM Unit ORDER BY UnitName";
@@ -251,6 +238,8 @@ public class MedicineUnitDAO {
         }
         return unitTypes;
     }
+
+    /* Retrieves the record ID for a specific medicine and unit type pair. */
     public int getMedicineUnitId(int medicineId, int unitId) {
         String sql = "SELECT MedicineUnitId FROM MedicineUnit WHERE MedicineId = ? AND UnitId = ?";
         try (Connection conn = dbContext.getConnection();
