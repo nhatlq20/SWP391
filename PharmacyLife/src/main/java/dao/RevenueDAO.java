@@ -5,8 +5,12 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import models.TopCustomer;
+import models.TopProduct;
 
 import utils.DBContext;
 
@@ -74,7 +78,6 @@ public class RevenueDAO {
     }
 
     public double getTotalDebt(Date from, Date to) throws SQLException {
-        // Số còn phải thu: Chờ xử lý, Đã xác nhận, Đang giao hàng
         String sql = "SELECT ISNULL(SUM(TotalAmount),0) FROM [Order] WHERE LOWER(Status) IN ('pending', N'chờ xử lý', 'confirmed', N'đã xác nhận', 'shipping', N'đang giao', N'đang giao hàng', 'processing')";
         sql = addDateFilter(sql, from, to);
         DBContext db = new DBContext();
@@ -159,7 +162,7 @@ public class RevenueDAO {
         sql += "GROUP BY m.MedicineId, m.MedicineName, max_mu.MaxRate " +
                 "ORDER BY SUM(oi.OrderQuantity * oi.UnitPrice) DESC, SUM(oi.OrderQuantity * ISNULL(mu.ConversionRate, 1)) DESC";
 
-        java.util.List<models.TopProduct> list = new java.util.ArrayList<>();
+        List<TopProduct> list = new ArrayList<>();
         DBContext db = new DBContext();
         try (Connection conn = db.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -173,7 +176,7 @@ public class RevenueDAO {
         return list;
     }
 
-    public java.util.List<models.TopCustomer> getTopCustomers(Date from, Date to, int limit) throws SQLException {
+    public List<TopCustomer> getTopCustomers(Date from, Date to, int limit) throws SQLException {
         String sql = "SELECT TOP " + limit
                 + " c.FullName, COUNT(o.OrderId) as OrderCount, SUM(o.TotalAmount) as TotalSpent " +
                 "FROM [Order] o "
@@ -183,14 +186,14 @@ public class RevenueDAO {
         sql += "GROUP BY c.CustomerId, c.FullName " +
                 "ORDER BY SUM(o.TotalAmount) DESC, COUNT(o.OrderId) DESC";
 
-        java.util.List<models.TopCustomer> list = new java.util.ArrayList<>();
+        List<TopCustomer> list = new ArrayList<>();
         DBContext db = new DBContext();
         try (Connection conn = db.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             setDateParameters(ps, from, to, 1);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                list.add(new models.TopCustomer(rs.getString("FullName"), rs.getInt("OrderCount"),
+                list.add(new TopCustomer(rs.getString("FullName"), rs.getInt("OrderCount"),
                         rs.getDouble("TotalSpent")));
             }
         }

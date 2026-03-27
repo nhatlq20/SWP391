@@ -7,7 +7,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import dao.ImportDAO;
 import dao.MedicineDAO;
 import dao.MedicineUnitDAO;
@@ -15,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import models.Import;
 import models.ImportDetail;
+import models.MedicineUnit;
 
 
 public class ImportService {
@@ -47,7 +47,7 @@ public class ImportService {
         HttpSession session = request.getSession();
         int staffId = getStaffIdFromSessionOrRequest(session, request.getParameter("importerId"));
         if (staffId == 0) {
-            request.setAttribute("error", "Vui lòng nhập thông tin người nhập hợp lệ");
+            request.setAttribute("error", "thông tin người nhập không hợp lệ");
             return false;
         }
         imp.setStaffId(staffId);
@@ -227,13 +227,13 @@ public class ImportService {
     }
 
     public void applyStockChange(int medicineUnitId, int quantity, double pricePerUnit, boolean isSetPrice) {
-        models.MedicineUnit mu = medicineUnitDAO.getUnitById(medicineUnitId);
+        MedicineUnit mu = medicineUnitDAO.getUnitById(medicineUnitId);
         if (mu == null)
             return;
 
         int medicineId = mu.getMedicineId();
         int convertedQty = quantity * mu.getConversionRate();
-        models.MedicineUnit baseUnit = medicineUnitDAO.getBaseUnit(medicineId);
+        MedicineUnit baseUnit = medicineUnitDAO.getBaseUnit(medicineId);
         int baseUnitId = (baseUnit != null) ? baseUnit.getUnitId() : 0;
 
         if (isSetPrice) {
