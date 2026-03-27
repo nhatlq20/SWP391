@@ -132,6 +132,13 @@
                                     </div>
 
                                     <div class="col-12 mt-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label class="form-label mb-0">Thành phần thuốc</label>
+                                            <button type="button" class="btn-add-row"
+                                                onclick="addRow('ingredientsTable')">
+                                                <i class="fas fa-plus-circle"></i> Thêm thành phần
+                                            </button>
+                                        </div>
                                         <div class="table-responsive">
                                             <table class="table align-middle" id="ingredientsTable"
                                                 style="margin-bottom: 0; border: none;">
@@ -146,6 +153,7 @@
                                                         <th style="border: none; padding: 0 0 8px 12px;">
                                                             <label class="form-label mb-0">Mô tả</label>
                                                         </th>
+                                                        <th style="width: 50px; border: none;"></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -158,6 +166,12 @@
                                     </div>
 
                                     <div class="col-12 mt-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label class="form-label mb-0">Công dụng & Liều dùng</label>
+                                            <button type="button" class="btn-add-row" onclick="addRow('usesTable')">
+                                                <i class="fas fa-plus-circle"></i> Thêm công dụng
+                                            </button>
+                                        </div>
                                         <div class="table-responsive">
                                             <table class="table align-middle" id="usesTable"
                                                 style="margin-bottom: 0; border: none;">
@@ -172,6 +186,7 @@
                                                         <th style="border: none; padding: 0 0 8px 12px;">
                                                             <label class="form-label mb-0">Lời khuyên</label>
                                                         </th>
+                                                        <th style="width: 50px; border: none;"></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -359,31 +374,62 @@
                         var table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
                         var newRow = table.insertRow();
                         newRow.style.border = 'none';
+                        var isFirst = table.rows.length === 1;
+
+                        var nameVal = data ? data.name : '';
+                        var strengthVal = data ? data.strength : '';
+                        var descVal = data ? data.desc : '';
+                        var adviceVal = data ? data.advice : '';
+
                         if (tableId === 'ingredientsTable') {
-                            newRow.innerHTML = `
-                                <td style="border: none; padding: 0;"><input class="form-control ing-name" value="${data ? data.name : ''}" placeholder="Ví dụ: Paracetamol"></td>
-                                <td style="border: none; padding: 0 0 0 12px;"><input class="form-control ing-strength" value="${data ? data.strength : ''}" placeholder="500mg"></td>
-                                <td style="border: none; padding: 0 0 0 12px;"><input class="form-control ing-desc" value="${data ? data.desc : ''}" placeholder="Giảm đau, hạ sốt"></td>
-                            `;
+                            var html = '<td style="border: none; padding: 0;"><input class="form-control ing-name" value="' + nameVal + '" placeholder="Ví dụ: Paracetamol"></td>' +
+                                '<td style="border: none; padding: 0 0 0 12px;"><input class="form-control ing-strength" value="' + strengthVal + '" placeholder="500mg"></td>' +
+                                '<td style="border: none; padding: 0 0 0 12px;"><input class="form-control ing-desc" value="' + descVal + '" placeholder="Giảm đau, hạ sốt"></td>' +
+                                '<td class="text-center" style="border: none; padding: 0 0 0 12px;">';
+                            if (!isFirst) {
+                                html += '<button type="button" class="btn-action btn-delete remove-row"><i class="fas fa-trash"></i></button>';
+                            }
+                            html += '</td>';
+                            newRow.innerHTML = html;
                         } else {
-                            newRow.innerHTML = `
-                                <td style="border: none; padding: 0;"><input class="form-control use-name" value="${data ? data.name : ''}" placeholder="Ví dụ: Đau đầu"></td>
-                                <td style="border: none; padding: 0 0 0 12px;"><input class="form-control use-desc" value="${data ? data.desc : ''}" placeholder="Giảm các triệu chứng đau nửa đầu..."></td>
-                                <td style="border: none; padding: 0 0 0 12px;"><input class="form-control use-advice" value="${data ? data.advice : ''}" placeholder="Lời khuyên (vệ sinh, ăn uống...)"></td>
-                            `;
+                            var html = '<td style="border: none; padding: 0;"><input class="form-control use-name" value="' + nameVal + '" placeholder="Ví dụ: Đau đầu"></td>' +
+                                '<td style="border: none; padding: 0 0 0 12px;"><input class="form-control use-desc" value="' + descVal + '" placeholder="Giảm các triệu chứng đau nửa đầu..."></td>' +
+                                '<td style="border: none; padding: 0 0 0 12px;"><input class="form-control use-advice" value="' + adviceVal + '" placeholder="Lời khuyên (vệ sinh, ăn uống...)"></td>' +
+                                '<td class="text-center" style="border: none; padding: 0 0 0 12px;">';
+                            if (!isFirst) {
+                                html += '<button type="button" class="btn-action btn-delete remove-row"><i class="fas fa-trash"></i></button>';
+                            }
+                            html += '</td>';
+                            newRow.innerHTML = html;
                         }
                     }
 
                     function parseInitialData() {
+                        function smartSplit(str) {
+                            var result = [];
+                            var start = 0;
+                            var nesting = 0;
+                            for (var i = 0; i < str.length; i++) {
+                                if (str[i] === '[' || str[i] === '(' || str[i] === '{') nesting++;
+                                if (str[i] === ']' || str[i] === ')' || str[i] === '}') nesting--;
+                                if (str[i] === ',' && nesting === 0) {
+                                    result.push(str.substring(start, i).trim());
+                                    start = i + 1;
+                                }
+                            }
+                            result.push(str.substring(start).trim());
+                            return result.filter(function (s) { return s !== ''; });
+                        }
+
                         var ingVal = document.getElementById('ingredientsHidden').value;
                         if (ingVal) {
-                            ingVal.split(',').forEach(function (part) {
+                            smartSplit(ingVal).forEach(function (part) {
                                 var input = part.trim();
                                 if (!input) return;
                                 var name = input, strength = '', desc = '';
                                 if (input.includes('[') && input.includes(']')) {
                                     var sStart = input.indexOf('[');
-                                    var sEnd = input.indexOf(']');
+                                    var sEnd = input.lastIndexOf(']');
                                     strength = input.substring(sStart + 1, sEnd);
                                     input = (input.substring(0, sStart) + input.substring(sEnd + 1)).trim();
                                 }
@@ -399,7 +445,7 @@
                         }
                         var useVal = document.getElementById('usesHidden').value;
                         if (useVal) {
-                            useVal.split(',').forEach(function (part) {
+                            smartSplit(useVal).forEach(function (part) {
                                 var input = part.trim();
                                 if (!input) return;
                                 var name = input, desc = '', advice = '';

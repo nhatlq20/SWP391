@@ -133,6 +133,12 @@
                                     </div>
                                 </div>
                                 <div class="col-12 mt-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label class="form-label mb-0">Thành phần thuốc</label>
+                                        <button type="button" class="btn-add-row" onclick="addRow('ingredientsTable')">
+                                            <i class="fas fa-plus-circle"></i> Thêm thành phần
+                                        </button>
+                                    </div>
                                     <div class="table-responsive">
                                         <table class="table" id="ingredientsTable"
                                             style="margin-bottom: 0; border: none;">
@@ -147,6 +153,7 @@
                                                     <th style="border: none; padding: 0 0 8px 12px;">
                                                         <label class="form-label mb-0">Mô tả</label>
                                                     </th>
+                                                    <th style="width: 50px; border: none;"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -159,6 +166,9 @@
                                                     <td style="border: none; padding: 0 0 0 12px;"><input
                                                             class="form-control ing-desc"
                                                             placeholder="Giảm đau, hạ sốt"></td>
+                                                    <td class="text-center" style="border: none; padding: 0 0 0 12px;">
+                                                        <!-- First row cannot be deleted -->
+                                                    </td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -167,6 +177,12 @@
                                 </div>
 
                                 <div class="col-12 mt-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label class="form-label mb-0">Công dụng & Liều dùng</label>
+                                        <button type="button" class="btn-add-row" onclick="addRow('usesTable')">
+                                            <i class="fas fa-plus-circle"></i> Thêm công dụng
+                                        </button>
+                                    </div>
                                     <div class="table-responsive">
                                         <table class="table" id="usesTable" style="margin-bottom: 0; border: none;">
                                             <thead>
@@ -180,6 +196,7 @@
                                                     <th style="border: none; padding: 0 0 8px 12px;">
                                                         <label class="form-label mb-0">Lời khuyên</label>
                                                     </th>
+                                                    <th style="width: 50px; border: none;"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -193,6 +210,9 @@
                                                     <td style="border: none; padding: 0 0 0 12px;"><input
                                                             class="form-control use-advice"
                                                             placeholder="Lời khuyên (vệ sinh, ăn uống...)"></td>
+                                                    <td class="text-center" style="border: none; padding: 0 0 0 12px;">
+                                                        <!-- First row cannot be deleted -->
+                                                    </td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -379,28 +399,28 @@
                 function addRow(tableId) {
                     var table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
                     var newRow = table.insertRow();
+                    var isFirst = table.rows.length === 1;
+
                     if (tableId === 'ingredientsTable') {
-                        newRow.innerHTML = `
-                            <td><input class="form-control ing-name" placeholder="Ví dụ: Paracetamol"></td>
-                            <td><input class="form-control ing-strength" placeholder="500mg"></td>
-                            <td><input class="form-control ing-desc" placeholder="Mô tả..."></td>
-                            <td class="text-center">
-                                <button type="button" class="btn-action btn-delete remove-row">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        `;
+                        var html = '<td style="border: none; padding: 0;"><input class="form-control ing-name" placeholder="Ví dụ: Paracetamol"></td>' +
+                            '<td style="border: none; padding: 0 0 0 12px;"><input class="form-control ing-strength" placeholder="500mg"></td>' +
+                            '<td style="border: none; padding: 0 0 0 12px;"><input class="form-control ing-desc" placeholder="Mô tả..."></td>' +
+                            '<td class="text-center" style="border: none; padding: 0 0 0 12px;">';
+                        if (!isFirst) {
+                            html += '<button type="button" class="btn-action btn-delete remove-row"><i class="fas fa-trash"></i></button>';
+                        }
+                        html += '</td>';
+                        newRow.innerHTML = html;
                     } else {
-                        newRow.innerHTML = `
-                            <td><input class="form-control use-name" placeholder="Ví dụ: Đau đầu"></td>
-                            <td><input class="form-control use-desc" placeholder="Mô tả chi tiết..."></td>
-                            <td><input class="form-control use-advice" placeholder="Lời khuyên..."></td>
-                            <td class="text-center">
-                                <button type="button" class="btn-action btn-delete remove-row">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        `;
+                        var html = '<td style="border: none; padding: 0;"><input class="form-control use-name" placeholder="Ví dụ: Đau đầu"></td>' +
+                            '<td style="border: none; padding: 0 0 0 12px;"><input class="form-control use-desc" placeholder="Mô tả chi tiết..."></td>' +
+                            '<td style="border: none; padding: 0 0 0 12px;"><input class="form-control use-advice" placeholder="Lời khuyên..."></td>' +
+                            '<td class="text-center" style="border: none; padding: 0 0 0 12px;">';
+                        if (!isFirst) {
+                            html += '<button type="button" class="btn-action btn-delete remove-row"><i class="fas fa-trash"></i></button>';
+                        }
+                        html += '</td>';
+                        newRow.innerHTML = html;
                     }
                 }
 
