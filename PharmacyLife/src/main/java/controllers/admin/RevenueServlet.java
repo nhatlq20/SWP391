@@ -24,7 +24,6 @@ public class RevenueServlet extends HttpServlet {
                 toDate = Date.valueOf(toDateStr);
             }
         } catch (Exception e) {
-            // fallback: null means all time
         }
 
         dao.RevenueDAO revenueDAO = new dao.RevenueDAO();
@@ -32,7 +31,6 @@ public class RevenueServlet extends HttpServlet {
             Date sqlCurrentStart, sqlCurrentEnd, sqlPrevStart, sqlPrevEnd;
 
             if (fromDate != null && toDate != null) {
-                // If filtered: compare selected period with previous period of SAME length
                 sqlCurrentStart = fromDate;
                 sqlCurrentEnd = toDate;
 
@@ -43,7 +41,6 @@ public class RevenueServlet extends HttpServlet {
                 sqlPrevStart = Date.valueOf(currentStartLD.minusDays(daysBetween));
                 sqlPrevEnd = Date.valueOf(currentStartLD.minusDays(1));
             } else {
-                // If NOT filtered: compare current month up to today with previous full month
                 java.time.LocalDate now = java.time.LocalDate.now();
                 java.time.LocalDate currentMonthStart = now.withDayOfMonth(1);
                 java.time.LocalDate previousMonthStart = currentMonthStart.minusMonths(1);
@@ -55,26 +52,21 @@ public class RevenueServlet extends HttpServlet {
                 sqlPrevEnd = Date.valueOf(previousMonthEnd);
             }
 
-            // Fetch metrics for data display or comparison
             int displayOrders = revenueDAO.getTotalOrders(fromDate, toDate);
             double displayRev = revenueDAO.getTotalRevenue(fromDate, toDate);
             double displayRecv = revenueDAO.getActualReceived(fromDate, toDate);
             double displayDebt = revenueDAO.getTotalDebt(fromDate, toDate);
             java.util.Map<String, Integer> statusStats = revenueDAO.getOrderStatusStatistics(fromDate, toDate);
 
-            // Fetch current period metrics (matching growth context)
             int currentOrders = revenueDAO.getTotalOrders(sqlCurrentStart, sqlCurrentEnd);
             double currentRev = revenueDAO.getTotalRevenue(sqlCurrentStart, sqlCurrentEnd);
 
-            // Fetch previous period metrics
             int prevOrders = revenueDAO.getTotalOrders(sqlPrevStart, sqlPrevEnd);
             double prevRev = revenueDAO.getTotalRevenue(sqlPrevStart, sqlPrevEnd);
 
-            // Calculate Growth % for Orders & Revenue
             request.setAttribute("orderGrowth", calculateGrowth(currentOrders, prevOrders));
             request.setAttribute("revenueGrowth", calculateGrowth(currentRev, prevRev));
 
-            // Calculate Ratios for Received & Debt relative to displayed revenue
             double receivedRatio = (displayRev > 0) ? (displayRecv / displayRev) * 100.0 : 0.0;
             double debtRatio = (displayRev > 0) ? (displayDebt / displayRev) * 100.0 : 0.0;
 
@@ -87,7 +79,6 @@ public class RevenueServlet extends HttpServlet {
             request.setAttribute("receivable", displayDebt);
             request.setAttribute("statusStats", statusStats);
 
-            // Fetch and set top lists
             request.setAttribute("topProducts", revenueDAO.getTopSellingProducts(fromDate, toDate, 5));
             request.setAttribute("topCustomers", revenueDAO.getTopCustomers(fromDate, toDate, 5));
         } catch (Exception e) {
@@ -98,7 +89,6 @@ public class RevenueServlet extends HttpServlet {
 
     private double calculateGrowth(double current, double previous) {
         if (previous == 0) {
-            // If baseline is 0, just return 100% if current > 0, else 0%
             return current > 0 ? 100.0 : 0.0;
         }
         return ((current - previous) / previous) * 100.0;
