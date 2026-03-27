@@ -189,6 +189,15 @@ public class CategoryController extends HttpServlet {
 
 		dao.createCategory(c);
 
+		String status = request.getParameter("status");
+		if (status != null) {
+			switch (status) {
+				case "addSuccess":
+					request.setAttribute("successMessage", "Thêm danh mục thành công!");
+					break;
+			}
+		}
+
 		response.sendRedirect(request.getContextPath() + "/category?action=list");
 
 	}
