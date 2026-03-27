@@ -133,9 +133,10 @@
                                     </div>
                                 </div>
                                 <div class="col-12 mt-4">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <label class="form-label mb-0">Thành phần thuốc</label>
-                                        <button type="button" class="btn-add-row" onclick="addRow('ingredientsTable')">
+                                    <div class="d-flex justify-content-end align-items-center mb-2">
+                                        <button type="button" class="btn-add-row"
+                                            style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: none; border-radius: 8px; padding: 6px 14px; font-size: 0.82rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;"
+                                            onclick="addRow('ingredientsTable')">
                                             <i class="fas fa-plus-circle"></i> Thêm thành phần
                                         </button>
                                     </div>
@@ -177,9 +178,10 @@
                                 </div>
 
                                 <div class="col-12 mt-4">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <label class="form-label mb-0">Công dụng & Liều dùng</label>
-                                        <button type="button" class="btn-add-row" onclick="addRow('usesTable')">
+                                    <div class="d-flex justify-content-end align-items-center mb-2">
+                                        <button type="button" class="btn-add-row"
+                                            style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: none; border-radius: 8px; padding: 6px 14px; font-size: 0.82rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;"
+                                            onclick="addRow('usesTable')">
                                             <i class="fas fa-plus-circle"></i> Thêm công dụng
                                         </button>
                                     </div>

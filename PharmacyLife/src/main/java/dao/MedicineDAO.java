@@ -435,7 +435,7 @@ public class MedicineDAO {
         deleteIngredientsByMedicineId(medicineId);
 
         // 2. Parse and insert/link
-        String[] parts = ingredientsStr.split(",");
+        List<String> parts = smartSplit(ingredientsStr);
         try (Connection conn = dbContext.getConnection()) {
             for (String part : parts) {
                 String input = part.trim();
@@ -533,7 +533,7 @@ public class MedicineDAO {
         deleteConditionsByMedicineId(medicineId);
 
         // 2. Parse and insert
-        String[] parts = conditionsStr.split(",");
+        List<String> parts = smartSplit(conditionsStr);
         try (Connection conn = dbContext.getConnection()) {
             for (String part : parts) {
                 String input = part.trim();
@@ -905,5 +905,40 @@ public class MedicineDAO {
         }
 
         return 0;
+    }
+
+    /*
+     * Custom split logic that ignores commas inside parentheses (), square
+     * brackets [], or curly braces {}.
+     */
+    private java.util.List<String> smartSplit(String str) {
+        java.util.List<String> result = new java.util.ArrayList<>();
+        if (str == null || str.isBlank())
+            return result;
+
+        StringBuilder current = new StringBuilder();
+        int nesting = 0;
+
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (c == '[' || c == '(' || c == '{')
+                nesting++;
+            if (c == ']' || c == ')' || c == '}')
+                nesting--;
+
+            if (c == ',' && nesting == 0) {
+                String s = current.toString().trim();
+                if (!s.isEmpty())
+                    result.add(s);
+                current = new StringBuilder();
+            } else {
+                current.append(c);
+            }
+        }
+        String last = current.toString().trim();
+        if (!last.isEmpty())
+            result.add(last);
+
+        return result;
     }
 }

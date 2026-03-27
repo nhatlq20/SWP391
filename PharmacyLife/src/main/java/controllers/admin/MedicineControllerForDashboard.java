@@ -99,16 +99,16 @@ public class MedicineControllerForDashboard extends HttpServlet {
         if (status != null) {
             switch (status) {
                 case "addSuccess":
-                    request.setAttribute("successMessage", "New medicine added successfully!");
+                    request.setAttribute("successMessage", "Thêm thuốc mới thành công!");
                     break;
                 case "updateSuccess":
-                    request.setAttribute("successMessage", "Medicine updated successfully!");
+                    request.setAttribute("successMessage", "Cập nhật thông tin thuốc thành công!");
                     break;
                 case "deleteSuccess":
-                    request.setAttribute("successMessage", "Medicine deleted successfully!");
+                    request.setAttribute("successMessage", "Xóa thuốc thành công!");
                     break;
                 case "error":
-                    request.setAttribute("errorMessage", "An error occurred. Please try again!");
+                    request.setAttribute("errorMessage", "Có lỗi xảy ra. Vui lòng thử lại!");
                     break;
             }
         }
@@ -333,14 +333,14 @@ public class MedicineControllerForDashboard extends HttpServlet {
 
                 response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard?status=addSuccess");
             } else {
-                request.setAttribute("errorMessage", "Could not add medicine. Please try again.");
+                request.setAttribute("errorMessage", "Không thể thêm thuốc. Vui lòng thử lại.");
                 List<Category> categories = categoryDAO.getAllCategories();
                 request.setAttribute("categories", categories);
                 request.getRequestDispatcher("/view/admin/medicine-add-for-dashboard.jsp").forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Error: " + e.getMessage());
+            request.setAttribute("errorMessage", "Lỗi: " + e.getMessage());
             List<Category> categories = categoryDAO.getAllCategories();
             request.setAttribute("categories", categories);
             request.getRequestDispatcher("/view/admin/medicine-add-for-dashboard.jsp").forward(request, response);
@@ -473,7 +473,7 @@ public class MedicineControllerForDashboard extends HttpServlet {
 
                 response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard?status=updateSuccess");
             } else {
-                request.setAttribute("errorMessage", "Could not update medicine record. Please try again.");
+                request.setAttribute("errorMessage", "Không thể cập nhật thuốc. Vui lòng thử lại.");
                 List<Category> categories = categoryDAO.getAllCategories();
                 request.setAttribute("medicine", medicine);
                 request.setAttribute("categories", categories);
@@ -481,7 +481,7 @@ public class MedicineControllerForDashboard extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Error: " + e.getMessage());
+            request.setAttribute("errorMessage", "Lỗi: " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/admin/medicines-dashboard");
         }
     }
