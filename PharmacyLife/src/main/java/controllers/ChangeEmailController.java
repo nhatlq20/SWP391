@@ -1,5 +1,6 @@
 package controllers;
 
+import dao.CustomerDAO;
 import dao.UserDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -81,6 +82,14 @@ public class ChangeEmailController extends HttpServlet {
             String newEmail = request.getParameter("newEmail");
             if (newEmail == null || newEmail.trim().isEmpty()) {
                 request.setAttribute("errorMessage", "Email không được để trống");
+                request.getRequestDispatcher("view/client/reset-email.jsp").forward(request, response);
+                return;
+            }
+            
+            // Check if email already exists in both Customer and Staff tables
+            UserDAO userDAO = new UserDAO();
+            if (userDAO.findByEmail(newEmail) != null) {
+                request.setAttribute("errorMessage", "Email này đã được sử dụng trong hệ thống. Vui lòng chọn email khác.");
                 request.getRequestDispatcher("view/client/reset-email.jsp").forward(request, response);
                 return;
             }
