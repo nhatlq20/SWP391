@@ -18,6 +18,8 @@
             <jsp:include page="/view/common/header.jsp" />
             <jsp:include page="/view/common/sidebar.jsp" />
 
+          
+
             <div class="main-content">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="page-title"><i class="fas fa-list me-2 text-primary"></i>Quản lí danh mục</h2>
@@ -41,6 +43,9 @@
                         </c:if>
                     </div>
                 </div>
+                  <c:if test="${not empty successMessage}">
+                <div class="alert alert-success text-center" style="margin: 20px 0;">${successMessage}</div>
+            </c:if>
 
                 <div class="medicine-card">
                     <div class="table-responsive">
