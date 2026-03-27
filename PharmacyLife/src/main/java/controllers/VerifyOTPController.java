@@ -49,11 +49,18 @@ public class VerifyOTPController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String enteredOtp = request.getParameter("otp");
+        if (enteredOtp == null || enteredOtp.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Vui lòng nhập mã OTP.");
+            request.getRequestDispatcher("view/client/verify-otp.jsp").forward(request, response);
+            return;
+        }
+
         HttpSession session = request.getSession();
         String sessionOtp = (String) session.getAttribute("otp");
         String action = (String) session.getAttribute("otpAction");
 
-        if (enteredOtp != null && enteredOtp.equals(sessionOtp)) {
+        if (enteredOtp.equals(sessionOtp)) {
+            // Xử lý xác thực OTP ngay lập tức
             if ("register".equals(action)) {
                 // Handle Registration
                 String fullName = (String) session.getAttribute("regFullName");

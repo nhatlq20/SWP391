@@ -56,14 +56,9 @@
 
         <!-- Jakarta Mail Implementation -->
         <dependency>
-            <groupId>org.eclipse.angus</groupId>
+            <groupId>com.sun.mail</groupId>
             <artifactId>jakarta.mail</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.angus</groupId>
-            <artifactId>angus-activation</artifactId>
-            <version>1.1.0</version>
+            <version>2.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
