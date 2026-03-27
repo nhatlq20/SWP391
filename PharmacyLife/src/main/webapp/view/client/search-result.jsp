@@ -61,9 +61,11 @@
                                                                             value="${pageContext.request.contextPath}/assets/img/${imageUrlTrimmed}" />
                                                                     </c:otherwise>
                                                                 </c:choose>
-                                                                <img src="${imgSrc}" alt="${medicine.medicineName}"
-                                                                    class="card-img-top img-fluid"
-                                                                    onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/img/no-image.png';">
+                                                                <a href="${pageContext.request.contextPath}/medicine/detail?id=${medicine.medicineId}">
+                                                                    <img src="${imgSrc}" alt="${medicine.medicineName}"
+                                                                        class="card-img-top img-fluid"
+                                                                        onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/img/no-image.png';">
+                                                                </a>
                                                             </c:when>
                                                             <c:otherwise>
                                                                 <img src="${pageContext.request.contextPath}/assets/img/no-image.png"
@@ -74,7 +76,9 @@
 
                                                         <div class="card-body d-flex flex-column">
                                                             <h5 class="card-title text-truncate medicine-name">
-                                                                <c:out value='${medicine.medicineName}' />
+                                                                <a href="${pageContext.request.contextPath}/medicine/detail?id=${medicine.medicineId}" style="color:inherit; text-decoration:none;">
+                                                                    <c:out value='${medicine.medicineName}' />
+                                                                </a>
                                                             </h5>
                                                             <div class="mt-auto">
                                                                 <div class="mb-2">
@@ -129,6 +133,33 @@
                             <script src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
                             <script>
                                 function addToCartAjax(btn, medicineId) {
+                                    // Animation: fly image to cart
+                                    const card = btn.closest('.medicine-card');
+                                    const img = card.querySelector('img');
+                                    const cartIcon = document.querySelector('.cart-btn i.fas.fa-shopping-cart');
+                                    if (img && cartIcon) {
+                                        const imgRect = img.getBoundingClientRect();
+                                        const cartRect = cartIcon.getBoundingClientRect();
+                                        const flyImg = img.cloneNode(true);
+                                        flyImg.classList.add('fly-item');
+                                        document.body.appendChild(flyImg);
+                                        flyImg.style.left = imgRect.left + 'px';
+                                        flyImg.style.top = imgRect.top + 'px';
+                                        flyImg.style.width = imgRect.width + 'px';
+                                        flyImg.style.height = imgRect.height + 'px';
+                                        setTimeout(() => {
+                                            flyImg.style.left = cartRect.left + (cartRect.width/2 - imgRect.width/4) + 'px';
+                                            flyImg.style.top = cartRect.top + (cartRect.height/2 - imgRect.height/4) + 'px';
+                                            flyImg.style.width = imgRect.width/2 + 'px';
+                                            flyImg.style.height = imgRect.height/2 + 'px';
+                                            flyImg.style.opacity = '0.5';
+                                        }, 10);
+                                        setTimeout(() => {
+                                            flyImg.remove();
+                                            cartIcon.classList.add('cart-pop');
+                                            setTimeout(()=>cartIcon.classList.remove('cart-pop'), 350);
+                                        }, 850);
+                                    }
                                     const isLoggedIn = '<c:out value="${sessionScope.userId != null}"/>' === 'true';
                                     const userRole = '${sessionScope.roleName != null ? sessionScope.roleName : ""}';
                                     const role = userRole.toLowerCase();
@@ -176,6 +207,8 @@
                                             }
                                         });
                                 }
+                            </script>
+                
                             </script>
                 </body>
 
