@@ -11,7 +11,6 @@ import java.util.Map;
 import utils.DBContext;
 
 public class RevenueDAO {
-    // Thực thu: đơn hàng đã giao và đã nhận tiền
     public double getActualReceived(Date from, Date to) throws SQLException {
         String sql = "SELECT ISNULL(SUM(TotalAmount),0) FROM [Order] WHERE LOWER(Status) IN ('delivered', N'đã giao', N'đã giao hàng', 'completed', N'hoàn thành', N'giao hàng thành công', N'đã hoàn thành')";
         if (from != null && to != null) {
@@ -109,7 +108,6 @@ public class RevenueDAO {
         sql += " GROUP BY Status";
         Map<String, Integer> stats = new HashMap<>();
 
-        // Khởi tạo mặc định để JSP hiển thị đủ trạng thái dù count = 0
         stats.put("Pending", 0);
         stats.put("Confirmed", 0);
         stats.put("Shipping", 0);
@@ -125,7 +123,6 @@ public class RevenueDAO {
                 String statusFromDB = rs.getString("Status");
                 int count = rs.getInt("Count");
 
-                // Ánh xạ trạng thái tiếng Việt về phím tiếng Anh cho JSP
                 if (statusFromDB != null) {
                     String s = statusFromDB.toLowerCase();
                     if (s.equals("pending") || s.equals("chờ xử lý")) {

@@ -1,33 +1,18 @@
 package models;
 
-/**
- * Model đại diện cho bảng [ImportDetail] trong database.
- *
- * Schema:
- * - ImportDetailId INT IDENTITY(1,1) PRIMARY KEY
- * - ImportId INT NOT NULL
- * - MedicineUnitId INT NOT NULL
- * - ImportQuantity INT NOT NULL
- * - UnitPrice DECIMAL(12, 2) NOT NULL
- */
 public class ImportDetail {
 
-    private int detailId; // ImportDetailId
-    private int importId; // ImportId
-    private int medicineUnitId; // MedicineUnitId
-
-    // Helper fields (not mapping columns for insert)
+    private int detailId; 
+    private int importId; 
+    private int medicineUnitId; 
     private int medicineId;
     private int unitId;
-
-    private String medicineName; // Tên thuốc (join từ bảng MedicineUnit -> Medicine)
-    private String medicineCode; // Mã thuốc (join từ bảng MedicineUnit -> Medicine)
-    private String unitName; // Tên đơn vị (join từ bảng MedicineUnit -> Unit)
-
-    private int quantity; // ImportQuantity
-    private double unitPrice; // UnitPrice
-
-    private double totalAmount; // quantity * unitPrice (tính toán)
+    private String medicineName; 
+    private String medicineCode; 
+    private String unitName; 
+    private int quantity; 
+    private double unitPrice;
+    private double totalAmount; 
 
     public ImportDetail() {
     }

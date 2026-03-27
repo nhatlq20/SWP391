@@ -1,35 +1,22 @@
 package controllers.admin;
 
 import java.io.IOException;
-import java.sql.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import dao.ImportDAO;
-import dao.MedicineDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import models.Import;
-import models.ImportDetail;
-import models.Medicine;
 
 public class AdminImportController extends HttpServlet {
 
     private ImportDAO importDAO;
-    private MedicineDAO medicineDAO;
-    private dao.MedicineUnitDAO medicineUnitDAO;
     private dao.SupplierDAO supplierDAO;
     private dao.CategoryDAO categoryDAO;
+    private ImportService importService;
 
     private String getImportView(String name, HttpServletRequest request) {
-        // name: list, view, create, edit, details
         switch (name) {
             case "list":
                 return "/view/admin/import-list-for-dashboard.jsp";
@@ -48,18 +35,15 @@ public class AdminImportController extends HttpServlet {
 
     public void init() throws ServletException {
         importDAO = new ImportDAO();
-        medicineDAO = new MedicineDAO();
-        medicineUnitDAO = new dao.MedicineUnitDAO();
         supplierDAO = new dao.SupplierDAO();
         categoryDAO = new dao.CategoryDAO();
+        importService = new ImportService();
     }
 
-    // Kiểm tra quyền admin
     private boolean checkAdminPermission(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         String roleName = (session != null) ? (String) session.getAttribute("roleName") : null;
-
         if (roleName == null || !roleName.equalsIgnoreCase("admin")) {
             response.sendRedirect(request.getContextPath() + "/home");
             return false;
@@ -70,15 +54,12 @@ public class AdminImportController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        if (!checkAdminPermission(request, response)) {
+        if (!checkAdminPermission(request, response))
             return;
-        }
 
         String action = request.getParameter("action");
-        if (action == null) {
+        if (action == null)
             action = "list";
-        }
 
         try {
             switch (action) {
@@ -105,40 +86,31 @@ public class AdminImportController extends HttpServlet {
                     break;
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
-            request.getRequestDispatcher(getImportView("list", request)).forward(request, response);
+            handleException(e, request, response);
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         request.setCharacterEncoding("UTF-8");
-
-        if (!checkAdminPermission(request, response)) {
+        if (!checkAdminPermission(request, response))
             return;
-        }
 
         String action = request.getParameter("action");
-        if (action == null) {
-            action = "list";
-        }
-
         try {
             switch (action) {
                 case "create":
-                    createImport(request, response);
+                    handleCreate(request, response);
                     break;
                 case "update":
-                    updateImport(request, response);
+                    handleUpdate(request, response);
                     break;
-                case "addDetail":
-                    addImportDetail(request, response);
+                case "delete":
+                    deleteImport(request, response);
                     break;
                 case "deleteDetail":
-                    deleteImportDetail(request, response);
+                    handleDeleteDetail(request, response);
                     break;
                 case "search":
                     searchImports(request, response);
@@ -151,659 +123,135 @@ public class AdminImportController extends HttpServlet {
                     break;
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
-            request.getRequestDispatcher(getImportView("list", request)).forward(request, response);
+            handleException(e, request, response);
         }
     }
 
-    // Hiển thị danh sách phiếu nhập
-    private void listImports(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        List<Import> imports = importDAO.getAllImports();
-        request.setAttribute("imports", imports);
-        request.getRequestDispatcher(getImportView("list", request)).forward(request, response);
-    }
+    // --- Action Handlers (Delegating to Service) ---
 
-    // Tìm kiếm phiếu nhập
-    private void searchImports(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String keyword = request.getParameter("keyword");
-        List<Import> imports;
-        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
-        if (hasKeyword) {
-            imports = importDAO.searchImports(keyword);
+    private void handleCreate(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        if (importService.processCreateImport(request)) {
+            response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
         } else {
-            imports = importDAO.getAllImports();
-        }
-        request.setAttribute("imports", imports);
-        request.setAttribute("keyword", keyword);
-        request.setAttribute("hasKeyword", hasKeyword);
-        request.getRequestDispatcher(getImportView("list", request)).forward(request, response);
-    }
-
-    // Xem chi tiết phiếu nhập
-    private void viewImport(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        int importId = getImportIdFromRequest(request);
-
-        if (importId > 0) {
-            Import imp = importDAO.getImportById(importId);
-            if (imp == null) {
-                request.setAttribute("error", "Không tìm thấy phiếu nhập");
-                listImports(request, response);
-                return;
-            }
-
-            List<ImportDetail> details = importDAO.getImportDetails(importId);
-            request.setAttribute("importRecord", imp);
-            request.setAttribute("details", details);
-            request.getRequestDispatcher(getImportView("view", request)).forward(request, response);
-        } else {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Mã phiếu nhập không hợp lệ");
-        }
-    }
-
-    // Hiển thị form tạo mới
-    private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String newCode = importDAO.generateImportCode();
-        request.setAttribute("newCode", newCode);
-
-        List<Medicine> medicines = importDAO.getAllMedicines();
-        request.setAttribute("medicines", medicines);
-
-        List<models.Supplier> suppliers = importDAO.getAllSuppliers();
-        request.setAttribute("suppliers", suppliers);
-
-        List<models.Category> categories = categoryDAO.getAllCategories();
-        request.setAttribute("categories", categories);
-
-        request.getRequestDispatcher(getImportView("create", request)).forward(request, response);
-    }
-
-    // Hiển thị form chỉnh sửa
-    private void showEditForm(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        int importId = getImportIdFromRequest(request);
-
-        if (importId > 0) {
-            Import imp = importDAO.getImportById(importId);
-            if (imp == null) {
-                request.setAttribute("error", "Không tìm thấy phiếu nhập");
-                listImports(request, response);
-                return;
-            }
-
-            if ("Đã duyệt".equals(imp.getStatus())) {
-                request.setAttribute("error", "Không thể chỉnh sửa phiếu nhập đã được duyệt.");
-                listImports(request, response);
-                return;
-            }
-
-            List<ImportDetail> details = importDAO.getImportDetails(importId);
-            request.setAttribute("importRecord", imp);
-            request.setAttribute("details", details);
-
-            List<Medicine> medicines = importDAO.getAllMedicines();
-            request.setAttribute("medicines", medicines);
-
-            List<models.Supplier> suppliers = importDAO.getAllSuppliers();
-            request.setAttribute("suppliers", suppliers);
-
-            List<models.Category> categories = categoryDAO.getAllCategories();
-            request.setAttribute("categories", categories);
-
-            request.getRequestDispatcher(getImportView("edit", request)).forward(request, response);
-        } else {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Mã phiếu nhập không hợp lệ");
-        }
-    }
-
-    // Tạo phiếu nhập mới
-    private void createImport(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        try {
-            Import imp = new Import();
-
-            // Resolve Supplier
-            String supplierInput = request.getParameter("supplierId");
-            int supplierId = parseOrLookupSupplierId(supplierInput);
-            if (supplierId == 0) {
-                request.setAttribute("error", "Không tìm thấy nhà cung cấp: " + supplierInput);
-                showCreateForm(request, response);
-                return;
-            }
-            imp.setSupplierId(supplierId);
-
-            imp.setImportDate(parseDate(request.getParameter("importDate")));
-
-            // Resolve Staff
-            HttpSession session = request.getSession();
-            Object userIdObj = session.getAttribute("userId");
-            int staffId = 0;
-
-            if (userIdObj != null) {
-                try {
-                    staffId = Integer.parseInt(userIdObj.toString());
-                } catch (NumberFormatException e) {
-                }
-            }
-            if (staffId == 0) {
-                staffId = parseStaffId(request.getParameter("importerId"));
-            }
-
-            if (staffId == 0) {
-                request.setAttribute("error", "Vui lòng nhập thông tin người nhập hợp lệ (Mã hoặc ID)");
-                showCreateForm(request, response);
-                return;
-            }
-            imp.setStaffId(staffId);
-            imp.setTotalAmount(0);
-            imp.setImportCode("TEMP" + System.currentTimeMillis() % 100000); // Temporary code to satisfy NOT NULL
-                                                                             // UNIQUE
-
-            String status = request.getParameter("status");
-            if (status == null || status.isEmpty()) {
-                status = "Đang chờ";
-            }
-            imp.setStatus(status);
-
-            if (importDAO.createImport(imp)) {
-                int newImportId = imp.getImportId();
-                int itemsAdded = 0;
-                StringBuilder detailErrors = new StringBuilder();
-
-                Map<Integer, Map<String, String>> medicinesMap = new HashMap<>();
-                Enumeration<String> paramNames = request.getParameterNames();
-
-                while (paramNames.hasMoreElements()) {
-                    String paramName = paramNames.nextElement();
-                    if (paramName.startsWith("medicines[")) {
-                        int startIdx = paramName.indexOf('[') + 1;
-                        int endIdx = paramName.indexOf(']');
-                        if (startIdx > 0 && endIdx > startIdx) {
-                            try {
-                                int index = Integer.parseInt(paramName.substring(startIdx, endIdx));
-                                String fieldName = paramName.substring(endIdx + 2);
-                                String value = request.getParameter(paramName);
-
-                                medicinesMap.putIfAbsent(index, new HashMap<>());
-                                medicinesMap.get(index).put(fieldName, value);
-                            } catch (NumberFormatException e) {
-                            }
-                        }
-                    }
-                }
-
-                for (Map<String, String> medicineData : medicinesMap.values()) {
-                    String medicineIdStr = medicineData.get("medicineId");
-                    String quantityStr = medicineData.get("quantity");
-                    String priceStr = medicineData.get("price");
-
-                    if (medicineIdStr != null && !medicineIdStr.isEmpty() &&
-                            quantityStr != null && !quantityStr.isEmpty() &&
-                            priceStr != null && !priceStr.isEmpty()) {
-                        try {
-                            int medicineId = Integer.parseInt(medicineIdStr);
-                            int unitId = Integer.parseInt(medicineData.getOrDefault("unitId", "0"));
-                            int quantity = (int) Double.parseDouble(quantityStr);
-                            double price = Double.parseDouble(priceStr);
-
-                            if (quantity <= 0) {
-                                detailErrors.append("Số lượng thuốc mã ").append(medicineIdStr)
-                                        .append(" phải lớn hơn 0. ");
-                                continue;
-                            }
-                            if (price <= 0 || price > 100000000) {
-                                detailErrors.append("Giá nhập thuốc mã ").append(medicineIdStr)
-                                        .append(" phải > 0 và <= 100.000.000. ");
-                                continue;
-                            }
-
-                            if (medicineId > 0) {
-                                // Find or create MedicineUnitId
-                                int medicineUnitId = -1;
-                                if (unitId > 0) {
-                                    medicineUnitId = medicineUnitDAO.getMedicineUnitId(medicineId, unitId);
-                                }
-
-                                // Fallback: try to find base unit if no unitId or not found
-                                if (medicineUnitId <= 0) {
-                                    models.MedicineUnit bu = medicineUnitDAO.getBaseUnit(medicineId);
-                                    if (bu != null) {
-                                        medicineUnitId = bu.getMedicineUnitId();
-                                    }
-                                }
-
-                                if (medicineUnitId <= 0) {
-                                    detailErrors.append("Không xác định được đơn vị cho thuốc ID ").append(medicineId)
-                                            .append(". ");
-                                    continue;
-                                }
-
-                                ImportDetail detail = new ImportDetail(newImportId, medicineUnitId, quantity, price);
-                                if (importDAO.addImportDetail(detail)) {
-                                    itemsAdded++;
-                                } else {
-                                    detailErrors.append("Không thể thêm thuốc mã ").append(medicineIdStr)
-                                            .append(" vào database. ");
-                                }
-                            }
-                        } catch (NumberFormatException e) {
-                            detailErrors.append("Dữ liệu thuốc mã ").append(medicineIdStr).append(" không hợp lệ. ");
-                        }
-                    }
-                }
-
-                if (itemsAdded == 0) {
-                    importDAO.deleteImport(newImportId);
-                    request.setAttribute("error",
-                            "Lưu thất bại: " + (detailErrors.length() > 0 ? detailErrors.toString()
-                                    : "Vui lòng thêm ít nhất 1 loại thuốc hợp lệ"));
-                    showCreateForm(request, response);
-                    return;
-                }
-
-                double total = importDAO.calculateTotalAmount(newImportId);
-                imp.setTotalAmount(total);
-                importDAO.updateImport(imp);
-
-                if ("Đã duyệt".equals(status)) {
-                    List<ImportDetail> detailsToSync = importDAO.getImportDetails(newImportId);
-                    if (detailsToSync != null) {
-                        for (ImportDetail detail : detailsToSync) {
-                            applyStockChange(detail.getMedicineUnitId(), detail.getQuantity(), detail.getUnitPrice(),
-                                    true);
-                        }
-                    }
-                }
-
-                if (detailErrors.length() > 0) {
-                    request.getSession().setAttribute("message",
-                            "Phiếu nhập đã được tạo nhưng có một số mục lỗi: " + detailErrors.toString());
-                }
-                response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
-            } else {
-                request.setAttribute("error", "Không thể tạo phiếu nhập trên cơ sở dữ liệu. Vui lòng thử lại.");
-                showCreateForm(request, response);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi tạo phiếu nhập: " + e.getMessage());
             showCreateForm(request, response);
         }
     }
 
-    // Cập nhật phiếu nhập
-    private void updateImport(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        try {
-            int importId = getImportIdFromRequest(request);
-            if (importId == 0) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing Import ID");
-                return;
-            }
-
-            Import imp = importDAO.getImportById(importId);
-            String oldStatus = imp != null ? imp.getStatus() : null;
-            if (imp == null) {
-                request.setAttribute("error", "Không tìm thấy phiếu nhập");
-                listImports(request, response);
-                return;
-            }
-
-            String supplierInput = request.getParameter("supplierId");
-            int supplierId = parseOrLookupSupplierId(supplierInput);
-            if (supplierId > 0) {
-                imp.setSupplierId(supplierId);
-            }
-
-            String importerInput = request.getParameter("importerId");
-            int staffId = parseStaffId(importerInput);
-            if (staffId > 0) {
-                imp.setStaffId(staffId);
-            }
-
-            imp.setImportDate(parseDate(request.getParameter("importDate")));
-
-            String status = request.getParameter("status");
-            if (status != null && !status.isEmpty()) {
-                imp.setStatus(status);
-            }
-
-            Map<Integer, Map<String, String>> existingDetailsMap = new HashMap<>();
-            Map<Integer, Map<String, String>> newMedicinesMap = new HashMap<>();
-            Enumeration<String> paramNames = request.getParameterNames();
-
-            while (paramNames.hasMoreElements()) {
-                String paramName = paramNames.nextElement();
-                if (paramName.startsWith("newMedicines[")) {
-                    int startIdx = paramName.indexOf('[') + 1;
-                    int endIdx = paramName.indexOf(']');
-                    if (startIdx > 0 && endIdx > startIdx) {
-                        try {
-                            int index = Integer.parseInt(paramName.substring(startIdx, endIdx));
-                            String fieldName = paramName.substring(endIdx + 2);
-                            String value = request.getParameter(paramName);
-
-                            newMedicinesMap.putIfAbsent(index, new HashMap<>());
-                            newMedicinesMap.get(index).put(fieldName, value);
-                        } catch (NumberFormatException e) {
-                        }
-                    }
-                } else if (paramName.startsWith("existingDetails[")) {
-                    int startIdx = paramName.indexOf('[') + 1;
-                    int endIdx = paramName.indexOf(']');
-                    if (startIdx > 0 && endIdx > startIdx) {
-                        try {
-                            int detailId = Integer.parseInt(paramName.substring(startIdx, endIdx));
-                            String fieldName = paramName.substring(endIdx + 2);
-                            String value = request.getParameter(paramName);
-
-                            existingDetailsMap.putIfAbsent(detailId, new HashMap<>());
-                            existingDetailsMap.get(detailId).put(fieldName, value);
-                        } catch (NumberFormatException e) {
-                        }
-                    }
-                }
-            }
-
-            // Process existing details updates
-            List<ImportDetail> currentDetails = importDAO.getImportDetails(importId);
-            for (Map.Entry<Integer, Map<String, String>> entry : existingDetailsMap.entrySet()) {
-                int detailId = entry.getKey();
-                Map<String, String> data = entry.getValue();
-                String qStr = data.get("quantity");
-                String pStr = data.get("price");
-
-                if (qStr != null && pStr != null) {
-                    try {
-                        int newQty = (int) Double.parseDouble(qStr);
-                        double newPrice = Double.parseDouble(pStr);
-
-                        if (newQty <= 0 || newPrice <= 0 || newPrice > 100000000) {
-                            continue;
-                        }
-
-                        ImportDetail oldDetail = null;
-                        for (ImportDetail d : currentDetails) {
-                            if (d.getDetailId() == detailId) {
-                                oldDetail = d;
-                                break;
-                            }
-                        }
-
-                        if (oldDetail != null
-                                && (oldDetail.getQuantity() != newQty || oldDetail.getUnitPrice() != newPrice)) {
-                            // If status is Approved, adjust stock
-                            if ("Đã duyệt".equals(oldStatus)) {
-                                int diff = newQty - oldDetail.getQuantity();
-                                if (diff != 0) {
-                                    applyStockChange(oldDetail.getMedicineUnitId(), diff, 0, false);
-                                }
-                                if (Math.abs(newPrice - oldDetail.getUnitPrice()) > 0.0001) {
-                                    applyStockChange(oldDetail.getMedicineUnitId(), 0, newPrice, true);
-                                }
-                            }
-                            oldDetail.setQuantity(newQty);
-                            oldDetail.setUnitPrice(newPrice);
-                            importDAO.updateImportDetail(oldDetail);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            StringBuilder detailErrors = new StringBuilder();
-
-            for (Map<String, String> medicineData : newMedicinesMap.values()) {
-                String medicineIdStr = medicineData.get("medicineId");
-                String quantityStr = medicineData.get("quantity");
-                String priceStr = medicineData.get("price");
-
-                if (medicineIdStr != null && !medicineIdStr.isEmpty() &&
-                        quantityStr != null && !quantityStr.isEmpty() &&
-                        priceStr != null && !priceStr.isEmpty()) {
-                    try {
-                        int medicineId = Integer.parseInt(medicineIdStr);
-                        int unitId = Integer.parseInt(medicineData.getOrDefault("unitId", "0"));
-                        int quantity = (int) Double.parseDouble(quantityStr);
-                        double price = Double.parseDouble(priceStr);
-
-                        if (quantity <= 0 || price <= 0 || price > 100000000) {
-                            detailErrors.append("Số lượng hoặc đơn giá bỏ qua (không hợp lệ). ");
-                            continue;
-                        }
-
-                        if (medicineId > 0) {
-                            int medicineUnitId = -1;
-                            if (unitId > 0) {
-                                medicineUnitId = medicineUnitDAO.getMedicineUnitId(medicineId, unitId);
-                            }
-                            if (medicineUnitId <= 0) {
-                                models.MedicineUnit bu = medicineUnitDAO.getBaseUnit(medicineId);
-                                if (bu != null)
-                                    medicineUnitId = bu.getMedicineUnitId();
-                            }
-
-                            if (medicineUnitId > 0) {
-                                ImportDetail detail = new ImportDetail(importId, medicineUnitId, quantity, price);
-                                if (!importDAO.addImportDetail(detail)) {
-                                    detailErrors.append("Không thể thêm thuốc mới ID ").append(medicineId).append(". ");
-                                }
-                            }
-                        }
-                    } catch (NumberFormatException e) {
-                        detailErrors.append("Lỗi format thuốc mới. ");
-                    }
-                }
-            }
-
-            double total = importDAO.calculateTotalAmount(importId);
-            imp.setTotalAmount(total);
-
-            // Check if the import has at least 1 medicine
-            List<ImportDetail> updatedDetails = importDAO.getImportDetails(importId);
-            if (updatedDetails == null || updatedDetails.isEmpty()) {
-                request.setAttribute("error", "Phiếu nhập phải có ít nhất 1 loại thuốc");
-                request.setAttribute("importRecord", imp);
-                request.setAttribute("details", updatedDetails);
-                List<Medicine> medicines = importDAO.getAllMedicines();
-                request.setAttribute("medicines", medicines);
-                List<models.Supplier> suppliers = importDAO.getAllSuppliers();
-                request.setAttribute("suppliers", suppliers);
-                List<models.Category> categories = categoryDAO.getAllCategories();
-                request.setAttribute("categories", categories);
-                request.getRequestDispatcher(getImportView("edit", request)).forward(request, response);
-                return;
-            }
-
-            if (importDAO.updateImport(imp)) {
-                if (!"Đã duyệt".equals(oldStatus) && "Đã duyệt".equals(imp.getStatus())) {
-                    List<ImportDetail> detailsToSync = importDAO.getImportDetails(importId);
-                    if (detailsToSync != null) {
-                        for (ImportDetail detail : detailsToSync) {
-                            applyStockChange(detail.getMedicineUnitId(), detail.getQuantity(), detail.getUnitPrice(),
-                                    true);
-                        }
-                    }
-                } else if ("Đã duyệt".equals(oldStatus) && !"Đã duyệt".equals(imp.getStatus())) {
-                    // Status changed from Approved to Pending or other: Subtract stock
-                    List<ImportDetail> detailsToSync = importDAO.getImportDetails(importId);
-                    if (detailsToSync != null) {
-                        for (ImportDetail detail : detailsToSync) {
-                            applyStockChange(detail.getMedicineUnitId(), -detail.getQuantity(), 0, false);
-                        }
-                    }
-                }
-                response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
-            } else {
-                request.setAttribute("error", "Không thể cập nhật phiếu nhập");
-                request.setAttribute("importRecord", imp);
-                request.setAttribute("details", updatedDetails);
-                request.getRequestDispatcher(getImportView("edit", request)).forward(request, response);
-            }
-        } catch (
-
-        Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Lỗi khi cập nhật: " + e.getMessage());
-            listImports(request, response);
+    private void handleUpdate(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        if (importService.processUpdateImport(request)) {
+            response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
+        } else {
+            showEditForm(request, response);
         }
     }
 
-    // Xóa phiếu nhập
-    private void deleteImport(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    private void handleDeleteDetail(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        int detailId = Integer.parseInt(request.getParameter("detailId"));
         int importId = getImportIdFromRequest(request);
-        if (importId > 0) {
-            Import imp = importDAO.getImportById(importId);
-            if (imp != null && "Đã duyệt".equals(imp.getStatus())) {
-                request.setAttribute("error", "Không thể xóa phiếu nhập đã duyệt");
-                listImports(request, response);
-                return;
-            }
-            if (importDAO.deleteImport(importId)) {
-                response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
-                return;
-            }
+        if (importDAO.deleteImportDetail(detailId)) {
+            importDAO.updateImport(importDAO.getImportById(importId)); // Update total
         }
-        request.setAttribute("error", "Không thể xóa phiếu nhập");
+        response.sendRedirect(request.getContextPath() + "/admin/imports?action=edit&id=" + importId);
+    }
+
+    private void deleteImport(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        int importId = getImportIdFromRequest(request);
+        Import imp = importDAO.getImportById(importId);
+        if (imp != null && !"Đã duyệt".equals(imp.getStatus())) {
+            importDAO.deleteImport(importId);
+        } else {
+            request.setAttribute("error", "Không thể xóa phiếu đã duyệt");
+        }
         listImports(request, response);
     }
 
-    // Thêm chi tiết thuốc
-    private void addImportDetail(HttpServletRequest request, HttpServletResponse response)
+    // --- View Rendering ---
+
+    private void listImports(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            int importId = getImportIdFromRequest(request);
-            if (importId == 0) {
-                response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
-                return;
-            }
-
-            String medInput = request.getParameter("medicineCode");
-            int medicineId = parseOrLookupMedicineId(medInput);
-
-            if (medicineId == 0) {
-                request.setAttribute("error", "Mã thuốc không hợp lệ: " + medInput);
-                response.sendRedirect(request.getContextPath() + "/admin/imports?action=edit&id=" + importId);
-                return;
-            }
-
-            int quantity = Integer.parseInt(request.getParameter("quantity"));
-            double price = Double.parseDouble(request.getParameter("price"));
-            int unitId = Integer
-                    .parseInt(request.getParameter("unitId") != null ? request.getParameter("unitId") : "0");
-
-            int medicineUnitId = medicineUnitDAO.getMedicineUnitId(medicineId, unitId);
-            if (medicineUnitId <= 0) {
-                models.MedicineUnit bu = medicineUnitDAO.getBaseUnit(medicineId);
-                if (bu != null)
-                    medicineUnitId = bu.getMedicineUnitId();
-            }
-
-            if (medicineUnitId <= 0) {
-                request.setAttribute("error", "Không tìm thấy đơn vị phù hợp cho thuốc.");
-                response.sendRedirect(request.getContextPath() + "/admin/imports?action=edit&id=" + importId);
-                return;
-            }
-
-            ImportDetail detail = new ImportDetail(importId, medicineUnitId, quantity, price);
-            detail.recalculateTotal();
-
-            if (importDAO.addImportDetail(detail)) {
-                Import imp = importDAO.getImportById(importId);
-                double total = importDAO.calculateTotalAmount(importId);
-                imp.setTotalAmount(total);
-                importDAO.updateImport(imp);
-            }
-            response.sendRedirect(request.getContextPath() + "/admin/imports?action=edit&id=" + importId);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            int importId = getImportIdFromRequest(request);
-            if (importId > 0) {
-                response.sendRedirect(request.getContextPath() + "/admin/imports?action=edit&id=" + importId);
-            } else {
-                response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
-            }
-        }
+        request.setAttribute("imports", importDAO.getAllImports());
+        request.getRequestDispatcher(getImportView("list", request)).forward(request, response);
     }
 
-    // Xóa chi tiết thuốc
-    private void deleteImportDetail(HttpServletRequest request, HttpServletResponse response)
+    private void viewImport(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            int detailId = Integer.parseInt(request.getParameter("detailId"));
-            int importId = getImportIdFromRequest(request);
-
-            if (importId > 0) {
-                // Check if this is the last detail
-                List<ImportDetail> details = importDAO.getImportDetails(importId);
-                if (details != null && details.size() <= 1) {
-                    // Cannot delete if it's the last item
-                    request.setAttribute("error",
-                            "Phiếu nhập phải có ít nhất 1 loại thuốc. Không thể xóa chi tiết cuối cùng.");
-                    showEditForm(request, response);
-                    return;
-                } else if (details == null) {
-                    // DAO error
-                    request.setAttribute("error", "Lỗi khi lấy danh sách thuốc");
-                    showEditForm(request, response);
-                    return;
-                }
-            }
-
-            if (importDAO.deleteImportDetail(detailId)) {
-                if (importId > 0) {
-                    Import imp = importDAO.getImportById(importId);
-                    double total = importDAO.calculateTotalAmount(importId);
-                    imp.setTotalAmount(total);
-                    importDAO.updateImport(imp);
-                    response.sendRedirect(request.getContextPath() + "/admin/imports?action=edit&id=" + importId);
-                } else {
-                    response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
-                }
-            } else {
-                if (importId > 0) {
-                    response.sendRedirect(request.getContextPath() + "/admin/imports?action=edit&id=" + importId);
-                } else {
-                    response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/admin/imports?action=list");
-        }
+        int id = getImportIdFromRequest(request);
+        request.setAttribute("importRecord", importDAO.getImportById(id));
+        request.setAttribute("details", importDAO.getImportDetails(id));
+        request.getRequestDispatcher(getImportView("view", request)).forward(request, response);
     }
 
-    // Lấy danh sách chi tiết (AJAX)
+    private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setAttribute("newCode", importDAO.generateImportCode());
+        request.setAttribute("medicines", importDAO.getAllMedicines());
+        request.setAttribute("suppliers", importDAO.getAllSuppliers());
+        request.setAttribute("categories", categoryDAO.getAllCategories());
+        request.getRequestDispatcher(getImportView("create", request)).forward(request, response);
+    }
+
+    private void showEditForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        int id = getImportIdFromRequest(request);
+        Import imp = importDAO.getImportById(id);
+        if (imp == null || "Đã duyệt".equals(imp.getStatus())) {
+            listImports(request, response);
+            return;
+        }
+        request.setAttribute("importRecord", imp);
+        request.setAttribute("details", importDAO.getImportDetails(id));
+        request.setAttribute("medicines", importDAO.getAllMedicines());
+        request.setAttribute("suppliers", importDAO.getAllSuppliers());
+        request.setAttribute("categories", categoryDAO.getAllCategories());
+        request.getRequestDispatcher(getImportView("edit", request)).forward(request, response);
+    }
+
+    private void searchImports(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String keyword = request.getParameter("keyword");
+        request.setAttribute("imports", importDAO.searchImports(keyword));
+        request.setAttribute("keyword", keyword);
+        request.getRequestDispatcher(getImportView("list", request)).forward(request, response);
+    }
+
     private void getImportDetails(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int importId = getImportIdFromRequest(request);
-        if (importId > 0) {
-            List<ImportDetail> details = importDAO.getImportDetails(importId);
-            request.setAttribute("details", details);
-            request.getRequestDispatcher(getImportView("details", request)).forward(request, response);
+        int id = getImportIdFromRequest(request);
+        request.setAttribute("details", importDAO.getImportDetails(id));
+        request.getRequestDispatcher(getImportView("details", request)).forward(request, response);
+    }
+
+    private void createSupplierAjax(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        try {
+            String name = request.getParameter("supplierName");
+            models.Supplier s = new models.Supplier();
+            s.setSupplierName(name);
+            s.setSupplierAddress(request.getParameter("supplierAddress"));
+            s.setContactInfo(request.getParameter("contactInfo"));
+            if (supplierDAO.createSupplier(s)) {
+                response.getWriter().write("{\"success\": true, \"supplierId\": " + s.getSupplierId()
+                        + ", \"supplierName\": \"" + s.getSupplierName() + "\"}");
+            } else {
+                response.getWriter().write("{\"success\": false, \"message\": \"Lỗi DB\"}");
+            }
+        } catch (Exception e) {
+            response.getWriter().write("{\"success\": false, \"message\": \"" + e.getMessage() + "\"}");
         }
     }
 
-    // ================= HELPER METHODS ===============
     private int getImportIdFromRequest(HttpServletRequest request) {
-        String[] params = { "id", "code", "importCode", "importId" };
-        for (String param : params) {
-            String val = request.getParameter(param);
-            if (val != null && !val.isEmpty()) {
+        String[] params = { "id", "importId", "code" };
+        for (String p : params) {
+            String v = request.getParameter(p);
+            if (v != null && !v.isEmpty()) {
                 try {
-                    return Integer.parseInt(val);
-                } catch (NumberFormatException e) {
-                    if (val.toUpperCase().startsWith("IP")) {
+                    return Integer.parseInt(v);
+                } catch (Exception e) {
+                    if (v.toUpperCase().startsWith("IP")) {
                         try {
-                            return Integer.parseInt(val.substring(2));
-                        } catch (NumberFormatException ex) {
+                            return Integer.parseInt(v.substring(2));
+                        } catch (Exception ex) {
                         }
                     }
                 }
@@ -812,99 +260,10 @@ public class AdminImportController extends HttpServlet {
         return 0;
     }
 
-    private int parseOrLookupSupplierId(String input) {
-        if (input == null || input.isEmpty()) {
-            return 0;
-        }
-        try {
-            return Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            return importDAO.getSupplierIdByName(input);
-        }
-    }
-
-    private void applyStockChange(int medicineUnitId, int quantity, double pricePerUnit, boolean isSetPrice) {
-        models.MedicineUnit mu = medicineUnitDAO.getUnitById(medicineUnitId);
-        if (mu == null)
-            return;
-
-        int medicineId = mu.getMedicineId();
-        int convertedQty = quantity * mu.getConversionRate();
-
-        // Find base unit for correct stock update parameters
-        models.MedicineUnit baseUnit = medicineUnitDAO.getBaseUnit(medicineId);
-        int baseUnitId = (baseUnit != null) ? baseUnit.getUnitId() : 0;
-
-        if (isSetPrice) {
-            // Adjust original price: newPrice / conversionRate = price of 1 base unit
-            double baseUnitPrice = pricePerUnit;
-            medicineDAO.addQuantityAndSetOriginalPrice(medicineId, baseUnitId, convertedQty, baseUnitPrice);
-        } else {
-            medicineDAO.updateStockQuantity(medicineId, baseUnitId, convertedQty);
-        }
-    }
-
-    private int parseOrLookupMedicineId(String input) {
-        if (input == null || input.isEmpty()) {
-            return 0;
-        }
-        try {
-            return Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            return importDAO.getMedicineIdByCode(input);
-        }
-    }
-
-    private int parseStaffId(String input) {
-        if (input == null || input.isEmpty()) {
-            return 0;
-        }
-        try {
-            return Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            return importDAO.getStaffIdByCode(input);
-        }
-    }
-
-    private void createSupplierAjax(HttpServletRequest request, HttpServletResponse response)
+    private void handleException(Exception e, HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        try {
-            String name = request.getParameter("supplierName");
-            String address = request.getParameter("supplierAddress");
-            String contact = request.getParameter("contactInfo");
-
-            if (name == null || name.trim().isEmpty()) {
-                response.getWriter()
-                        .write("{\"success\": false, \"message\": \"Tên nhà cung cấp không được để trống\"}");
-                return;
-            }
-
-            models.Supplier supplier = new models.Supplier();
-            supplier.setSupplierName(name);
-            supplier.setSupplierAddress(address);
-            supplier.setContactInfo(contact);
-
-            if (supplierDAO.createSupplier(supplier)) {
-                response.getWriter().write("{\"success\": true, \"supplierId\": " + supplier.getSupplierId()
-                        + ", \"supplierName\": \"" + supplier.getSupplierName() + "\"}");
-            } else {
-                response.getWriter().write("{\"success\": false, \"message\": \"Không thể tạo nhà cung cấp\"}");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.getWriter().write("{\"success\": false, \"message\": \"Lỗi server: " + e.getMessage() + "\"}");
-        }
-    }
-
-    private Date parseDate(String dateStr) throws ParseException {
-        if (dateStr == null || dateStr.isEmpty()) {
-            return new Date(System.currentTimeMillis());
-        }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        java.util.Date date = sdf.parse(dateStr);
-        return new Date(date.getTime());
+        e.printStackTrace();
+        req.setAttribute("error", "Lỗi: " + e.getMessage());
+        listImports(req, resp);
     }
 }

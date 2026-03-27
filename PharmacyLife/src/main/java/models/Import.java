@@ -2,43 +2,15 @@ package models;
 
 import java.sql.Date;
 
-/**
- * Model đại diện cho bảng [Import] trong database.
- *
- * Schema:
- * - ImportId INT IDENTITY(1,1) PRIMARY KEY
- * - SupplierId INT NOT NULL
- * - StaffId INT NOT NULL
- * - ImportCreateAt DATETIME2
- * - TotalPrice DECIMAL(12,2) NOT NULL
- *
- * Một số field (supplierName, importerName) là thông tin join thêm để hiển thị.
- * Thuộc tính importCode được dùng làm mã hiển thị (ví dụ: IP001) nhưng
- * không được lưu trong database; ta có thể sinh từ ImportId nếu cần.
- */
 public class Import {
-
-    // Khóa chính thực trong DB
     private int importId;
-
-    // Mã hiển thị (không mapping cột, có thể sinh từ importId)
     private String importCode;
-
-    // Khóa ngoại tới Supplier
     private int supplierId;
     private String supplierName;
-
-    // Khóa ngoại tới Staff (người nhập)
     private int staffId;
     private String staffName;
-
-    // Ngày/giờ nhập (map với ImportCreateAt)
     private Date importDate;
-
-    // Tổng tiền (map với TotalPrice)
     private double totalAmount;
-
-    // Trạng thái phiếu nhập (ImportStatus)
     private String importStatus;
 
     public Import() {
@@ -54,8 +26,6 @@ public class Import {
         this.importDate = importDate;
         this.totalAmount = totalAmount;
     }
-
-    // Getters & Setters
 
     public int getImportId() {
         return importId;
