@@ -12,10 +12,8 @@ import utils.DBContext;
 
 public class RevenueDAO {
     public double getActualReceived(Date from, Date to) throws SQLException {
-        String sql = "SELECT ISNULL(SUM(TotalAmount),0) FROM [Order] WHERE LOWER(Status) IN ('delivered', N'đã giao', N'đã giao hàng', 'completed', N'hoàn thành', N'giao hàng thành công', N'đã hoàn thành')";
-        if (from != null && to != null) {
-            sql += " AND CAST(OrderDate AS DATE) BETWEEN ? AND ?";
-        }
+        String sql = "SELECT ISNULL(SUM(TotalAmount),0) FROM [Order] WHERE LOWER(Status) IN ('delivered', N'đã giao', N'đã giao hàng', 'completed', N'hoàn thành', N'giao hàng thành công', N'đã hoàn thành', 'success')";
+        sql = addDateFilter(sql, from, to);
         DBContext db = new DBContext();
         try (Connection conn = db.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -28,18 +26,28 @@ public class RevenueDAO {
     }
 
     private void setDateParameters(PreparedStatement ps, Date from, Date to, int startIndex) throws SQLException {
-        if (from != null && to != null) {
-            ps.setDate(startIndex, from);
-            ps.setDate(startIndex + 1, to);
+        int idx = startIndex;
+        if (from != null) {
+            ps.setDate(idx++, from);
+        }
+        if (to != null) {
+            ps.setDate(idx++, to);
         }
     }
 
-    public int getTotalOrders(Date from, Date to) throws SQLException {
-
-        String sql = "SELECT COUNT(*) FROM [Order] WHERE 1=1";
-        if (from != null && to != null) {
-            sql += " AND CAST(OrderDate AS DATE) BETWEEN ? AND ?";
+    private String addDateFilter(String sql, Date from, Date to) {
+        if (from != null) {
+            sql += " AND CAST(OrderDate AS DATE) >= ? ";
         }
+        if (to != null) {
+            sql += " AND CAST(OrderDate AS DATE) <= ? ";
+        }
+        return sql;
+    }
+
+    public int getTotalOrders(Date from, Date to) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM [Order] WHERE 1=1";
+        sql = addDateFilter(sql, from, to);
         DBContext db = new DBContext();
         try (Connection conn = db.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -52,10 +60,8 @@ public class RevenueDAO {
     }
 
     public double getTotalRevenue(Date from, Date to) throws SQLException {
-        String sql = "SELECT ISNULL(SUM(TotalAmount),0) FROM [Order] WHERE Status NOT IN ('Cancelled', N'Đã hủy')";
-        if (from != null && to != null) {
-            sql += " AND CAST(OrderDate AS DATE) BETWEEN ? AND ?";
-        }
+        String sql = "SELECT ISNULL(SUM(TotalAmount),0) FROM [Order] WHERE LOWER(Status) NOT IN ('cancelled', N'đã hủy')";
+        sql = addDateFilter(sql, from, to);
         DBContext db = new DBContext();
         try (Connection conn = db.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -69,10 +75,8 @@ public class RevenueDAO {
 
     public double getTotalDebt(Date from, Date to) throws SQLException {
         // Số còn phải thu: Chờ xử lý, Đã xác nhận, Đang giao hàng
-        String sql = "SELECT ISNULL(SUM(TotalAmount),0) FROM [Order] WHERE Status IN ('Pending', N'Chờ xử lý', 'Confirmed', N'Đã xác nhận', 'Shipping', N'Đang giao hàng')";
-        if (from != null && to != null) {
-            sql += " AND CAST(OrderDate AS DATE) BETWEEN ? AND ?";
-        }
+        String sql = "SELECT ISNULL(SUM(TotalAmount),0) FROM [Order] WHERE LOWER(Status) IN ('pending', N'chờ xử lý', 'confirmed', N'đã xác nhận', 'shipping', N'đang giao', N'đang giao hàng', 'processing')";
+        sql = addDateFilter(sql, from, to);
         DBContext db = new DBContext();
         try (Connection conn = db.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -85,10 +89,8 @@ public class RevenueDAO {
     }
 
     public double getAverageOrderValue(Date from, Date to) throws SQLException {
-        String sql = "SELECT ISNULL(AVG(TotalAmount),0) FROM [Order] WHERE LOWER(Status) IN ('delivered', N'đã giao', N'đã giao hàng', 'completed', N'hoàn thành', N'giao hàng thành công', N'đã hoàn thành')";
-        if (from != null && to != null) {
-            sql += " AND CAST(OrderDate AS DATE) BETWEEN ? AND ?";
-        }
+        String sql = "SELECT ISNULL(AVG(TotalAmount),0) FROM [Order] WHERE LOWER(Status) IN ('delivered', N'đã giao', N'đã giao hàng', 'completed', N'hoàn thành', N'giao hàng thành công', N'đã hoàn thành', 'success')";
+        sql = addDateFilter(sql, from, to);
         DBContext db = new DBContext();
         try (Connection conn = db.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -102,9 +104,7 @@ public class RevenueDAO {
 
     public Map<String, Integer> getOrderStatusStatistics(Date from, Date to) throws SQLException {
         String sql = "SELECT Status, COUNT(*) AS Count FROM [Order] WHERE 1=1";
-        if (from != null && to != null) {
-            sql += " AND CAST(OrderDate AS DATE) BETWEEN ? AND ?";
-        }
+        sql = addDateFilter(sql, from, to);
         sql += " GROUP BY Status";
         Map<String, Integer> stats = new HashMap<>();
 
@@ -154,10 +154,8 @@ public class RevenueDAO {
                 + "JOIN MedicineUnit mu ON oi.MedicineUnitId = mu.MedicineUnitId "
                 + "JOIN Medicine m ON mu.MedicineId = m.MedicineId "
                 + "CROSS APPLY (SELECT MAX(ConversionRate) as MaxRate FROM MedicineUnit WHERE MedicineId = m.MedicineId) max_mu "
-                + "WHERE o.Status NOT IN ('Cancelled', N'Đã hủy') ";
-        if (from != null && to != null) {
-            sql += " AND CAST(o.OrderDate AS DATE) BETWEEN ? AND ? ";
-        }
+                + "WHERE LOWER(o.Status) NOT IN ('cancelled', N'đã hủy') ";
+        sql = addDateFilter(sql, from, to);
         sql += "GROUP BY m.MedicineId, m.MedicineName, max_mu.MaxRate " +
                 "ORDER BY SUM(oi.OrderQuantity * oi.UnitPrice) DESC, SUM(oi.OrderQuantity * ISNULL(mu.ConversionRate, 1)) DESC";
 
@@ -180,10 +178,8 @@ public class RevenueDAO {
                 + " c.FullName, COUNT(o.OrderId) as OrderCount, SUM(o.TotalAmount) as TotalSpent " +
                 "FROM [Order] o "
                 + "JOIN Customer c ON o.CustomerId = c.CustomerId "
-                + "WHERE o.Status NOT IN ('Cancelled', N'Đã hủy') ";
-        if (from != null && to != null) {
-            sql += " AND CAST(o.OrderDate AS DATE) BETWEEN ? AND ? ";
-        }
+                + "WHERE LOWER(o.Status) NOT IN ('cancelled', N'đã hủy') ";
+        sql = addDateFilter(sql, from, to);
         sql += "GROUP BY c.CustomerId, c.FullName " +
                 "ORDER BY SUM(o.TotalAmount) DESC, COUNT(o.OrderId) DESC";
 
