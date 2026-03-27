@@ -152,74 +152,71 @@
                             <!-- Top Lists Section -->
                             <div class="row gap-24 mt-4">
                                 <!-- Top Products -->
-                                <div class="col-12 col-xl-6 d-flex flex-column">
-                                    <div class="section-title mt-0" style="color: #27ae60;"><i
-                                            class="fas fa-capsules me-2"></i>Top 5 Sản phẩm bán chạy nhất</div>
-                                    <div class="table-responsive bg-white rounded shadow-sm p-3 border-0 flex-grow-1">
-                                        <table class="table table-hover align-middle mb-0"
-                                            style="table-layout: fixed; width: 100%;">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th style="width: 50%;">Tên thuốc</th>
-                                                    <th class="text-center" style="width: 20%;">SL bán</th>
-                                                    <th class="text-end" style="width: 30%;">Doanh thu</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <c:forEach var="p" items="${topProducts}">
+                                <div class="col-12 col-xl-6">
+                                    <div class="revenue-card">
+                                        <div class="section-title text-success"><i class="fas fa-capsules me-2"></i>Top 5 Sản phẩm bán chạy nhất</div>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle">
+                                                <thead>
                                                     <tr>
-                                                        <td class="fw-semibold text-primary">${p.medicineName}</td>
-                                                        <td class="text-center">${p.totalQuantity}</td>
-                                                        <td class="text-end text-success fw-bold">
-                                                            <fmt:formatNumber value="${p.totalRevenue}"
-                                                                maxFractionDigits="0" /> ₫
-                                                        </td>
+                                                        <th style="width: 50%;">Tên thuốc</th>
+                                                        <th class="text-center" style="width: 20%;">SL bán (Hộp)</th>
+                                                        <th class="text-end" style="width: 30%;">Doanh thu</th>
                                                     </tr>
-                                                </c:forEach>
-                                                <c:if test="${empty topProducts}">
-                                                    <tr>
-                                                        <td colspan="3" class="text-center text-muted py-3">Không có số
-                                                            liệu</td>
-                                                    </tr>
-                                                </c:if>
-                                            </tbody>
-                                        </table>
+                                                </thead>
+                                                <tbody>
+                                                    <c:forEach var="p" items="${topProducts}">
+                                                        <tr>
+                                                            <td class="fw-semibold text-primary">${p.medicineName}</td>
+                                                            <td class="text-center">
+                                                                <fmt:formatNumber value="${p.totalQuantity}" maxFractionDigits="1" />
+                                                            </td>
+                                                            <td class="text-end text-success fw-bold">
+                                                                <fmt:formatNumber value="${p.totalRevenue}" maxFractionDigits="0" /> ₫
+                                                            </td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                    <c:if test="${empty topProducts}">
+                                                        <tr>
+                                                            <td colspan="3" class="text-center text-muted py-3">Không có số liệu</td>
+                                                        </tr>
+                                                    </c:if>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- Top Customers -->
-                                <div class="col-12 col-xl-6 d-flex flex-column">
-                                    <div class="section-title mt-0" style="color: #e74c3c;"><i
-                                            class="fas fa-user-tag me-2"></i>Top 5 Khách hàng mua nhiều nhất</div>
-                                    <div class="table-responsive bg-white rounded shadow-sm p-3 border-0 flex-grow-1">
-                                        <table class="table table-hover align-middle mb-0"
-                                            style="table-layout: fixed; width: 100%;">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th style="width: 50%;">Khách hàng</th>
-                                                    <th class="text-center" style="width: 20%;">Số đơn</th>
-                                                    <th class="text-end" style="width: 30%;">Tiền đã mua</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <c:forEach var="c" items="${topCustomers}">
+                                <div class="col-12 col-xl-6">
+                                    <div class="revenue-card">
+                                        <div class="section-title text-danger"><i class="fas fa-user-tag me-2"></i>Top 5 Khách hàng mua nhiều nhất</div>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle">
+                                                <thead>
                                                     <tr>
-                                                        <td class="fw-semibold">${c.customerName} <i
-                                                                class="fas fa-crown text-warning ms-1"></i></td>
-                                                        <td class="text-center">${c.orderCount}</td>
-                                                        <td class="text-end text-success fw-bold">
-                                                            <fmt:formatNumber value="${c.totalSpent}"
-                                                                maxFractionDigits="0" /> ₫
-                                                        </td>
+                                                        <th style="width: 50%;">Khách hàng</th>
+                                                        <th class="text-center" style="width: 20%;">Số đơn</th>
+                                                        <th class="text-end" style="width: 30%;">Tiền đã mua</th>
                                                     </tr>
-                                                </c:forEach>
-                                                <c:if test="${empty topCustomers}">
-                                                    <tr>
-                                                        <td colspan="3" class="text-center text-muted py-3">Không có số
-                                                            liệu</td>
-                                                    </tr>
-                                                </c:if>
-                                            </tbody>
-                                        </table>
+                                                </thead>
+                                                <tbody>
+                                                    <c:forEach var="c" items="${topCustomers}">
+                                                        <tr>
+                                                            <td class="fw-semibold">${c.customerName} <i class="fas fa-crown text-warning ms-1"></i></td>
+                                                            <td class="text-center">${c.orderCount}</td>
+                                                            <td class="text-end text-success fw-bold">
+                                                                <fmt:formatNumber value="${c.totalSpent}" maxFractionDigits="0" /> ₫
+                                                            </td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                    <c:if test="${empty topCustomers}">
+                                                        <tr>
+                                                            <td colspan="3" class="text-center text-muted py-3">Không có số liệu</td>
+                                                        </tr>
+                                                    </c:if>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

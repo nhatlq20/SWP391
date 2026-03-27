@@ -100,6 +100,7 @@
                                             <thead>
                                                 <tr>
                                                     <th class="ps-4">Sản phẩm</th>
+                                                    <th class="text-center">Đơn vị</th>
                                                     <th class="text-center">Đơn giá</th>
                                                     <th class="text-center">Số lượng</th>
                                                     <th class="text-end pe-4">Thành tiền</th>
@@ -123,6 +124,7 @@
                                                                 </div>
                                                             </div>
                                                         </td>
+                                                        <td class="text-center">${item.unitName}</td>
                                                         <td class="text-center"
                                                             style="white-space: nowrap; min-width: 100px;">
                                                             <fmt:formatNumber value="${item.unitPrice}" type="number"
@@ -139,7 +141,7 @@
                                             </tbody>
                                             <tfoot style="background-color: #f9fafb;">
                                                 <tr>
-                                                    <td colspan="3" class="text-end fw-bold py-2">Giá gốc:</td>
+                                                    <td colspan="4" class="text-end fw-bold py-2">Giá gốc:</td>
                                                     <td class="text-end fw-bold py-2 pe-4" style="white-space: nowrap;">
                                                         <fmt:formatNumber
                                                             value="${order.totalAmount + order.discountAmount}"
@@ -148,7 +150,7 @@
                                                 </tr>
                                                 <c:if test="${order.discountAmount > 0}">
                                                     <tr>
-                                                        <td colspan="3" class="text-end fw-bold py-2 text-danger">
+                                                        <td colspan="4" class="text-end fw-bold py-2 text-danger">
                                                             Mã Voucher <c:if test="${not empty order.voucher}">
                                                                 (${order.voucher.voucherCode})</c:if>:
                                                         </td>
@@ -161,7 +163,7 @@
                                                     </tr>
                                                 </c:if>
                                                 <tr style="border-top: 2px solid #e5e7eb;">
-                                                    <td colspan="3" class="text-end fw-bold py-3 fs-5">Tổng cộng:</td>
+                                                    <td colspan="4" class="text-end fw-bold py-3 fs-5">Tổng cộng:</td>
                                                     <td class="text-end fs-5 fw-bold py-3 pe-4 text-primary"
                                                         style="white-space: nowrap;">
                                                         <fmt:formatNumber value="${order.totalAmount}" type="number"

@@ -141,6 +141,7 @@
                                                 <th
                                                     style="border-top-left-radius: 12px; border-bottom-left-radius: 12px;">
                                                     Sản phẩm</th>
+                                                <th class="text-center">Đơn vị</th>
                                                 <th class="text-center">Đơn giá</th>
                                                 <th class="text-center">Số lượng</th>
                                                 <th class="text-end"
@@ -165,6 +166,7 @@
                                                             </div>
                                                         </div>
                                                     </td>
+                                                    <td class="text-center">${item.unitName}</td>
                                                     <td class="text-center">
                                                         <fmt:formatNumber value="${item.unitPrice}" type="currency"
                                                             currencySymbol="₫" maxFractionDigits="0" />
@@ -179,7 +181,7 @@
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <td colspan="3" class="text-end pt-4 border-0">
+                                                <td colspan="4" class="text-end pt-4 border-0">
                                                     <span class="total-label"
                                                         style="font-size: 0.95rem; color: #6b7280;">Giá gốc:</span>
                                                 </td>
@@ -193,7 +195,7 @@
                                             </tr>
                                             <c:if test="${order.discountAmount > 0}">
                                                 <tr>
-                                                    <td colspan="3" class="text-end pt-2 border-0">
+                                                    <td colspan="4" class="text-end pt-2 border-0">
                                                         <span class="total-label text-danger"
                                                             style="font-size: 0.95rem;">
                                                             Mã Voucher <c:if test="${not empty order.voucher}">
@@ -211,7 +213,7 @@
                                                 </tr>
                                             </c:if>
                                             <tr>
-                                                <td colspan="3" class="text-end pt-2 border-0">
+                                                <td colspan="4" class="text-end pt-2 border-0">
                                                     <span class="total-label"
                                                         style="font-size: 1.1rem; color: var(--text-slate); font-weight: 700;">Tổng
                                                         cộng:</span>
