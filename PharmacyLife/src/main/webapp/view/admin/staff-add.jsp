@@ -85,7 +85,7 @@
                                                     <i class="fas fa-phone me-1"></i> Số điện thoại
                                                 </label>
                                                 <input type="text" id="staffPhone" name="staffPhone"
-                                                    placeholder="Số điện thoại" class="form-control">
+                                                    placeholder="Số điện thoại" required class="form-control">
                                             </div>
                                         </div>
 
@@ -94,7 +94,7 @@
                                                 <label for="staffDob" class="form-label">
                                                     <i class="fas fa-calendar-alt me-1"></i> Ngày sinh
                                                 </label>
-                                                <input type="date" id="staffDob" name="staffDob" class="form-control">
+                                                <input type="date" id="staffDob" name="staffDob" required class="form-control">
                                             </div>
                                         </div>
 

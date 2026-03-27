@@ -211,6 +211,16 @@ public class StaffController extends HttpServlet {
                         return;
                     }
 
+                    if (staffPhone == null || staffPhone.trim().isEmpty()) {
+                        forwardAddWithError(request, response, "Vui lòng nhập số điện thoại nhân viên!", staffName, staffEmail);
+                        return;
+                    }
+
+                    if (staffDobStr == null || staffDobStr.isEmpty()) {
+                        forwardAddWithError(request, response, "Vui lòng chọn ngày sinh nhân viên!", staffName, staffEmail);
+                        return;
+                    }
+
                     RoleDAO roleDao = new RoleDAO();
                     Integer roleId = roleDao.getRoleIdByName("Staff");
 
