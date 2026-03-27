@@ -16,10 +16,7 @@ import jakarta.servlet.http.HttpSession;
 import models.Import;
 import models.ImportDetail;
 
-/**
- * Service class for handling Business Logic related to Pharmacy Imports.
- * This class takes the logic weight off the AdminImportController.
- */
+
 public class ImportService {
 
     private final ImportDAO importDAO;
@@ -32,13 +29,11 @@ public class ImportService {
         this.medicineUnitDAO = new MedicineUnitDAO();
     }
 
-    /**
-     * Logic to create a new Pharmacy Import with multiple medicine details.
-     */
+ 
     public boolean processCreateImport(HttpServletRequest request) throws Exception {
         Import imp = new Import();
 
-        // 1. Resolve Supplier
+
         String supplierInput = request.getParameter("supplierId");
         int supplierId = parseOrLookupSupplierId(supplierInput);
         if (supplierId == 0) {
@@ -48,7 +43,7 @@ public class ImportService {
         imp.setSupplierId(supplierId);
         imp.setImportDate(parseDate(request.getParameter("importDate")));
 
-        // 2. Resolve Staff
+
         HttpSession session = request.getSession();
         int staffId = getStaffIdFromSessionOrRequest(session, request.getParameter("importerId"));
         if (staffId == 0) {
@@ -65,7 +60,6 @@ public class ImportService {
         }
         imp.setStatus(status);
 
-        // 3. Create Import Header
         if (importDAO.createImport(imp)) {
             int newImportId = imp.getImportId();
             int itemsAdded = 0;
@@ -86,7 +80,7 @@ public class ImportService {
                 return false;
             }
 
-            // 4. Update total and sync stock if approved
+
             double total = importDAO.calculateTotalAmount(newImportId);
             imp.setTotalAmount(total);
             importDAO.updateImport(imp);
@@ -104,9 +98,7 @@ public class ImportService {
         return false;
     }
 
-    /**
-     * Logic to update an existing Pharmacy Import and its details.
-     */
+   
     public boolean processUpdateImport(HttpServletRequest request) throws Exception {
         int importId = parseId(request.getParameter("id"));
         if (importId == 0)
@@ -123,7 +115,7 @@ public class ImportService {
 
         String oldStatus = imp.getStatus();
 
-        // 1. Update basic info
+
         imp.setSupplierId(parseOrLookupSupplierId(request.getParameter("supplierId")));
         imp.setStaffId(parseStaffId(request.getParameter("importerId")));
         imp.setImportDate(parseDate(request.getParameter("importDate")));
@@ -133,7 +125,7 @@ public class ImportService {
             imp.setStatus(newStatus);
         }
 
-        // 2. Process existing details update & new details addition
+
         Map<Integer, Map<String, String>> existingDetailsMap = parseMedicinesFromRequest(request, "existingDetails[");
         Map<Integer, Map<String, String>> newMedicinesMap = parseMedicinesFromRequest(request, "newMedicines[");
 
@@ -144,7 +136,7 @@ public class ImportService {
             processSingleImportDetail(importId, medicineData, detailErrors);
         }
 
-        // 3. Recalculate and Save
+
         double total = importDAO.calculateTotalAmount(importId);
         imp.setTotalAmount(total);
 
@@ -155,7 +147,6 @@ public class ImportService {
         return false;
     }
 
-    // --- Private Helper Methods (Extracted Logic) ---
 
     private boolean processSingleImportDetail(int importId, Map<String, String> medicineData, StringBuilder errors) {
         try {

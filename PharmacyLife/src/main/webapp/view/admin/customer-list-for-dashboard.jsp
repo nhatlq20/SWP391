@@ -27,9 +27,6 @@
                                 <input type="text" id="customerSearchInput" placeholder="Tìm tên khách hàng, email..."
                                     oninput="filterTable()">
                             </div>
-                            <button class="btn-action btn-view" title="Lọc" style="width:40px;height:40px;">
-                                <i class="fas fa-filter"></i>
-                            </button>
                         </div>
                     </div>
 
@@ -91,7 +88,7 @@
                                                         style="width:14px"></i> ${c.phone}</div>
                                             </td>
                                             <td>
-                                                <div class="desc" style="-webkit-line-clamp: 2;">${c.address}</div>
+                                                <div class="desc" style="-webkit-line-clamp: 2; line-clamp: 2;">${c.address}</div>
                                             </td>
                                             <td>
                                                 <c:choose>

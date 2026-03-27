@@ -28,9 +28,6 @@
                                 <input type="text" id="orderSearchInput" placeholder="Tìm mã đơn, khách hàng..."
                                     oninput="filterTable()">
                             </div>
-                            <button class="btn-action btn-view" title="Lọc" style="width:40px;height:40px;">
-                                <i class="fas fa-filter"></i>
-                            </button>
                         </div>
                     </div>
 
