@@ -433,7 +433,10 @@
                                                 style="max-width: 130px; overflow: hidden;">
                                                 <button type="button" class="btn btn-light px-3"
                                                     onclick="decreaseQty()">−</button>
-                                                <input type="text" id="quantity" value="1" min="1"
+                                                <input type="text" id="quantity" value="1" min="1" inputmode="numeric"
+                                                    oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value === '0') this.value = '1';"
+                                                    onblur="if(this.value === '' || parseInt(this.value) < 1) this.value = '1';"
+                                                    onkeydown="if(['-', '+', '.', 'e', ' '].includes(event.key)) event.preventDefault();"
                                                     class="form-control text-center border-0 shadow-none qty-input">
                                                 <button type="button" class="btn btn-light px-3"
                                                     onclick="increaseQty()">+</button>
@@ -701,7 +704,13 @@
                                         const currentUserType = '${sessionScope.userType}';
                                         if (currentUserType === 'staff' || currentUserType === 'admin') return;
 
-                                        const qty = document.getElementById('quantity').value;
+                                        let qtyInput = document.getElementById('quantity');
+                                        let qty = qtyInput.value;
+                                        if (qty === '' || parseInt(qty) < 1) {
+                                            qty = '1';
+                                            qtyInput.value = '1';
+                                        }
+
                                         const mainImg = document.querySelector('.main-img');
                                         const muid = document.getElementById('formMuid').value;
 
